@@ -26,7 +26,7 @@ public class TildeETranslate {
 
 
 	@RequestMapping("/e-translate/tilde")
-	public ResponseEntity<String> greeting(
+	public ResponseEntity<String> tildeTranslate(
 			@RequestParam(value = "input", defaultValue = "") String input) {
 		
 		if( input == null || input.trim().length() == 0 ){
