@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>conversion</artifactId>
-			<version>0.0.1-Snapshot</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
