@@ -4,10 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -31,8 +35,7 @@ public class TildeETranslate extends BaseRestController {
 	private String appId;
 
 	private String endpoint = "https://letsmt.eu/ws/Service.svc/json/Translate?appid={appid}&systemid={systemid}&text={text}";
-	private String contentType = "application/rdf-xml";
-
+	
 	@RequestMapping("/e-translate/tilde")
 	public ResponseEntity<String> tildeTranslate(
 			@RequestParam(value = "input") String input,
@@ -41,7 +44,8 @@ public class TildeETranslate extends BaseRestController {
 			@RequestParam(value = "source-lang") String sourceLang,
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "translation-system-id") String translationSystemId,
-			@RequestParam(value = "domain", defaultValue = "") String domain) {
+			@RequestParam(value = "domain", defaultValue = "") String domain,
+			@RequestHeader("Accept") String acceptHeader ) {
 
 		// input validation - validation for required parameters is done by
 		// spring mvc
@@ -57,6 +61,9 @@ public class TildeETranslate extends BaseRestController {
 
 		// extract plaintext
 		String plaintext = null;
+		Model model = ModelFactory.createDefaultModel();
+		Resource sourceResource = null;
+		
 		if (inputType.equals("INPUT_TYPE_NIF")) {
 			// TODO validate NIF
 			// TODO extract plaintext + provenance information from NIF
@@ -66,6 +73,7 @@ public class TildeETranslate extends BaseRestController {
 			plaintext = "";
 		} else {
 			plaintext = input;
+			sourceResource = rdfConversionService.plaintextToRDF(model, plaintext, sourceLang);
 		}
 
 		// send request to tilde mt
@@ -76,7 +84,7 @@ public class TildeETranslate extends BaseRestController {
 					.routeParam("systemid", translationSystemId)
 					.routeParam("text", plaintext)
 					.header("client-id", clientId)
-					.header("Content-type", contentType).asString();
+					.header("Content-type", "application/rdf-xml").asString();
 
 			if (response.getStatus() != HttpStatus.OK.value()) {
 				return externalServiceFailedResponse();
@@ -92,7 +100,16 @@ public class TildeETranslate extends BaseRestController {
 		} catch (UnirestException e) {
 			return externalServiceFailedResponse();
 		}
-		return new ResponseEntity<String>(translation, HttpStatus.OK);
+		
+		rdfConversionService.addTranslation(translation, sourceResource, targetLang);
+		
+		System.err.println(acceptHeader);
+		
+		// get output format
+		RDFConversionService.RDFSerialization outputFormat = getOutputSerialization(acceptHeader);
+		String serialization = rdfConversionService.serializeRDF(model, outputFormat);
+		
+		return new ResponseEntity<String>(serialization, HttpStatus.OK);
 	}
 
 	public RDFConversionService getRdfConversionService() {
