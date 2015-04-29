@@ -103,8 +103,6 @@ public class TildeETranslate extends BaseRestController {
 		
 		rdfConversionService.addTranslation(translation, sourceResource, targetLang);
 		
-		System.err.println(acceptHeader);
-		
 		// get output format
 		RDFConversionService.RDFSerialization outputFormat = getOutputSerialization(acceptHeader);
 		String serialization = rdfConversionService.serializeRDF(model, outputFormat);
