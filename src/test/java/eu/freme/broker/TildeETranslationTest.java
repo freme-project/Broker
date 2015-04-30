@@ -17,6 +17,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.GetRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 
 public class TildeETranslationTest {
 
@@ -34,7 +35,7 @@ public class TildeETranslationTest {
 		assertTrue(createBaseRequest().asString().getStatus() == HttpStatus.OK
 				.value());
 
-		//TODO add NIF validator here
+		// TODO add NIF validator here
 	}
 
 	/**
@@ -42,7 +43,7 @@ public class TildeETranslationTest {
 	 * 
 	 * @return
 	 */
-	private GetRequest createBaseRequest() {
+	private HttpRequestWithBody createBaseRequest() {
 		String input = "hello world";
 		String inputType = "plaintext";
 		String clientId = "u-bd13faca-b816-4085-95d5-05373d695ab7";
@@ -51,7 +52,7 @@ public class TildeETranslationTest {
 		String translationSystemId = "smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813";
 
 		return Unirest
-				.get(baseUrl
+				.post(baseUrl
 						+ "e-translate/tilde?input={input}&input-type={inputType}&client-id={clientId}&source-lang={sourceLang}&target-lang={targetLang}&translation-system-id={translationSystemId}")
 				.routeParam("input", input).routeParam("inputType", inputType)
 				.routeParam("clientId", clientId)
