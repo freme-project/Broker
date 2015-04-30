@@ -1,0 +1,11 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
+@prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .
+
+<http://example.org/document/1#char=0,17>
+    a nif:String , nif:Context , nif:RFC5147String ;
+    nif:isString "text to translate"@en;
+    itsrdf:translate "yes" ;
+    nif:beginIndex "0"^^xsd:nonNegativeInteger;
+    nif:endIndex "17"^^xsd:nonNegativeInteger;
+    nif:sourceUrl <http://differentday.blogspot.com/2007_01_01_archive.html> .

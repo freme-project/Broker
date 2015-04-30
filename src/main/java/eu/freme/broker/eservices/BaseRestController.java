@@ -8,25 +8,26 @@ import org.springframework.http.ResponseEntity;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
+import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConversionService;
 
 public class BaseRestController {
 
 	// see https://jena.apache.org/documentation/io/rdf-input.html for a list of
 	// http accept headers
-	private HashMap<String, RDFConversionService.RDFSerialization> rdfFormats;
-	private final RDFConversionService.RDFSerialization defaultRDFOutputFormat = RDFConversionService.RDFSerialization.JSON_LD;
+	private HashMap<String, RDFConstants.RDFSerialization> rdfFormats;
+	private final RDFConstants.RDFSerialization defaultRDFOutputFormat = RDFConstants.RDFSerialization.JSON_LD;
 	final String inputTypePlaintext = "plaintext";
 	
 	@Autowired
 	RDFConversionService rdfConversionService;
 
 	public BaseRestController() {
-		rdfFormats = new HashMap<String, RDFConversionService.RDFSerialization>();
+		rdfFormats = new HashMap<String, RDFConstants.RDFSerialization>();
 		rdfFormats.put("text/turtle",
-				RDFConversionService.RDFSerialization.TURTLE);
+				RDFConstants.RDFSerialization.TURTLE);
 		rdfFormats.put("application/ld+json",
-				RDFConversionService.RDFSerialization.JSON_LD);
+				RDFConstants.RDFSerialization.JSON_LD);
 	}
 
 	/**
@@ -48,7 +49,7 @@ public class BaseRestController {
 	 * @param acceptHeader
 	 * @return
 	 */
-	protected RDFConversionService.RDFSerialization getOutputSerialization(
+	protected RDFConstants.RDFSerialization getOutputSerialization(
 			String acceptHeader) {
 
 		if (rdfFormats.containsKey(acceptHeader)) {
@@ -68,7 +69,7 @@ public class BaseRestController {
 	 */
 	protected Model unserializeNIF(String rdf, String inputFormat)
 			throws Exception {
-		RDFConversionService.RDFSerialization format = rdfFormats
+		RDFConstants.RDFSerialization format = rdfFormats
 				.get(inputFormat);
 		if (format == null) {
 			throw new RuntimeException("Unknown format: " + inputFormat);

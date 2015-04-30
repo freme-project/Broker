@@ -18,6 +18,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 import eu.freme.conversion.etranslate.TranslationConversionService;
+import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConversionService;
 
 @RestController
@@ -62,8 +63,14 @@ public class TildeETranslation extends BaseRestController {
 		if (!inputType.equals(inputTypePlaintext)) {
 			try {
 				model = unserializeNIF(input, inputType);
-				// TODO: Extract plaintext from RDF
-				plaintext = "";
+				plaintext = translationConversionService
+						.extractTextToTranslate(model);
+				
+				if( plaintext == null ){
+					return new ResponseEntity<String>(
+							"No text to translate could be found in input.",
+							HttpStatus.BAD_REQUEST);					
+				}
 			} catch (Exception e) {
 				return new ResponseEntity<String>("Error parsing input",
 						HttpStatus.BAD_REQUEST);
@@ -103,7 +110,7 @@ public class TildeETranslation extends BaseRestController {
 				sourceResource, targetLang);
 
 		// get output format
-		RDFConversionService.RDFSerialization outputFormat = getOutputSerialization(acceptHeader);
+		RDFConstants.RDFSerialization outputFormat = getOutputSerialization(acceptHeader);
 		String serialization;
 		try {
 			serialization = rdfConversionService.serializeRDF(model,
