@@ -16,16 +16,17 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import eu.freme.conversion.etranslate.TranslationConversionService;
 import eu.freme.conversion.rdf.RDFConversionService;
 
 @RestController
-public class TildeETranslate extends BaseRestController {
+public class TildeETranslation extends BaseRestController {
 
 	@Autowired
 	RDFConversionService rdfConversionService;
 
-	private final String INPUT_TYPE_NIF_TURTLE = "nif/turtle";
-	private final String INPUT_TYPE_PLAINTEXT = "plaintext";
+	@Autowired
+	TranslationConversionService translationConversionService;
 
 	public void setAppId(String appId) {
 		this.appId = appId;
@@ -35,7 +36,7 @@ public class TildeETranslate extends BaseRestController {
 	private String appId;
 
 	private String endpoint = "https://letsmt.eu/ws/Service.svc/json/Translate?appid={appid}&systemid={systemid}&text={text}";
-	
+
 	@RequestMapping("/e-translate/tilde")
 	public ResponseEntity<String> tildeTranslate(
 			@RequestParam(value = "input") String input,
@@ -45,35 +46,31 @@ public class TildeETranslate extends BaseRestController {
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "translation-system-id") String translationSystemId,
 			@RequestParam(value = "domain", defaultValue = "") String domain,
-			@RequestHeader("Accept") String acceptHeader ) {
+			@RequestHeader(value = "Accept", defaultValue = "") String acceptHeader) {
 
-		// input validation - validation for required parameters is done by
-		// spring mvc
-		inputType = inputType.toLowerCase();
-		if (!(inputType.equals(INPUT_TYPE_NIF_TURTLE) || inputType
-				.equals(INPUT_TYPE_PLAINTEXT))) {
-			return new ResponseEntity<String>(
-					"valid input type is required to be "
-							+ String.join(",", INPUT_TYPE_NIF_TURTLE,
-									INPUT_TYPE_PLAINTEXT),
+		if (!validateInputType(inputType)) {
+			return new ResponseEntity<String>("Invalid input-type",
 					HttpStatus.BAD_REQUEST);
 		}
 
-		// extract plaintext
+		// create rdf model
 		String plaintext = null;
 		Model model = ModelFactory.createDefaultModel();
 		Resource sourceResource = null;
-		
-		if (inputType.equals("INPUT_TYPE_NIF")) {
-			// TODO validate NIF
-			// TODO extract plaintext + provenance information from NIF
-			// TODO tbd: what happens if there are multiple strings in the
-			// source document
 
-			plaintext = "";
+		if (!inputType.equals(inputTypePlaintext)) {
+			try {
+				model = unserializeNIF(input, inputType);
+				// TODO: Extract plaintext from RDF
+				plaintext = "";
+			} catch (Exception e) {
+				return new ResponseEntity<String>("Error parsing input",
+						HttpStatus.BAD_REQUEST);
+			}
 		} else {
 			plaintext = input;
-			sourceResource = rdfConversionService.plaintextToRDF(model, plaintext, sourceLang);
+			sourceResource = rdfConversionService.plaintextToRDF(model,
+					plaintext, sourceLang);
 		}
 
 		// send request to tilde mt
@@ -100,13 +97,20 @@ public class TildeETranslate extends BaseRestController {
 		} catch (UnirestException e) {
 			return externalServiceFailedResponse();
 		}
-		
-		rdfConversionService.addTranslation(translation, sourceResource, targetLang);
-		
+
+		translationConversionService.addTranslation(translation,
+				sourceResource, targetLang);
+
 		// get output format
 		RDFConversionService.RDFSerialization outputFormat = getOutputSerialization(acceptHeader);
-		String serialization = rdfConversionService.serializeRDF(model, outputFormat);
-		
+		String serialization;
+		try {
+			serialization = rdfConversionService.serializeRDF(model,
+					outputFormat);
+		} catch (Exception e) {
+			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 		return new ResponseEntity<String>(serialization, HttpStatus.OK);
 	}
 
