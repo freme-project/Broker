@@ -10,6 +10,6 @@ import eu.freme.eservices.elink.ELinkConfig;
 
 @SpringBootApplication
 @ComponentScan("eu.freme.broker.eservices")
-@Import( {ConversionApplicationConfig.class, EEntityConfig.class})
+@Import( {ConversionApplicationConfig.class, EEntityConfig.class, ELinkConfig.class})
 public class BrokerConfig {
 }
