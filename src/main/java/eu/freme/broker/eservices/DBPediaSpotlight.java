@@ -1,8 +1,5 @@
 package eu.freme.broker.eservices;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +17,7 @@ import eu.freme.eservices.eentity.api.EEntityAPI;
 import eu.freme.eservices.eentity.exceptions.ExternalServiceFailedException;
 
 @RestController
-public class EEntityDBPediaSpotlightAPI extends BaseRestController {
+public class DBPediaSpotlight extends BaseRestController {
 
 	@Autowired
 	EEntityAPI entityAPI;
@@ -44,9 +41,9 @@ public class EEntityDBPediaSpotlightAPI extends BaseRestController {
 
 		// get output format
 		RDFConstants.RDFSerialization outputFormat = getOutputSerialization(acceptHeader);
-		System.out.println(rdf);
 		try {
-			Model model = rdfConversionService.unserializeRDF(rdf, RDFConstants.RDFSerialization.TURTLE);
+			Model model = rdfConversionService.unserializeRDF(rdf,
+					RDFConstants.RDFSerialization.TURTLE);
 			String serialization = rdfConversionService.serializeRDF(model,
 					outputFormat);
 			return new ResponseEntity<String>(serialization, HttpStatus.OK);
