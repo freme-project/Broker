@@ -13,14 +13,14 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConversionService;
-import eu.freme.eservices.eentity.api.EEntityAPI;
+import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.ExternalServiceFailedException;
 
 @RestController
 public class DBPediaSpotlight extends BaseRestController {
 
 	@Autowired
-	EEntityAPI entityAPI;
+	EEntityService entityAPI;
 
 	@Autowired
 	RDFConversionService rdfConversionService;
@@ -42,6 +42,7 @@ public class DBPediaSpotlight extends BaseRestController {
 		// get output format
 		RDFConstants.RDFSerialization outputFormat = getOutputSerialization(acceptHeader);
 		try {
+			System.out.println(rdf);
 			Model model = rdfConversionService.unserializeRDF(rdf,
 					RDFConstants.RDFSerialization.TURTLE);
 			String serialization = rdfConversionService.serializeRDF(model,
