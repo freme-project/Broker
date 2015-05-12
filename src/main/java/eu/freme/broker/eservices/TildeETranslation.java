@@ -1,5 +1,7 @@
 package eu.freme.broker.eservices;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -48,8 +50,9 @@ public class TildeETranslation extends BaseRestController {
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "translation-system-id") String translationSystemId,
 			@RequestParam(value = "domain", defaultValue = "") String domain,
-			@RequestHeader(value = "Accept", defaultValue = "") String acceptHeader) {
-
+			@RequestHeader(value = "Accept", defaultValue = "") String acceptHeader,
+			HttpServletRequest request) {
+		
 		if (!validateInputType(inputType)) {
 			return new ResponseEntity<String>("Invalid input-type",
 					HttpStatus.BAD_REQUEST);
