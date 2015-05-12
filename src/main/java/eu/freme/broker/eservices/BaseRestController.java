@@ -1,7 +1,15 @@
 package eu.freme.broker.eservices;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +24,19 @@ public class BaseRestController {
 	// see https://jena.apache.org/documentation/io/rdf-input.html for a list of
 	// http accept headers
 	private HashMap<String, RDFConstants.RDFSerialization> rdfFormats;
+
 	private final RDFConstants.RDFSerialization defaultRDFOutputFormat = RDFConstants.RDFSerialization.JSON_LD;
+
 	final String inputTypePlaintext = "plaintext";
-	
+
+	Logger logger = Logger.getLogger(BaseRestController.class);
+
 	@Autowired
 	RDFConversionService rdfConversionService;
 
 	public BaseRestController() {
 		rdfFormats = new HashMap<String, RDFConstants.RDFSerialization>();
-		rdfFormats.put("text/turtle",
-				RDFConstants.RDFSerialization.TURTLE);
+		rdfFormats.put("text/turtle", RDFConstants.RDFSerialization.TURTLE);
 		rdfFormats.put("application/ld+json",
 				RDFConstants.RDFSerialization.JSON_LD);
 	}
@@ -69,21 +80,21 @@ public class BaseRestController {
 	 */
 	protected Model unserializeNIF(String rdf, String inputFormat)
 			throws Exception {
-		RDFConstants.RDFSerialization format = rdfFormats
-				.get(inputFormat);
+		RDFConstants.RDFSerialization format = rdfFormats.get(inputFormat);
 		if (format == null) {
 			throw new RuntimeException("Unknown format: " + inputFormat);
 		}
 		return rdfConversionService.unserializeRDF(rdf, format);
 	}
-	
+
 	/**
 	 * Validate that input type has one of the valid values.
 	 * 
 	 * @param inputType
 	 * @return
 	 */
-	protected boolean validateInputType(String inputType){
-		return inputType.equals( inputTypePlaintext ) || rdfFormats.containsKey( inputType );
+	protected boolean validateInputType(String inputType) {
+		return inputType.equals(inputTypePlaintext)
+				|| rdfFormats.containsKey(inputType);
 	}
 }
