@@ -106,16 +106,35 @@
 		</plugins>
 	</build>
 
+	<distributionManagement>
+		<repository>
+			<id>freme-nexus</id>
+			<name>Internal Releases</name>
+			<url>http://rv1443.1blu.de/nexus/content/repositories/freme-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>freme-nexus</id>
+			<name>Internal Releases</name>
+			<url>http://rv1443.1blu.de/nexus/content/repositories/freme-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<repositories>
 		<repository>
-			<id>spring-releases</id>
-			<url>https://repo.spring.io/libs-release</url>
+			<id>freme-release</id>
+			<name>freme-nexus</name>
+			<url>http://rv1443.1blu.de/nexus/content/repositories/freme-releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>freme-snapshot</id>
+			<name>freme-nexus</name>
+			<url>http://rv1443.1blu.de/nexus/content/repositories/freme-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
 		</repository>
 	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-releases</id>
-			<url>https://repo.spring.io/libs-release</url>
-		</pluginRepository>
-	</pluginRepositories>
 </project>
