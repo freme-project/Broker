@@ -68,21 +68,35 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<!-- get all project dependencies -->
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
 					<!-- MainClass in mainfest make a executable jar -->
 					<archive>
 						<manifest>
 							<mainClass>eu.freme.Broker</mainClass>
 						</manifest>
 					</archive>
+					<descriptors>
+						<descriptor>src/main/assembly/assembly.xml</descriptor>
+					</descriptors>
 				</configuration>
 				<executions>
 					<execution>
@@ -97,10 +111,17 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
+				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<archive>
+						<manifest>
+							<mainClass>eu.freme.broker.Broker</mainClass>
+						</manifest>
+					</archive>
+
+					<excludes>
+						<exclude>**/*.properties</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -110,12 +131,12 @@
 		<repository>
 			<id>freme-nexus</id>
 			<name>Internal Releases</name>
-			<url>http://rv1443.1blu.de/nexus/content/repositories/freme-releases/</url>
+			<url>http://rv1443.1blu.de/nexus/content/repositories/releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>freme-nexus</id>
 			<name>Internal Releases</name>
-			<url>http://rv1443.1blu.de/nexus/content/repositories/freme-snapshots/</url>
+			<url>http://rv1443.1blu.de/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -123,15 +144,15 @@
 		<repository>
 			<id>freme-release</id>
 			<name>freme-nexus</name>
-			<url>http://rv1443.1blu.de/nexus/content/repositories/freme-releases/</url>
+			<url>http://rv1443.1blu.de/nexus/content/repositories/releases/</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 		<repository>
-			<id>freme-snapshot</id>
+			<id>freme-nexus</id>
 			<name>freme-nexus</name>
-			<url>http://rv1443.1blu.de/nexus/content/repositories/freme-snapshots/</url>
+			<url>http://rv1443.1blu.de/nexus/content/repositories/snapshots/</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
