@@ -22,7 +22,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.conversion.etranslate.TranslationConversionService;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConversionService;
-import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 
 @RestController
 public class TildeETranslation extends BaseRestController {
@@ -33,68 +32,85 @@ public class TildeETranslation extends BaseRestController {
 	@Autowired
 	TranslationConversionService translationConversionService;
 
-	private String endpoint = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
 
-	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
+	@Value("${tildemt.appid}")
+	private String appId;
+
+	private String endpoint = "https://letsmt.eu/ws/Service.svc/json/Translate?appid={appid}&systemid={systemid}&text={text}";
+
+	@RequestMapping(value = "/e-translate/tilde", method = RequestMethod.POST)
 	public ResponseEntity<String> tildeTranslate(
 			@RequestParam(value = "input") String input,
 			@RequestParam(value = "input-type") String inputType,
+			@RequestParam(value = "client-id") String clientId,
 			@RequestParam(value = "source-lang") String sourceLang,
 			@RequestParam(value = "target-lang") String targetLang,
+			@RequestParam(value = "translation-system-id") String translationSystemId,
 			@RequestParam(value = "domain", defaultValue = "") String domain,
 			@RequestHeader(value = "Accept", defaultValue = "") String acceptHeader,
 			HttpServletRequest request) {
-
+		
 		if (!validateInputType(inputType)) {
-			logger.info("invalid input type");
 			return new ResponseEntity<String>("Invalid input-type",
 					HttpStatus.BAD_REQUEST);
 		}
 
 		// create rdf model
+		String plaintext = null;
 		Model model = ModelFactory.createDefaultModel();
+		Resource sourceResource = null;
 
 		if (!inputType.equals(inputTypePlaintext)) {
 			try {
 				model = unserializeNIF(input, inputType);
+				plaintext = translationConversionService
+						.extractTextToTranslate(model);
+				
+				if( plaintext == null ){
+					return new ResponseEntity<String>(
+							"No text to translate could be found in input.",
+							HttpStatus.BAD_REQUEST);					
+				}
 			} catch (Exception e) {
-				logger.error(e);
 				return new ResponseEntity<String>("Error parsing input",
 						HttpStatus.BAD_REQUEST);
 			}
 		} else {
-			rdfConversionService.plaintextToRDF(model, input, sourceLang);
+			plaintext = input;
+			sourceResource = rdfConversionService.plaintextToRDF(model,
+					plaintext, sourceLang);
 		}
 
 		// send request to tilde mt
+		String translation = null;
 		try {
-
-			// workaround for tilde mt bug
-			model.setNsPrefix("itsrdf", "http://www.w3.org/2005/11/its/rdf#");
-			HttpResponse<String> response = Unirest
-					.post(endpoint)
-					.routeParam("source-lang", sourceLang)
-					.routeParam("target-lang", targetLang)
-					.header("Accept", "application/x-turtle")
-					.header("Content-Type", "application/x-turtle")
-					.body(rdfConversionService.serializeRDF(model,
-							RDFSerialization.TURTLE)).asString();
+			HttpResponse<String> response = Unirest.get(endpoint)
+					.routeParam("appid", appId)
+					.routeParam("systemid", translationSystemId)
+					.routeParam("text", plaintext)
+					.header("client-id", clientId)
+					.header("Content-type", "application/rdf-xml").asString();
 
 			if (response.getStatus() != HttpStatus.OK.value()) {
-				logger.error("external service failed, response body: "
-						+ response.getBody());
 				return externalServiceFailedResponse();
 			}
 
-			String translation = response.getBody();
+			translation = response.getBody();
 
-			Model responseModel = rdfConversionService.unserializeRDF(
-					translation, RDFSerialization.TURTLE);
-			model.add(responseModel);
-		} catch (Exception e) {
-			logger.error(e);
+			// strip leading and trailing slash
+			if (translation.length() > 1) {
+				translation = translation
+						.substring(1, translation.length() - 1);
+			}
+		} catch (UnirestException e) {
 			return externalServiceFailedResponse();
 		}
+
+		translationConversionService.addTranslation(translation,
+				sourceResource, targetLang);
 
 		// get output format
 		RDFConstants.RDFSerialization outputFormat = getOutputSerialization(acceptHeader);
