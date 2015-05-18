@@ -10,7 +10,7 @@
 			<directory>src/main/scripts</directory>
 			<outputDirectory>bin</outputDirectory>
 			<includes>
-				<include>server_start.sh</include>
+				<include>*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
