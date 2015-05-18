@@ -1,6 +1,5 @@
 ZIP_LOCATION="/var/www/html/freme-distributions/"
 FREME_LOCATION="/opt/freme/"
-FREME_USER=$0
 
 cd target/FREME-*-full/FREME*/
 
@@ -17,7 +16,9 @@ rm -f $target_zip
 mv $zip_file $target_zip
 
 # stop current freme
-kill `cat "$FREME_LOCATION/FREME*/config/pid.txt"`
+echo $FREME_LOCATION$dir"/config/pid.txt\n"
+echo cat $FREME_LOCATION$dir"/config/pid.txt"
+kill `cat $FREME_LOCATION$dir"/config/pid.txt"`
 
 # deploy new freme
 target_dir="$FREME_LOCATION$dir"
@@ -25,7 +26,7 @@ rm -rf /opt/freme/*
 cp -r $dir /opt/freme
 cd $target_dir
 chmod +x bin/start.sh
-chown "$FREME_USER:$FREME_USER" target_dir
+#chown "$FREME_USER:$FREME_USER" target_dir
 
 # start new freme
 nohup bin/start.sh >/dev/null 2>&1 &
