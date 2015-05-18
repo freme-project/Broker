@@ -28,6 +28,10 @@ cd $target_dir
 chmod +x bin/start.sh
 #chown "$FREME_USER:$FREME_USER" target_dir
 
+# configuration
+rm -r $target_dir"/config"
+cp -r src/main/resources/configs/freme-dev/ $target_dir"/config/"
+
 # start new freme
 nohup bin/start.sh >/dev/null 2>&1 &
 echo $! > config/pid.txt
