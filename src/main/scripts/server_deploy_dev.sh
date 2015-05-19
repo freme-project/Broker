@@ -16,8 +16,6 @@ rm -f $target_zip
 mv $zip_file $target_zip
 
 # stop current freme
-echo $FREME_LOCATION$dir"/config/pid.txt\n"
-echo cat $FREME_LOCATION$dir"/config/pid.txt"
 kill `cat $FREME_LOCATION$dir"/config/pid.txt"`
 
 # deploy new freme
