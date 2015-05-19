@@ -25,7 +25,7 @@ rm -rf /opt/freme/*
 cp -r $dir /opt/freme
 chmod +x $target_dir"/bin/start_server.sh"
 chmod +x $target_dir"/bin/start_local.sh"
-#chown "$FREME_USER:$FREME_USER" target_dir
+chmod +x $target_dir"/bin/restart_server.sh"
 
 # configuration
 rm -r $target_dir"/config"
