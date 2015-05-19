@@ -22,8 +22,8 @@ kill `cat $FREME_LOCATION$dir"/config/pid.txt"`
 target_dir="$FREME_LOCATION$dir"
 rm -rf /opt/freme/*
 cp -r $dir /opt/freme
-chmod +x $target_dir"/bin/start.sh"
-chmod +x $target_dir"/bin/server_start.sh"
+chmod +x $target_dir"/bin/start_server.sh"
+chmod +x $target_dir"/bin/server_local.sh"
 #chown "$FREME_USER:$FREME_USER" target_dir
 
 # configuration
