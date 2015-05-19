@@ -30,7 +30,8 @@ chmod +x $target_dir"/bin/start_local.sh"
 # configuration
 pwd
 rm -r $target_dir"/config"
-cp -r $BROKER_WORKSPACE"src/main/resources/configs/freme-dev/" $target_dir"/config/"
+cp -r $BROKER_WORKSPACE"/src/main/resources/configs/freme-dev/" $target_dir"/config/"
 
 # start new freme
+cd $target_dir
 bin/server_start.sh
