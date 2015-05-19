@@ -1,5 +1,6 @@
 ZIP_LOCATION="/var/www/html/freme-distributions/"
 FREME_LOCATION="/opt/freme/"
+BROKER_WORKSPACE=`pwd`
 
 cd target/FREME-*-full/FREME*/
 
@@ -11,7 +12,7 @@ mv Broker*.jar "$dir.jar"
 cd ..
 zip_file="$dir.zip"
 zip -r $zip_file *
-target_zip=$ZIP_LOCATION$zip_file
+target_zip=$ZIP_LOCATION"/*SNAPSHOT.zip"
 rm -f $target_zip
 mv $zip_file $target_zip
 
@@ -27,9 +28,9 @@ chmod +x $target_dir"/bin/start_local.sh"
 #chown "$FREME_USER:$FREME_USER" target_dir
 
 # configuration
-cd ..
+pwd
 rm -r $target_dir"/config"
-cp -r src/main/resources/configs/freme-dev/ $target_dir"/config/"
+cp -r $BROKER_WORKSPACE"src/main/resources/configs/freme-dev/" $target_dir"/config/"
 
 # start new freme
 bin/server_start.sh
