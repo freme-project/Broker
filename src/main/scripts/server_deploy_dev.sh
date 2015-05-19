@@ -33,5 +33,4 @@ cp -r $BROKER_WORKSPACE"/src/main/resources/configs/freme-dev/" $target_dir"/con
 
 # start new freme
 cd $target_dir
-pwd
-sh bin/server_start.sh
+bin/start_server.sh
