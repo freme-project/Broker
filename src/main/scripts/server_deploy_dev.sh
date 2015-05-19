@@ -32,4 +32,4 @@ rm -r $target_dir"/config"
 cp -r $BROKER_WORKSPACE"/src/main/resources/configs/freme-dev/" $target_dir"/config/"
 
 # start new freme
-sh $target_dir"bin/start_server.sh"
+sh $target_dir"/bin/start_server.sh"
