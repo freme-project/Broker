@@ -22,8 +22,8 @@ kill `cat $FREME_LOCATION$dir"/config/pid.txt"`
 target_dir="$FREME_LOCATION$dir"
 rm -rf /opt/freme/*
 cp -r $dir /opt/freme
-cd $target_dir
-chmod +x bin/start.sh
+chmod +x $target_dir"/bin/start.sh"
+chmod +x $target_dir"/bin/server_start.sh"
 #chown "$FREME_USER:$FREME_USER" target_dir
 
 # configuration
@@ -31,5 +31,4 @@ rm -r $target_dir"/config"
 cp -r src/main/resources/configs/freme-dev/ $target_dir"/config/"
 
 # start new freme
-nohup bin/start.sh >/dev/null 2>&1 &
-echo $! > config/pid.txt
+bin/server_start.sh
