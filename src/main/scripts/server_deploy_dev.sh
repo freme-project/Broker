@@ -23,7 +23,7 @@ kill `cat $FREME_LOCATION$dir"/config/pid.txt"`
 # deploy new freme
 target_dir="$FREME_LOCATION$dir"
 rm -rf /opt/freme/*
-mv dist /opt/freme$dir
+mv dist $target_dir
 chmod +x $target_dir"/bin/start_server.sh"
 chmod +x $target_dir"/bin/start_local.sh"
 chmod +x $target_dir"/bin/restart_server.sh"
