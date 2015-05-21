@@ -1,6 +1,6 @@
 package eu.freme.broker;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,12 +9,8 @@ import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.http.HttpStatus;
-
-import scala.annotation.meta.setter;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -33,8 +29,7 @@ public class TildeETranslationTest {
 		context = SpringApplication.run(BrokerConfig.class);
 	}
 
-	@Test
-	public void testPlaintextEtranslate() throws UnirestException {
+	public void translatePlaintext(String plaintext) throws UnirestException {
 		String clientId = "u-bd13faca-b816-4085-95d5-05373d695ab7";
 		String sourceLang = "en";
 		String targetLang = "de";
@@ -43,14 +38,21 @@ public class TildeETranslationTest {
 		HttpResponse<String> response = Unirest
 				.post(baseUrl
 						+ "e-translate/tilde?input={input}&client-id={clientId}&source-lang={sourceLang}&target-lang={targetLang}&translation-system-id={translationSystemId}")
-				.routeParam("input", "hello world")
+				.routeParam("input", plaintext)
 				.header("Content-Type", "plaintext")
 				.routeParam("clientId", clientId)
 				.routeParam("sourceLang", sourceLang)
 				.routeParam("targetLang", targetLang)
 				.routeParam("translationSystemId", translationSystemId).asString();
 
-		assertTrue(response.getStatus()==200);
+		assertTrue(response.getStatus()==200);		
+	}
+	
+	@Test
+	public void testPlaintextEtranslate() throws UnirestException, IOException {
+		translatePlaintext("hello world");
+		String data = readFile( "src/test/resources/rdftest/e-translate/data.txt" );
+		translatePlaintext(data);		
 	}
 
 	private String readFile(String file) throws IOException {

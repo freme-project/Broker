@@ -1,8 +1,5 @@
 package eu.freme.broker.eservices;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BadRequestException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,6 +19,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.ExternalServiceFailedException;
 import eu.freme.conversion.etranslate.TranslationConversionService;
 import eu.freme.conversion.rdf.RDFConstants;
@@ -47,7 +45,7 @@ public class TildeETranslation extends BaseRestController {
 
 	@RequestMapping(value = "/e-translate/tilde", method = RequestMethod.POST)
 	public ResponseEntity<String> tildeTranslate(
-			@RequestParam(value = "input", required=false) String input,
+			@RequestParam(value = "input", required = false) String input,
 			@RequestParam(value = "client-id") String clientId,
 			@RequestParam(value = "source-lang") String sourceLang,
 			@RequestParam(value = "target-lang") String targetLang,
@@ -55,8 +53,8 @@ public class TildeETranslation extends BaseRestController {
 			@RequestParam(value = "domain", defaultValue = "") String domain,
 			@RequestHeader(value = "Accept", defaultValue = "") String acceptHeader,
 			@RequestHeader(value = "Content-Type", defaultValue = "") String contentType,
-			@RequestBody(required=false) String postBody) {
-		
+			@RequestBody(required = false) String postBody) {
+
 		validateContentType(contentType);
 
 		// create rdf model
@@ -70,13 +68,15 @@ public class TildeETranslation extends BaseRestController {
 				model = unserializeNIF(postBody, contentType);
 				sourceResource = translationConversionService
 						.extractTextToTranslate(model);
-				
-				if( sourceResource == null ){
-					throw new BadRequestException("No text to translate could be found in input.");
+
+				if (sourceResource == null) {
+					throw new BadRequestException(
+							"No text to translate could be found in input.");
 				}
 				Property isString = model.getProperty(RDFConstants.nifPrefix
 						+ "isString");
-				plaintext = sourceResource.getProperty(isString).getObject().asLiteral().getString();
+				plaintext = sourceResource.getProperty(isString).getObject()
+						.asLiteral().getString();
 			} catch (Exception e) {
 				logger.error("failed", e);
 				throw new BadRequestException("Error parsing input");
@@ -91,6 +91,7 @@ public class TildeETranslation extends BaseRestController {
 		// send request to tilde mt
 		String translation = null;
 		try {
+			System.out.println(plaintext);
 			HttpResponse<String> response = Unirest.get(endpoint)
 					.routeParam("appid", appId)
 					.routeParam("systemid", translationSystemId)
@@ -99,7 +100,11 @@ public class TildeETranslation extends BaseRestController {
 					.header("Content-type", "application/rdf-xml").asString();
 
 			if (response.getStatus() != HttpStatus.OK.value()) {
-				return externalServiceFailedResponse();
+				if( response.getStatus() == HttpStatus.BAD_REQUEST.value() ){
+					throw new BadRequestException("external service has failed: " + response.getBody());
+				} else{
+					throw new ExternalServiceFailedException();
+				}
 			}
 
 			translation = response.getBody();
@@ -110,7 +115,7 @@ public class TildeETranslation extends BaseRestController {
 						.substring(1, translation.length() - 1);
 			}
 		} catch (UnirestException e) {
-			return externalServiceFailedResponse();
+			throw new ExternalServiceFailedException();
 		}
 
 		translationConversionService.addTranslation(translation,

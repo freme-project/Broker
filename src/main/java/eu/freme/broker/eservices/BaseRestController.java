@@ -1,19 +1,9 @@
 package eu.freme.broker.eservices;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
 import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.freme.broker.exception.InvalidContentTypeException;
@@ -40,17 +30,6 @@ public class BaseRestController {
 		rdfFormats.put("text/turtle", RDFConstants.RDFSerialization.TURTLE);
 		rdfFormats.put("application/json+ld",
 				RDFConstants.RDFSerialization.JSON_LD);
-	}
-
-	/**
-	 * Create this response in the REST controller when the external service is
-	 * unavailable or has reported an error.
-	 * 
-	 * @return
-	 */
-	protected ResponseEntity<String> externalServiceFailedResponse() {
-		return new ResponseEntity<String>("The external service failed",
-				HttpStatus.BAD_GATEWAY);
 	}
 
 	/**
