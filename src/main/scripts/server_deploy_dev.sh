@@ -21,9 +21,9 @@ mv $zip_file $target_zip
 kill `cat $FREME_LOCATION$dir"/config/pid.txt"`
 
 # deploy new freme
-target_dir="$FREME_LOCATION$dir"
+target_dir="$FREME_LOCATION"
 rm -rf /opt/freme/*
-mv dist $target_dir
+mv dist/* $target_dir
 chmod +x $target_dir"/bin/start_server.sh"
 chmod +x $target_dir"/bin/start_local.sh"
 chmod +x $target_dir"/bin/restart_server.sh"
@@ -31,6 +31,3 @@ chmod +x $target_dir"/bin/restart_server.sh"
 # configuration
 rm -r $target_dir"/config"
 cp -r $BROKER_WORKSPACE"/src/main/resources/configs/freme-dev/" $target_dir"/config/"
-
-# start new freme
-sh $target_dir"/bin/start_server.sh"
