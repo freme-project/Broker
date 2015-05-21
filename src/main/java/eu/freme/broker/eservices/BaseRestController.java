@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
+import eu.freme.broker.exception.InvalidContentTypeException;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConversionService;
 
@@ -37,7 +38,7 @@ public class BaseRestController {
 	public BaseRestController() {
 		rdfFormats = new HashMap<String, RDFConstants.RDFSerialization>();
 		rdfFormats.put("text/turtle", RDFConstants.RDFSerialization.TURTLE);
-		rdfFormats.put("application/ld+json",
+		rdfFormats.put("application/json+ld",
 				RDFConstants.RDFSerialization.JSON_LD);
 	}
 
@@ -88,13 +89,17 @@ public class BaseRestController {
 	}
 
 	/**
-	 * Validate that input type has one of the valid values.
+	 * Validate that Content-Type header has one of the valid values.
 	 * 
 	 * @param inputType
 	 * @return
 	 */
-	protected boolean validateInputType(String inputType) {
-		return inputType.equals(inputTypePlaintext)
-				|| rdfFormats.containsKey(inputType);
+	protected boolean validateContentType(String inputType) {
+		if( inputType.equals(inputTypePlaintext)
+				|| rdfFormats.containsKey(inputType) ){
+			return true;
+		} else{
+			throw new InvalidContentTypeException();
+		}
 	}
 }

@@ -1,11 +1,13 @@
 package eu.freme.broker.eservices;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.BadRequestException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import eu.freme.broker.exception.ExternalServiceFailedException;
 import eu.freme.conversion.etranslate.TranslationConversionService;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConversionService;
@@ -43,42 +47,42 @@ public class TildeETranslation extends BaseRestController {
 
 	@RequestMapping(value = "/e-translate/tilde", method = RequestMethod.POST)
 	public ResponseEntity<String> tildeTranslate(
-			@RequestParam(value = "input") String input,
-			@RequestParam(value = "input-type") String inputType,
+			@RequestParam(value = "input", required=false) String input,
 			@RequestParam(value = "client-id") String clientId,
 			@RequestParam(value = "source-lang") String sourceLang,
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "translation-system-id") String translationSystemId,
 			@RequestParam(value = "domain", defaultValue = "") String domain,
 			@RequestHeader(value = "Accept", defaultValue = "") String acceptHeader,
-			HttpServletRequest request) {
+			@RequestHeader(value = "Content-Type", defaultValue = "") String contentType,
+			@RequestBody(required=false) String postBody) {
 		
-		if (!validateInputType(inputType)) {
-			return new ResponseEntity<String>("Invalid input-type",
-					HttpStatus.BAD_REQUEST);
-		}
+		validateContentType(contentType);
 
 		// create rdf model
 		String plaintext = null;
 		Model model = ModelFactory.createDefaultModel();
 		Resource sourceResource = null;
 
-		if (!inputType.equals(inputTypePlaintext)) {
+		if (!contentType.equals(inputTypePlaintext)) {
+			// input is nif
 			try {
-				model = unserializeNIF(input, inputType);
-				plaintext = translationConversionService
+				model = unserializeNIF(postBody, contentType);
+				sourceResource = translationConversionService
 						.extractTextToTranslate(model);
 				
-				if( plaintext == null ){
-					return new ResponseEntity<String>(
-							"No text to translate could be found in input.",
-							HttpStatus.BAD_REQUEST);					
+				if( sourceResource == null ){
+					throw new BadRequestException("No text to translate could be found in input.");
 				}
+				Property isString = model.getProperty(RDFConstants.nifPrefix
+						+ "isString");
+				plaintext = sourceResource.getProperty(isString).getObject().asLiteral().getString();
 			} catch (Exception e) {
-				return new ResponseEntity<String>("Error parsing input",
-						HttpStatus.BAD_REQUEST);
+				logger.error("failed", e);
+				throw new BadRequestException("Error parsing input");
 			}
 		} else {
+			// input is plaintext
 			plaintext = input;
 			sourceResource = rdfConversionService.plaintextToRDF(model,
 					plaintext, sourceLang);
@@ -119,6 +123,7 @@ public class TildeETranslation extends BaseRestController {
 			serialization = rdfConversionService.serializeRDF(model,
 					outputFormat);
 		} catch (Exception e) {
+			logger.error("failed", e);
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
