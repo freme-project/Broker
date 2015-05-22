@@ -11,6 +11,6 @@ public class Broker {
 
 	public static void main(String[] args) {
 		logger.info("Starting FREME");
-		SpringApplication.run(BrokerConfig.class);
+		SpringApplication.run(FremeFullConfig.class);
 	}
 }

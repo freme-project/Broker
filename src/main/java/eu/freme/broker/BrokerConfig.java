@@ -1,23 +1,28 @@
 package eu.freme.broker;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
 import com.github.isrsal.logging.LoggingFilter;
 
+import eu.freme.broker.tools.NIFParameterFactory;
+import eu.freme.broker.tools.RDFSerializationFormats;
 import eu.freme.conversion.ConversionApplicationConfig;
-import eu.freme.eservices.eentity.EEntityConfig;
-import eu.freme.eservices.elink.ELinkConfig;
+
+/**
+ * configures broker without api endpoints and e-Services
+ * 
+ * @author jnehring
+ */
 
 @SpringBootApplication
-@ComponentScan("eu.freme.broker.eservices")
-@Import( {ConversionApplicationConfig.class, EEntityConfig.class, ELinkConfig.class})
+@Import(ConversionApplicationConfig.class)
 public class BrokerConfig {
 	
     @Bean
@@ -29,4 +34,15 @@ public class BrokerConfig {
     	filter.setUrlPatterns(urlPatterns);
         return filter;
     }
+    
+    @Bean
+    public RDFSerializationFormats rdfFormats(){
+    	return new RDFSerializationFormats();
+    }
+    
+    @Bean
+    public NIFParameterFactory getNifParameterFactory(){
+    	return new NIFParameterFactory();
+    }
+
 }

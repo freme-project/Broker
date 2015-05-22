@@ -21,15 +21,12 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.ExternalServiceFailedException;
+import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.etranslate.TranslationConversionService;
 import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.conversion.rdf.RDFConversionService;
 
 @RestController
 public class TildeETranslation extends BaseRestController {
-
-	@Autowired
-	RDFConversionService rdfConversionService;
 
 	@Autowired
 	TranslationConversionService translationConversionService;
@@ -43,29 +40,49 @@ public class TildeETranslation extends BaseRestController {
 
 	private String endpoint = "https://letsmt.eu/ws/Service.svc/json/Translate?appid={appid}&systemid={systemid}&text={text}";
 
-	@RequestMapping(value = "/e-translate/tilde", method = RequestMethod.POST)
+	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
 	public ResponseEntity<String> tildeTranslate(
 			@RequestParam(value = "input", required = false) String input,
+			@RequestParam(value = "i", required = false) String i,
+			@RequestParam(value = "informat", required = false) String informat,
+			@RequestParam(value = "f", required = false) String f,
+			@RequestParam(value = "outformat", required = false) String outformat,
+			@RequestParam(value = "o", required = false) String o,
+			@RequestParam(value = "prefix", required = false) String prefix,
+			@RequestParam(value = "p", required = false) String p,
+			@RequestHeader(value = "Accept", required=false) String acceptHeader,
+			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
+			@RequestBody(required = false) String postBody,
 			@RequestParam(value = "client-id") String clientId,
 			@RequestParam(value = "source-lang") String sourceLang,
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "translation-system-id") String translationSystemId,
-			@RequestParam(value = "domain", defaultValue = "") String domain,
-			@RequestHeader(value = "Accept", defaultValue = "") String acceptHeader,
-			@RequestHeader(value = "Content-Type", defaultValue = "") String contentType,
-			@RequestBody(required = false) String postBody) {
+			@RequestParam(value = "domain", defaultValue = "") String domain){
 
-		validateContentType(contentType);
-
+		// merge long and short parameters - long parameters override short parameters
+		if( input == null ){
+			input = i;
+		}
+		if( informat == null ){
+			informat = f;
+		}
+		if( outformat == null ){
+			outformat = o;
+		}
+		if( prefix == null ){
+			prefix = p;
+		}
+		NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
+		
 		// create rdf model
 		String plaintext = null;
 		Model model = ModelFactory.createDefaultModel();
 		Resource sourceResource = null;
 
-		if (!contentType.equals(inputTypePlaintext)) {
+		if (!parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
 			// input is nif
 			try {
-				model = unserializeNIF(postBody, contentType);
+				model = this.unserializeNif(parameters.getInput(), parameters.getInformat());
 				sourceResource = translationConversionService
 						.extractTextToTranslate(model);
 
@@ -83,21 +100,20 @@ public class TildeETranslation extends BaseRestController {
 			}
 		} else {
 			// input is plaintext
-			plaintext = input;
+			plaintext = parameters.getInput();
 			sourceResource = rdfConversionService.plaintextToRDF(model,
-					plaintext, sourceLang);
+					plaintext, sourceLang, parameters.getPrefix());
 		}
 
 		// send request to tilde mt
 		String translation = null;
 		try {
-			System.out.println(plaintext);
 			HttpResponse<String> response = Unirest.get(endpoint)
 					.routeParam("appid", appId)
 					.routeParam("systemid", translationSystemId)
 					.routeParam("text", plaintext)
 					.header("client-id", clientId)
-					.header("Content-type", "application/rdf-xml").asString();
+					.asString();
 
 			if (response.getStatus() != HttpStatus.OK.value()) {
 				if( response.getStatus() == HttpStatus.BAD_REQUEST.value() ){
@@ -122,11 +138,10 @@ public class TildeETranslation extends BaseRestController {
 				sourceResource, targetLang);
 
 		// get output format
-		RDFConstants.RDFSerialization outputFormat = getOutputSerialization(acceptHeader);
 		String serialization;
 		try {
 			serialization = rdfConversionService.serializeRDF(model,
-					outputFormat);
+					parameters.getOutformat());
 		} catch (Exception e) {
 			logger.error("failed", e);
 			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -135,12 +150,4 @@ public class TildeETranslation extends BaseRestController {
 		return new ResponseEntity<String>(serialization, HttpStatus.OK);
 	}
 
-	public RDFConversionService getRdfConversionService() {
-		return rdfConversionService;
-	}
-
-	public void setRdfConversionService(
-			RDFConversionService rdfConversionService) {
-		this.rdfConversionService = rdfConversionService;
-	}
 }
