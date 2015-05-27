@@ -1,5 +1,9 @@
 package eu.freme.broker.eservices;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -21,6 +25,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.ExternalServiceFailedException;
+import eu.freme.broker.exception.InternalServerErrrorException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.etranslate.TranslationConversionService;
 import eu.freme.conversion.rdf.RDFConstants;
@@ -101,6 +106,12 @@ public class TildeETranslation extends BaseRestController {
 		} else {
 			// input is plaintext
 			plaintext = parameters.getInput();
+			try {
+				plaintext = URLDecoder.decode(plaintext, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				logger.error(e);
+				throw new InternalServerErrrorException(e.getMessage());				
+			}
 			sourceResource = rdfConversionService.plaintextToRDF(model,
 					plaintext, sourceLang, parameters.getPrefix());
 		}
@@ -111,7 +122,7 @@ public class TildeETranslation extends BaseRestController {
 			HttpResponse<String> response = Unirest.get(endpoint)
 					.routeParam("appid", appId)
 					.routeParam("systemid", translationSystemId)
-					.routeParam("text", plaintext)
+					.routeParam("text", URLEncoder.encode(plaintext, "UTF-8"))
 					.header("client-id", clientId)
 					.asString();
 
@@ -131,7 +142,11 @@ public class TildeETranslation extends BaseRestController {
 						.substring(1, translation.length() - 1);
 			}
 		} catch (UnirestException e) {
+			logger.error(e);
 			throw new ExternalServiceFailedException();
+		} catch( UnsupportedEncodingException e){
+			logger.error(e);
+			throw new BadRequestException(e.getMessage());
 		}
 
 		translationConversionService.addTranslation(translation,

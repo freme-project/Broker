@@ -3,8 +3,11 @@ package eu.freme.broker;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URLEncoder;
 
 import org.junit.After;
 import org.junit.Before;
@@ -33,7 +36,7 @@ public class TildeETranslationTest {
 	}
 
 	private String readFile(String file) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(file));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 		StringBuilder bldr = new StringBuilder();
 		String line;
 		while ((line = reader.readLine()) != null) {
@@ -69,6 +72,13 @@ public class TildeETranslationTest {
 		data = readFile("src/test/resources/rdftest/e-translate/data.json");
 		response = baseRequest().header("Content-Type",
 				"application/json+ld").body(data).asString();
+		assertTrue(response.getStatus() == 200);
+		assertTrue(response.getBody().length() > 0);
+		
+		data = readFile("src/test/resources/rdftest/e-translate/data.txt");
+		response = baseRequest()
+				.queryString("input", URLEncoder.encode(data, "UTF-8"))
+				.queryString("informat", "text").asString();
 		assertTrue(response.getStatus() == 200);
 		assertTrue(response.getBody().length() > 0);
 	}
