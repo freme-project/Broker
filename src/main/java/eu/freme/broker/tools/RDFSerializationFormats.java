@@ -14,5 +14,6 @@ public class RDFSerializationFormats extends HashMap<String, RDFConstants.RDFSer
 		put("text", RDFConstants.RDFSerialization.PLAINTEXT);
 		put("turtle", RDFConstants.RDFSerialization.TURTLE);
 		put("json-ld", RDFConstants.RDFSerialization.JSON_LD);
+		put("application/x-turtle", RDFConstants.RDFSerialization.TURTLE);
 	}
 }
