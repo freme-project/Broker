@@ -44,17 +44,17 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>conversion</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-entity</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-link</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.isrsal</groupId>
@@ -172,4 +172,12 @@
 			</releases>
 		</repository>
 	</repositories>
+	
+	
+	<scm>
+		<connection>scm:git:git@github.com:freme-project/Broker.git</connection>
+		<url>scm:git:git@github.com/freme-project:Broker.git</url>
+		<developerConnection>scm:git:git@github.com:freme-project/Broker.git</developerConnection>
+	  <tag>HEAD</tag>
+  </scm>
 </project>
