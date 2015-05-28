@@ -1,0 +1,248 @@
+<html>
+<head>
+  <title>FREME API doc</title>
+  <style type="text/css"> 
+  
+      body {
+        font-family:verdana, sans-serif;
+        background-color:#cccccc;
+      }
+      
+      #content{
+        position:relative;
+        left:50%;
+        margin:10px 0 10px -450px;
+        width:900px;
+        background-color:white;
+        border:1px solid black;
+        padding:20px;
+      } 
+      
+      code{
+        background-color:#dddddd;
+        overflow:auto;
+        display:block;
+        padding:20px;
+      }
+      
+      title{
+        font-size:40px;
+        font-weight:bold;
+        text-align:center;
+        display:block;
+        margin:20px 0 40px 0;
+      }
+      
+      h1{
+        margin-top:60px;
+      }
+      
+      h2{
+        margin-top:40px;
+      }
+    </style> 
+</head>
+<body>
+  <div id="content">
+    <title>FREME Documentation</title>
+    
+    <p>This document shows the documentation of FREME REST API version 0.1.</p>
+    
+    <h2>Table of contents</h2>
+    <ul>
+      <li><a href="#user-content-general">General</li>
+      <li><a href="#user-content-tilde-e-translation">Tilde e-Translation</li>
+      <li><a href="#user-content-e-entity">e-Entity</li>
+      <li><a href="#user-content-e-link">e-Link</li>
+    </ul>
+    
+    <h1>
+    <a id="user-content-general" class="anchor" href="#general" aria-hidden="true"><span class="octicon octicon-link"></span></a>General</h1>
+    
+    <p>This section defines the default parameter set for all FREME e-Services. The parameters have a long and a short form. If both are set, the long form overrides the short form. The API follows the most important points from <a href="http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html">NIF API specifications</a>. All FREME api endpoints accept only HTTP POST requests.</p>
+    
+    <ul>
+    <li>input (short form: i):
+    
+    <ul>
+    <li>input of the e-Service in plaintext or nif</li>
+    <li>No default</li>
+    <li>Depends on informat and intype</li>
+    </ul>
+    </li>
+    <li>informat (short form: f):
+    
+    <ul>
+    <li>format of input parameter.</li>
+    <li>possible values
+    
+    <ul>
+    <li>text (plaintext)</li>
+    <li>text/turtle (default)</li>
+    <li>application/json+ld</li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li>outformat (short form: o):
+    
+    <ul>
+    <li>output format</li>
+    <li>possible values
+    
+    <ul>
+    <li>text/turtle (default)</li>
+    <li>application/json+ld</li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li>prefix (short form: p)
+    
+    <ul>
+    <li>Controls the url of rdf resources generated from plaintext. Has default value "<a href="http://freme-project.eu/">http://freme-project.eu/</a>"</li>
+    </ul>
+    </li>
+    </ul>
+    
+    <p>The following header values are used by all FREME e-Services</p>
+    
+    <ul>
+    <li>Accept
+    
+    <ul>
+    <li>possible values
+    
+    <ul>
+    <li>text/turtle (default)</li>
+    <li>application/json-ld</li>
+    </ul>
+    </li>
+    <li>When parameter outformat is set then the Accept header is not used by FREME api</li>
+    </ul>
+    </li>
+    <li>Content-Type
+    
+    <ul>
+    <li>possible values
+    
+    <ul>
+    <li>text/turtle (default)</li>
+    <li>application/json-ld</li>
+    </ul>
+    </li>
+    <li>When parameter informat is set then the Content-Type header is not used by FREME api<br>
+    </li>
+    </ul>
+    </li>
+    </ul>
+    
+    <h1>
+    <a id="user-content-tilde-e-translation" class="anchor" href="#tilde-e-translation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tilde e-Translation</h1>
+    
+    <p>Tilde e-Translate has endpoint <a href="http://rv1460.1blu.de/v1/e-translation/tilde">http://rv1460.1blu.de/v1/e-translation/tilde</a>.
+    Parameters can be submitted via URL or via form-data post body:</p>
+    
+    <ul>
+    <li>client-id: temporary until tilde has finished the new api</li>
+    <li>translation-system-id: temporary until tilde has finished the new api. Check <a href="https://services.tilde.com/translationsystems">here</a> for a list of available translation systems.</li>
+    <li>source-lang: source language, e.g. "de" or "en". This control right now only the annotation in NIF. The source language for translation is currently controlled by translation-system-id</li>
+    <li>target-lang: target language, e.g. "de" or "en". This control right now only the annotation in NIF. The target language for translation is currently controlled by translation-system-id</li>
+    <li>domain: unused optional dummy parameter</li>
+    </ul>
+    
+    <p>Example call for local broker: POST <a href="http://rv1460.1blu.de/v1/e-translation/tilde?input=hello+world&amp;informat=text&amp;client-id=u-bd13faca-b816-4085-95d5-05373d695ab7&amp;source-lang=en&amp;target-lang=de&amp;translation-system-id=smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813">http://rv1460.1blu.de/v1/e-translation/tilde?input=hello+world&amp;informat=text&amp;client-id=u-bd13faca-b816-4085-95d5-05373d695ab7&amp;source-lang=en&amp;target-lang=de&amp;translation-system-id=smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813</a></p>
+    
+    <h1>
+    <a id="user-content-e-entity" class="anchor" href="#e-entity" aria-hidden="true"><span class="octicon octicon-link"></span></a>e-Entity</h1>
+    
+    <p>The service has base URI http://rv1460.1blu.de/v1/e-entity/{engine-name} and it can currently process only English texts. It supports GET and POST requests.</p>
+    
+    <h4>
+    <a id="user-content-parameters" class="anchor" href="#parameters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters</h4>
+    
+    <p>Following set of parameters are supported:</p>
+    
+    <ul>
+    <li>
+    input: plain text sent as value of the input parameter (part of the URL). Short form is i.</li>
+    <li>
+    informat: determines in which format the input is given. Short form is f.</li>
+    <li>
+    outformat: The format in which the output is serialized. Short form is o.</li>
+    <li>
+    prefix: The prefix, which the NIF implementation MUST use to create and parse URIs. Unused optional dummy parameter. Short form is p.</li>
+    <li>
+    language: unused optional dummy parameter</li>
+    </ul>
+    
+    <p>The service also accepts text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing.</p>
+    
+    <p>The API currently supports the DBpedia Spotlight implementation (dbpedia-spotlight). The specific parameters of the DBpedia Spotlight are as follows:</p>
+    
+    <ul>
+    <li>
+    confidence: specific parameter for the DBpedia Spotlight NER system. It is an optional parameter with default value set to 0.3.</li>
+    </ul>
+    
+    <h4>
+    <a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples:</h4>
+    
+    <pre><code>curl -v "http://rv1460.1blu.de/v1/e-entity/dbpedia-spotlight?confidence=0.3&amp;informat=text&amp;input=This+is+Germany." -H "Accept: text/turtle"
+    
+curl -v "http://rv1460.1blu.de/v1/e-entity/dbpedia-spotlight?confidence=0.3&amp;informat=text&amp;input=This+is+Germany." -H "Accept: application/json+ld"
+    
+curl -X POST -d @../src/main/resources/data/data.ttl "http://rv1460.1blu.de/v1/e-entity/dbpedia-spotlight/?confidence=0.3" -H "Content-Type: text/turtle" -H "Accept: text/turtle"
+    </code></pre>
+    
+    <h1>
+    <a id="user-content-e-link" class="anchor" href="#e-link" aria-hidden="true"><span class="octicon octicon-link"></span></a>e-Link</h1>
+    
+    <p>The service has base URI http://rv1460.1blu.de/v1/e-link/{engine-name}. It receives NIF document (with annotated entities) and performs enrichment with pre-defined templates.</p>
+    
+    <p>Following set of parameters are supported:</p>
+    
+    <ul>
+    <li>
+    templateid: the ID of the template to be used for enrichment</li>
+    <li>
+    informat: specifies in what format the data sent for enrichment is</li>
+    <li>
+    outformat: specifies in what format the enriched data should be returned</li>
+    </ul>
+    
+    <p>Accept and Content-Type headers are also considered and implemented. Note that the informat and outformat parameters have higher priority then the Accept and Content-Type headers.</p>
+    
+    <h4>
+    <a id="user-content-examples-1" class="anchor" href="#examples-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples:</h4>
+    
+    <p><code>curl -X POST -d @data.ttl "http://rv1460.1blu.de/v1/e-link/?outformat=turtle&amp;templateid=1" -H "Content-Type: text/turtle"</code></p>
+    
+    <h4>
+    <a id="user-content-available-templates" class="anchor" href="#available-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Available templates:</h4>
+    
+    <p><strong>Template id</strong>: 1</p>
+    
+    <p><strong>Description:</strong> enriches named entities in the input document with a list of museums close to that entity. The template is executed for every named entity in the input document.</p>
+    
+    <h5>
+    <a id="user-content-sparql-endpoint-httpdbpediaorgsparql" class="anchor" href="#sparql-endpoint-httpdbpediaorgsparql" aria-hidden="true"><span class="octicon octicon-link"></span></a>SPARQL endpoint <a href="http://dbpedia.org/sparql">http://dbpedia.org/sparql</a>
+    </h5>
+    
+    <pre><code>PREFIX dbpedia: &lt;http://dbpedia.org/resource/&gt;
+    PREFIX dbpedia-owl: &lt;http://dbpedia.org/ontology/&gt;
+    PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+    PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;
+    CONSTRUCT {
+        ?museum &lt;http://xmlns.com/foaf/0.1/based_near&gt; &lt;@@@entity_uri@@@&gt; .
+    }
+    WHERE {
+        &lt;@@@entity_uri@@@&gt; geo:geometry ?citygeo .
+        ?museum rdf:type &lt;http://schema.org/Museum&gt; .
+        ?museum geo:geometry ?museumgeo .
+        FILTER (&lt;bif:st_intersects&gt;(?museumgeo, ?citygeo, 10))
+    } LIMIT 10
+    </code></pre>
+   </div> 
+</body>
+</html>
