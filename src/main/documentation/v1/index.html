@@ -140,7 +140,7 @@
     <h1>
     <a id="user-content-tilde-e-translation" class="anchor" href="#tilde-e-translation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Tilde e-Translation</h1>
     
-    <p>Tilde e-Translate has endpoint <a href="http://rv1460.1blu.de/v1/e-translation/tilde">http://rv1460.1blu.de/v1/e-translation/tilde</a>.
+    <p>Tilde e-Translate has endpoint <a href="http://rv1460.1blu.de/0.1/e-translation/tilde">http://rv1460.1blu.de/0.1/e-translation/tilde</a>.
     Parameters can be submitted via URL or via form-data post body:</p>
     
     <ul>
@@ -151,12 +151,12 @@
     <li>domain: unused optional dummy parameter</li>
     </ul>
     
-    <p>Example call for local broker: POST <a href="http://rv1460.1blu.de/v1/e-translation/tilde?input=hello+world&amp;informat=text&amp;client-id=u-bd13faca-b816-4085-95d5-05373d695ab7&amp;source-lang=en&amp;target-lang=de&amp;translation-system-id=smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813">http://rv1460.1blu.de/v1/e-translation/tilde?input=hello+world&amp;informat=text&amp;client-id=u-bd13faca-b816-4085-95d5-05373d695ab7&amp;source-lang=en&amp;target-lang=de&amp;translation-system-id=smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813</a></p>
+    <p>Example call for local broker: POST <a href="http://rv1460.1blu.de/0.1/e-translation/tilde?input=hello+world&amp;informat=text&amp;client-id=u-bd13faca-b816-4085-95d5-05373d695ab7&amp;source-lang=en&amp;target-lang=de&amp;translation-system-id=smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813">http://rv1460.1blu.de/0.1/e-translation/tilde?input=hello+world&amp;informat=text&amp;client-id=u-bd13faca-b816-4085-95d5-05373d695ab7&amp;source-lang=en&amp;target-lang=de&amp;translation-system-id=smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813</a></p>
     
     <h1>
     <a id="user-content-e-entity" class="anchor" href="#e-entity" aria-hidden="true"><span class="octicon octicon-link"></span></a>e-Entity</h1>
     
-    <p>The service has base URI http://rv1460.1blu.de/v1/e-entity/{engine-name} and it can currently process only English texts. It supports GET and POST requests.</p>
+    <p>The service has base URI http://rv1460.1blu.de/0.1/e-entity/{engine-name} and it can currently process only English texts. It supports GET and POST requests.</p>
     
     <h4>
     <a id="user-content-parameters" class="anchor" href="#parameters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Parameters</h4>
@@ -188,17 +188,17 @@
     <h4>
     <a id="user-content-examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples:</h4>
     
-    <pre><code>curl -v "http://rv1460.1blu.de/v1/e-entity/dbpedia-spotlight?confidence=0.3&amp;informat=text&amp;input=This+is+Germany." -H "Accept: text/turtle"
+    <pre><code>curl -v "http://rv1460.1blu.de/0.1/e-entity/dbpedia-spotlight?confidence=0.3&amp;informat=text&amp;input=This+is+Germany." -H "Accept: text/turtle"
     
-curl -v "http://rv1460.1blu.de/v1/e-entity/dbpedia-spotlight?confidence=0.3&amp;informat=text&amp;input=This+is+Germany." -H "Accept: application/json+ld"
+curl -v "http://rv1460.1blu.de/0.1/e-entity/dbpedia-spotlight?confidence=0.3&amp;informat=text&amp;input=This+is+Germany." -H "Accept: application/json+ld"
     
-curl -X POST -d @../src/main/resources/data/data.ttl "http://rv1460.1blu.de/v1/e-entity/dbpedia-spotlight/?confidence=0.3" -H "Content-Type: text/turtle" -H "Accept: text/turtle"
+curl -X POST -d @../src/main/resources/data/data.ttl "http://rv1460.1blu.de/0.1/e-entity/dbpedia-spotlight/?confidence=0.3" -H "Content-Type: text/turtle" -H "Accept: text/turtle"
     </code></pre>
     
     <h1>
     <a id="user-content-e-link" class="anchor" href="#e-link" aria-hidden="true"><span class="octicon octicon-link"></span></a>e-Link</h1>
     
-    <p>The service has base URI http://rv1460.1blu.de/v1/e-link/{engine-name}. It receives NIF document (with annotated entities) and performs enrichment with pre-defined templates.</p>
+    <p>The service has base URI http://rv1460.1blu.de/0.1/e-link/{engine-name}. It receives NIF document (with annotated entities) and performs enrichment with pre-defined templates.</p>
     
     <p>Following set of parameters are supported:</p>
     
@@ -216,7 +216,7 @@ curl -X POST -d @../src/main/resources/data/data.ttl "http://rv1460.1blu.de/v1/e
     <h4>
     <a id="user-content-examples-1" class="anchor" href="#examples-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples:</h4>
     
-    <p><code>curl -X POST -d @data.ttl "http://rv1460.1blu.de/v1/e-link/?outformat=turtle&amp;templateid=1" -H "Content-Type: text/turtle"</code></p>
+    <p><code>curl -X POST -d @data.ttl "http://rv1460.1blu.de/0.1/e-link/?outformat=turtle&amp;templateid=1" -H "Content-Type: text/turtle"</code></p>
     
     <h4>
     <a id="user-content-available-templates" class="anchor" href="#available-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Available templates:</h4>
