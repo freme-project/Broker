@@ -1,6 +1,6 @@
 ZIP_LOCATION="/var/www/html/freme-distributions/"
 FREME_LOCATION="/opt/freme/"
-BROKER_WORKSPACE=`pwd`
+BROKER_WORKSPACE="/var/lib/jenkins/workspace/Broker/"
 
 cd target/FREME-*-full/FREME*/
 
@@ -13,21 +13,23 @@ mv dist/Broker*.jar "dist/"$dir".jar"
 # zip it and move to zip location
 zip_file="$dir.zip"
 zip -r $zip_file "dist"
-target_zip=$ZIP_LOCATION"/*SNAPSHOT.zip"
+target_zip=$ZIP_LOCATION"*SNAPSHOT.zip"
 rm -f $target_zip
-mv $zip_file $target_zip
+mv $zip_file $ZIP_LOCATION
 
 # stop current freme
-kill `cat $FREME_LOCATION$dir"/config/pid.txt"`
+service freme stop
 
 # deploy new freme
-target_dir="$FREME_LOCATION"
 rm -rf /opt/freme/*
-mv dist/* $target_dir
-chmod +x $target_dir"/bin/start_server.sh"
-chmod +x $target_dir"/bin/start_local.sh"
-chmod +x $target_dir"/bin/restart_server.sh"
+mv dist/* $FREME_LOCATION
+chmod +x $FREME_LOCATION"bin/start_server.sh"
+chmod +x $FREME_LOCATION"bin/start_local.sh"
+chmod +x $FREME_LOCATION"bin/restart_server.sh"
 
 # configuration
-rm -r $target_dir"/config"
-cp -r $BROKER_WORKSPACE"/src/main/resources/configs/freme-dev/" $target_dir"/config/"
+rm -r $FREME_LOCATION"config"
+cp -r $BROKER_WORKSPACE"src/main/resources/configs/freme-dev/" $FREME_LOCATION"config"
+
+# start
+service freme start
