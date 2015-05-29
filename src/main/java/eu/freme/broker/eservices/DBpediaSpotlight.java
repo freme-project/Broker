@@ -70,7 +70,7 @@ public class DBpediaSpotlight extends BaseRestController {
             } else if (contentTypeHeader != null) {
                 readFrom = contentTypeHeader;
             } else {
-                throw new BadRequestException("Neither informat/i param nor the Content-Type header were set.");
+                return new ResponseEntity<String>("Neither informat/i param nor the Content-Type header were set.", HttpStatus.BAD_REQUEST);
             }
                         
             if(readFrom.equals("text")) {
@@ -83,12 +83,12 @@ public class DBpediaSpotlight extends BaseRestController {
                 } else {
                     // input and i param are not set
                     // return bad request
-                    throw new BadRequestException("You set the informat param to text, however, neither input nor i param was set.");
+                    return new ResponseEntity<String>("You set the informat param to text, however, neither input nor i param was set.", HttpStatus.BAD_REQUEST);
                 }                
             } else {
                 // the content is sent as body
                 if(contentTypeHeader == null) {
-                    throw new BadRequestException("Neither informat nor Content-Type header was set.");
+                    return new ResponseEntity<String>("Neither informat nor Content-Type header was set.", HttpStatus.BAD_REQUEST);
                 }
             
                 inModel = ModelFactory.createDefaultModel();
