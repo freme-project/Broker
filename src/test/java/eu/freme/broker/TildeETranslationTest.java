@@ -22,17 +22,16 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 
 public class TildeETranslationTest {
 
-	String url = "http://localhost:8080/e-translation/tilde";
-	ConfigurableApplicationContext context;
+	String url = null;
 
 	String clientId = "u-bd13faca-b816-4085-95d5-05373d695ab7";
 	String sourceLang = "en";
 	String targetLang = "de";
 	String translationSystemId = "smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813";
-
+	
 	@Before
-	public void setup() {
-		context = SpringApplication.run(FremeFullConfig.class);
+	public void setup(){
+		url = APITestSuite.getURLEndpoint() + "/e-translation/tilde";
 	}
 
 	private String readFile(String file) throws IOException {
@@ -82,10 +81,4 @@ public class TildeETranslationTest {
 		assertTrue(response.getStatus() == 200);
 		assertTrue(response.getBody().length() > 0);
 	}
-
-	@After
-	public void teardown() {
-		context.close();
-	}
-
 }
