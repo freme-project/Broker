@@ -10,4 +10,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value=HttpStatus.BAD_GATEWAY, reason="External service failed")
 public class ExternalServiceFailedException extends RuntimeException{
 
+	public ExternalServiceFailedException(){
+		
+	}
+	
+	public ExternalServiceFailedException(String msg){
+		super(msg);
+	}
 }

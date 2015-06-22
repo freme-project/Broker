@@ -42,12 +42,13 @@ public class NIFParameterFactory {
 			}
 			thisInformat = rdfSerializationFormats.get(informat);
 		} else {
-			if (!rdfSerializationFormats.containsKey(contentTypeHeader)) {
+			String[] contentTypeHeaderParts = contentTypeHeader.split(";");
+			if (!rdfSerializationFormats.containsKey(contentTypeHeaderParts[0])) {
 				throw new BadRequestException(
 						"Content-Type header has invalid value \""
 								+ contentTypeHeader + "\"");
 			}
-			thisInformat = rdfSerializationFormats.get(contentTypeHeader);
+			thisInformat = rdfSerializationFormats.get(contentTypeHeaderParts[0]);
 		}
 
 		RDFSerialization thisOutformat;

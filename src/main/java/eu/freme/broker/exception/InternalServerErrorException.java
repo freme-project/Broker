@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @SuppressWarnings("serial")
 @ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR)
-public class InternalServerErrrorException extends RuntimeException{
-	public InternalServerErrrorException(String msg){
+public class InternalServerErrorException extends RuntimeException{
+	public InternalServerErrorException(String msg){
 		super(msg);
 	}
 }
