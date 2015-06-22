@@ -127,7 +127,7 @@ public class TildeETranslation extends BaseRestController {
 
 		} catch (Exception e) {
 			logger.error(e);
-			throw new ExternalServiceFailedException();
+			throw new ExternalServiceFailedException(e.getMessage());
 		}
 
 		// get output format
