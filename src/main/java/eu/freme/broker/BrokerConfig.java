@@ -18,7 +18,7 @@ import eu.freme.conversion.ConversionApplicationConfig;
 /**
  * configures broker without api endpoints and e-Services
  * 
- * @author jnehring
+ * @author Jan Nehring - jan.nehring@dfki.de
  */
 
 @SpringBootApplication

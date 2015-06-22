@@ -6,6 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 
+/**
+ * Helper class to create a NIFParameterSet according to the specification of NIF.
+ * 
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class NIFParameterFactory {
 
 	@Autowired

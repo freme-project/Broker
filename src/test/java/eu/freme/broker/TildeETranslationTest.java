@@ -20,6 +20,11 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
+/**
+ * Test Tilde e-Translation broker endpoint.
+ * 
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class TildeETranslationTest {
 
 	String url = "http://localhost:8080/e-translation/tilde";

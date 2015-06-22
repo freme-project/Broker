@@ -4,6 +4,11 @@ import java.util.HashMap;
 
 import eu.freme.conversion.rdf.RDFConstants;
 
+/**
+ * Defines the RDFSerializationFormats accepted by the REST endpoints.
+ * 
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 @SuppressWarnings("serial")
 public class RDFSerializationFormats extends HashMap<String, RDFConstants.RDFSerialization>{
 

@@ -11,7 +11,12 @@ import eu.freme.broker.tools.RDFSerializationFormats;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConversionService;
 
-public class BaseRestController {
+/**
+ * Common codes for all rest controllers.
+ * 
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
+public abstract class BaseRestController {
 
 
 	Logger logger = Logger.getLogger(BaseRestController.class);

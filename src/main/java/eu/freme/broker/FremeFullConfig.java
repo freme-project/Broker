@@ -10,7 +10,7 @@ import eu.freme.eservices.elink.ELinkConfig;
 /**
  * loads BrokerConfig + API endpoints
  * 
- * @author jnehring
+ * @author Jan Nehring - jan.nehring@dfki.de
  */
 @SpringBootApplication
 @ComponentScan("eu.freme.broker.eservices")

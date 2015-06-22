@@ -30,6 +30,11 @@ import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.etranslate.TranslationConversionService;
 import eu.freme.conversion.rdf.RDFConstants;
 
+/**
+ * REST controller for Tilde e-Translation service
+ * 
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 @RestController
 public class TildeETranslation extends BaseRestController {
 
