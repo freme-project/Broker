@@ -1,13 +1,12 @@
 <assembly>
-	<id>full</id>
-	<!-- Specifies that our binary distribution is a zip package -->
+	<id>assembly-apitester</id>
 	<formats>
 		<format>dir</format>
 	</formats>
 
 	<fileSets>
 		<fileSet>
-			<directory>src/main/scripts</directory>
+			<directory>src/test/resources</directory>
 			<outputDirectory>bin</outputDirectory>
 			<includes>
 				<include>*</include>
@@ -28,4 +27,14 @@
 			</includes>
 		</fileSet>
 	</fileSets>
+
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>/</outputDirectory>
+			<useProjectArtifact>true</useProjectArtifact>
+			<useProjectAttachments>true</useProjectAttachments>
+			<scope>test</scope>
+		</dependencySet>
+	</dependencySets>
+
 </assembly>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>eu.freme</groupId>
@@ -99,26 +100,19 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<!-- MainClass in mainfest make a executable jar -->
-					<archive>
-						<manifest>
-							<mainClass>eu.freme.Broker</mainClass>
-						</manifest>
-					</archive>
-					<descriptors>
-						<descriptor>src/main/assembly/assembly.xml</descriptor>
-					</descriptors>
-					<finalName>FREME-${project.version}</finalName>
-				</configuration>
 				<executions>
 					<execution>
-						<id>make-assembly</id>
-						<!-- bind to the packaging phase -->
+						<id>freme-distribution</id>
 						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/assembly-distribution.xml</descriptor>
+							</descriptors>
+							<finalName>FREME-${project.version}</finalName>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -128,13 +122,34 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>eu.freme.broker.Broker</mainClass>
+							<mainClass>eu.freme.broker.TestRunner</mainClass>
 						</manifest>
 					</archive>
-
 					<excludes>
 						<exclude>**/*.properties</exclude>
 					</excludes>
+					<archive>
+						<manifest>
+							<mainClass>eu.freme.broker.TestRunner</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>eu.freme.brokerAPITestSuite.java</include>
+					</includes>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -171,12 +186,12 @@
 			</releases>
 		</repository>
 	</repositories>
-	
-	
+
+
 	<scm>
 		<connection>scm:git:git@github.com:freme-project/Broker.git</connection>
 		<url>scm:git:git@github.com/freme-project:Broker.git</url>
 		<developerConnection>scm:git:git@github.com:freme-project/Broker.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 </project>
