@@ -38,7 +38,7 @@ public class EPublishing {
 
         if (file.getSize() > maxUploadSize) {
             double size = maxUploadSize / (1024.0 * 1024);
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new byte[0], HttpStatus.BAD_REQUEST);
             //throw new BadRequestException(String.format("The uploaded file is too large. The maximum file size for uploads is %.2f MB", size));
         }
 
