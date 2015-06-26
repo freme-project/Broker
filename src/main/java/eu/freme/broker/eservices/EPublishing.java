@@ -2,6 +2,7 @@ package eu.freme.broker.eservices;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.MalformedJsonException;
+import eu.freme.broker.exception.BadRequestException;
 import eu.freme.eservices.epublishing.EPublishingService;
 import eu.freme.eservices.epublishing.exception.EPubCreationException;
 import eu.freme.eservices.epublishing.exception.InvalidZipException;
@@ -24,20 +25,22 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Pieter Heyvaert <pheyvaer.heyvaert@ugent.be>
  */
 @RestController
-@MultipartConfig(
-       // fileSizeThreshold   = 1024 * 1024 * 1,  // 1 MB
-        maxFileSize         = 1024 * 1024 * 200, // 10 MB
-        maxRequestSize      = 1024 * 1024 * 200 // 15 MB
-)
 public class EPublishing {
 
     private static final Logger logger = Logger.getLogger(EPublishing.class.getName());
+    private static final long maxUploadSize = 1024 * 1024 * 200;
 
     @Autowired
     EPublishingService entityAPI;
 
     @RequestMapping(value = "/e-publishing/html", method = RequestMethod.POST)
     public ResponseEntity<byte[]> htmlToEPub(@RequestParam("htmlZip") MultipartFile file, @RequestParam("metadata") String jMetadata) {
+
+        if (file.getSize() > maxUploadSize) {
+            double size = maxUploadSize / (1024.0 * 1024);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            //throw new BadRequestException(String.format("The uploaded file is too large. The maximum file size for uploads is %.2f MB", size));
+        }
 
         try {
             Gson gson = new Gson();
