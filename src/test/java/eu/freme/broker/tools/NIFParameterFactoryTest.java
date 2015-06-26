@@ -14,6 +14,9 @@ import eu.freme.broker.BrokerConfig;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BrokerConfig.class)
 public class NIFParameterFactoryTest {

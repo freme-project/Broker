@@ -11,7 +11,7 @@ import eu.freme.eservices.epublishing.EPublishingConfig;
 /**
  * loads BrokerConfig + API endpoints
  * 
- * @author jnehring
+ * @author Jan Nehring - jan.nehring@dfki.de
  */
 @SpringBootApplication
 @ComponentScan(basePackages="eu.freme.broker.eservices")

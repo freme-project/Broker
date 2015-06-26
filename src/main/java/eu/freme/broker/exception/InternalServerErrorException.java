@@ -7,10 +7,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @SuppressWarnings("serial")
-@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="")
-public class BadRequestException extends RuntimeException{
-
-	public BadRequestException(String msg){
+@ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR)
+public class InternalServerErrorException extends RuntimeException{
+	public InternalServerErrorException(String msg){
 		super(msg);
 	}
 }

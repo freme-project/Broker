@@ -6,6 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 
+/**
+ * Helper class to create a NIFParameterSet according to the specification of NIF.
+ * 
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class NIFParameterFactory {
 
 	@Autowired
@@ -37,12 +42,13 @@ public class NIFParameterFactory {
 			}
 			thisInformat = rdfSerializationFormats.get(informat);
 		} else {
-			if (!rdfSerializationFormats.containsKey(contentTypeHeader)) {
+			String[] contentTypeHeaderParts = contentTypeHeader.split(";");
+			if (!rdfSerializationFormats.containsKey(contentTypeHeaderParts[0])) {
 				throw new BadRequestException(
 						"Content-Type header has invalid value \""
 								+ contentTypeHeader + "\"");
 			}
-			thisInformat = rdfSerializationFormats.get(contentTypeHeader);
+			thisInformat = rdfSerializationFormats.get(contentTypeHeaderParts[0]);
 		}
 
 		RDFSerialization thisOutformat;

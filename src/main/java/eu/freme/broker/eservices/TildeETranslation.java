@@ -1,7 +1,9 @@
 package eu.freme.broker.eservices;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,32 +15,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.ExternalServiceFailedException;
+import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.etranslate.TranslationConversionService;
 import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 
+/**
+ * REST controller for Tilde e-Translation service
+ * 
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 @RestController
 public class TildeETranslation extends BaseRestController {
 
 	@Autowired
 	TranslationConversionService translationConversionService;
 
-	public void setAppId(String appId) {
-		this.appId = appId;
-	}
-
-	@Value("${tildemt.appid}")
-	private String appId;
-
-	private String endpoint = "https://letsmt.eu/ws/Service.svc/json/Translate?appid={appid}&systemid={systemid}&text={text}";
+	private String endpoint = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
 
 	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
 	public ResponseEntity<String> tildeTranslate(
@@ -50,104 +49,97 @@ public class TildeETranslation extends BaseRestController {
 			@RequestParam(value = "o", required = false) String o,
 			@RequestParam(value = "prefix", required = false) String prefix,
 			@RequestParam(value = "p", required = false) String p,
-			@RequestHeader(value = "Accept", required=false) String acceptHeader,
-			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
+			@RequestHeader(value = "Accept", required = false) String acceptHeader,
+			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 			@RequestBody(required = false) String postBody,
-			@RequestParam(value = "client-id") String clientId,
 			@RequestParam(value = "source-lang") String sourceLang,
 			@RequestParam(value = "target-lang") String targetLang,
-			@RequestParam(value = "translation-system-id") String translationSystemId,
-			@RequestParam(value = "domain", defaultValue = "") String domain){
+			@RequestParam(value = "domain", defaultValue = "") String domain) {
 
-		// merge long and short parameters - long parameters override short parameters
-		if( input == null ){
+		// merge long and short parameters - long parameters override short
+		// parameters
+		if (input == null) {
 			input = i;
 		}
-		if( informat == null ){
+		if (informat == null) {
 			informat = f;
 		}
-		if( outformat == null ){
+		if (outformat == null) {
 			outformat = o;
 		}
-		if( prefix == null ){
+		if (prefix == null) {
 			prefix = p;
 		}
-		NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
-		
+		NIFParameterSet parameters = this.normalizeNif(input, informat,
+				outformat, postBody, acceptHeader, contentTypeHeader, prefix);
+
 		// create rdf model
 		String plaintext = null;
-		Model model = ModelFactory.createDefaultModel();
-		Resource sourceResource = null;
+		Model inputModel = ModelFactory.createDefaultModel();
 
-		if (!parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
+		if (!parameters.getInformat().equals(
+				RDFConstants.RDFSerialization.PLAINTEXT)) {
 			// input is nif
 			try {
-				model = this.unserializeNif(parameters.getInput(), parameters.getInformat());
-				sourceResource = translationConversionService
-						.extractTextToTranslate(model);
-
-				if (sourceResource == null) {
-					throw new BadRequestException(
-							"No text to translate could be found in input.");
-				}
-				Property isString = model.getProperty(RDFConstants.nifPrefix
-						+ "isString");
-				plaintext = sourceResource.getProperty(isString).getObject()
-						.asLiteral().getString();
+				inputModel = this.unserializeNif(parameters.getInput(),
+						parameters.getInformat());
 			} catch (Exception e) {
 				logger.error("failed", e);
-				throw new BadRequestException("Error parsing input");
+				throw new BadRequestException("Error parsing NIF input");
 			}
 		} else {
 			// input is plaintext
 			plaintext = parameters.getInput();
-			sourceResource = rdfConversionService.plaintextToRDF(model,
-					plaintext, sourceLang, parameters.getPrefix());
+			try {
+				plaintext = URLDecoder.decode(plaintext, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				logger.error(e);
+				throw new InternalServerErrorException(e.getMessage());
+			}
+			rdfConversionService.plaintextToRDF(inputModel, plaintext,
+					sourceLang, parameters.getPrefix());
 		}
 
 		// send request to tilde mt
-		String translation = null;
+		Model responseModel = null;
 		try {
-			HttpResponse<String> response = Unirest.get(endpoint)
-					.routeParam("appid", appId)
-					.routeParam("systemid", translationSystemId)
-					.routeParam("text", plaintext)
-					.header("client-id", clientId)
-					.asString();
+			HttpResponse<String> response = Unirest
+					.post(endpoint)
+					.routeParam("source-lang", sourceLang)
+					.routeParam("target-lang", targetLang)
+					.header("Accept", "application/x-turtle")
+					.header("Content-Type", "application/x-turtle")
+					.body(rdfConversionService.serializeRDF(inputModel,
+							RDFSerialization.TURTLE)).asString();
 
 			if (response.getStatus() != HttpStatus.OK.value()) {
-				if( response.getStatus() == HttpStatus.BAD_REQUEST.value() ){
-					throw new BadRequestException("external service has failed: " + response.getBody());
-				} else{
-					throw new ExternalServiceFailedException();
-				}
+				logger.error("external service failed, response body: "
+						+ response.getBody());
+				throw new ExternalServiceFailedException(
+						"External service failed with status code "
+								+ response.getStatus());
 			}
 
-			translation = response.getBody();
+			String translation = response.getBody();
 
-			// strip leading and trailing slash
-			if (translation.length() > 1) {
-				translation = translation
-						.substring(1, translation.length() - 1);
-			}
-		} catch (UnirestException e) {
-			throw new ExternalServiceFailedException();
+			responseModel = rdfConversionService.unserializeRDF(translation,
+					RDFSerialization.TURTLE);
+
+		} catch (Exception e) {
+			logger.error(e);
+			throw new ExternalServiceFailedException(e.getMessage());
 		}
-
-		translationConversionService.addTranslation(translation,
-				sourceResource, targetLang);
 
 		// get output format
 		String serialization;
 		try {
-			serialization = rdfConversionService.serializeRDF(model,
+			serialization = rdfConversionService.serializeRDF(responseModel,
 					parameters.getOutformat());
 		} catch (Exception e) {
 			logger.error("failed", e);
-			return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new InternalServerErrorException("internal server error");
 		}
 
 		return new ResponseEntity<String>(serialization, HttpStatus.OK);
 	}
-
 }
