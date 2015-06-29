@@ -1,0 +1,8 @@
+@prefix nif:   <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://freme-project.eu/#char=0,17>
+        a               nif:RFC5147String , nif:Context , nif:String ;
+        nif:beginIndex  "0"^^xsd:nonNegativeInteger ;
+        nif:endIndex    "32"^^xsd:nonNegativeInteger ;
+        nif:isString    "Show me the source of the light."@en .
