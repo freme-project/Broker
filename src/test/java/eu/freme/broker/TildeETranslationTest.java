@@ -4,7 +4,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
@@ -20,15 +19,18 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
+/**
+ * Test Tilde e-Translation broker endpoint.
+ * 
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class TildeETranslationTest {
 
 	String url = "http://localhost:8080/e-translation/tilde";
 	ConfigurableApplicationContext context;
 
-	String clientId = "u-bd13faca-b816-4085-95d5-05373d695ab7";
 	String sourceLang = "en";
 	String targetLang = "de";
-	String translationSystemId = "smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813";
 
 	@Before
 	public void setup() {
@@ -48,10 +50,9 @@ public class TildeETranslationTest {
 	}
 
 	private HttpRequestWithBody baseRequest() {
-		return Unirest.post(url).queryString("client-id", clientId)
+		return Unirest.post(url)
 				.queryString("source-lang", sourceLang)
-				.queryString("target-lang", targetLang)
-				.queryString("translation-system-id", translationSystemId);
+				.queryString("target-lang", targetLang);
 	}
 
 	@Test

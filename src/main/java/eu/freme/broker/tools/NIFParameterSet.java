@@ -6,7 +6,7 @@ import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
  * describes nif parameters as defined in
  * http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html
  * 
- * @author jnehring
+ * @author Jan Nehring - jan.nehring@dfki.de
  */
 public class NIFParameterSet {
 
