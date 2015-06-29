@@ -16,15 +16,15 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @author Jan Nehring
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TildeETranslationTest.class, EEntityTest.class })
-public class APITestSuite {
+@SuiteClasses({ TestTildeETranslation.class, TESTEEntity.class })
+public class APIFullTest {
 
 	static ConfigurableApplicationContext context;
 	static boolean startFreme;
 
 	@BeforeClass
 	public static void setUp() {
-		
+		System.err.println("xxx");
 		String str = System.getProperty("freme.test.startServer");
 		if( str == null ){
 			startFreme = true;

@@ -120,37 +120,14 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>eu.freme.broker.TestRunner</mainClass>
-						</manifest>
-					</archive>
 					<excludes>
 						<exclude>**/*.properties</exclude>
 					</excludes>
-					<archive>
-						<manifest>
-							<mainClass>eu.freme.broker.TestRunner</mainClass>
-						</manifest>
-					</archive>
 				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<includes>
-						<include>eu.freme.brokerAPITestSuite.java</include>
-					</includes>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>

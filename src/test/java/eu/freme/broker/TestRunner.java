@@ -3,7 +3,7 @@ package eu.freme.broker;
 import org.junit.runner.JUnitCore;
 
 /**
- * Starter class to execute test suite from a .jar archive
+ * Starter class to execute test suite pointing to a particular endpoint.
  * 
  * @author Jan Nehring
  */
