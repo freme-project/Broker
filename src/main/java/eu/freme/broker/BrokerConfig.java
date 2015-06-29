@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import com.github.isrsal.logging.LoggingFilter;
 
 import eu.freme.broker.tools.NIFParameterFactory;
+import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.RDFSerializationFormats;
 import eu.freme.conversion.ConversionApplicationConfig;
 
@@ -40,6 +41,11 @@ public class BrokerConfig {
     	return new RDFSerializationFormats();
     }
     
+    @Bean
+    public RDFELinkSerializationFormats eLinkRdfFormats(){
+    	return new RDFELinkSerializationFormats();
+    }
+
     @Bean
     public NIFParameterFactory getNifParameterFactory(){
     	return new NIFParameterFactory();
