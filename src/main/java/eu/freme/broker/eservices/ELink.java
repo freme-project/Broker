@@ -49,8 +49,8 @@ public class ELink extends BaseRestController {
         
         // Enriching using a template.        
         // POST /e-link/enrich/
-        // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
-	@RequestMapping(value = "/e-link/enrich/", method = RequestMethod.POST)
+        // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
+	@RequestMapping(value = "/e-link/documents/", method = RequestMethod.POST)
 	public ResponseEntity<String> enrich(
 			@RequestParam(value = "templateid",    required=true)  int    templateId,
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
@@ -141,10 +141,10 @@ public class ELink extends BaseRestController {
                 }
             } catch (TemplateNotFoundException ex) {
                 logger.warn("The template with the specified ID has not been found.", ex);
-                return new ResponseEntity<String>("The template with the specified ID has not been found.", HttpStatus.NOT_FOUND);
+                throw new TemplateNotFoundException("The template with the specified ID has not been found.");
             } catch (Exception ex) {
                 logger.error("Internal service problem. Please contact the service provider.", ex);
-                return new ResponseEntity<String>("Internal service problem. Please contact the service provider.", HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new InternalServerErrorException("Unknown problem. Please contact us.");
             }
             throw new InternalServerErrorException("Unknown problem. Please contact us.");
 	}
@@ -190,7 +190,7 @@ public class ELink extends BaseRestController {
                     }
                     thisInformat = rdfELinkSerializationFormats.get(contentTypeHeader);
 		}
-                // END: Checking the outformat parameter
+                // END: Checking the informat parameter
                 
                 // Checking the outformat parameter
                 RDFSerialization thisOutformat;
@@ -293,6 +293,7 @@ public class ELink extends BaseRestController {
         
         // Get one template.
         // GET /e-link/templates/{template-id}
+        // curl -v http://api-dev.freme-project.eu/current/e-link/templates/1
 	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.GET)
 	public ResponseEntity<String> getTemplateById(
                 @RequestHeader(value = "Accept",       required=false) String acceptHeader,
@@ -305,7 +306,7 @@ public class ELink extends BaseRestController {
                 if( outformat == null ){
                     outformat = o;
                 }
-               
+
                 // Checking the outformat parameter
                 RDFSerialization thisOutformat;
                 if( acceptHeader != null && acceptHeader.equals("*/*")) {
@@ -375,6 +376,7 @@ public class ELink extends BaseRestController {
 
         // Retrieve all templates.
         // GET /e-link/templates/
+        // curl -v http://api-dev.freme-project.eu/current/e-link/templates/
 	@RequestMapping(value = "/e-link/templates/", method = RequestMethod.GET)
 	public ResponseEntity<String> getAllTemplates(
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,

@@ -19,7 +19,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import eu.freme.broker.exception.ExternalServiceFailedException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.conversion.rdf.RDFConversionService;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 
@@ -33,10 +32,7 @@ public class DBpediaSpotlight extends BaseRestController {
 	@Autowired
 	EEntityService entityAPI;
 
-//	@Autowired
-//	RDFConversionService rdfConversionService;
-
-	@RequestMapping(value = "/e-entity/dbpedia-spotlight", method = {
+	@RequestMapping(value = "/e-entity/dbpedia-spotlight/documents", method = {
             RequestMethod.POST, RequestMethod.GET })
 	public ResponseEntity<String> execute(
 			@RequestParam(value = "input", required = false) String input,
