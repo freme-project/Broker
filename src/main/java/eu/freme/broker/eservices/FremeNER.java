@@ -175,7 +175,7 @@ public class FremeNER extends BaseRestController {
 
         // Submitting dataset for use in the e-Entity service.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/?name=test&language=en" -X POST
-	@RequestMapping(value = "/e-entity/freme-ner/datasets/", method = {
+	@RequestMapping(value = "/e-entity/freme-ner/datasets", method = {
             RequestMethod.POST })
 	public ResponseEntity<String> createDataset(
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
@@ -252,7 +252,7 @@ public class FremeNER extends BaseRestController {
             }
             
             headers.add("Location",
-                    "http://139.18.2.231:8080/api/datasets/?format="+format
+                    "http://139.18.2.231:8080/api/datasets?format="+format
                     + "&name="+name
                     + "&language="+language);
             return new ResponseEntity<String>(null,headers,HttpStatus.TEMPORARY_REDIRECT);
@@ -331,7 +331,7 @@ public class FremeNER extends BaseRestController {
                     break;
             }
             headers.add("Location",
-                    "http://139.18.2.231:8080/api/datasets/"+name+"?format="+format
+                    "http://139.18.2.231:8080/api/datasets"+name+"?format="+format
                     + "&language="+language);
             
             return new ResponseEntity<String>(null,headers,HttpStatus.TEMPORARY_REDIRECT);
