@@ -106,7 +106,7 @@ public class TildeETerminology extends BaseRestController {
 			HttpResponse<String> response = Unirest.post(endpoint)
 					.queryString("sourceLang", sourceLang)
 					.queryString("targetLang", targetLang)
-					.queryString("domain", "")
+					.queryString("domain", domain)
 					.header("Accept", "application/turtle")
 					.header("Content-Type", "application/turtle")
 					.body(nifString).asString();
