@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @SuppressWarnings("serial")
 @ResponseStatus(value=HttpStatus.NOT_FOUND, reason="")
-public class TemplateNotFoundException extends RuntimeException {
+public class TemplateNotFoundException extends FREMEHttpException {
     
 	public TemplateNotFoundException(String msg){
 		super(msg);

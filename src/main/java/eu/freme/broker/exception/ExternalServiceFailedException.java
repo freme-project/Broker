@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @SuppressWarnings("serial")
 @ResponseStatus(value=HttpStatus.BAD_GATEWAY)
-public class ExternalServiceFailedException extends RuntimeException{
+public class ExternalServiceFailedException extends FREMEHttpException{
 
 	public ExternalServiceFailedException(){
 		
@@ -16,5 +16,9 @@ public class ExternalServiceFailedException extends RuntimeException{
 	
 	public ExternalServiceFailedException(String msg){
 		super(msg);
+	}
+	
+	public ExternalServiceFailedException(String msg, HttpStatus httpStatusCode){
+		super(msg, httpStatusCode);
 	}
 }

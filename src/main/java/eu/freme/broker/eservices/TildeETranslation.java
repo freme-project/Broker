@@ -113,11 +113,10 @@ public class TildeETranslation extends BaseRestController {
 							RDFSerialization.TURTLE)).asString();
 
 			if (response.getStatus() != HttpStatus.OK.value()) {
-				logger.error("external service failed, response body: "
-						+ response.getBody());
 				throw new ExternalServiceFailedException(
 						"External service failed with status code "
-								+ response.getStatus());
+								+ response.getStatus(),
+						HttpStatus.valueOf(response.getStatus()));
 			}
 
 			String translation = response.getBody();
@@ -126,8 +125,13 @@ public class TildeETranslation extends BaseRestController {
 					RDFSerialization.TURTLE);
 
 		} catch (Exception e) {
-			logger.error(e);
-			throw new ExternalServiceFailedException(e.getMessage());
+			if (e instanceof ExternalServiceFailedException) {
+				throw new ExternalServiceFailedException(e.getMessage(),
+						((ExternalServiceFailedException) e)
+								.getHttpStatusCode());
+			} else {
+				throw new ExternalServiceFailedException(e.getMessage());
+			}
 		}
 
 		// get output format

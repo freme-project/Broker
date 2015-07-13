@@ -3,7 +3,6 @@ package eu.freme.broker.eservices;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -102,7 +101,9 @@ public class TildeETerminology extends BaseRestController {
 		try {
 			String nifString = rdfConversionService.serializeRDF(inputModel,
 					RDFSerialization.TURTLE);
-			System.err.println(nifString);
+			if( logger.isDebugEnabled() ){
+				logger.debug( "send nif to tilde e-terminology: \n" + nifString);
+			}
 			HttpResponse<String> response = Unirest.post(endpoint)
 					.queryString("sourceLang", sourceLang)
 					.queryString("targetLang", targetLang)
@@ -112,11 +113,10 @@ public class TildeETerminology extends BaseRestController {
 					.body(nifString).asString();
 
 			if (response.getStatus() != HttpStatus.OK.value()) {
-				logger.error("external service failed, response body: "
-						+ response.getBody());
 				throw new ExternalServiceFailedException(
 						"External service failed with status code "
-								+ response.getStatus());
+								+ response.getStatus(),
+						HttpStatus.valueOf(response.getStatus()));
 			}
 
 			String translation = response.getBody();
@@ -125,8 +125,13 @@ public class TildeETerminology extends BaseRestController {
 					RDFSerialization.TURTLE);
 
 		} catch (Exception e) {
-			logger.error(e);
-			throw new ExternalServiceFailedException(e.getMessage());
+			if (e instanceof ExternalServiceFailedException) {
+				throw new ExternalServiceFailedException(e.getMessage(),
+						((ExternalServiceFailedException) e)
+								.getHttpStatusCode());
+			} else {
+				throw new ExternalServiceFailedException(e.getMessage());
+			}
 		}
 
 		// get output format
