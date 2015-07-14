@@ -1,4 +1,4 @@
-package eu.freme.broker;
+package eu.freme.broker.integration_tests;
 
 import static org.junit.Assert.assertTrue;
 
@@ -20,7 +20,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
-public class TestTildeETranslation {
+public class TildeETranslationTest {
 
 	String url = null;
 
@@ -31,7 +31,8 @@ public class TestTildeETranslation {
 	
 	@Before
 	public void setup(){
-		url = APIFullTest.getURLEndpoint() + "/e-translation/tilde";
+		IntegrationTestSetup.setUp();
+		url = IntegrationTestSetup.getURLEndpoint() + "/e-translation/tilde";
 	}
 
 	private String readFile(String file) throws IOException {

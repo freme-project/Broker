@@ -3,7 +3,6 @@ package eu.freme.broker.eservices;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,19 +26,16 @@ import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 
 /**
- * REST controller for Tilde e-Translation service
+ * REST controller for Tilde e-Terminology service
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @RestController
-public class TildeETranslation extends BaseRestController {
+public class TildeETerminology extends BaseRestController {
 
-	@Autowired
-	TranslationConversionService translationConversionService;
+	private String endpoint = "https://services.tilde.com/Terminology/";
 
-	private String endpoint = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
-
-	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
+	@RequestMapping(value = "/e-terminology/tilde", method = RequestMethod.POST)
 	public ResponseEntity<String> tildeTranslate(
 			@RequestParam(value = "input", required = false) String input,
 			@RequestParam(value = "i", required = false) String i,
@@ -103,14 +99,18 @@ public class TildeETranslation extends BaseRestController {
 		// send request to tilde mt
 		Model responseModel = null;
 		try {
-			HttpResponse<String> response = Unirest
-					.post(endpoint)
-					.routeParam("source-lang", sourceLang)
-					.routeParam("target-lang", targetLang)
-					.header("Accept", "application/x-turtle")
-					.header("Content-Type", "application/x-turtle")
-					.body(rdfConversionService.serializeRDF(inputModel,
-							RDFSerialization.TURTLE)).asString();
+			String nifString = rdfConversionService.serializeRDF(inputModel,
+					RDFSerialization.TURTLE);
+			if( logger.isDebugEnabled() ){
+				logger.debug( "send nif to tilde e-terminology: \n" + nifString);
+			}
+			HttpResponse<String> response = Unirest.post(endpoint)
+					.queryString("sourceLang", sourceLang)
+					.queryString("targetLang", targetLang)
+					.queryString("domain", domain)
+					.header("Accept", "application/turtle")
+					.header("Content-Type", "application/turtle")
+					.body(nifString).asString();
 
 			if (response.getStatus() != HttpStatus.OK.value()) {
 				throw new ExternalServiceFailedException(

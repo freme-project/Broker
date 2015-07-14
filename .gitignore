@@ -4,5 +4,9 @@
 .settings
 /logs/
 *~
+<<<<<<< HEAD
 .springBeans
 /bin/
+=======
+.springBeansnbactions.xml
+>>>>>>> refs/remotes/origin/master

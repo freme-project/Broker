@@ -18,7 +18,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 import eu.freme.broker.exception.ExternalServiceFailedException;
 import eu.freme.broker.tools.NIFParameterSet;
-import eu.freme.conversion.rdf.RDFConversionService;
+import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 
@@ -32,18 +32,13 @@ public class DBpediaSpotlight extends BaseRestController {
 	@Autowired
 	EEntityService entityAPI;
 
-	@Autowired
-	RDFConversionService rdfConversionService;
-
-	@RequestMapping(value = "/e-entity/dbpedia-spotlight", method = {
+	@RequestMapping(value = "/e-entity/dbpedia-spotlight/documents", method = {
             RequestMethod.POST, RequestMethod.GET })
 	public ResponseEntity<String> execute(
 			@RequestParam(value = "input", required = false) String input,
 			@RequestParam(value = "i", required = false) String i,
-                        // text, text/turtle, application/json+ld
 			@RequestParam(value = "informat", required = false) String informat,
 			@RequestParam(value = "f", required = false) String f,
-                        // text, text/turtle, application/json+ld
 			@RequestParam(value = "outformat", required = false) String outformat,
 			@RequestParam(value = "o", required = false) String o,
 			@RequestParam(value = "prefix", required = false) String prefix,
@@ -53,59 +48,50 @@ public class DBpediaSpotlight extends BaseRestController {
 			@RequestParam(value = "language", required = false) String languageParam,
 			@RequestParam(value = "confidence", required = false) String confidenceParam,
                         @RequestBody(required = false) String postBody) {
-
-            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);            
+            
+            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
            
             Model inModel;
             Model outModel = ModelFactory.createDefaultModel();;
 
+            // merge long and short parameters - long parameters override short parameters
+            if( input == null ){
+                input = i;
+            }
+            if( informat == null ){
+                informat = f;
+            }
+            if( outformat == null ){
+                outformat = o;
+            }
+            if( prefix == null ){
+                prefix = p;
+            }
+            
             String textForProcessing = null;
             
-            // text, text/turtle, application/json+ld
-            String readFrom = null;
-            if(informat != null) {
-                readFrom = informat;
-            } else if(f != null) {
-                readFrom = f;                
-            } else if (contentTypeHeader != null) {
-                readFrom = contentTypeHeader;
+            if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
+                // input is sent as value of the input parameter
+                textForProcessing = input;
             } else {
-                return new ResponseEntity<String>("Neither informat/i param nor the Content-Type header were set.", HttpStatus.BAD_REQUEST);
-            }
-                        
-            if(readFrom.equals("text")) {
-                // reading the output from the input parameter
-                if(input != null) {
-                    textForProcessing = input;
-                // reading the output from the i (short form) parameter
-                } else if (i != null) {
-                    textForProcessing = i;
-                } else {
-                    // input and i param are not set
-                    // return bad request
-                    return new ResponseEntity<String>("You set the informat param to text, however, neither input nor i param was set.", HttpStatus.BAD_REQUEST);
-                }                
-            } else {
-                // the content is sent as body
-                if(contentTypeHeader == null) {
-                    return new ResponseEntity<String>("Neither informat nor Content-Type header was set.", HttpStatus.BAD_REQUEST);
-                }
-            
+                // input is sent as body of the request
                 inModel = ModelFactory.createDefaultModel();
-                
-                switch(contentTypeHeader) {
-
-                    case "text/turtle":
+                switch(parameters.getInformat()) {
+                    case TURTLE:
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
                         break;
-                        
-                    case "application/x-turtle":
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
-                        break;
-                        
-                    case "application/json+ld":
+                    case JSON_LD:
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "JSON-LD");
                         break;
+                    case RDF_XML:
+                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "RDF/XML");
+                        break;
+                    case N_TRIPLES:
+                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N-TRIPLE");
+                        break;
+                    case N3:
+                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N3");
+                        break;                        
                 }
                 
                 StmtIterator iter = inModel.listStatements(null, RDF.type, inModel.getResource("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#Context"));
@@ -114,9 +100,14 @@ public class DBpediaSpotlight extends BaseRestController {
                     Statement isStringStm = contextRes.getProperty(inModel.getProperty("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#isString"));
                     textForProcessing = isStringStm.getObject().asLiteral().getString();                    
                 }
+                
+                if(textForProcessing == null) {
+                    throw new eu.freme.broker.exception.BadRequestException("No text to process could be found in the input.");
+                }
             }
+            
             try {
-                String dbpediaSpotlightRes = entityAPI.callDBpediaSpotlight(textForProcessing, confidenceParam, languageParam);
+                String dbpediaSpotlightRes = entityAPI.callDBpediaSpotlight(textForProcessing, confidenceParam, languageParam, parameters.getPrefix());
                 outModel.read(new ByteArrayInputStream(dbpediaSpotlightRes.getBytes()), null, "TTL");
             } catch (BadRequestException e) {
                 logger.error("failed", e);
@@ -128,12 +119,27 @@ public class DBpediaSpotlight extends BaseRestController {
             
             String serialization;
             try {
-                serialization = rdfConversionService.serializeRDF(outModel, parameters.getOutformat());
+                switch(parameters.getOutformat()) {
+                    case TURTLE:
+                        serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.TURTLE);
+                        return new ResponseEntity<String>(serialization, HttpStatus.OK);                
+                    case JSON_LD:
+                        serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.JSON_LD);
+                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
+                    case RDF_XML:
+                        serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.RDF_XML);
+                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
+                    case N_TRIPLES:
+                        serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.N_TRIPLES);
+                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
+                    case N3:
+                        serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.N3);
+                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
+                }
             } catch (Exception e) {
                 logger.error("failed", e);
                 return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            
-            return new ResponseEntity<String>(serialization, HttpStatus.OK);
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 }
