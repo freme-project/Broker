@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.NotFoundException;
 
 import org.json.JSONObject;
 
@@ -367,7 +368,12 @@ public class ELink extends BaseRestController {
                         responseHeaders.set("Content-Type", "text/n3");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                 }
-            } catch (Exception ex) {
+                
+            } 
+            catch (TemplateNotFoundException e){
+                throw new TemplateNotFoundException("Template not found.");
+            }
+            catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             }
             
