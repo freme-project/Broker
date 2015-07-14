@@ -1,8 +1,5 @@
 package eu.freme.broker.eservices;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -90,12 +87,6 @@ public class TildeETranslation extends BaseRestController {
 		} else {
 			// input is plaintext
 			plaintext = parameters.getInput();
-			try {
-				plaintext = URLDecoder.decode(plaintext, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				logger.error(e);
-				throw new InternalServerErrorException(e.getMessage());
-			}
 			rdfConversionService.plaintextToRDF(inputModel, plaintext,
 					sourceLang, parameters.getPrefix());
 		}

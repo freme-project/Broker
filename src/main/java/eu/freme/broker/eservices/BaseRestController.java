@@ -66,7 +66,7 @@ public abstract class BaseRestController {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleError(HttpServletRequest req,
 			Exception exception) {
-		logger.error("Request: " + req.getRequestURL() + " raised " + exception);
+		logger.error("Request: " + req.getRequestURL() + " raised ", exception);
 
 		HttpStatus statusCode = null;
 		if (exception instanceof MissingServletRequestParameterException) {
