@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.NotFoundException;
 
 import org.json.JSONObject;
 
