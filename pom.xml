@@ -191,6 +191,9 @@
 							<!-- <templatePath>${basedir}/templates/strapdown.html.hbs</templatePath> -->
 							<outputPath>${basedir}/target/doc/html/document.html</outputPath>
 							<swaggerDirectory>${basedir}/target/doc/swagger-ui</swaggerDirectory>
+							<apiModelPropertyAccessExclusions>
+								<apiModelPropertyAccessExclusion>hidden</apiModelPropertyAccessExclusion>
+							</apiModelPropertyAccessExclusions>
 						</apiSource>
 					</apiSources>
 				</configuration>
@@ -203,6 +206,29 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!--
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<configuration>
+							<executable>python</executable>
+							<workingDirectory>target/doc/swagger-ui/</workingDirectory>
+							<arguments>
+								<argument>excludeHiddenParams.py</argument>
+							</arguments>
+						</configuration>
+						<id>python-build</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			-->
 		</plugins>
 	</build>
 

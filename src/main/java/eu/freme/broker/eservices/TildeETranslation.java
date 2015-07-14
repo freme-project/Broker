@@ -1,10 +1,6 @@
 package eu.freme.broker.eservices;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import io.swagger.annotations.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -43,11 +39,7 @@ import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @RestController
-@Path("/pet")
-@Api(value = "pet", authorizations = {
-      @Authorization(value="sampleoauth", scopes = {})
-    })
-@Produces({"application/json", "application/xml"})
+@Api(value = "e-Translation")
 
 public class TildeETranslation extends BaseRestController {
 
@@ -58,16 +50,14 @@ public class TildeETranslation extends BaseRestController {
 
 	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
 	@POST
-	 @Path("/findByStatus")
-	 @ApiOperation(value = "Finds Pets by status",
-	    notes = "Multiple status values can be provided with comma seperated strings",
-	    responseContainer = "List")
+	@Path("/e-translation/tilde")
+	@ApiOperation(value = "e-Translation")
 
 	public ResponseEntity<String> tildeTranslate(
-			@RequestParam(value = "input", required = false) String input,
-			@RequestParam(value = "i", required = false) String i,
+			@ApiParam(value = "content to translate") @RequestParam(value = "input", required = false) String input,
+			@ApiParam(name = "HIDDEN") @RequestParam(value = "i", required = false) String i,
 			@RequestParam(value = "informat", required = false) String informat,
-			@RequestParam(value = "f", required = false) String f,
+			@ApiParam(name = "HIDDEN") @RequestParam(value = "f", required = false) String f,
 			@RequestParam(value = "outformat", required = false) String outformat,
 			@RequestParam(value = "o", required = false) String o,
 			@RequestParam(value = "prefix", required = false) String prefix,
