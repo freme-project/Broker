@@ -1,21 +1,21 @@
 package eu.freme.broker.integration_tests;
 
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import eu.freme.broker.FremeFullConfig;
 
 /**
- * This class starts FREME for integration tests. It executes all test suites
- * from the @SuiteClasses annotation. It also provides the API base url (e.g.
- * http://localhost:8080) for the test suites.
+ * This class sets up FREME integration tests. It can start FREME but can be
+ * configured by the TestRunner to not start FREME. It also provides the base
+ * url for the API under test. In case FREME is not started by
+ * IntegrationTestSetup then the base url for the API under test should be
+ * specified. This is done by TestRunner class.
  * 
  * @author Jan Nehring
  */
-public class IntegrationTestBase {
+public class IntegrationTestSetup {
 
 	static ConfigurableApplicationContext context;
 	/**
@@ -24,12 +24,12 @@ public class IntegrationTestBase {
 	 */
 	static boolean startFreme;
 
-	static Logger logger = Logger.getLogger(IntegrationTestBase.class);
+	static Logger logger = Logger.getLogger(IntegrationTestSetup.class);
+	static boolean alreadySetup = false;
 
-	@BeforeClass
 	public static void setUp() {
 
-		logger.info("---------------\nStart FREME Integration tests\n---------------");
+		logger.info("\n-------------------------------------------------------\nSetup FREME Integration tests\n-------------------------------------------------------");
 
 		String str = System.getProperty("freme.test.startServer");
 		if (str == null) {
@@ -41,9 +41,17 @@ public class IntegrationTestBase {
 		if (startFreme) {
 			context = SpringApplication.run(FremeFullConfig.class);
 		}
+
+		alreadySetup = true;
+		logger.info("\n-------------------------------------------------------\nSetup FREME Integration tests finished\n-------------------------------------------------------");
+
 	}
 
-	protected String getURLEndpoint() {
+	public static String getURLEndpoint() {
+
+		if (!alreadySetup) {
+			setUp();
+		}
 
 		String baseurl = System.getProperty("freme.test.baseurl");
 		if (baseurl != null) {
@@ -57,11 +65,4 @@ public class IntegrationTestBase {
 		}
 	}
 
-	@AfterClass
-	public static void tearDown() {
-		if (startFreme) {
-			context.close();
-		}
-		logger.info("---------------\nFinished FREME Integration tests\n---------------");
-	}
 }

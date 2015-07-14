@@ -11,13 +11,13 @@ import com.mashape.unirest.request.HttpRequestWithBody;
  *
  * @author Pieter Heyvaert <pheyvaer.heyvaert@ugent.be>
  */
-public class EPublishingTest extends IntegrationTestBase{
+public class EPublishingTest{
 
 	String url = null;
 	
 	@Before
 	public void setup(){
-		url = getURLEndpoint() + "/e-publishing/";
+		url = IntegrationTestSetup.getURLEndpoint() + "/e-publishing/";
 	}
 
     private HttpRequestWithBody baseRequest(String function) {
