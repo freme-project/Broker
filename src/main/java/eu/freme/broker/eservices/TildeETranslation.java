@@ -1,7 +1,16 @@
 package eu.freme.broker.eservices;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -32,6 +42,12 @@ import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @RestController
+@Path("/pet")
+@Api(value = "pet", authorizations = {
+      @Authorization(value="sampleoauth", scopes = {})
+    })
+@Produces({"application/json", "application/xml"})
+
 public class TildeETranslation extends BaseRestController {
 
 	@Autowired
@@ -40,6 +56,11 @@ public class TildeETranslation extends BaseRestController {
 	private String endpoint = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
 
 	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
+	 @Path("/findByStatus")
+	 @ApiOperation(value = "Finds Pets by status",
+	    notes = "Multiple status values can be provided with comma seperated strings",
+	    responseContainer = "List")
+
 	public ResponseEntity<String> tildeTranslate(
 			@RequestParam(value = "input", required = false) String input,
 			@RequestParam(value = "i", required = false) String i,

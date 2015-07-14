@@ -56,7 +56,7 @@
 			<artifactId>e-link</artifactId>
 			<version>0.2-SNAPSHOT</version>
 		</dependency>
-                <dependency>
+		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-publishing</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
@@ -79,11 +79,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 		</dependency>
-                <dependency>
-                        <groupId>org.json</groupId>
-                        <artifactId>json</artifactId>
-                        <version>20140107</version>
-                </dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
+		</dependency>
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>1.5.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -147,6 +152,55 @@
 						<exclude>**/*.properties</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.kongchen</groupId>
+				<artifactId>swagger-maven-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<apiSources>
+						<apiSource>
+							<springmvc>true</springmvc>
+							<locations>eu.freme.broker.eservices.TildeETranslation</locations>
+							<schemes>http</schemes>
+							<host>api-dev.freme-project.eu</host>
+							<basePath>/current</basePath>
+							<info>
+								<title>Swagger Maven Plugin Sample</title>
+								<version>v1</version>
+								<!-- use markdown here because I'm using markdown for output, if 
+									you need to use html or other markup language, you need to use your target 
+									language, and note escape your description for xml -->
+								<description>
+									This is a sample.
+								</description>
+								<termsOfService>
+									http://www.github.com/kongchen/swagger-maven-plugin
+								</termsOfService>
+								<contact>
+									<email>kongchen@gmail.com</email>
+									<name>Kong Chen</name>
+									<url>http://kongch.com</url>
+								</contact>
+								<license>
+									<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+									<name>Apache 2.0</name>
+								</license>
+							</info>
+							<outputPath>${basedir}/target/doc/html/document.html</outputPath>
+							<swaggerDirectory>${basedir}/target/doc/swagger-ui</swaggerDirectory>
+						</apiSource>
+					</apiSources>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+
 			</plugin>
 		</plugins>
 	</build>
