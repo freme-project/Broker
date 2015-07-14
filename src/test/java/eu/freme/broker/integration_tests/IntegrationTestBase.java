@@ -18,7 +18,7 @@ import eu.freme.broker.FremeFullConfig;
  * 
  * @author Jan Nehring
  */
-public class IntegrationTestSetup {
+public class IntegrationTestBase {
 
 	static ConfigurableApplicationContext context;
 	/**
@@ -27,19 +27,11 @@ public class IntegrationTestSetup {
 	 */
 	static boolean startFreme;
 
-	/**
-	 * setUp() is called upon every integration test and the flag alreadySetup
-	 * contols that freme is started only once.
-	 */
-	static boolean alreadySetup = false;
+	static Logger logger = Logger.getLogger(IntegrationTestBase.class);
 
-	static Logger logger = Logger.getLogger(IntegrationTestSetup.class);
-
+	@BeforeClass
 	public static void setUp() {
 
-		if( alreadySetup ){
-			return;
-		}
 		logger.info("---------------\nStart FREME Integration tests\n---------------");
 
 		String str = System.getProperty("freme.test.startServer");
@@ -52,10 +44,9 @@ public class IntegrationTestSetup {
 		if (startFreme) {
 			context = SpringApplication.run(FremeFullConfig.class);
 		}
-		alreadySetup = true;
 	}
 
-	static String getURLEndpoint() {
+	protected String getURLEndpoint() {
 
 		String baseurl = System.getProperty("freme.test.baseurl");
 		if (baseurl != null) {

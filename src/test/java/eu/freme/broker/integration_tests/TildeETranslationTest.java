@@ -20,7 +20,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
-public class TildeETranslationTest {
+public class TildeETranslationTest extends IntegrationTestBase {
 
 	String url = null;
 
@@ -31,8 +31,7 @@ public class TildeETranslationTest {
 	
 	@Before
 	public void setup(){
-		IntegrationTestSetup.setUp();
-		url = IntegrationTestSetup.getURLEndpoint() + "/e-translation/tilde";
+		url = getURLEndpoint() + "/e-translation/tilde";
 	}
 
 	private String readFile(String file) throws IOException {

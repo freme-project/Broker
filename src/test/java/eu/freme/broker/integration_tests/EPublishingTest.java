@@ -20,14 +20,13 @@ import org.springframework.context.ConfigurableApplicationContext;
  *
  * @author Pieter Heyvaert <pheyvaer.heyvaert@ugent.be>
  */
-public class EPublishingTest {
+public class EPublishingTest extends IntegrationTestBase{
 
 	String url = null;
 	
 	@Before
 	public void setup(){
-		IntegrationTestSetup.setUp();
-		url = IntegrationTestSetup.getURLEndpoint() + "/e-publishing/";
+		url = getURLEndpoint() + "/e-publishing/";
 	}
 
     private HttpRequestWithBody baseRequest(String function) {
