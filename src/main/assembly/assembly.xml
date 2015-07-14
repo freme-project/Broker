@@ -1,12 +1,12 @@
 <assembly>
-	<id>assembly-apitester</id>
+	<id>full</id>
 	<formats>
 		<format>dir</format>
 	</formats>
 
 	<fileSets>
 		<fileSet>
-			<directory>src/test/resources</directory>
+			<directory>src/main/scripts</directory>
 			<outputDirectory>bin</outputDirectory>
 			<includes>
 				<include>*</include>
@@ -27,14 +27,4 @@
 			</includes>
 		</fileSet>
 	</fileSets>
-
-	<dependencySets>
-		<dependencySet>
-			<outputDirectory>/</outputDirectory>
-			<useProjectArtifact>true</useProjectArtifact>
-			<useProjectAttachments>true</useProjectAttachments>
-			<scope>test</scope>
-		</dependencySet>
-	</dependencySets>
-
 </assembly>

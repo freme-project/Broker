@@ -119,7 +119,7 @@
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>src/main/assembly/assembly-distribution.xml</descriptor>
+								<descriptor>src/main/assembly/assembly.xml</descriptor>
 							</descriptors>
 							<finalName>FREME-${project.version}</finalName>
 						</configuration>
