@@ -84,9 +84,10 @@
 			<artifactId>json</artifactId>
 			<version>20140107</version>
 		</dependency>
+
 		<dependency>
 			<groupId>io.swagger</groupId>
-			<artifactId>swagger-annotations</artifactId>
+			<artifactId>swagger-jersey2-jaxrs</artifactId>
 			<version>1.5.0</version>
 		</dependency>
 	</dependencies>
@@ -156,12 +157,12 @@
 			<plugin>
 				<groupId>com.github.kongchen</groupId>
 				<artifactId>swagger-maven-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.1.1-SNAPSHOT</version>
 				<configuration>
 					<apiSources>
 						<apiSource>
-							<springmvc>false</springmvc>
-							<locations>eu.freme.broker.eservices.TildeETranslation</locations>
+							<springmvc>true</springmvc>
+							<locations>eu.freme.broker.eservices</locations>
 							<schemes>http</schemes>
 							<host>api-dev.freme-project.eu</host>
 							<basePath>/current</basePath>
@@ -187,6 +188,7 @@
 									<name>Apache 2.0</name>
 								</license>
 							</info>
+							<!-- <templatePath>${basedir}/templates/strapdown.html.hbs</templatePath> -->
 							<outputPath>${basedir}/target/doc/html/document.html</outputPath>
 							<swaggerDirectory>${basedir}/target/doc/swagger-ui</swaggerDirectory>
 						</apiSource>
@@ -200,7 +202,6 @@
 						</goals>
 					</execution>
 				</executions>
-
 			</plugin>
 		</plugins>
 	</build>
@@ -236,6 +237,19 @@
 			</releases>
 		</repository>
 	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>sonatype-snapshot</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 
 	<scm>
