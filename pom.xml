@@ -160,7 +160,7 @@
 				<configuration>
 					<apiSources>
 						<apiSource>
-							<springmvc>true</springmvc>
+							<springmvc>false</springmvc>
 							<locations>eu.freme.broker.eservices.TildeETranslation</locations>
 							<schemes>http</schemes>
 							<host>api-dev.freme-project.eu</host>

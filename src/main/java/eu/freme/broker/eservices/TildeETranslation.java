@@ -9,6 +9,7 @@ import io.swagger.annotations.Authorization;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
@@ -56,6 +57,7 @@ public class TildeETranslation extends BaseRestController {
 	private String endpoint = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
 
 	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
+	@POST
 	 @Path("/findByStatus")
 	 @ApiOperation(value = "Finds Pets by status",
 	    notes = "Multiple status values can be provided with comma seperated strings",
