@@ -1,6 +1,7 @@
 package eu.freme.broker.eservices;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -31,7 +32,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.web.bind.annotation.RequestBody;
 
+
+import io.swagger.annotations.*;
 @RestController
+
+@Api(value="e-Entity")
+
 public class FremeNER extends BaseRestController {
 
 	@Autowired
@@ -40,20 +46,43 @@ public class FremeNER extends BaseRestController {
         // Submitting document for processing.
 	@RequestMapping(value = "/e-entity/freme-ner/documents", method = {
             RequestMethod.POST, RequestMethod.GET })
+	
+
+	 @ApiOperation(httpMethod="POST" , value = "Entity recognition and linking using Freme-NER engine.",
+	    notes = "Entity enrichment with Freme-NER engine",
+	    responseContainer = "List")
+	 @ApiResponses(value = { @ApiResponse(code = 400, message = "Insert message"),
+	    @ApiResponse(code = 404, message = "Insert message") })
+
 	public ResponseEntity<String> execute(
+			@ApiParam(value="Plaintext sent as value of the input parameter. Short form is i.")
 			@RequestParam(value = "input", required = false) String input,
-			@RequestParam(value = "i", required = false) String i,
+			@ApiParam(name="HIDDEN") @RequestParam(value = "i", required = false) String i,
+			
+			@ApiParam(value="Format of input string. Only \"text\" is provided (default). Overrides Content-Type header. Short form is f.")
 			@RequestParam(value = "informat", required = false) String informat,
-			@RequestParam(value = "f", required = false) String f,
+			@ApiParam(name="HIDDEN") @RequestParam(value = "f", required = false) String f,
+			
+			@ApiParam("RDF serialization format of Output. Can be \"json-ld\", \"turtle\" (?). Defaults to \"turtle\". Overrides Accept Header. Short form is o.")
 			@RequestParam(value = "outformat", required = false) String outformat,
-			@RequestParam(value = "o", required = false) String o,
+			@ApiParam(name="HIDDEN") @RequestParam(value = "o", required = false) String o,
+			
+			@ApiParam("Unused optional Parameter. Short form is p.")
 			@RequestParam(value = "prefix", required = false) String prefix,
-			@RequestParam(value = "p", required = false) String p,
+			@ApiParam(name="HIDDEN") @RequestParam(value = "p", required = false) String p,
+			
+			@ApiParam(value="Format of outputg. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". ")
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
+			
+			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". ")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+			
+			@ApiParam(value="Source language. Can be en,de,nl,fr,it,es (according to supported NER engine).")
 			@RequestParam(value = "language", required = false) String language,
+			
+			@ApiParam(value="A mandatory parameter which indicates the dataset used for entity linking which includes a list of entites and associated labels.")
 			@RequestParam(value = "dataset", required = false) String dataset,
-                        @RequestBody(required = false) String postBody) {
+            @RequestBody(required = false) String postBody) {
             
             // Check the language parameter.
             if(language == null) {

@@ -38,8 +38,10 @@ import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
+
 @RestController
 @Api(value = "e-Translation")
+@Produces({"application/json", "application/xml"})
 
 public class TildeETranslation extends BaseRestController {
 
@@ -50,23 +52,44 @@ public class TildeETranslation extends BaseRestController {
 
 	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
 	@POST
-	@Path("/e-translation/tilde")
-	@ApiOperation(value = "e-Translation")
+
+	 @ApiOperation(value = "Translate from source-language to target-language",
+	    notes = "Perform machine translation with Tilde's API.",
+	    responseContainer = "List")
+     @ApiResponses(value = { @ApiResponse(code = 400, message = "Insert message"),
+	    @ApiResponse(code = 404, message = "Insert message") })
 
 	public ResponseEntity<String> tildeTranslate(
-			@ApiParam(value = "content to translate") @RequestParam(value = "input", required = false) String input,
-			@ApiParam(name = "HIDDEN") @RequestParam(value = "i", required = false) String i,
+
+			@ApiParam(value="The string to be translated. Short form is i.") 
+			@RequestParam(value = "input", required = false) String input,
+			@ApiParam(name="HIDDEN") @RequestParam(value = "i", required = false) String i,
+
+			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Content-Type header. Short form is f.")
 			@RequestParam(value = "informat", required = false) String informat,
-			@ApiParam(name = "HIDDEN") @RequestParam(value = "f", required = false) String f,
+			@ApiParam(name="HIDDEN") @RequestParam(value = "f", required = false) String f,
+			
+			@ApiParam(value="Format of output string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Accept header. Short form is o.")
 			@RequestParam(value = "outformat", required = false) String outformat,
-			@ApiParam(name = "HIDDEN") @RequestParam(value = "o", required = false) String o,
+			@ApiParam(name="HIDDEN") @RequestParam(value = "o", required = false) String o,
+
+			@ApiParam(value="Controls the url of rdf resources generated from plaintext. Has default value \"http://freme-project.eu/\"")
 			@RequestParam(value = "prefix", required = false) String prefix,
-			@ApiParam(name = "HIDDEN") @RequestParam(value = "p", required = false) String p,
+			@ApiParam(name="HIDDEN") @RequestParam(value = "p", required = false) String p,
+
+			@ApiParam(value="Format of output. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".")
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
+
+			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+
 			@RequestBody(required = false) String postBody,
-			@RequestParam(value = "source-lang") String sourceLang,
-			@RequestParam(value = "target-lang") String targetLang,
+
+			@ApiParam(value="Source language to be translated from, e.g. \"en\".") @RequestParam(value = "source-lang") String sourceLang,
+
+			@ApiParam(value="Target language to be translated to, e.g. \"de\".") @RequestParam(value = "target-lang") String targetLang,
+			
+			@ApiParam(value="Currently not used", required=false)
 			@RequestParam(value = "domain", defaultValue = "") String domain) {
 
 		// merge long and short parameters - long parameters override short
