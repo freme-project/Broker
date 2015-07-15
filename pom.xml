@@ -207,6 +207,25 @@
 				</executions>
 			</plugin>
 
+			<plugin>
+				<groupId>com.github.arnebinder</groupId>
+				<artifactId>hide-swagger-params-maven-plugin</artifactId>
+				<version>0.1-SNAPSHOT</version>
+				<configuration>
+					<jsonfile>target/doc/swagger-ui/swagger.json</jsonfile>
+					<hiddenNameValue>HIDDEN</hiddenNameValue>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>hideparams</goal>
+						</goals>
+					</execution>
+				</executions>
+
+			</plugin>
+
 			<!--
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
