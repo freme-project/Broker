@@ -22,8 +22,8 @@ import eu.freme.broker.tools.NIFParameterFactory;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.RDFSerializationFormats;
-import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.conversion.rdf.RDFConversionService;
+import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.conversion.rdf.RDFConversionService;
 
 /**
  * Common codes for all rest controllers.

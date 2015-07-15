@@ -1,6 +1,6 @@
 package eu.freme.broker.tools;
 
-import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
+import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 
 /**
  * describes nif parameters as defined in

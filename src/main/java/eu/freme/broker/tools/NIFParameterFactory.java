@@ -4,7 +4,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.freme.broker.exception.BadRequestException;
-import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
+import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 
 /**
  * Helper class to create a NIFParameterSet according to the specification of NIF.

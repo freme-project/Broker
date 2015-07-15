@@ -14,7 +14,7 @@ import eu.freme.broker.tools.CORSFilter;
 import eu.freme.broker.tools.NIFParameterFactory;
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.RDFSerializationFormats;
-import eu.freme.conversion.ConversionApplicationConfig;
+import eu.freme.common.ConversionApplicationConfig;
 
 /**
  * configures broker without api endpoints and e-Services

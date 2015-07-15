@@ -15,8 +15,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.tools.NIFParameterSet;
-import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
+import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 import eu.freme.eservices.elink.DataEnricher;
 import eu.freme.eservices.elink.Exporter;
 import eu.freme.eservices.elink.Template;
@@ -30,10 +30,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.ws.rs.NotFoundException;
 
 import org.json.JSONObject;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
