@@ -99,7 +99,7 @@ public class FremeNER extends BaseRestController {
             
             if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
                 // input is sent as value of the input parameter
-                textForProcessing = input;
+                textForProcessing = parameters.getInput();
             } else {
                 // input is sent as body of the request
                 inModel = ModelFactory.createDefaultModel();
