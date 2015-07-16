@@ -206,14 +206,15 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>com.github.arnebinder</groupId>
 				<artifactId>hide-swagger-params-maven-plugin</artifactId>
 				<version>0.1-SNAPSHOT</version>
 				<configuration>
 					<jsonfile>target/doc/swagger-ui/swagger.json</jsonfile>
-					<hiddenNameValue>HIDDEN</hiddenNameValue>
+					<yamlfile>../Documentation/swagger.yaml</yamlfile>
+					<excludeKey>description</excludeKey>
+					<excludeValue>HIDDEN</excludeValue>
 				</configuration>
 				<executions>
 					<execution>
@@ -223,31 +224,7 @@
 						</goals>
 					</execution>
 				</executions>
-
 			</plugin>
-
-			<!--
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<configuration>
-							<executable>python</executable>
-							<workingDirectory>target/doc/swagger-ui/</workingDirectory>
-							<arguments>
-								<argument>excludeHiddenParams.py</argument>
-							</arguments>
-						</configuration>
-						<id>python-build</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			-->
 		</plugins>
 	</build>
 

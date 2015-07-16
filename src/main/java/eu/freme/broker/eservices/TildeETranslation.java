@@ -53,41 +53,54 @@ public class TildeETranslation extends BaseRestController {
 	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
 	@POST
 
-	 @ApiOperation(value = "Translate from source-language to target-language",
-	    notes = "Perform machine translation with Tilde's API.",
-	    responseContainer = "List")
-     @ApiResponses(value = { @ApiResponse(code = 400, message = "Insert message"),
-	    @ApiResponse(code = 404, message = "Insert message") })
+	@ApiOperation(value = "Translate from source-language to target-language",
+	    notes = "Perform machine translation with Tilde's API.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successful response"),
+			@ApiResponse(code = 400, message = "Insert message"),
+			@ApiResponse(code = 404, message = "Insert message") })
 
 	public ResponseEntity<String> tildeTranslate(
 
 			@ApiParam(value="The string to be translated. Short form is i.") 
 			@RequestParam(value = "input", required = false) String input,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "i", required = false) String i,
+			@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
 
-			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Content-Type header. Short form is f.")
+			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Content-Type header. Short form is f.",
+					allowableValues = "json-ld,turtle,text",
+					defaultValue = "turtle")
 			@RequestParam(value = "informat", required = false) String informat,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "f", required = false) String f,
+			@ApiParam(value="HIDDEN") @RequestParam(value = "f", required = false) String f,
 			
-			@ApiParam(value="Format of output string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Accept header. Short form is o.")
+			@ApiParam(value="Format of output string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Accept header. Short form is o.",
+					allowableValues = "json-ld,turtle,text",
+					defaultValue = "turtle")
 			@RequestParam(value = "outformat", required = false) String outformat,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "o", required = false) String o,
+			@ApiParam(value="HIDDEN") @RequestParam(value = "o", required = false) String o,
 
 			@ApiParam(value="Controls the url of rdf resources generated from plaintext. Has default value \"http://freme-project.eu/\"")
 			@RequestParam(value = "prefix", required = false) String prefix,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "p", required = false) String p,
+			@ApiParam(value="HIDDEN") @RequestParam(value = "p", required = false) String p,
 
-			@ApiParam(value="Format of output. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".")
+			@ApiParam(value="Format of output. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".",
+					allowableValues = "json-ld,turtle,text",
+					defaultValue = "turtle")
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 
-			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".")
+			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".",
+					allowableValues = "json-ld,turtle,text",
+					defaultValue = "turtle")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
 			@RequestBody(required = false) String postBody,
 
-			@ApiParam(value="Source language to be translated from, e.g. \"en\".") @RequestParam(value = "source-lang") String sourceLang,
+			@ApiParam(value="Source language, e.g. \"en\". A list of available language pairs is [here](https://services.tilde.com/translationsystems).",
+					allowableValues = "en,de,fr,nl,it,es")
+			@RequestParam(value = "source-lang") String sourceLang,
 
-			@ApiParam(value="Target language to be translated to, e.g. \"de\".") @RequestParam(value = "target-lang") String targetLang,
+			@ApiParam(value="Target language, e.g. \"de\". A list of available language pairs is [here](https://services.tilde.com/translationsystems).",
+					allowableValues = "en,de,fr,nl,it,es")
+			@RequestParam(value = "target-lang") String targetLang,
 			
 			@ApiParam(value="Currently not used", required=false)
 			@RequestParam(value = "domain", defaultValue = "") String domain) {

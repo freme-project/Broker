@@ -36,46 +36,61 @@ public class DBpediaSpotlight extends BaseRestController {
 
 	@RequestMapping(value = "/e-entity/dbpedia-spotlight/documents", method = {
             RequestMethod.POST, RequestMethod.GET })
-	
 
-	 @ApiOperation(value = "Entity recognition and linking usind DBPedia-Spotlight engine.",
-	    notes = "Entity enrichment with DBPedia-Spotlight engine",
+	@ApiOperation(notes = "Enriches Text content with entities gathered by the DBPedia Spotlight engine.The service also accepts text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing.",
+	    value = "Entity recognition and linking using DBPedia Spotlight engine. ",
 	    responseContainer = "List")
-	 @ApiResponses(value = { @ApiResponse(code = 400, message = "Insert message"),
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response",
+                    response = String.class),
+            @ApiResponse(code = 400, message = "Insert message"),
 	    @ApiResponse(code = 404, message = "Insert message") })
-	
-	
-	
+
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "body", value = "HIDDEN", required = false, dataType = "string", paramType = "body")
+    })
 	public ResponseEntity<String> execute(
 			
 			@ApiParam(value="Plaintext sent as value of the input parameter. Short form is i.")
-			@RequestParam(value = "input", required = false) String input,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "i", required = false) String i,
+			@RequestParam(value = "input", required = true) String input,
+			@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
 			
-			@ApiParam(value="Format of input string. Only \"text\" is provided (default). Overrides Content-Type header. Short form is f.")
+			@ApiParam(value="Format of input string. Only \"text\" is provided (default). Overrides Content-Type header. Short form is f.",
+                    allowableValues = "text",
+                    defaultValue = "text")
 			@RequestParam(value = "informat", required = false) String informat,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "f", required = false) String f,
+			@ApiParam(value="HIDDEN") @RequestParam(value = "f", required = false) String f,
 			
-			@ApiParam("RDF serialization format of Output. Can be \"json-ld\", \"turtle\" (?). Defaults to \"turtle\". Overrides Accept Header. Short form is o.")
+			@ApiParam(value = "RDF serialization format of Output. Can be \"json-ld\", \"turtle\" (?). Defaults to \"turtle\". Overrides Accept Header. Short form is o.",
+                    allowableValues = "json-ld,turtle,text",
+                    defaultValue = "turtle")
 			@RequestParam(value = "outformat", required = false) String outformat,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "o", required = false) String o,
+			@ApiParam(value="HIDDEN") @RequestParam(value = "o", required = false) String o,
 			
 			@ApiParam("Unused optional Parameter. Short form is p.")
 			@RequestParam(value = "prefix", required = false) String prefix,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "p", required = false) String p,
+			@ApiParam(value="HIDDEN") @RequestParam(value = "p", required = false) String p,
 			
-			@ApiParam(value="Format of outputg. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". ")
+			@ApiParam(value="Format of output. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".",
+                    allowableValues = "json-ld,turtle,text",
+                    defaultValue = "turtle")
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 			
-			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". ")
+			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".",
+                    allowableValues = "json-ld,turtle,text",
+                    defaultValue = "turtle")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 			
-			@ApiParam(value="Source language. Can be en,de,nl,fr,it,es (according to supported NER engine).")
+			@ApiParam(value="Source language. Can be en,de,nl,fr,it,es (according to supported NER engine).",
+                    allowableValues = "en,de,nl,fr,it,es")
 			@RequestParam(value = "language", required = false) String languageParam,
 			
-			@ApiParam(value="Threshhold to limit the output of entities. Default is 0.3")
+			@ApiParam(value="Threshold to limit the output of entities. Default is 0.3",
+                defaultValue = "0.3")
 			@RequestParam(value = "confidence", required = false) String confidenceParam,
-                        @RequestBody(required = false) String postBody) {
+
+            @RequestBody(required = false) String postBody) {
             
             NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
            
