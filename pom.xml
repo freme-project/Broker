@@ -164,8 +164,8 @@
 							<springmvc>true</springmvc>
 							<locations>eu.freme.broker.eservices.TildeETranslation</locations>
 							<schemes>http</schemes>
-							<host>api-dev.freme-project.eu</host>
-							<basePath>/current</basePath>
+							<host>api.freme-project.eu</host>
+							<basePath>/0.2</basePath>
 							<info>
 								<title>FREME API Documentation</title>
 								<version>0.2</version>
