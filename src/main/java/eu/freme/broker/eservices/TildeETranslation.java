@@ -62,8 +62,8 @@ public class TildeETranslation extends BaseRestController {
 			@ApiResponse(code = 406, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-translation/tilde",
 			method = RequestMethod.POST,
-			produces = {"text/plain", "text/turtle", "application/json+ld"},
-			consumes = {"text/plain", "text/turtle", "application/json+ld"})
+			produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
+			consumes = {"text/plain", "text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml","text/n3"})
 
 	public ResponseEntity<String> tildeTranslate(
 
