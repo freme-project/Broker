@@ -53,41 +53,40 @@ public class TildeETranslation extends BaseRestController {
 	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
 	@POST
 
-	@ApiOperation(value = "Translate from source-language to target-language",
-	    notes = "Perform machine translation with Tilde's API.")
+	@ApiOperation(value = "Perform machine translation using Tilde's API",
+	    notes = "Parameters can be submitted via URL or via form-data post body. A list of available language pairs is [here](https://services.tilde.com/translationsystems).")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successful response"),
-			@ApiResponse(code = 400, message = "Insert message"),
-			@ApiResponse(code = 404, message = "Insert message") })
+			@ApiResponse(code = 406, message = "Bad request - input validation failed") })
 
 	public ResponseEntity<String> tildeTranslate(
 
-			@ApiParam(value="The string to be translated. Short form is i.") 
+			@ApiParam(value="The string to be translated. Can be either plaintext or NIF (see parameter informat). Short form is i.")
 			@RequestParam(value = "input", required = false) String input,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
 
-			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Content-Type header. Short form is f.",
+			@ApiParam(value="Format of input string. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Content-Type header. Short form is f.",
 					allowableValues = "json-ld,turtle,text",
 					defaultValue = "turtle")
 			@RequestParam(value = "informat", required = false) String informat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "f", required = false) String f,
 			
-			@ApiParam(value="Format of output string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Accept header. Short form is o.",
+			@ApiParam(value="Format of output string. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Accept header. Short form is o.",
 					allowableValues = "json-ld,turtle,text",
 					defaultValue = "turtle")
 			@RequestParam(value = "outformat", required = false) String outformat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "o", required = false) String o,
 
-			@ApiParam(value="Controls the url of rdf resources generated from plaintext. Has default value \"http://freme-project.eu/\"")
+			@ApiParam(value="Controls the url of rdf resources generated from plaintext. Has default value \"http://freme-project.eu/\". Short form is p.")
 			@RequestParam(value = "prefix", required = false) String prefix,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "p", required = false) String p,
 
-			@ApiParam(value="Format of output. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".",
+			@ApiParam(value="Format of output. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". The parameter *outformat* overrides Accept header.",
 					allowableValues = "json-ld,turtle,text",
 					defaultValue = "turtle")
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 
-			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".",
+			@ApiParam(value="Format of input string. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". The parameter *informat* overrides Content-Type header.",
 					allowableValues = "json-ld,turtle,text",
 					defaultValue = "turtle")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
@@ -102,8 +101,8 @@ public class TildeETranslation extends BaseRestController {
 					allowableValues = "en,de,fr,nl,it,es")
 			@RequestParam(value = "target-lang") String targetLang,
 			
-			@ApiParam(value="Currently not used", required=false)
-			@RequestParam(value = "domain", defaultValue = "") String domain) {
+			@ApiParam(value="Currently not used")
+			@RequestParam(value = "domain", defaultValue = "", required=false) String domain) {
 
 		// merge long and short parameters - long parameters override short
 		// parameters
