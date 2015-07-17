@@ -67,7 +67,7 @@ public class TildeETranslation extends BaseRestController {
 
 	public ResponseEntity<String> tildeTranslate(
 
-			@ApiParam(value="The string to be translated. Can be either plaintext or NIF (see parameter informat). Short form is i.")
+			@ApiParam(value="The string to be translated. Can be either plaintext or NIF (see parameter informat). Short form is i. If set, it will be prefered over the body content.")
 			@RequestParam(value = "input", required = false) String input,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
 
