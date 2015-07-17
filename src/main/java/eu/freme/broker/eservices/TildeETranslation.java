@@ -87,14 +87,14 @@ public class TildeETranslation extends BaseRestController {
 			@RequestParam(value = "prefix", required = false) String prefix,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "p", required = false) String p,
 
-			@ApiParam(value="Format of output. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". The parameter *outformat* overrides Accept header.",
-					allowableValues = requestFormatValuesShort,
-					defaultValue = "turtle")
+			//@ApiParam(value="Format of output. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". The parameter *outformat* overrides Accept header.",
+			//		allowableValues = requestFormatValuesShort,
+			//		defaultValue = "turtle")
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 
-			@ApiParam(value="Format of input string. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". The parameter *informat* overrides Content-Type header.",
-					allowableValues = requestFormatValuesShort,
-					defaultValue = "turtle")
+			//@ApiParam(value="Format of input string. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". The parameter *informat* overrides Content-Type header.",
+			//		allowableValues = requestFormatValuesShort,
+			//		defaultValue = "turtle")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
 			@RequestBody(required = false) String postBody,
