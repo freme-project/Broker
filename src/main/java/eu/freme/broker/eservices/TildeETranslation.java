@@ -51,7 +51,7 @@ public class TildeETranslation extends BaseRestController {
 
 	private String endpoint = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
 
-	private final String requestFormatValuesShort = "text, json-ld, turtle";
+	//private final String requestFormatValuesShort = "text, json-ld, turtle";
 	//private final String[] requestFormatValuesMime = {"text/plain", "text/turtle", "application/json+ld"};
 
 	@POST
@@ -63,7 +63,7 @@ public class TildeETranslation extends BaseRestController {
 	@RequestMapping(value = "/e-translation/tilde",
 			method = RequestMethod.POST,
 			produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
-			consumes = {"text/plain", "text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml","text/n3"})
+			consumes = {"text/plain", "text/turtle", "application/json+ld"})//, "application/n-triples", "application/rdf+xml","text/n3"})
 
 	public ResponseEntity<String> tildeTranslate(
 
@@ -72,13 +72,13 @@ public class TildeETranslation extends BaseRestController {
 			@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
 
 			@ApiParam(value="Format of input string. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Content-Type header. Short form is f.",
-					allowableValues = requestFormatValuesShort,
+					allowableValues = "text, json-ld, turtle",
 					defaultValue = "turtle")
 			@RequestParam(value = "informat", required = false) String informat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "f", required = false) String f,
 			
 			@ApiParam(value="Format of output string. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Accept header. Short form is o.",
-					allowableValues = requestFormatValuesShort,
+					allowableValues = "json-ld, turtle",
 					defaultValue = "turtle")
 			@RequestParam(value = "outformat", required = false) String outformat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -97,6 +97,7 @@ public class TildeETranslation extends BaseRestController {
 			//		defaultValue = "turtle")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
+			@ApiParam(value="The string to be translated. Can be either plaintext or NIF. Will be overwritten by parameter input, if set. The format of the body can be \"text/plain\", \"text/turtle\", \"application/json+ld\". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
 			@RequestBody(required = false) String postBody,
 
 			@ApiParam(value="Source language, e.g. \"en\". A list of available language pairs is [here](https://services.tilde.com/translationsystems).",
