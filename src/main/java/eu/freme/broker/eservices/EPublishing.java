@@ -12,10 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.annotation.MultipartConfig;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +64,11 @@ public class EPublishing {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
             @ApiResponse(code = 400, message = "Bad request - input validation failed") })
-    @RequestMapping(value = "/e-publishing/html", method = RequestMethod.POST)
+    @RequestMapping(value = "/e-publishing/html",
+            method = RequestMethod.POST,
+           // consumes = "application/zip",
+            consumes = "multipart/form-data",
+            produces = "application/epub+zip")
     public ResponseEntity<byte[]> htmlToEPub(
             @RequestParam("htmlZip") MultipartFile file,
             @RequestParam("metadata") String jMetadata) {
