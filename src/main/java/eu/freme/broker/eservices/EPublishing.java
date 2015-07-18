@@ -11,6 +11,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.annotation.MultipartConfig;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Pieter Heyvaert <pheyvaer.heyvaert@ugent.be>
  */
+@Api(value= "e-Publishing")
 @RestController
 public class EPublishing {
 
@@ -33,8 +39,38 @@ public class EPublishing {
     @Autowired
     EPublishingService entityAPI;
 
+
+    @ApiOperation(value = "Create eBooks in the EPUB3 format",
+            notes = "Creates an eBook in the EPUB3 format from a zip file containing HTML Files and more (images etc.) and a json file containing all necessary metadata for the creation of the eBook.\n" +
+                    "\n" +
+                    "**Example Call**\n" +
+                    "\n" +
+                    "`curl --form \"htmlZip=@alice.zip\" --form metadata='json-string' http://api-dev.freme-project.eu/current/e-publishing/html`\n" +
+                    "\n" +
+                    "**Metadata JSON may include the following**\n" +
+                    "* `titles` - a list of Strings where each String represents one title\n" +
+                    "* `authors` - a list of Strings where each String represents one author\n" +
+                    "* `illustrators` - a list of Strings where each String represents one illustrator\n" +
+                    "* `creators` - a list of Strings where each String represents one creator\n" +
+                    "* `subjects` - a list of Strings where each String represents one subject\n" +
+                    "* `coverImage` - the location of the cover image inside the zip file\n" +
+                    "* `language` - the language of the content (e.g., 'en')\n" +
+                    "* `source` - the original source of the content\n" +
+                    "* `description` - the description of the EPUB\n" +
+                    "* `rights` - the rights applicable to the EPUB\n" +
+                    "* `identifier` - the identifier is represented by 'value', 'scheme' is optional and represents the used scheme corresponding with the value.\n" +
+                    "* `tableOfContents` - it is an ordered list of the chapters/sections in the EPUB. For each you provide the title and the corresponding HTML file (= resource). If no tableOfContents is provided, the service will do a best effort at creating one. However, when no (x)html file is found in the root of the zip, the service will return an invalid EPUB.\n" +
+                    "\n" +
+                    "**Sample .zips**\n" +
+                    "* [Alice in wonderland](https://drive.google.com/open?id=0B-qMtkPK-unYbVROT1J2TTRycDg&authuser=0)\n" +
+                    "* [A shared culture](https://drive.google.com/open?id=0B-qMtkPK-unYdWlHTWMyS2VaV28&authuser=0)")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
     @RequestMapping(value = "/e-publishing/html", method = RequestMethod.POST)
-    public ResponseEntity<byte[]> htmlToEPub(@RequestParam("htmlZip") MultipartFile file, @RequestParam("metadata") String jMetadata) {
+    public ResponseEntity<byte[]> htmlToEPub(
+            @RequestParam("htmlZip") MultipartFile file,
+            @RequestParam("metadata") String jMetadata) {
 
         if (file.getSize() > maxUploadSize) {
             double size = maxUploadSize / (1024.0 * 1024);

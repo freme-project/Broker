@@ -42,7 +42,6 @@ import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 
 @RestController
 @Api(value = "e-Translation")
-@Produces({"application/json", "application/xml"})
 
 public class TildeETranslation extends BaseRestController {
 
@@ -54,7 +53,6 @@ public class TildeETranslation extends BaseRestController {
 	//private final String requestFormatValuesShort = "text, json-ld, turtle";
 	//private final String[] requestFormatValuesMime = {"text/plain", "text/turtle", "application/json+ld"};
 
-	@POST
 	@ApiOperation(value = "Perform machine translation using Tilde's API",
 	    notes = "Parameters can be submitted via URL or via form-data post body. A list of available language pairs is [here](https://services.tilde.com/translationsystems).")
 	@ApiResponses(value = {

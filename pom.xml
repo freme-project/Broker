@@ -162,7 +162,7 @@
 					<apiSources>
 						<apiSource>
 							<springmvc>true</springmvc>
-							<locations>eu.freme.broker.eservices.TildeETranslation</locations>
+							<locations>eu.freme.broker.eservices.EPublishing</locations>
 							<schemes>http</schemes>
 							<host>api.freme-project.eu</host>
 							<basePath>/0.2</basePath>
