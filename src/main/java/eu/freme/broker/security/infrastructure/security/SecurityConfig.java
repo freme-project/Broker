@@ -1,14 +1,21 @@
 package eu.freme.broker.security.infrastructure.security;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
 
 import eu.freme.broker.security.api.ApiController;
 import eu.freme.broker.security.infrastructure.externalwebservice.SomeExternalServiceAuthenticator;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.vote.AffirmativeBased;
+import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -20,6 +27,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,10 +37,12 @@ import javax.servlet.http.HttpServletResponse;
 @EnableWebMvcSecurity
 @EnableScheduling
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter implements ApplicationContextAware{
 
     @Value("${backend.admin.role}")
     private String backendAdminRole;
+    
+    private ApplicationContext applicationContext;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -39,21 +50,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 csrf().disable().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
                 and().
-                authorizeRequests().
-                antMatchers(actuatorEndpoints()).hasRole(backendAdminRole).
-                anyRequest().authenticated().
+                authorizeRequests().anyRequest().anonymous().
                 and().
-                anonymous().disable().
                 exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
 
         http.addFilterBefore(new AuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class).
                 addFilterBefore(new ManagementEndpointAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class);
-    }
-
-    private String[] actuatorEndpoints() {
-        return new String[]{ApiController.AUTOCONFIG_ENDPOINT, ApiController.BEANS_ENDPOINT, ApiController.CONFIGPROPS_ENDPOINT,
-                ApiController.ENV_ENDPOINT, ApiController.MAPPINGS_ENDPOINT,
-                ApiController.METRICS_ENDPOINT, ApiController.SHUTDOWN_ENDPOINT};
     }
 
     @Override
@@ -99,5 +101,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			}
 		};
+    }
+    
+    public void setApplicationContext(ApplicationContext applicationContext){
+    	super.setApplicationContext(applicationContext);
+    	this.applicationContext = applicationContext;
+    }
+    
+    @Bean
+    public AffirmativeBased getDecisionVoter(){
+    	Map<String,AccessDecisionVoter> map = applicationContext.getBeansOfType(AccessDecisionVoter.class);
+    	ArrayList<AccessDecisionVoter> list = new ArrayList<AccessDecisionVoter>(map.values());
+    	list.add(new RoleVoter());
+    	
+    	return new AffirmativeBased(list);
     }
 }

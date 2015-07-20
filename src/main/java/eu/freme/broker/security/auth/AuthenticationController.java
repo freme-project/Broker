@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthenticationController extends ApiController {
 
-    @RequestMapping(value = AUTHENTICATE_URL, method = RequestMethod.POST)
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public String authenticate() {
         return "This is just for in-code-documentation purposes and Rest API reference documentation." +
                 "Servlet will never get to this point as Http requests are processed by AuthenticationFilter." +

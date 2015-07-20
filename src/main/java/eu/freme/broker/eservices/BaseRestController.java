@@ -45,6 +45,8 @@ public abstract class BaseRestController {
 
 	@Autowired
 	RDFELinkSerializationFormats rdfELinkSerializationFormats;
+	
+	public static final String authenticationEndpoint = "/authenticate";
 
 	protected NIFParameterSet normalizeNif(String input, String informat,
 			String outformat, String postBody, String acceptHeader,

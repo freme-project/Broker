@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
+import eu.freme.broker.eservices.BaseRestController;
 import eu.freme.broker.security.api.ApiController;
 
 import org.slf4j.Logger;
@@ -104,7 +105,7 @@ public class AuthenticationFilter extends GenericFilterBean {
     }
 
     private boolean postToAuthenticate(HttpServletRequest httpRequest, String resourcePath) {
-        return ApiController.AUTHENTICATE_URL.equalsIgnoreCase(resourcePath) && httpRequest.getMethod().equals("POST");
+        return BaseRestController.authenticationEndpoint.equalsIgnoreCase(resourcePath) && httpRequest.getMethod().equals("POST");
     }
 
     private void processUsernamePasswordAuthentication(HttpServletResponse httpResponse, Optional<String> username, Optional<String> password) throws IOException {

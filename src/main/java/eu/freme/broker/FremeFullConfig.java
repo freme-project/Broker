@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
+import eu.freme.common.ConversionApplicationConfig;
 import eu.freme.eservices.eentity.EEntityConfig;
 import eu.freme.eservices.elink.ELinkConfig;
 import eu.freme.eservices.epublishing.EPublishingConfig;
@@ -20,7 +21,7 @@ import eu.freme.eservices.epublishing.EPublishingConfig;
  */
 @SpringBootApplication
 @ComponentScan(basePackages="eu.freme.broker.eservices")
-@Import({BrokerConfig.class, EEntityConfig.class, ELinkConfig.class, EPublishingConfig.class})
+@Import({BrokerConfig.class, EEntityConfig.class, ELinkConfig.class, EPublishingConfig.class, ConversionApplicationConfig.class})
 public class FremeFullConfig {
 
 	@Value("${workspace.location}")
