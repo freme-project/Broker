@@ -708,8 +708,7 @@ public class ELink extends BaseRestController {
             @ApiResponse(code = 200, message = "Successful response"),
             @ApiResponse(code = 404, message = "A template with such id was not found.") })
 	@RequestMapping(value = "/e-link/templates/{templateid}",
-            method = RequestMethod.DELETE,
-            produces = {"text/plain"})
+            method = RequestMethod.DELETE)
 	public ResponseEntity<String> removeTemplateById(
             @ApiParam("The id of the template to delete.")
             @PathVariable("templateid") String id) {
