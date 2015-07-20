@@ -179,6 +179,7 @@
 							<!-- <templatePath>${basedir}/templates/strapdown.html.hbs</templatePath> -->
 							<outputPath>${basedir}/target/doc/html/document.html</outputPath>
 							<swaggerDirectory>${basedir}/target/doc/swagger-ui</swaggerDirectory>
+							<modelSubstitute>/swagger.override.map</modelSubstitute>
 						</apiSource>
 					</apiSources>
 				</configuration>
@@ -244,6 +245,7 @@
 			</releases>
 		</repository>
 	</repositories>
+
 
 	<pluginRepositories>
 		<pluginRepository>
