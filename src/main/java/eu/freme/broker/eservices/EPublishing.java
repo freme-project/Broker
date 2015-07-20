@@ -70,9 +70,8 @@ public class EPublishing {
             consumes = "multipart/form-data",
             produces = "application/epub+zip")
     public ResponseEntity<byte[]> htmlToEPub(
-            @RequestParam("htmlZip") MultipartFile file,
-            @RequestParam("metadata") String jMetadata) {
-
+            @ApiParam(name="htmlZip", value="The html zip file to generate the epub from.") @RequestParam(value="htmlZip") MultipartFile file,
+            @RequestParam(value="metadata") String jMetadata) {
         if (file.getSize() > maxUploadSize) {
             double size = maxUploadSize / (1024.0 * 1024);
             return new ResponseEntity<>(new byte[0], HttpStatus.BAD_REQUEST);
