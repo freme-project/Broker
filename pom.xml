@@ -162,9 +162,6 @@
 								<!-- use markdown here because I'm using markdown for output, if 
 									you need to use html or other markup language, you need to use your target 
 									language, and note escape your description for xml -->
-								<description>
-									This is a sample.
-								</description>
 							</info>
 							<!-- <templatePath>${basedir}/templates/strapdown.html.hbs</templatePath> -->
 							<outputPath>${basedir}/target/doc/html/document.html</outputPath>
