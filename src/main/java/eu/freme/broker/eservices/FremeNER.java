@@ -1,5 +1,6 @@
 package eu.freme.broker.eservices;
 
+import eu.freme.broker.tools.NIFParameterFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
@@ -33,53 +34,63 @@ import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.annotations.*;
 @RestController
 
-@Api(value="e-Entity")
+@Api("e-Entity")
 
 public class FremeNER extends BaseRestController {
 
 	@Autowired
 	EEntityService entityAPI;
 
-        // Submitting document for processing.
-	@RequestMapping(value = "/e-entity/freme-ner/documents", method = {
-            RequestMethod.POST, RequestMethod.GET })
-	
-
-	 @ApiOperation(httpMethod="POST" , value = "Entity recognition and linking using Freme-NER engine.",
-	    notes = "Entity enrichment with Freme-NER engine",
-	    responseContainer = "List")
-	 @ApiResponses(value = { @ApiResponse(code = 400, message = "Insert message"),
-	    @ApiResponse(code = 404, message = "Insert message") })
-
+	@ApiOperation(value = "Entity recognition and linking using Freme-NER engine.",
+	   notes = "Enriches Text content with entities gathered by the Freme-NER engine. The service also accepts text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing.")
+	@ApiResponses(value = {
+       @ApiResponse(code = 200, message = "Successful response"),
+	   @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+    // Submitting document for processing.
+    @RequestMapping(value = "/e-entity/freme-ner/documents",
+            method = {RequestMethod.POST, RequestMethod.GET },
+            consumes = {"text/plain", "text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
+            produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> execute(
-			@ApiParam(value="Plaintext sent as value of the input parameter. Short form is i.")
+			@ApiParam(value="The text to enrich. Can be either plaintext or NIF (see parameter informat). Short form is i.")
 			@RequestParam(value = "input", required = false) String input,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "i", required = false) String i,
+			@ApiParam("HIDDEN") @RequestParam(value = "i", required = false) String i,
 			
-			@ApiParam(value="Format of input string. Only \"text\" is provided (default). Overrides Content-Type header. Short form is f.")
+			@ApiParam(value="Format of input string. Can be "+ NIFParameterFactory.allowedValuesInformat+". Overrides Content-Type header. Short form is f.",
+                    allowableValues = NIFParameterFactory.allowedValuesInformat,
+                    defaultValue = "text")
 			@RequestParam(value = "informat", required = false) String informat,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "f", required = false) String f,
+			@ApiParam("HIDDEN") @RequestParam(value = "f", required = false) String f,
 			
-			@ApiParam("RDF serialization format of Output. Can be \"json-ld\", \"turtle\" (?). Defaults to \"turtle\". Overrides Accept Header. Short form is o.")
+			@ApiParam(value="RDF serialization format of Output. Can be "+NIFParameterFactory.allowedValuesOutformat+". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+                    defaultValue = "turtle")
 			@RequestParam(value = "outformat", required = false) String outformat,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "o", required = false) String o,
+			@ApiParam("HIDDEN") @RequestParam(value = "o", required = false) String o,
 			
 			@ApiParam("Unused optional Parameter. Short form is p.")
 			@RequestParam(value = "prefix", required = false) String prefix,
-			@ApiParam(name="HIDDEN") @RequestParam(value = "p", required = false) String p,
-			
-			@ApiParam(value="Format of outputg. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". ")
-			@RequestHeader(value = "Accept", required = false) String acceptHeader,
-			
-			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\". ")
-			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
-			
-			@ApiParam(value="Source language. Can be en,de,nl,fr,it,es (according to supported NER engine).")
+			@ApiParam("HIDDEN") @RequestParam(value = "p", required = false) String p,
+
+            //@ApiParam(value="Format of output. Can be \"application/json+ld\", \"text/turtle\". Defaults to \"text/turtle\". The parameter *outformat* overrides Accept header.",
+            //        allowableValues = "text/turtle, application/json+ld",
+            //        defaultValue = "text/turtle")
+            @RequestHeader(value = "Accept", required = false) String acceptHeader,
+
+            //@ApiParam(value="Format of input string. Can be \"text/plain\". Defaults to \"text/plain\". The parameter *informat* overrides Content-Type header.",
+            //        allowableValues = "text/plain",
+            //        defaultValue = "text/plain")
+            @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+
+            @ApiParam(value="The text to enrich. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.allowedValuesInformatMime+". Defaults to \"text/plain\". The parameter *informat* overrides the Content-Type.")
+            @RequestBody(required = false) String postBody,
+
+            @ApiParam(value="Source language. Can be en, de, nl, fr, it, es (according to supported NER engine).",
+                    allowableValues = "en,de,nl,fr,it,es")
 			@RequestParam(value = "language", required = false) String language,
 			
 			@ApiParam(value="A mandatory parameter which indicates the dataset used for entity linking which includes a list of entites and associated labels.")
-			@RequestParam(value = "dataset", required = false) String dataset,
-            @RequestBody(required = false) String postBody) {
+			@RequestParam(value = "dataset", required = true) String dataset) {
             
             // Check the language parameter.
             if(language == null) {

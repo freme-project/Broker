@@ -1,5 +1,6 @@
 package eu.freme.broker.eservices;
 
+import eu.freme.broker.tools.NIFParameterFactory;
 import io.swagger.annotations.*;
 
 import java.io.UnsupportedEncodingException;
@@ -68,14 +69,14 @@ public class TildeETranslation extends BaseRestController {
 			@RequestParam(value = "input", required = false) String input,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
 
-			@ApiParam(value="Format of input string. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Content-Type header. Short form is f.",
-					allowableValues = "text, json-ld, turtle",
+			@ApiParam(value="Format of input string. Can be "+NIFParameterFactory.allowedValuesInformat+". Defaults to \"turtle\". This parameter overrides Content-Type header. Short form is f.",
+					allowableValues = NIFParameterFactory.allowedValuesInformat,
 					defaultValue = "turtle")
 			@RequestParam(value = "informat", required = false) String informat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "f", required = false) String f,
 			
-			@ApiParam(value="Format of output string. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". This parameter overrides Accept header. Short form is o.",
-					allowableValues = "json-ld, turtle",
+			@ApiParam(value="RDF serialization format of Output. Can be "+NIFParameterFactory.allowedValuesOutformat+". Defaults to \"turtle\". This parameter overrides Accept header (Response Content Type). Short form is o.",
+					allowableValues = NIFParameterFactory.allowedValuesOutformat,
 					defaultValue = "turtle")
 			@RequestParam(value = "outformat", required = false) String outformat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -94,7 +95,7 @@ public class TildeETranslation extends BaseRestController {
 			//		defaultValue = "turtle")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-			@ApiParam(value="The string to be translated. Can be either plaintext or NIF. Will be overwritten by parameter input, if set. The format of the body can be \"text/plain\", \"text/turtle\", \"application/json+ld\". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
+			@ApiParam(value="The string to be translated. Can be either plaintext or NIF. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.allowedValuesInformatMime+". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
 			@RequestBody(required = false) String postBody,
 
 			@ApiParam(value="Source language, e.g. \"en\". A list of available language pairs is [here](https://services.tilde.com/translationsystems).",

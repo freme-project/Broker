@@ -1,5 +1,6 @@
 package eu.freme.broker.eservices;
 
+import eu.freme.broker.tools.NIFParameterFactory;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,42 +29,36 @@ import java.io.ByteArrayInputStream;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-@Api(value="e-Entity")
+@Api("e-Entity")
 public class DBpediaSpotlight extends BaseRestController {
 
 	@Autowired
 	EEntityService entityAPI;
 
-	@RequestMapping(value = "/e-entity/dbpedia-spotlight/documents", method = {
-            RequestMethod.POST, RequestMethod.GET })
-
 	@ApiOperation(notes = "Enriches Text content with entities gathered by the DBPedia Spotlight engine.The service also accepts text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing.",
-	    value = "Entity recognition and linking using DBPedia Spotlight engine. ",
-	    responseContainer = "List")
+	    value = "Entity recognition and linking using DBPedia Spotlight engine. ")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful response",
-                    response = String.class),
-            @ApiResponse(code = 400, message = "Insert message"),
-	    @ApiResponse(code = 404, message = "Insert message") })
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 400, message = "Bad request - input validation failed")})
+    @RequestMapping(value = "/e-entity/dbpedia-spotlight/documents",
+            method = {RequestMethod.POST, RequestMethod.GET },
+            produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
+            consumes = {"text/plain", "text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml","text/n3"})
 
-
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "body", value = "HIDDEN", required = false, dataType = "string", paramType = "body")
-    })
 	public ResponseEntity<String> execute(
 			
-			@ApiParam(value="Plaintext sent as value of the input parameter. Short form is i.")
-			@RequestParam(value = "input", required = true) String input,
+			@ApiParam(value="The text to enrich. Can be either plaintext or NIF (see parameter informat). Short form is i.")
+			@RequestParam(value = "input", required = false) String input,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
 			
-			@ApiParam(value="Format of input string. Only \"text\" is provided (default). Overrides Content-Type header. Short form is f.",
-                    allowableValues = "text",
+			@ApiParam(value="Format of input string. Can be "+NIFParameterFactory.allowedValuesInformat+". Overrides Content-Type header. Short form is f.",
+                    allowableValues = NIFParameterFactory.allowedValuesInformat,
                     defaultValue = "text")
 			@RequestParam(value = "informat", required = false) String informat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "f", required = false) String f,
 			
-			@ApiParam(value = "RDF serialization format of Output. Can be \"json-ld\", \"turtle\" (?). Defaults to \"turtle\". Overrides Accept Header. Short form is o.",
-                    allowableValues = "json-ld,turtle,text",
+			@ApiParam(value = "RDF serialization format of Output. Can be "+NIFParameterFactory.allowedValuesOutformat+". Defaults to \"turtle\". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
                     defaultValue = "turtle")
 			@RequestParam(value = "outformat", required = false) String outformat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -72,25 +67,26 @@ public class DBpediaSpotlight extends BaseRestController {
 			@RequestParam(value = "prefix", required = false) String prefix,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "p", required = false) String p,
 			
-			@ApiParam(value="Format of output. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".",
-                    allowableValues = "json-ld,turtle,text",
-                    defaultValue = "turtle")
+			//@ApiParam(value="Format of output. Can be \"application/json+ld\", \"text/turtle\". Defaults to \"text/turtle\". The parameter *outformat* overrides Accept header.",
+            //        allowableValues = "text/turtle, application/json+ld",
+            //        defaultValue = "text/turtle")
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 			
-			@ApiParam(value="Format of input string. Can be \"plaintext\", \"json-ld\", \"turtle\". Defaults to \"turtle\".",
-                    allowableValues = "json-ld,turtle,text",
-                    defaultValue = "turtle")
+			//@ApiParam(value="Format of input string. Can be \"text/plain\". Defaults to \"text/plain\". The parameter *informat* overrides Content-Type header.",
+            //        allowableValues = "text/plain",
+            //        defaultValue = "text/plain")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+
+            @ApiParam(value="The text to enrich. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.allowedValuesInformatMime+". Defaults to \"text/plain\". The parameter *informat* overrides the Content-Type.")
+            @RequestBody(required = false) String postBody,
 			
-			@ApiParam(value="Source language. Can be en,de,nl,fr,it,es (according to supported NER engine).",
+			@ApiParam(value="Source language. Can be en, de, nl, fr, it, es (according to supported NER engine).",
                     allowableValues = "en,de,nl,fr,it,es")
 			@RequestParam(value = "language", required = false) String languageParam,
 			
 			@ApiParam(value="Threshold to limit the output of entities. Default is 0.3",
                 defaultValue = "0.3")
-			@RequestParam(value = "confidence", required = false) String confidenceParam,
-
-            @RequestBody(required = false) String postBody) {
+			@RequestParam(value = "confidence", required = false) String confidenceParam){
             
             NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
            

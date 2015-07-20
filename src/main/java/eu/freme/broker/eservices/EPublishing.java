@@ -26,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author Pieter Heyvaert <pheyvaer.heyvaert@ugent.be>
  */
-@Api(value= "e-Publishing")
+@Api("e-Publishing")
 @RestController
 public class EPublishing {
 
