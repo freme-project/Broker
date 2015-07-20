@@ -22,11 +22,8 @@ import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
-import eu.freme.eservices.elink.Exporter;
-import eu.freme.eservices.elink.Template;
 
 import java.io.ByteArrayInputStream;
-import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -131,7 +128,7 @@ public class FremeNER extends BaseRestController {
             
             if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
                 // input is sent as value of the input parameter
-                textForProcessing = input;
+                textForProcessing = parameters.getInput();
             } else {
                 // input is sent as body of the request
                 inModel = ModelFactory.createDefaultModel();

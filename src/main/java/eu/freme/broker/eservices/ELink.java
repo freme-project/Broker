@@ -223,22 +223,27 @@ public class ELink extends BaseRestController {
                     case TURTLE:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        t.setId(templateDAO.generateTemplateId());
                         break;
                     case JSON_LD:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "JSON-LD");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        t.setId(templateDAO.generateTemplateId());
                         break;
                     case RDF_XML:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "RDF/XML");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        t.setId(templateDAO.generateTemplateId());
                         break;
                     case N_TRIPLES:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "N-Triples");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        t.setId(templateDAO.generateTemplateId());
                         break;
                     case N3:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "N3");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        t.setId(templateDAO.generateTemplateId());
                         break;                        
                 }
                 
@@ -367,7 +372,12 @@ public class ELink extends BaseRestController {
                         responseHeaders.set("Content-Type", "text/n3");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                 }
-            } catch (Exception ex) {
+                
+            } 
+            catch (TemplateNotFoundException e){
+                throw new TemplateNotFoundException("Template not found.");
+            }
+            catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             }
             

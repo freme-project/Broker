@@ -1,4 +1,4 @@
-package eu.freme.broker;
+package eu.freme.broker.integration_tests;
 
 import static org.junit.Assert.assertTrue;
 
@@ -6,33 +6,25 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequestWithBody;
 
 /**
- * Test Tilde e-Translation broker endpoint.
+ * Test Tilde e-Terminology broker endpoint.
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 public class TildeETerminologyTest {
 
-	String url = "http://localhost:8080/e-terminology/tilde";
-	ConfigurableApplicationContext context;
+	String url;
 
 	@Before
 	public void setup() {
-		context = SpringApplication.run(FremeFullConfig.class);
+		url = IntegrationTestSetup.getURLEndpoint() + "/e-terminology/tilde";
 	}
 
 	private String readFile(String file) throws IOException {
@@ -72,10 +64,4 @@ public class TildeETerminologyTest {
 		//
 		// assertTrue(response.getStatus() == HttpStatus.OK.value());
 	}
-
-	@After
-	public void teardown() {
-		context.close();
-	}
-
 }

@@ -1,4 +1,4 @@
-package eu.freme.broker;
+package eu.freme.broker.integration_tests;
 
 import static org.junit.Assert.assertTrue;
 
@@ -8,33 +8,26 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
-/**
- * Test Tilde e-Translation broker endpoint.
- * 
- * @author Jan Nehring - jan.nehring@dfki.de
- */
 public class TildeETranslationTest {
 
-	String url = "http://localhost:8080/e-translation/tilde";
-	ConfigurableApplicationContext context;
+	String url = null;
 
+	String clientId = "u-bd13faca-b816-4085-95d5-05373d695ab7";
 	String sourceLang = "en";
 	String targetLang = "de";
-
+	String translationSystemId = "smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813";
+	
 	@Before
-	public void setup() {
-		context = SpringApplication.run(FremeFullConfig.class);
+	public void setup(){
+		url = IntegrationTestSetup.getURLEndpoint() + "/e-translation/tilde";
 	}
 
 	private String readFile(String file) throws IOException {
@@ -50,9 +43,10 @@ public class TildeETranslationTest {
 	}
 
 	private HttpRequestWithBody baseRequest() {
-		return Unirest.post(url)
+		return Unirest.post(url).queryString("client-id", clientId)
 				.queryString("source-lang", sourceLang)
-				.queryString("target-lang", targetLang);
+				.queryString("target-lang", targetLang)
+				.queryString("translation-system-id", translationSystemId);
 	}
 
 	@Test
@@ -83,10 +77,4 @@ public class TildeETranslationTest {
 		assertTrue(response.getStatus() == 200);
 		assertTrue(response.getBody().length() > 0);
 	}
-
-	@After
-	public void teardown() {
-		context.close();
-	}
-
 }

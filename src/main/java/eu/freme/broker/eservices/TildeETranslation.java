@@ -39,7 +39,6 @@ import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
-
 @RestController
 @Api(value = "e-Translation")
 
@@ -143,12 +142,6 @@ public class TildeETranslation extends BaseRestController {
 		} else {
 			// input is plaintext
 			plaintext = parameters.getInput();
-			try {
-				plaintext = URLDecoder.decode(plaintext, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				logger.error(e);
-				throw new InternalServerErrorException(e.getMessage());
-			}
 			rdfConversionService.plaintextToRDF(inputModel, plaintext,
 					sourceLang, parameters.getPrefix());
 		}

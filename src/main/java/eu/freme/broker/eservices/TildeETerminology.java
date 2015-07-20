@@ -1,8 +1,5 @@
 package eu.freme.broker.eservices;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +18,6 @@ import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.ExternalServiceFailedException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.tools.NIFParameterSet;
-import eu.freme.conversion.etranslate.TranslationConversionService;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 
@@ -52,6 +48,7 @@ public class TildeETerminology extends BaseRestController {
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "domain", defaultValue = "") String domain) {
 
+		System.err.println(postBody);
 		// merge long and short parameters - long parameters override short
 		// parameters
 		if (input == null) {
@@ -86,12 +83,6 @@ public class TildeETerminology extends BaseRestController {
 		} else {
 			// input is plaintext
 			plaintext = parameters.getInput();
-			try {
-				plaintext = URLDecoder.decode(plaintext, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				logger.error(e);
-				throw new InternalServerErrorException(e.getMessage());
-			}
 			rdfConversionService.plaintextToRDF(inputModel, plaintext,
 					sourceLang, parameters.getPrefix());
 		}
