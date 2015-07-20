@@ -13,6 +13,7 @@ import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
  */
 public class NIFParameterFactory {
 
+	// used for swagger annotations
 	public static final String allowedValuesOutformat = "json-ld, turtle";
 	public static final String allowedValuesInformat = "text, json-ld, turtle";
 	public static final String allowedValuesInformatMime = "text/plain, text/turtle, application/json+ld, application/n-triples, application/rdf+xml, text/n3";

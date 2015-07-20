@@ -1,5 +1,7 @@
 package eu.freme.broker.eservices;
 
+import eu.freme.broker.tools.NIFParameterFactory;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,46 +40,84 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@Api("e-Link")
 @RestController
 public class ELink extends BaseRestController {
     
-        @Autowired
-        DataEnricher dataEnricher;
+    @Autowired
+    DataEnricher dataEnricher;
 
-        @Autowired
-        TemplateDAO templateDAO;
-        
-        // Enriching using a template.        
-        // POST /e-link/enrich/
-        // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
-	@RequestMapping(value = "/e-link/documents/", method = RequestMethod.POST)
+    @Autowired
+    TemplateDAO templateDAO;
+
+    // Enriching using a template.
+    // POST /e-link/enrich/
+    // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
+    @ApiOperation(notes = "This service accepts a NIF document (with annotated entities) and performs enrichment with pre-defined templates. The templates contain \"fields\" marked between three at-signs @@@field-name@@@. If a user, while calling the enrichment endpoint specifies an \"unknown\" parameter (not from the list above), then the values of that \"unknown\" parameters will be used to replace with the corresponding \"field\" in the query template. This feature doesn't work via \"Try-it-out!\"-button.",
+            value = "Fetch data about named entities from various ontologies")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+    @RequestMapping(value = "/e-link/documents/",
+            method = RequestMethod.POST,
+            consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
+            produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> enrich(
-			@RequestParam(value = "templateid",    required=true)  int    templateId,
-			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
-			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
-                        @RequestBody String postBody,
-                        @RequestParam Map<String,String> allParams) {
+            //@ApiParam(value=The text to enrich with data. Can be NIF (see parameter informat). Short form is i.")
+            //@RequestParam(value = "input", required = false) String input,
+            //@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
+
+            @ApiParam(value = "Format of input string. Can be json-ld, turtle. Overrides Content-Type header. Short form is f.",
+                    allowableValues = "json-ld, turtle",
+                    defaultValue = "turtle")
+            @RequestParam(value = "informat", required = false) String informat,
+            @ApiParam(value = "HIDDEN") @RequestParam(value = "f", required = false) String f,
+
+            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.allowedValuesOutformat + ". Defaults to \"turtle\". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+                    defaultValue = "turtle")
+            @RequestParam(value = "outformat", required = false) String outformat,
+            @ApiParam(value = "HIDDEN") @RequestParam(value = "o", required = false) String o,
+
+            //@ApiParam("Unused optional Parameter. Short form is p.")
+            //@RequestParam(value = "prefix", required = false) String prefix,
+            //@ApiParam(value = "HIDDEN") @RequestParam(value = "p", required = false) String p,
+
+            @RequestHeader(value = "Accept", required = false) String acceptHeader,
+
+            @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+
+            @ApiParam(value = "The text to enrich with data. The format of the body can be text/turtle, application/json+ld. The parameter *informat* overrides the Content-Type.")
+            @RequestBody(required = false) String postBody,
+
+            @ApiParam("the ID of the template to be used for enrichment")
+            @RequestParam(value = "templateid",    required=true)  int templateId,
+			//@RequestHeader(value = "Accept",       required=false) String acceptHeader,
+			//@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
+            //            @RequestBody String postBody,
+            @ApiParam("HIDDEN")
+            @RequestParam Map<String,String> allParams) {
             try {
-                String informat  = null;
-                String f         = null;
-                String outformat = null;
-                String o         = null;
+                //String informat  = null;
+                //String f         = null;
+                //String outformat = null;
+                //String o         = null;
                 
                 HashMap<String, String> templateParams = new HashMap();
                 
                 for (Map.Entry<String, String> entry : allParams.entrySet()) {
                     switch(entry.getKey()) {
                         case "informat":
-                            informat = entry.getValue();
+                            //informat = entry.getValue();
                             break;
                         case "f":
-                            f = entry.getValue();
+                            //f = entry.getValue();
                             break;
                         case "outformat":
-                            outformat = entry.getValue();
+                            //outformat = entry.getValue();
                             break;
                         case "o":
-                            o = entry.getValue();
+                            //o = entry.getValue();
                             break;
                         default:
                             templateParams.put(entry.getKey(), entry.getValue());
@@ -152,15 +192,33 @@ public class ELink extends BaseRestController {
         // Creating a template.
         // POST /e-link/templates/
         // Example: curl -X POST -d @template.json "http://localhost:8080/e-link/templates/" -H "Content-Type: application/json" -H "Accept: application/json" -v
-	@RequestMapping(value = "/e-link/templates/", method = RequestMethod.POST)
+	@ApiOperation("Creates a new enrichment template.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+    @RequestMapping(value = "/e-link/templates/",
+            method = RequestMethod.POST,
+            consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
+            produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> createTemplate(
-			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
-			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
-                        @RequestParam(value = "informat",      required=false) String informat,
-                        @RequestParam(value = "f",             required=false) String f,
-                        @RequestParam(value = "outformat",     required=false) String outformat,
-                        @RequestParam(value = "o",             required=false) String o,
-                        @RequestBody String postBody) {
+            @ApiParam(value = "Format of input string. Can be json-ld, turtle. Overrides Content-Type header. Short form is f.",
+                    allowableValues = "json-ld, turtle",
+                    defaultValue = "turtle")
+            @RequestParam(value = "informat", required = false) String informat,
+            @ApiParam(value = "HIDDEN") @RequestParam(value = "f", required = false) String f,
+
+            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.allowedValuesOutformat + ". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+                    defaultValue = "turtle")
+            @RequestParam(value = "outformat", required = false) String outformat,
+            @ApiParam(value = "HIDDEN") @RequestParam(value = "o", required = false) String o,
+
+            @RequestHeader(value = "Accept", required = false) String acceptHeader,
+
+            @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+
+            @ApiParam(value = "The new template. The format of the body can be text/turtle, application/json+ld. Defaults to text/turtle. The parameter *informat* overrides the Content-Type.")
+            @RequestBody(required = false) String postBody) {
             
             try {
                 
@@ -299,12 +357,24 @@ public class ELink extends BaseRestController {
         // Get one template.
         // GET /e-link/templates/{template-id}
         // curl -v http://api-dev.freme-project.eu/current/e-link/templates/1
-	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.GET)
+    @ApiOperation("Returns one specific template with specified ID in a specified format.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+	@RequestMapping(value = "/e-link/templates/{templateid}",
+            method = RequestMethod.GET,
+            produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> getTemplateById(
-                @RequestHeader(value = "Accept",       required=false) String acceptHeader,
-                @PathVariable("templateid") String id,
-                @RequestParam(value = "outformat",     required=false) String outformat,
-                @RequestParam(value = "o",             required=false) String o) {
+            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.allowedValuesOutformat + ". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+                    defaultValue = "turtle")
+            @RequestParam(value = "outformat", required = false) String outformat,
+            @ApiParam(value = "HIDDEN") @RequestParam(value = "o", required = false) String o,
+
+            @RequestHeader(value = "Accept", required = false) String acceptHeader,
+
+            @ApiParam("The ID of the requested template.")
+            @PathVariable("templateid") String id) {
             
             try {
                 
@@ -387,12 +457,21 @@ public class ELink extends BaseRestController {
         // Retrieve all templates.
         // GET /e-link/templates/
         // curl -v http://api-dev.freme-project.eu/current/e-link/templates/
-	@RequestMapping(value = "/e-link/templates/", method = RequestMethod.GET)
+    @ApiOperation("Returns a list of all templates in specified format.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+	@RequestMapping(value = "/e-link/templates/",
+            method = RequestMethod.GET,
+            produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> getAllTemplates(
-			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
-			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
-                        @RequestParam(value = "outformat",     required=false) String outformat,
-                        @RequestParam(value = "o",             required=false) String o) {
+            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.allowedValuesOutformat + ". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+                    defaultValue = "turtle")
+            @RequestParam(value = "outformat", required = false) String outformat,
+            @ApiParam(value = "HIDDEN") @RequestParam(value = "o", required = false) String o,
+
+            @RequestHeader(value = "Accept", required = false) String acceptHeader) {
             try {
                 if( outformat == null ) {
                     outformat = o;
@@ -464,16 +543,36 @@ public class ELink extends BaseRestController {
        
         // Update one template.
         // PUT /e-link/templates/{template-id}
-	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.PUT)
+    @ApiOperation("Update an enrichment template with specified ID. The new data is submitted as body of a PUT request.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+	@RequestMapping(value = "/e-link/templates/{templateid}",
+            method = RequestMethod.PUT,
+            consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
+            produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> updateTemplateById(
-			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
-			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
-                        @RequestParam(value = "informat",      required=false) String informat,
-                        @RequestParam(value = "f",             required=false) String f,
-                        @RequestParam(value = "outformat",     required=false) String outformat,
-                        @RequestParam(value = "o",             required=false) String o,
-                        @PathVariable("templateid") String templateId,
-                        @RequestBody String postBody) {
+            @ApiParam(value = "Format of the template. Can be json-ld, turtle. Overrides Content-Type header. Short form is f.",
+                    allowableValues = "json-ld, turtle",
+                    defaultValue = "turtle")
+            @RequestParam(value = "informat", required = false) String informat,
+            @ApiParam(value = "HIDDEN") @RequestParam(value = "f", required = false) String f,
+
+            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.allowedValuesOutformat + ". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+                    defaultValue = "turtle")
+            @RequestParam(value = "outformat", required = false) String outformat,
+            @ApiParam(value = "HIDDEN") @RequestParam(value = "o", required = false) String o,
+
+            @RequestHeader(value = "Accept", required = false) String acceptHeader,
+
+            @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+
+            @ApiParam(value = "The new template. The format of the body can be text/turtle, application/json+ld. Defaults to text/turtle. The parameter *informat* overrides the Content-Type.")
+            @RequestBody(required = false) String postBody,
+
+            @ApiParam("The ID of the template to update.")
+            @PathVariable("templateid") String templateId) {
             try {
                 
                 if( informat == null ){
@@ -604,8 +703,16 @@ public class ELink extends BaseRestController {
                 
         // Removing a template.
         // DELETE /e-link/templates/{template-id}
-	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.DELETE)
-	public ResponseEntity<String> removeTemplateById(@PathVariable("templateid") String id) {
+    @ApiOperation("Removes a template with specified ID.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 404, message = "A template with such id was not found.") })
+	@RequestMapping(value = "/e-link/templates/{templateid}",
+            method = RequestMethod.DELETE,
+            produces = {"text/plain"})
+	public ResponseEntity<String> removeTemplateById(
+            @ApiParam("The id of the template to delete.")
+            @PathVariable("templateid") String id) {
             
             if(templateDAO.removeTemplateById(id)) {
                 return new ResponseEntity<String>("The template was sucessfully removed.", HttpStatus.NO_CONTENT);

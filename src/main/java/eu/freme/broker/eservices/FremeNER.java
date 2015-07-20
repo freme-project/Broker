@@ -72,14 +72,8 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "prefix", required = false) String prefix,
 			@ApiParam("HIDDEN") @RequestParam(value = "p", required = false) String p,
 
-            //@ApiParam(value="Format of output. Can be \"application/json+ld\", \"text/turtle\". Defaults to \"text/turtle\". The parameter *outformat* overrides Accept header.",
-            //        allowableValues = "text/turtle, application/json+ld",
-            //        defaultValue = "text/turtle")
             @RequestHeader(value = "Accept", required = false) String acceptHeader,
 
-            //@ApiParam(value="Format of input string. Can be \"text/plain\". Defaults to \"text/plain\". The parameter *informat* overrides Content-Type header.",
-            //        allowableValues = "text/plain",
-            //        defaultValue = "text/plain")
             @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
             @ApiParam(value="The text to enrich. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.allowedValuesInformatMime+". Defaults to \"text/plain\". The parameter *informat* overrides the Content-Type.")
@@ -212,15 +206,32 @@ public class FremeNER extends BaseRestController {
 
         // Submitting dataset for use in the e-Entity service.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/?name=test&language=en" -X POST
-	@RequestMapping(value = "/e-entity/freme-ner/datasets", method = {
-            RequestMethod.POST })
+    @ApiOperation(value = "Submitting dataset for use in the e-Entity service",
+    notes = "Create dataset in SKOS format which includes prefLabel, altLabel or label properties (unless the param properties is explicitly set).")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+	@RequestMapping(value = "/e-entity/freme-ner/datasets",
+            method = {RequestMethod.POST },
+            consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> createDataset(
-			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
-			@RequestParam(value = "name", required = false) String name,
-			@RequestParam(value = "language", required = false) String language,
-			@RequestParam(value = "informat", required = false) String informat,
-			@RequestParam(value = "f", required = false) String f,
-                        @RequestBody(required = false) String postBody) {
+            @ApiParam(value="RDF serialization format of the dataset. Can be json+ld, turtle. Overrides Content-Type header. Short form is f.",
+                    allowableValues = "turtle, json+ld",
+                    defaultValue = "turtle")
+            @RequestParam(value = "informat", required = false) String informat,
+            @ApiParam("HIDDEN") @RequestParam(value = "f", required = false) String f,
+
+            @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+
+            @ApiParam(value="The dataset. The format of the body can be \"text/turtle\", \"application/json+ld\", \"application/n-triples\", \"application/rdf+xml\", \"text/n3\". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
+            @RequestBody(required = false) String postBody,
+
+            @ApiParam("proposed dataset name. It can be considered as ID for the dataset. It should include only numbers, letters and should NOT include white spaces.")
+            @RequestParam(value = "name", required = false) String name,
+
+            @ApiParam(value = "language of the labels in the dataset. If the parameter is not specified, all labels without language tag will be used while performing linking. At the moment only following languages are supported - FREME NER (en/de/fr/es/it), DBpedia Spotlight (en).",
+                    allowableValues = "de, en, nl, it, fr, es")
+            @RequestParam(value = "language", required = false) String language) {
             
             // merge long and short parameters - long parameters override short parameters.
             if( informat == null ){
@@ -297,15 +308,31 @@ public class FremeNER extends BaseRestController {
         
         // Updating dataset for use in the e-Entity service.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test?language=en" -X PUT
-	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}", method = {
-            RequestMethod.PUT })
+    @ApiOperation("Updating dataset for use in the e-Entity service")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}",
+            method = {RequestMethod.PUT },
+            consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> updateDataset(
-			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
-			@PathVariable(value = "name") String name,
-			@RequestParam(value = "language", required = false) String language,
-			@RequestParam(value = "informat", required = false) String informat,
-			@RequestParam(value = "f", required = false) String f,
-                        @RequestBody(required = false) String postBody) {
+            @ApiParam(value="RDF serialization format of the dataset. Can be json+ld, turtle. Overrides Content-Type header. Short form is f.",
+                    allowableValues = "turtle, json+ld",
+                    defaultValue = "turtle")
+            @RequestParam(value = "informat", required = false) String informat,
+            @ApiParam("HIDDEN") @RequestParam(value = "f", required = false) String f,
+
+            @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+
+            @ApiParam(value="The dataset. The format of the body can be \"text/turtle\", \"application/json+ld\", \"application/n-triples\", \"application/rdf+xml\", \"text/n3\". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
+            @RequestBody(required = false) String postBody,
+
+            @ApiParam("The name name of the dataset to update. It can be considered as ID for the dataset. It should include only numbers, letters and should NOT include white spaces.")
+            @RequestParam(value = "name", required = false) String name,
+
+            @ApiParam(value = "language of the labels in the dataset. If the parameter is not specified, all labels without language tag will be used while performing linking. At the moment only following languages are supported - FREME NER (en/de/fr/es/it), DBpedia Spotlight (en).",
+                    allowableValues = "de, en, nl, it, fr, es")
+            @RequestParam(value = "language", required = false) String language) {
             
             // Check the dataset name parameter.
             if(name == null) {
@@ -376,10 +403,12 @@ public class FremeNER extends BaseRestController {
         
         // Get info about a specific dataset.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test
-	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}", method = {
-            RequestMethod.GET })
+	@ApiOperation("Get info about a specific dataset")
+    @RequestMapping(value = "/e-entity/freme-ner/datasets/{name}",
+            method = {RequestMethod.GET })
 	public ResponseEntity<String> getDataset(
-                @PathVariable(value = "name") String name) {
+            @ApiParam("The name of teh requested dataset.")
+            @PathVariable(value = "name") String name) {
             
             // Check the dataset name parameter.
             if(name == null) {
@@ -394,8 +423,9 @@ public class FremeNER extends BaseRestController {
         
         // Get info about all available datasets.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets
-	@RequestMapping(value = "/e-entity/freme-ner/datasets", method = {
-            RequestMethod.GET })
+    @ApiOperation("Get info about all available datasets")
+	@RequestMapping(value = "/e-entity/freme-ner/datasets",
+            method = {RequestMethod.GET })
 	public ResponseEntity<String> getAllDatasets() {
             
             HttpHeaders headers = new HttpHeaders();
@@ -406,9 +436,11 @@ public class FremeNER extends BaseRestController {
         
         // Removing a specific dataset.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test" -X DELETE
-	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}", method = {
-            RequestMethod.DELETE })
+    @ApiOperation("Removing a specific dataset")
+	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}",
+            method = {RequestMethod.DELETE })
 	public ResponseEntity<String> removeDataset(
+            @ApiParam("The name of the dataset to remove")
 			@PathVariable(value = "name") String name) {
             
             // Check the dataset name parameter.

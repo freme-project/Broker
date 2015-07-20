@@ -85,14 +85,8 @@ public class TildeETranslation extends BaseRestController {
 			@RequestParam(value = "prefix", required = false) String prefix,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "p", required = false) String p,
 
-			//@ApiParam(value="Format of output. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". The parameter *outformat* overrides Accept header.",
-			//		allowableValues = requestFormatValuesShort,
-			//		defaultValue = "turtle")
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 
-			//@ApiParam(value="Format of input string. Can be \"text\", \"json-ld\", \"turtle\". Defaults to \"turtle\". The parameter *informat* overrides Content-Type header.",
-			//		allowableValues = requestFormatValuesShort,
-			//		defaultValue = "turtle")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
 			@ApiParam(value="The string to be translated. Can be either plaintext or NIF. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.allowedValuesInformatMime+". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")

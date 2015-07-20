@@ -67,14 +67,8 @@ public class DBpediaSpotlight extends BaseRestController {
 			@RequestParam(value = "prefix", required = false) String prefix,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "p", required = false) String p,
 			
-			//@ApiParam(value="Format of output. Can be \"application/json+ld\", \"text/turtle\". Defaults to \"text/turtle\". The parameter *outformat* overrides Accept header.",
-            //        allowableValues = "text/turtle, application/json+ld",
-            //        defaultValue = "text/turtle")
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 			
-			//@ApiParam(value="Format of input string. Can be \"text/plain\". Defaults to \"text/plain\". The parameter *informat* overrides Content-Type header.",
-            //        allowableValues = "text/plain",
-            //        defaultValue = "text/plain")
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
             @ApiParam(value="The text to enrich. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.allowedValuesInformatMime+". Defaults to \"text/plain\". The parameter *informat* overrides the Content-Type.")
