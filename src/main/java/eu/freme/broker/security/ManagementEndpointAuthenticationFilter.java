@@ -1,4 +1,4 @@
-package eu.freme.broker.security.infrastructure.security;
+package eu.freme.broker.security;
 
 import com.google.common.base.Optional;
 

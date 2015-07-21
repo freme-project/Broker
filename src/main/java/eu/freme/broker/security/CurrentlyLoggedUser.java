@@ -1,4 +1,4 @@
-package eu.freme.broker.security.domain;
+package eu.freme.broker.security;
 
 import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 

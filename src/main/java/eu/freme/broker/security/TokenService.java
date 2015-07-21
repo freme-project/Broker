@@ -1,4 +1,4 @@
-package eu.freme.broker.security.infrastructure.security;
+package eu.freme.broker.security;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;

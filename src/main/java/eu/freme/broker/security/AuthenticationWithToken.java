@@ -1,4 +1,4 @@
-package eu.freme.broker.security.infrastructure.security;
+package eu.freme.broker.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;

@@ -1,4 +1,4 @@
-package eu.freme.broker.security.infrastructure.security;
+package eu.freme.broker.security;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
-import eu.freme.broker.security.infrastructure.security.voter.UserAccessDecisionVoter;
+import eu.freme.broker.security.voter.UserAccessDecisionVoter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

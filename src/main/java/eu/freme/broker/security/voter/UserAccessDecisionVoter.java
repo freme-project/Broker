@@ -1,4 +1,4 @@
-package eu.freme.broker.security.infrastructure.security.voter;
+package eu.freme.broker.security.voter;
 
 import java.util.Collection;
 
