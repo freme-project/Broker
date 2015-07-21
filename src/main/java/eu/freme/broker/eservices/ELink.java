@@ -53,7 +53,37 @@ public class ELink extends BaseRestController {
     // Enriching using a template.
     // POST /e-link/enrich/
     // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
-    @ApiOperation(notes = "This service accepts a NIF document (with annotated entities) and performs enrichment with pre-defined templates. The templates contain \"fields\" marked between three at-signs @@@field-name@@@. If a user, while calling the enrichment endpoint specifies an \"unknown\" parameter (not from the list above), then the values of that \"unknown\" parameters will be used to replace with the corresponding \"field\" in the query template. This feature doesn't work via \"Try-it-out!\"-button.",
+    @ApiOperation(notes = "This service accepts a NIF document (with annotated entities) and performs enrichment with pre-defined templates. The templates contain \"fields\" marked between three at-signs @@@field-name@@@. If a user, while calling the enrichment endpoint specifies an \"unknown\" parameter (not from the list above), then the values of that \"unknown\" parameters will be used to replace with the corresponding \"field\" in the query template. This feature doesn't work via \"Try-it-out!\"-button.\n"+
+            "\n" +
+            "You can find a list of available templates in the FREME wiki.\n" +
+            "\n" +
+            "**This is an example of a NIF document containing annotated entities that can be processed by e-link:**\n" +
+            "\n" +
+            "```\n" +
+            "\n" +
+            "@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .\n" +
+            "@prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .\n" +
+            "\n" +
+            "// NIF document for processing - named entity extraction.\n" +
+            "<http://example.org/document/1#char=0,21>\n" +
+            "   a nif:String , nif:Context , nif:RFC5147String ;\n" +
+            "   nif:isString \"We talk about Xiamen.\"^^xsd:string;\n" +
+            "   nif:beginIndex \"0\"^^xsd:nonNegativeInteger;\n" +
+            "   nif:endIndex \"21\"^^xsd:nonNegativeInteger;\n" +
+            "   nif:sourceUrl <http://differentday.blogspot.com/2007_01_01_archive.html> .\n" +
+            "\n" +
+            "// Detected entity mention linked with its DBpedia representation and ontology class.\n" +
+            "<http://example.org/document/1#char=14,20>\n" +
+            "   a nif:String , nif:RFC5147String , nif:Word, nif:Phrase ;\n" +
+            "   nif:referenceContext <http://example.org/document/1#char=0,21> ;\n" +
+            "   nif:anchorOf \"Xiamen\"\"\"^^xsd:string ;\n" +
+            "   nif:beginIndex \"14\"^^xsd:nonNegativeInteger ;\n" +
+            "   nif:endIndex \"20\"^^xsd:nonNegativeInteger ;\n" +
+            "itsrdf:taIdentRef  <http://dbpedia.org/resource/Xiamen> .\n" +
+            "itsrdf:taClassRef  <http://dbpedia.org/ontology/City> ;\n" +
+            "\n" +
+            "```"+
+            "\n" ,
             value = "Fetch data about named entities from various ontologies")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
