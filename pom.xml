@@ -186,6 +186,7 @@
 				<configuration>
 					<jsonfile>target/doc/swagger-ui/swagger.json</jsonfile>
 					<yamlfile>../Documentation/swagger.yaml</yamlfile>
+					<mergeYamlFile>src/main/resources/swagger.descriptions.yaml</mergeYamlFile>
 					<excludeKey>description</excludeKey>
 					<excludeValue>HIDDEN</excludeValue>
 				</configuration>

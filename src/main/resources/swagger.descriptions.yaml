@@ -1,0 +1,82 @@
+info:
+  description: |
+    This web page documents the REST API of the FREME project. You can find more information about FREME on the [project website](http://freme-project.eu) and on the
+    [FREME GitHub page](http://github.com/freme-project). The [FREME wiki](https://github.com/freme-project/technical-discussion/wiki) contains more technical documentation.
+
+    # General
+
+    This section defines the default parameter set for all FREME e-Services. The parameters have a long and a short form. If both are set, the long form overrides the short form. The API follows the most important points from [NIF API specifications](http://persistence.uni-leipzig.org/nlp2rdf/specification/api.html).
+
+    Please note that all parameters submitted via the URLs query string need to be URL encoded according to [RFC 3986](https://tools.ietf.org/html/rfc3986).
+
+    * input (short form: i):
+      * input of the e-Service in plaintext or nif
+      * No default
+      * Depends on informat and intype
+    * informat (short form: f):
+      * format of input parameter.
+      * possible values
+        * text (plaintext)
+        * text/turtle (default), short form: turtle
+        * application/json+ld, short form: json-ld
+        * application/n-triples, short form: n-triples
+        * application/rdf+xml, short form: rdf-xml
+        * text/n3, short form: n3
+    * outformat (short form: o):
+      * output format
+      * possible values
+        * text/turtle (default), short form: turtle
+        * application/json+ld, short form: json-ld
+        * application/n-triples, short form: n-triples
+        * application/rdf+xml, short form: rdf-xml
+        * text/n3, short form: n3
+    * prefix (short form: p)
+      * Controls the url of rdf resources generated from plaintext. Has default value "http://freme-project.eu/"
+
+    The following header values are used by all FREME e-Services
+    * Accept
+      * possible values
+        * turtle for text/turtle (default)
+        * json-ld for application/json+ld
+        * n-triples for application/n-triples
+        * rdf-xml for application/rdf+xml
+        * n3 for text/n3
+      * When parameter outformat is set then the Accept header is not used by FREME api
+    * Content-Type
+      * possible values
+        * text (plaintext)
+        * text/turtle (default), short form: turtle
+        * application/json+ld, short form: json-ld
+        * application/n-triples, short form: n-triples
+        * application/rdf+xml, short form: rdf-xml
+        * text/n3, short form: n3
+    * When parameter informat is set then the Content-Type header is not used by FREME api
+
+tags:
+- name: "e-Translation"
+
+paths:
+  /e-publishing/html:
+    post:
+      description: "Creates an eBook in the EPUB3 format from a zip file containing\
+        \ HTML Files and more (images etc.) and a json file containing all necessary\
+        \ metadata for the creation of the eBook.\n\n**Example Call**\n\n`curl --form\
+        \ \"htmlZip=@alice.zip\" --form metadata='json-string' http://api-dev.freme-project.eu/current/e-publishing/html`\n\
+        \n**Metadata JSON may include the following**\n* `titles` - a list of Strings\
+        \ where each String represents one title\n* `authors` - a list of Strings\
+        \ where each String represents one author\n* `illustrators` - a list of Strings\
+        \ where each String represents one illustrator\n* `creators` - a list of Strings\
+        \ where each String represents one creator\n* `subjects` - a list of Strings\
+        \ where each String represents one subject\n* `coverImage` - the location\
+        \ of the cover image inside the zip file\n* `language` - the language of the\
+        \ content (e.g., 'en')\n* `source` - the original source of the content\n\
+        * `description` - the description of the EPUB\n* `rights` - the rights applicable\
+        \ to the EPUB\n* `identifier` - the identifier is represented by 'value',\
+        \ 'scheme' is optional and represents the used scheme corresponding with the\
+        \ value.\n* `tableOfContents` - it is an ordered list of the chapters/sections\
+        \ in the EPUB. For each you provide the title and the corresponding HTML file\
+        \ (= resource). If no tableOfContents is provided, the service will do a best\
+        \ effort at creating one. However, when no (x)html file is found in the root\
+        \ of the zip, the service will return an invalid EPUB.\n\n**Sample .zips**\n\
+        * [Alice in wonderland](https://drive.google.com/open?id=0B-qMtkPK-unYbVROT1J2TTRycDg&authuser=0)\n\
+        * [A shared culture](https://drive.google.com/open?id=0B-qMtkPK-unYdWlHTWMyS2VaV28&authuser=0)"

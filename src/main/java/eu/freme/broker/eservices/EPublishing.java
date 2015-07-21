@@ -37,30 +37,7 @@ public class EPublishing {
     EPublishingService entityAPI;
 
 
-    @ApiOperation(value = "Create eBooks in the EPUB3 format",
-            notes = "Creates an eBook in the EPUB3 format from a zip file containing HTML Files and more (images etc.) and a json file containing all necessary metadata for the creation of the eBook.\n" +
-                    "\n" +
-                    "**Example Call**\n" +
-                    "\n" +
-                    "`curl --form \"htmlZip=@alice.zip\" --form metadata='json-string' http://api-dev.freme-project.eu/current/e-publishing/html`\n" +
-                    "\n" +
-                    "**Metadata JSON may include the following**\n" +
-                    "* `titles` - a list of Strings where each String represents one title\n" +
-                    "* `authors` - a list of Strings where each String represents one author\n" +
-                    "* `illustrators` - a list of Strings where each String represents one illustrator\n" +
-                    "* `creators` - a list of Strings where each String represents one creator\n" +
-                    "* `subjects` - a list of Strings where each String represents one subject\n" +
-                    "* `coverImage` - the location of the cover image inside the zip file\n" +
-                    "* `language` - the language of the content (e.g., 'en')\n" +
-                    "* `source` - the original source of the content\n" +
-                    "* `description` - the description of the EPUB\n" +
-                    "* `rights` - the rights applicable to the EPUB\n" +
-                    "* `identifier` - the identifier is represented by 'value', 'scheme' is optional and represents the used scheme corresponding with the value.\n" +
-                    "* `tableOfContents` - it is an ordered list of the chapters/sections in the EPUB. For each you provide the title and the corresponding HTML file (= resource). If no tableOfContents is provided, the service will do a best effort at creating one. However, when no (x)html file is found in the root of the zip, the service will return an invalid EPUB.\n" +
-                    "\n" +
-                    "**Sample .zips**\n" +
-                    "* [Alice in wonderland](https://drive.google.com/open?id=0B-qMtkPK-unYbVROT1J2TTRycDg&authuser=0)\n" +
-                    "* [A shared culture](https://drive.google.com/open?id=0B-qMtkPK-unYdWlHTWMyS2VaV28&authuser=0)")
+    @ApiOperation(value = "Create eBooks in the EPUB3 format")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
             @ApiResponse(code = 400, message = "Bad request - input validation failed") })
