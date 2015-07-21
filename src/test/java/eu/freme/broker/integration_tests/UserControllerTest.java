@@ -14,7 +14,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import eu.freme.broker.eservices.BaseRestController;
 
-public class UserTest {
+public class UserControllerTest {
 
 	String baseUrl = null;
 
@@ -34,6 +34,7 @@ public class UserTest {
 				.queryString("username", username)
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
+		System.err.println(response.getBody());
 
 		// create dublicate username should not work
 		response = Unirest.post(baseUrl + "/user")

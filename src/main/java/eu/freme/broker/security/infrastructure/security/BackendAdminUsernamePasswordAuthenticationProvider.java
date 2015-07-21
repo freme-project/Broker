@@ -1,6 +1,9 @@
 package eu.freme.broker.security.infrastructure.security;
 
 import com.google.common.base.Optional;
+
+import eu.freme.common.security.database.User;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,7 +32,7 @@ public class BackendAdminUsernamePasswordAuthenticationProvider implements Authe
         }
 
         return new UsernamePasswordAuthenticationToken(username.get(), null,
-                AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_BACKEND_ADMIN"));
+                AuthorityUtils.commaSeparatedStringToAuthorityList(User.roleAdmin));
     }
 
     private boolean credentialsMissing(Optional<String> username, Optional<String> password) {

@@ -1,11 +1,14 @@
 package eu.freme.broker.eservices;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,7 +39,7 @@ public class UserController extends BaseRestController {
 		}
 		
 		try {
-			String hashedPassword = PasswordHasher.getSaltedHash(password);User user = new User(username, hashedPassword, User.Role.User);
+			String hashedPassword = PasswordHasher.getSaltedHash(password);User user = new User(username, hashedPassword, User.roleAdmin);
 			userRepository.save(user);
 			return user;
 		} catch (Exception e) {
@@ -45,15 +48,18 @@ public class UserController extends BaseRestController {
 		}
 	}
 	
-	@RequestMapping(value = "/auth-call", method = RequestMethod.POST)
-	public ResponseEntity<String> auth() {
+	@RequestMapping(value = "/user/{userId}", method = RequestMethod.DELETE)
+	public ResponseEntity<String> deleteUser(@PathVariable("userId") int userId
+            ) {
 
+		User user = userRepository.findOne((long)userId);
 		Authentication authentication = SecurityContextHolder.getContext()
 				.getAuthentication();
-		User user = new User("bla", "blub", User.Role.Admin);
 
 		decisionManager.decide(authentication, user, null);
-
+		userRepository.delete(user);
+		System.err.println("deleted");
+		
 		return new ResponseEntity<String>("hello", HttpStatus.OK);
 	}
 
