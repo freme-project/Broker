@@ -2,8 +2,6 @@ package eu.freme.broker.security.infrastructure.security;
 
 import com.google.common.base.Optional;
 
-import eu.freme.broker.security.api.ApiController;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;

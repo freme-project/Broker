@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 import eu.freme.broker.eservices.BaseRestController;
-import eu.freme.broker.security.api.ApiController;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
