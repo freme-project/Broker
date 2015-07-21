@@ -58,6 +58,35 @@ public class EPublishing {
                     "* `identifier` - the identifier is represented by 'value', 'scheme' is optional and represents the used scheme corresponding with the value.\n" +
                     "* `tableOfContents` - it is an ordered list of the chapters/sections in the EPUB. For each you provide the title and the corresponding HTML file (= resource). If no tableOfContents is provided, the service will do a best effort at creating one. However, when no (x)html file is found in the root of the zip, the service will return an invalid EPUB.\n" +
                     "\n" +
+                    "**Example Metadata JSON**\n"+
+                    "```\n"+
+                    "{\n" +
+                    "  \"titles\":[\"Alice in Utopia\",\"Alice in Europe\"],\n" +
+                    "  \"authors\":[\"Joske Vermeulen\", \"Nick Borth\"],\n" +
+                    "  \"illustrators\":[\"Frans Vervaacke\", \"John Riplosh\"],\n" +
+                    "  \"creators\":[\"Joske Vermeulen\", \"Nick Borth\"],\n" +
+                    "  \"subjects\":[\"alice\", \"rabbit\"],\n" +
+                    "  \"coverImage\":\"cover.jpeg\",\n" +
+                    "  \"language\":\"en\",\n" +
+                    "  \"source\":\"\",\n" +
+                    "  \"description\":\"This is the story about Alice in wonderland, involving a rabbit etc.\",\n" +
+                    "  \"rights\":\"\",\n" +
+                    "  \"identifier\":{\n" +
+                    "    \"scheme\":\"\",\n" +
+                    "    \"value\":\"urn:1235-568-2235\"\n" +
+                    "  },\n" +
+                    "  \"tableOfContents\":[\n" +
+                    "    {\n" +
+                    "      \"title\":\"Chapter 1\",\n" +
+                    "      \"resource\":\"01.xhtml\"\n" +
+                    "    },\n" +
+                    "    {\n" +
+                    "      \"title\":\"Chapter 2\",\n" +
+                    "      \"resource\":\"02.xhtml\"\n" +
+                    "    }\n" +
+                    "  ]\n" +
+                    "}"+
+                    "```\n"+
                     "**Sample .zips**\n" +
                     "* [Alice in wonderland](https://drive.google.com/open?id=0B-qMtkPK-unYbVROT1J2TTRycDg&authuser=0)\n" +
                     "* [A shared culture](https://drive.google.com/open?id=0B-qMtkPK-unYdWlHTWMyS2VaV28&authuser=0)")

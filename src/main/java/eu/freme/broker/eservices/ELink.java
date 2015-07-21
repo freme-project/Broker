@@ -55,7 +55,7 @@ public class ELink extends BaseRestController {
     // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
     @ApiOperation(notes = "This service accepts a NIF document (with annotated entities) and performs enrichment with pre-defined templates. The templates contain \"fields\" marked between three at-signs @@@field-name@@@. If a user, while calling the enrichment endpoint specifies an \"unknown\" parameter (not from the list above), then the values of that \"unknown\" parameters will be used to replace with the corresponding \"field\" in the query template. This feature doesn't work via \"Try-it-out!\"-button.\n"+
             "\n" +
-            "You can find a list of available templates in the FREME wiki.\n" +
+            "You can find a list of available templates in the [FREME wiki](https://github.com/freme-project/technical-discussion/wiki/Broker-API-Calls#user-content-available-templates).\n" +
             "\n" +
             "**This is an example of a NIF document containing annotated entities that can be processed by e-link:**\n" +
             "\n" +
@@ -97,14 +97,14 @@ public class ELink extends BaseRestController {
             //@RequestParam(value = "input", required = false) String input,
             //@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
 
-            @ApiParam(value = "Format of input string. Can be json-ld, turtle. Overrides Content-Type header. Short form is f.",
-                    allowableValues = "json-ld, turtle",
+            @ApiParam(value = "Format of input string. Can be "+NIFParameterFactory.nifFormatsString+". Overrides Content-Type header. Short form is f.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
             @RequestParam(value = "informat", required = false) String informat,
             @ApiParam(value = "HIDDEN") @RequestParam(value = "f", required = false) String f,
 
-            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.allowedValuesOutformat + ". Defaults to \"turtle\". Overrides Accept Header (Response Content Type). Short form is o.",
-                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.nifFormatsString + ". Defaults to \"turtle\". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
             @RequestParam(value = "outformat", required = false) String outformat,
             @ApiParam(value = "HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -232,14 +232,14 @@ public class ELink extends BaseRestController {
             consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
             produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> createTemplate(
-            @ApiParam(value = "Format of input string. Can be json-ld, turtle. Overrides Content-Type header. Short form is f.",
-                    allowableValues = "json-ld, turtle",
+            @ApiParam(value = "Format of input string. Can be " + NIFParameterFactory.nifFormatsString + ". Overrides Content-Type header. Short form is f.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
             @RequestParam(value = "informat", required = false) String informat,
             @ApiParam(value = "HIDDEN") @RequestParam(value = "f", required = false) String f,
 
-            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.allowedValuesOutformat + ". Overrides Accept Header (Response Content Type). Short form is o.",
-                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.nifFormatsString + ". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
             @RequestParam(value = "outformat", required = false) String outformat,
             @ApiParam(value = "HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -396,8 +396,8 @@ public class ELink extends BaseRestController {
             method = RequestMethod.GET,
             produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> getTemplateById(
-            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.allowedValuesOutformat + ". Overrides Accept Header (Response Content Type). Short form is o.",
-                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.nifFormatsString + ". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
             @RequestParam(value = "outformat", required = false) String outformat,
             @ApiParam(value = "HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -496,8 +496,8 @@ public class ELink extends BaseRestController {
             method = RequestMethod.GET,
             produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> getAllTemplates(
-            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.allowedValuesOutformat + ". Overrides Accept Header (Response Content Type). Short form is o.",
-                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.nifFormatsString + ". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
             @RequestParam(value = "outformat", required = false) String outformat,
             @ApiParam(value = "HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -583,14 +583,14 @@ public class ELink extends BaseRestController {
             consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
             produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> updateTemplateById(
-            @ApiParam(value = "Format of the template. Can be json-ld, turtle. Overrides Content-Type header. Short form is f.",
-                    allowableValues = "json-ld, turtle",
+            @ApiParam(value = "Format of the template. Can be " + NIFParameterFactory.nifFormatsString+ ". Overrides Content-Type header. Short form is f.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
             @RequestParam(value = "informat", required = false) String informat,
             @ApiParam(value = "HIDDEN") @RequestParam(value = "f", required = false) String f,
 
-            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.allowedValuesOutformat + ". Overrides Accept Header (Response Content Type). Short form is o.",
-                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+            @ApiParam(value = "RDF serialization format of Output. Can be " + NIFParameterFactory.nifFormatsString + ". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
             @RequestParam(value = "outformat", required = false) String outformat,
             @ApiParam(value = "HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -599,7 +599,7 @@ public class ELink extends BaseRestController {
 
             @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-            @ApiParam(value = "The new template. The format of the body can be text/turtle, application/json+ld. Defaults to text/turtle. The parameter *informat* overrides the Content-Type.")
+            @ApiParam(value = "The new template. The format of the body can be "+NIFParameterFactory.nifFormatsMimeString+". Defaults to text/turtle. The parameter *informat* overrides the Content-Type.")
             @RequestBody(required = false) String postBody,
 
             @ApiParam("The ID of the template to update.")

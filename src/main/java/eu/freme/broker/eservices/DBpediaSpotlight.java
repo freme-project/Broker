@@ -35,7 +35,21 @@ public class DBpediaSpotlight extends BaseRestController {
 	@Autowired
 	EEntityService entityAPI;
 
-	@ApiOperation(notes = "Enriches Text content with entities gathered by the DBPedia Spotlight engine.The service also accepts text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing.",
+	@ApiOperation(notes = "Enriches Text content with entities gathered from various datasets by the DBPedia-Spotlight Engine. The service accepts plaintext or text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing. This example shows a NIF document that can be processed by the service:"+
+            "\n```" +
+            "\n"+
+            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
+            "@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .\n" +
+            "\n" +
+            "<http://example.org/document/1#char=0,18>\n" +
+            "    a nif:String , nif:Context , nif:RFC5147String ;\n" +
+            "    nif:isString \"Welcome to Berlin!.\"^^xsd:string;\n" +
+            "    nif:beginIndex \"0\"^^xsd:nonNegativeInteger;\n" +
+            "    nif:endIndex \"18\"^^xsd:nonNegativeInteger;\n" +
+            "    nif:sourceUrl <http://differentday.blogspot.com/2007_01_01_archive.html> ."+
+            "\n```" +
+            "\n",
+
 	    value = "Entity recognition and linking using DBPedia Spotlight engine. ")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
@@ -51,14 +65,14 @@ public class DBpediaSpotlight extends BaseRestController {
 			@RequestParam(value = "input", required = false) String input,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
 			
-			@ApiParam(value="Format of input string. Can be "+NIFParameterFactory.allowedValuesInformat+". Overrides Content-Type header. Short form is f.",
-                    allowableValues = NIFParameterFactory.allowedValuesInformat,
+			@ApiParam(value="Format of input string. Can be "+NIFParameterFactory.nifFormatsString+" or text. Overrides Content-Type header. Short form is f.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "text")
 			@RequestParam(value = "informat", required = false) String informat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "f", required = false) String f,
 			
-			@ApiParam(value = "RDF serialization format of Output. Can be "+NIFParameterFactory.allowedValuesOutformat+". Defaults to \"turtle\". Overrides Accept Header (Response Content Type). Short form is o.",
-                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+			@ApiParam(value = "RDF serialization format of Output. Can be "+NIFParameterFactory.nifFormatsString +". Defaults to \"turtle\". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
 			@RequestParam(value = "outformat", required = false) String outformat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -71,7 +85,7 @@ public class DBpediaSpotlight extends BaseRestController {
 			
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-            @ApiParam(value="The text to enrich. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.allowedValuesInformatMime+". Defaults to \"text/plain\". The parameter *informat* overrides the Content-Type.")
+            @ApiParam(value="The text to enrich. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.nifFormatsMimeString +". Defaults to \"text/plain\". The parameter *informat* overrides the Content-Type.")
             @RequestBody(required = false) String postBody,
 			
 			@ApiParam(value="Source language. Can be en, de, nl, fr, it, es (according to supported NER engine).",

@@ -3,14 +3,6 @@ package eu.freme.broker.eservices;
 import eu.freme.broker.tools.NIFParameterFactory;
 import io.swagger.annotations.*;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -62,7 +53,7 @@ public class TildeETranslation extends BaseRestController {
 	@RequestMapping(value = "/e-translation/tilde",
 			method = RequestMethod.POST,
 			produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
-			consumes = {"text/plain", "text/turtle", "application/json+ld"})//, "application/n-triples", "application/rdf+xml","text/n3"})
+			consumes = {"text/plain", "text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml","text/n3"})
 
 	public ResponseEntity<String> tildeTranslate(
 
@@ -70,14 +61,14 @@ public class TildeETranslation extends BaseRestController {
 			@RequestParam(value = "input", required = false) String input,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "i", required = false) String i,
 
-			@ApiParam(value="Format of input string. Can be "+NIFParameterFactory.allowedValuesInformat+". Defaults to \"turtle\". This parameter overrides Content-Type header. Short form is f.",
-					allowableValues = NIFParameterFactory.allowedValuesInformat,
+			@ApiParam(value="Format of input string. Can be "+NIFParameterFactory.nifFormatsString+"or text. Defaults to \"turtle\". This parameter overrides Content-Type header. Short form is f.",
+					allowableValues = NIFParameterFactory.nifFormatsString+", text",
 					defaultValue = "turtle")
 			@RequestParam(value = "informat", required = false) String informat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "f", required = false) String f,
 			
-			@ApiParam(value="RDF serialization format of Output. Can be "+NIFParameterFactory.allowedValuesOutformat+". Defaults to \"turtle\". This parameter overrides Accept header (Response Content Type). Short form is o.",
-					allowableValues = NIFParameterFactory.allowedValuesOutformat,
+			@ApiParam(value="RDF serialization format of Output. Can be "+NIFParameterFactory.nifFormatsString +". Defaults to \"turtle\". This parameter overrides Accept header (Response Content Type). Short form is o.",
+					allowableValues = NIFParameterFactory.nifFormatsString,
 					defaultValue = "turtle")
 			@RequestParam(value = "outformat", required = false) String outformat,
 			@ApiParam(value="HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -90,7 +81,7 @@ public class TildeETranslation extends BaseRestController {
 
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-			@ApiParam(value="The string to be translated. Can be either plaintext or NIF. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.allowedValuesInformatMime+". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
+			@ApiParam(value="The string to be translated. Can be either plaintext or NIF. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.nifFormatsMimeString +". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
 			@RequestBody(required = false) String postBody,
 
 			@ApiParam(value="Source language, e.g. \"en\". A list of available language pairs is [here](https://services.tilde.com/translationsystems).",
