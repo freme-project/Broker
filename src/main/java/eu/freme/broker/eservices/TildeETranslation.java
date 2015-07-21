@@ -48,6 +48,7 @@ public class TildeETranslation extends BaseRestController {
 	@Autowired
 	TranslationConversionService translationConversionService;
 
+	
 	private String endpoint = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
 
 	//private final String requestFormatValuesShort = "text, json-ld, turtle";
@@ -57,7 +58,7 @@ public class TildeETranslation extends BaseRestController {
 	    notes = "Parameters can be submitted via URL or via form-data post body. A list of available language pairs is [here](https://services.tilde.com/translationsystems).")
 	@ApiResponses(value = {
 			@ApiResponse(code = 200, message = "Successful response"),
-			@ApiResponse(code = 406, message = "Bad request - input validation failed") })
+			@ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-translation/tilde",
 			method = RequestMethod.POST,
 			produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},

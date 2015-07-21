@@ -57,7 +57,7 @@ public class ELink extends BaseRestController {
             value = "Fetch data about named entities from various ontologies")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
-            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
     @RequestMapping(value = "/e-link/documents/",
             method = RequestMethod.POST,
             consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
@@ -195,7 +195,8 @@ public class ELink extends BaseRestController {
 	@ApiOperation("Creates a new enrichment template.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
-            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+            @ApiResponse(code = 404, message = "Not Found"),
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
     @RequestMapping(value = "/e-link/templates/",
             method = RequestMethod.POST,
             consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
@@ -360,7 +361,7 @@ public class ELink extends BaseRestController {
     @ApiOperation("Returns one specific template with specified ID in a specified format.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
-            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-link/templates/{templateid}",
             method = RequestMethod.GET,
             produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
@@ -460,7 +461,7 @@ public class ELink extends BaseRestController {
     @ApiOperation("Returns a list of all templates in specified format.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
-            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-link/templates/",
             method = RequestMethod.GET,
             produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
@@ -546,7 +547,7 @@ public class ELink extends BaseRestController {
     @ApiOperation("Update an enrichment template with specified ID. The new data is submitted as body of a PUT request.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
-            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-link/templates/{templateid}",
             method = RequestMethod.PUT,
             consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
@@ -705,7 +706,8 @@ public class ELink extends BaseRestController {
         // DELETE /e-link/templates/{template-id}
     @ApiOperation("Removes a template with specified ID.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 204, message = "Successful removal response - No Content"),
+            @ApiResponse(code = 400, message = "Bad request - input validation failed"),
             @ApiResponse(code = 404, message = "A template with such id was not found.") })
 	@RequestMapping(value = "/e-link/templates/{templateid}",
             method = RequestMethod.DELETE)

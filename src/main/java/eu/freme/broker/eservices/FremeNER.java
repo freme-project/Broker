@@ -45,7 +45,7 @@ public class FremeNER extends BaseRestController {
 	   notes = "Enriches Text content with entities gathered by the Freme-NER engine. The service also accepts text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing.")
 	@ApiResponses(value = {
        @ApiResponse(code = 200, message = "Successful response"),
-	   @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+	   @ApiResponse(code = 400, message = "Bad request - input validation failed") })
     // Submitting document for processing.
     @RequestMapping(value = "/e-entity/freme-ner/documents",
             method = {RequestMethod.POST, RequestMethod.GET },
@@ -210,7 +210,7 @@ public class FremeNER extends BaseRestController {
     notes = "Create dataset in SKOS format which includes prefLabel, altLabel or label properties (unless the param properties is explicitly set).")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
-            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-entity/freme-ner/datasets",
             method = {RequestMethod.POST },
             consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
@@ -311,7 +311,7 @@ public class FremeNER extends BaseRestController {
     @ApiOperation("Updating dataset for use in the e-Entity service")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
-            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}",
             method = {RequestMethod.PUT },
             consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
@@ -407,7 +407,7 @@ public class FremeNER extends BaseRestController {
     @RequestMapping(value = "/e-entity/freme-ner/datasets/{name}",
             method = {RequestMethod.GET })
 	public ResponseEntity<String> getDataset(
-            @ApiParam("The name of teh requested dataset.")
+            @ApiParam("The name of the requested dataset.")
             @PathVariable(value = "name") String name) {
             
             // Check the dataset name parameter.
