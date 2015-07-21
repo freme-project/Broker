@@ -113,7 +113,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Appl
     	Map<String,AccessDecisionVoter> map = applicationContext.getBeansOfType(AccessDecisionVoter.class);
     	ArrayList<AccessDecisionVoter> list = new ArrayList<AccessDecisionVoter>(map.values());
     	list.add(new RoleVoter());
-    	
-    	return new AffirmativeBased(list);
+    	AffirmativeBased ab = new AffirmativeBased(list);
+    	return ab;
     }
 }
