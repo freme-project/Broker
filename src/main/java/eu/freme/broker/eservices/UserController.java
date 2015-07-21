@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +31,7 @@ public class UserController extends BaseRestController {
 	UserRepository userRepository;
 
 	@RequestMapping(value = "/user", method = RequestMethod.POST)
-	public User creatUser(
+	public User createUser(
 			@RequestParam(value = "username", required = true) String username,
 			@RequestParam(value = "password", required = true) String password) {
 
@@ -39,7 +40,8 @@ public class UserController extends BaseRestController {
 		}
 		
 		try {
-			String hashedPassword = PasswordHasher.getSaltedHash(password);User user = new User(username, hashedPassword, User.roleAdmin);
+			String hashedPassword = PasswordHasher.getSaltedHash(password);
+			User user = new User(username, hashedPassword, User.roleUser);
 			userRepository.save(user);
 			return user;
 		} catch (Exception e) {
@@ -49,18 +51,21 @@ public class UserController extends BaseRestController {
 	}
 	
 	@RequestMapping(value = "/user/{userId}", method = RequestMethod.DELETE)
+	//@PreAuthorize("hasRole('" + User.roleUser + "')")
 	public ResponseEntity<String> deleteUser(@PathVariable("userId") int userId
             ) {
 
 		User user = userRepository.findOne((long)userId);
+		if( user == null){
+			throw new BadRequestException("User not found");
+		}
+		
 		Authentication authentication = SecurityContextHolder.getContext()
 				.getAuthentication();
-
 		decisionManager.decide(authentication, user, null);
 		userRepository.delete(user);
-		System.err.println("deleted");
 		
-		return new ResponseEntity<String>("hello", HttpStatus.OK);
+		return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
 	}
 
 	public void setDecisionManager(AbstractAccessDecisionManager decisionManager) {

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -78,6 +79,8 @@ public abstract class BaseRestController {
 				&& ((FREMEHttpException) exception).getHttpStatusCode() != null) {
 			// get response code from FREMEHttpException
 			statusCode = ((FREMEHttpException) exception).getHttpStatusCode();
+		} else if( exception instanceof AccessDeniedException ){
+			throw new eu.freme.broker.exception.AccessDeniedException();
 		} else {
 			// get status code from exception class annotation
 			Annotation responseStatusAnnotation = exception.getClass()

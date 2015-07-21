@@ -26,6 +26,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
+import eu.freme.broker.security.infrastructure.security.voter.UserAccessDecisionVoter;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -109,7 +111,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Appl
     public AffirmativeBased getDecisionVoter(){
     	Map<String,AccessDecisionVoter> map = applicationContext.getBeansOfType(AccessDecisionVoter.class);
     	ArrayList<AccessDecisionVoter> list = new ArrayList<AccessDecisionVoter>(map.values());
-    	list.add(new RoleVoter());
+    	list.add(new UserAccessDecisionVoter());
     	AffirmativeBased ab = new AffirmativeBased(list);
     	return ab;
     }

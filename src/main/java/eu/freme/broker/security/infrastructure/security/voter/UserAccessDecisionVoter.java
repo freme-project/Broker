@@ -17,14 +17,19 @@ public class UserAccessDecisionVoter implements AccessDecisionVoter<User>{
 
 	@Override
 	public boolean supports(Class<?> clazz) {
+		System.err.println("****************************");
+		System.err.println(clazz);
+		System.err.println("****************************");
 		return clazz == User.class;
 	}
 
 	@Override
 	public int vote(Authentication authentication, User object,
 			Collection<ConfigAttribute> attributes) {
+		System.err.println("****************************");
 		System.err.println(authentication.getPrincipal());
-		return 0;
+		System.err.println("****************************");
+		return ACCESS_DENIED;
 	}
 
 }
