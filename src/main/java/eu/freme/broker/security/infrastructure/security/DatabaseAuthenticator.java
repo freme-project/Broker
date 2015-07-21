@@ -1,12 +1,9 @@
-package eu.freme.broker.security.infrastructure.externalwebservice;
+package eu.freme.broker.security.infrastructure.security;
 
 import java.util.List;
 
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.security.domain.DomainUser;
-import eu.freme.broker.security.infrastructure.AuthenticatedExternalWebService;
-import eu.freme.broker.security.infrastructure.security.AuthenticationWithToken;
-import eu.freme.broker.security.infrastructure.security.ExternalServiceAuthenticator;
 import eu.freme.common.security.database.User;
 import eu.freme.common.security.database.UserRepository;
 import eu.freme.common.security.tools.PasswordHasher;
@@ -16,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.authority.AuthorityUtils;
 
-public class SomeExternalServiceAuthenticator implements ExternalServiceAuthenticator {
+public class DatabaseAuthenticator implements ExternalServiceAuthenticator {
 
 	@Autowired
 	UserRepository userRepository;
 	
-	Logger logger = Logger.getLogger(SomeExternalServiceAuthenticator.class);
+	Logger logger = Logger.getLogger(DatabaseAuthenticator.class);
 	
     @Override
     public AuthenticationWithToken authenticate(String username, String password) {

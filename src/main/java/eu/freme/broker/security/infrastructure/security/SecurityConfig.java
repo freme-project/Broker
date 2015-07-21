@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import eu.freme.broker.security.api.ApiController;
-import eu.freme.broker.security.infrastructure.externalwebservice.SomeExternalServiceAuthenticator;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -72,7 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Appl
 
     @Bean
     public ExternalServiceAuthenticator someExternalServiceAuthenticator() {
-        return new SomeExternalServiceAuthenticator();
+        return new DatabaseAuthenticator();
     }
 
     @Bean
