@@ -42,10 +42,23 @@ public class FremeNER extends BaseRestController {
 	EEntityService entityAPI;
 
 	@ApiOperation(value = "Entity recognition and linking using Freme-NER engine.",
-	   notes = "Enriches Text content with entities gathered by the Freme-NER engine. The service also accepts text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing.")
+	   notes = "Enriches Text content with entities gathered from various datasets by the DBPedia-Spotlight Engine. The service accepts plaintext or text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing. This example shows a NIF document that can be processed by the service:"+
+            "\n```" +
+            "\n"+
+            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
+            "@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .\n" +
+            "\n" +
+            "<http://example.org/document/1#char=0,18>\n" +
+            "    a nif:String , nif:Context , nif:RFC5147String ;\n" +
+            "    nif:isString \"Welcome to Berlin!.\"^^xsd:string;\n" +
+            "    nif:beginIndex \"0\"^^xsd:nonNegativeInteger;\n" +
+            "    nif:endIndex \"18\"^^xsd:nonNegativeInteger;\n" +
+            "    nif:sourceUrl <http://differentday.blogspot.com/2007_01_01_archive.html> ."+
+            "\n```" +
+            "\n")
 	@ApiResponses(value = {
        @ApiResponse(code = 200, message = "Successful response"),
-	   @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+	   @ApiResponse(code = 400, message = "Bad request - input validation failed") })
     // Submitting document for processing.
     @RequestMapping(value = "/e-entity/freme-ner/documents",
             method = {RequestMethod.POST, RequestMethod.GET },
@@ -56,14 +69,14 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "input", required = false) String input,
 			@ApiParam("HIDDEN") @RequestParam(value = "i", required = false) String i,
 			
-			@ApiParam(value="Format of input string. Can be "+ NIFParameterFactory.allowedValuesInformat+". Overrides Content-Type header. Short form is f.",
-                    allowableValues = NIFParameterFactory.allowedValuesInformat,
+			@ApiParam(value="Format of input string. Can be "+ NIFParameterFactory.nifFormatsString+"or text. Overrides Content-Type header. Short form is f.",
+                    allowableValues = NIFParameterFactory.nifFormatsString + ", text",
                     defaultValue = "text")
 			@RequestParam(value = "informat", required = false) String informat,
 			@ApiParam("HIDDEN") @RequestParam(value = "f", required = false) String f,
 			
-			@ApiParam(value="RDF serialization format of Output. Can be "+NIFParameterFactory.allowedValuesOutformat+". Overrides Accept Header (Response Content Type). Short form is o.",
-                    allowableValues = NIFParameterFactory.allowedValuesOutformat,
+			@ApiParam(value="RDF serialization format of Output. Can be "+NIFParameterFactory.nifFormatsString +". Overrides Accept Header (Response Content Type). Short form is o.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
 			@RequestParam(value = "outformat", required = false) String outformat,
 			@ApiParam("HIDDEN") @RequestParam(value = "o", required = false) String o,
@@ -76,7 +89,7 @@ public class FremeNER extends BaseRestController {
 
             @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-            @ApiParam(value="The text to enrich. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.allowedValuesInformatMime+". Defaults to \"text/plain\". The parameter *informat* overrides the Content-Type.")
+            @ApiParam(value="The text to enrich. Will be overwritten by parameter input, if set. The format of the body can be "+NIFParameterFactory.nifFormatsMimeString +". Defaults to \"text/plain\". The parameter *informat* overrides the Content-Type.")
             @RequestBody(required = false) String postBody,
 
             @ApiParam(value="Source language. Can be en, de, nl, fr, it, es (according to supported NER engine).",
@@ -210,27 +223,28 @@ public class FremeNER extends BaseRestController {
     notes = "Create dataset in SKOS format which includes prefLabel, altLabel or label properties (unless the param properties is explicitly set).")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
-            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-entity/freme-ner/datasets",
             method = {RequestMethod.POST },
-            consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
+            consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
+            produces = {"application/json"})
 	public ResponseEntity<String> createDataset(
-            @ApiParam(value="RDF serialization format of the dataset. Can be json+ld, turtle. Overrides Content-Type header. Short form is f.",
-                    allowableValues = "turtle, json+ld",
+            @ApiParam(value="RDF serialization format of the dataset. Can be "+NIFParameterFactory.nifFormatsString+". Overrides Content-Type header. Short form is f.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
             @RequestParam(value = "informat", required = false) String informat,
             @ApiParam("HIDDEN") @RequestParam(value = "f", required = false) String f,
 
             @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-            @ApiParam(value="The dataset. The format of the body can be \"text/turtle\", \"application/json+ld\", \"application/n-triples\", \"application/rdf+xml\", \"text/n3\". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
+            @ApiParam(value="The dataset. The format of the body can be "+NIFParameterFactory.nifFormatsMimeString+". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
             @RequestBody(required = false) String postBody,
 
             @ApiParam("proposed dataset name. It can be considered as ID for the dataset. It should include only numbers, letters and should NOT include white spaces.")
             @RequestParam(value = "name", required = false) String name,
 
             @ApiParam(value = "language of the labels in the dataset. If the parameter is not specified, all labels without language tag will be used while performing linking. At the moment only following languages are supported - FREME NER (en/de/fr/es/it), DBpedia Spotlight (en).",
-                    allowableValues = "de, en, nl, it, fr, es")
+                    allowableValues = "de, en, it, fr, es")
             @RequestParam(value = "language", required = false) String language) {
             
             // merge long and short parameters - long parameters override short parameters.
@@ -311,20 +325,20 @@ public class FremeNER extends BaseRestController {
     @ApiOperation("Updating dataset for use in the e-Entity service")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
-            @ApiResponse(code = 404, message = "Bad request - input validation failed") })
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}",
             method = {RequestMethod.PUT },
             consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> updateDataset(
-            @ApiParam(value="RDF serialization format of the dataset. Can be json+ld, turtle. Overrides Content-Type header. Short form is f.",
-                    allowableValues = "turtle, json+ld",
+            @ApiParam(value="RDF serialization format of the dataset. Can be "+ NIFParameterFactory.nifFormatsString +". Overrides Content-Type header. Short form is f.",
+                    allowableValues = NIFParameterFactory.nifFormatsString,
                     defaultValue = "turtle")
             @RequestParam(value = "informat", required = false) String informat,
             @ApiParam("HIDDEN") @RequestParam(value = "f", required = false) String f,
 
             @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-            @ApiParam(value="The dataset. The format of the body can be \"text/turtle\", \"application/json+ld\", \"application/n-triples\", \"application/rdf+xml\", \"text/n3\". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
+            @ApiParam(value="The dataset. The format of the body can be "+NIFParameterFactory.nifFormatsMimeString+". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
             @RequestBody(required = false) String postBody,
 
             @ApiParam("The name name of the dataset to update. It can be considered as ID for the dataset. It should include only numbers, letters and should NOT include white spaces.")
@@ -407,7 +421,7 @@ public class FremeNER extends BaseRestController {
     @RequestMapping(value = "/e-entity/freme-ner/datasets/{name}",
             method = {RequestMethod.GET })
 	public ResponseEntity<String> getDataset(
-            @ApiParam("The name of teh requested dataset.")
+            @ApiParam("The name of the requested dataset.")
             @PathVariable(value = "name") String name) {
             
             // Check the dataset name parameter.
