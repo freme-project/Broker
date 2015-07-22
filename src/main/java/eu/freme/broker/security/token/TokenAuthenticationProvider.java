@@ -1,6 +1,9 @@
-package eu.freme.broker.security;
+package eu.freme.broker.security.token;
 
 import com.google.common.base.Optional;
+
+import eu.freme.broker.security.AuthenticationWithToken;
+
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -21,10 +24,12 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
         if (!token.isPresent() || token.get().isEmpty()) {
             throw new BadCredentialsException("Invalid token");
         }
-        if (!tokenService.contains(token.get())) {
-            throw new BadCredentialsException("Invalid token or token expired");
+        
+        Token tokenObject = tokenService.retrieve(token.get());
+        if( tokenObject == null){
+        	throw new BadCredentialsException("Invalid token");
         }
-        return tokenService.retrieve(token.get());
+        return new AuthenticationWithToken(tokenObject.getToken(), authentication.getCredentials());
     }
 
     @Override

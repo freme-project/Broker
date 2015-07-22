@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 
 import eu.freme.common.security.database.User;
 
-public class UserAccessDecisionVoter implements AccessDecisionVoter<User>{
+public class UserAccessDecisionVoter implements AccessDecisionVoter<User> {
 
 	@Override
 	public boolean supports(ConfigAttribute attribute) {
@@ -17,19 +17,23 @@ public class UserAccessDecisionVoter implements AccessDecisionVoter<User>{
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		System.err.println("****************************");
-		System.err.println(clazz);
-		System.err.println("****************************");
 		return clazz == User.class;
 	}
 
 	@Override
 	public int vote(Authentication authentication, User object,
 			Collection<ConfigAttribute> attributes) {
-		System.err.println("****************************");
-		System.err.println(authentication.getPrincipal());
-		System.err.println("****************************");
-		return ACCESS_DENIED;
-	}
+		
+		System.err.println();
+		if( authentication.getPrincipal().equals( "anonymousUser" )){
+			return ACCESS_DENIED;
+		}
 
+		User authenticatedUser = (User) authentication.getDetails();
+		if (authenticatedUser.getName() == object.getName()) {
+			return ACCESS_GRANTED;
+		} else {
+			return ACCESS_DENIED;
+		}
+	}
 }

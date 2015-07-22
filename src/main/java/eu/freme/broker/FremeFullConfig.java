@@ -15,7 +15,7 @@ import eu.freme.eservices.elink.ELinkConfig;
 import eu.freme.eservices.epublishing.EPublishingConfig;
 
 /**
- * loads BrokerConfig + API endpoints
+ * loads BrokerConfig and API endpoints
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */

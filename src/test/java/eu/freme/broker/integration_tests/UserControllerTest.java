@@ -2,6 +2,7 @@ package eu.freme.broker.integration_tests;
 
 import static org.junit.Assert.assertTrue;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import eu.freme.broker.eservices.BaseRestController;
 public class UserControllerTest {
 
 	String baseUrl = null;
+	Logger logger = Logger.getLogger(UserControllerTest.class);
 
 	@Before
 	public void setup() {
@@ -29,27 +31,27 @@ public class UserControllerTest {
 		String username = "my-user";
 		String password = "my-password";
 
-		// create user
+		logger.info("create user");
 		HttpResponse<String> response = Unirest.post(baseUrl + "/user")
 				.queryString("username", username)
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
 		Long userid = new JSONObject(response.getBody()).getLong("id");
 
-		// create dublicate username should not work
+		logger.info("create user with dublicate username - should not work, exception is ok");
 		response = Unirest.post(baseUrl + "/user")
 				.queryString("username", username)
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
 
-		// login with wrong password should fail
+		logger.info("create user with dublicate username - should not work, exception is ok");
 		response = Unirest
 				.post(baseUrl + BaseRestController.authenticationEndpoint)
 				.header("X-Auth-Username", username)
 				.header("X-Auth-Password", password + "xyz").asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
 
-		// login with new user
+		logger.info("login with new user / create token");
 		response = Unirest
 				.post(baseUrl + BaseRestController.authenticationEndpoint)
 				.header("X-Auth-Username", username)
@@ -60,23 +62,30 @@ public class UserControllerTest {
 		assertTrue(token.length() > 0);
 
 		// delete user without credentials should fail
-		System.err.println(baseUrl + "/user/ " + userid.toString());
+		logger.info("delete user without providing credentials - should fail, exception is ok");
 		response = Unirest.delete(baseUrl + "/user/" + userid.toString()).asString();
-		System.err.println(response.getStatus());
-		System.err.println(response.getBody());
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
 
-//		// create another user
-//		response = Unirest.post(baseUrl + "/user").queryString("username", "other-user")
-//				.queryString("password", password).asString();
-//		assertTrue(response.getStatus() == HttpStatus.OK.value());
-//		Long otherUserid = new JSONObject(response.getBody()).getLong("id");
-//
+		// create another user
+		logger.info("create a 2nd user");
+		response = Unirest.post(baseUrl + "/user").queryString("username", "other-user")
+				.queryString("password", password).asString();
+		assertTrue(response.getStatus() == HttpStatus.OK.value());
+		Long otherUserid = new JSONObject(response.getBody()).getLong("id");
+
 //		// delete other user should fail
 //		response = Unirest
-//				.delete(baseUrl + "/user/ " + otherUserid)
+//				.delete(baseUrl + "/user/" + otherUserid)
 //				.header("X-Auth-Token", token).asString();
+//		assertTrue(response.getStatus() == HttpStatus.FORBIDDEN.value());
 		
-
+		// delete own user should work
+		logger.info("delete own user - should work");
+		response = Unirest
+				.delete(baseUrl + "/user/" + userid)
+				.header("X-Auth-Token", token).asString();
+		System.err.println(response.getStatus());
+		System.err.println(response.getBody());
+		assertTrue(response.getStatus() == HttpStatus.OK.value());
 	}
 }

@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 import eu.freme.broker.eservices.BaseRestController;
+import eu.freme.broker.security.token.TokenResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +109,7 @@ public class AuthenticationFilter extends GenericFilterBean {
     }
 
     private void processUsernamePasswordAuthentication(HttpServletResponse httpResponse, Optional<String> username, Optional<String> password) throws IOException {
-        Authentication resultOfAuthentication = tryToAuthenticateWithUsernameAndPassword(username, password);
+    	Authentication resultOfAuthentication = tryToAuthenticateWithUsernameAndPassword(username, password);
         SecurityContextHolder.getContext().setAuthentication(resultOfAuthentication);
         httpResponse.setStatus(HttpServletResponse.SC_OK);
         TokenResponse tokenResponse = new TokenResponse(resultOfAuthentication.getDetails().toString());

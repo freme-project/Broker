@@ -80,7 +80,7 @@ public abstract class BaseRestController {
 			// get response code from FREMEHttpException
 			statusCode = ((FREMEHttpException) exception).getHttpStatusCode();
 		} else if( exception instanceof AccessDeniedException ){
-			throw new eu.freme.broker.exception.AccessDeniedException();
+			statusCode = HttpStatus.UNAUTHORIZED;
 		} else {
 			// get status code from exception class annotation
 			Annotation responseStatusAnnotation = exception.getClass()

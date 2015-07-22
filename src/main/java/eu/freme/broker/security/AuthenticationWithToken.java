@@ -3,6 +3,8 @@ package eu.freme.broker.security;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
+import eu.freme.broker.security.token.Token;
+
 import java.util.Collection;
 
 public class AuthenticationWithToken extends PreAuthenticatedAuthenticationToken {
@@ -14,7 +16,7 @@ public class AuthenticationWithToken extends PreAuthenticatedAuthenticationToken
         super(aPrincipal, aCredentials, anAuthorities);
     }
 
-    public void setToken(String token) {
+    public void setToken(Token token) {
         setDetails(token);
     }
 

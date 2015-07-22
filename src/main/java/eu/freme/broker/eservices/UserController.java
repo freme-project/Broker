@@ -38,7 +38,7 @@ public class UserController extends BaseRestController {
 		if (userRepository.findByName(username).size() > 0) {
 			throw new BadRequestException("Username already exists");
 		}
-		
+
 		try {
 			String hashedPassword = PasswordHasher.getSaltedHash(password);
 			User user = new User(username, hashedPassword, User.roleUser);
@@ -49,22 +49,21 @@ public class UserController extends BaseRestController {
 			throw new InternalServerErrorException();
 		}
 	}
-	
-	@RequestMapping(value = "/user/{userId}", method = RequestMethod.DELETE)
-	//@PreAuthorize("hasRole('" + User.roleUser + "')")
-	public ResponseEntity<String> deleteUser(@PathVariable("userId") int userId
-            ) {
 
-		User user = userRepository.findOne((long)userId);
-		if( user == null){
+	@RequestMapping(value = "/user/{userId}", method = RequestMethod.DELETE)
+	// @PreAuthorize("hasRole('" + User.roleUser + "')")
+	public ResponseEntity<String> deleteUser(@PathVariable("userId") long userId) {
+
+		User user = userRepository.findOne((long) userId);
+		if (user == null) {
 			throw new BadRequestException("User not found");
 		}
-		
+
 		Authentication authentication = SecurityContextHolder.getContext()
 				.getAuthentication();
 		decisionManager.decide(authentication, user, null);
 		userRepository.delete(user);
-		
+
 		return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
 	}
 
