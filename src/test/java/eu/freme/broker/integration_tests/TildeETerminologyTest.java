@@ -6,7 +6,9 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
@@ -18,6 +20,7 @@ import com.mashape.unirest.http.Unirest;
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
+@Ignore
 public class TildeETerminologyTest {
 
 	String url;
