@@ -62,9 +62,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Appl
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.// authenticationProvider(domainUsernamePasswordAuthenticationProvider()).
-                authenticationProvider(backendAdminUsernamePasswordAuthenticationProvider()).
-                authenticationProvider(tokenAuthenticationProvider());
+        auth.   authenticationProvider(backendAdminUsernamePasswordAuthenticationProvider()).
+                authenticationProvider(tokenAuthenticationProvider()).
+                authenticationProvider(databaseAuthenticationProvider());
     }
 
     @Bean
@@ -73,14 +73,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Appl
     }
 
     @Bean
-    public ExternalServiceAuthenticator someExternalServiceAuthenticator() {
-        return new DatabaseAuthenticator();
+    public AuthenticationProvider databaseAuthenticationProvider() {
+        return new DatabaseAuthenticationProvider();
     }
-
-//    @Bean
-//    public AuthenticationProvider domainUsernamePasswordAuthenticationProvider() {
-//        return new DomainUsernamePasswordAuthenticationProvider(tokenService(), someExternalServiceAuthenticator());
-//    }
 
     @Bean
     public AuthenticationProvider backendAdminUsernamePasswordAuthenticationProvider() {

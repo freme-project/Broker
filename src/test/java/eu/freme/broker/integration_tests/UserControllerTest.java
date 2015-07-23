@@ -36,8 +36,9 @@ public class UserControllerTest {
 				.queryString("username", username)
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
-		Long userid = new JSONObject(response.getBody()).getLong("id");
-
+		String responseUsername = new JSONObject(response.getBody()).getString("name");
+		assertTrue(username.equals(responseUsername));
+		
 		logger.info("create user with dublicate username - should not work, exception is ok");
 		response = Unirest.post(baseUrl + "/user")
 				.queryString("username", username)
@@ -63,15 +64,17 @@ public class UserControllerTest {
 
 		// delete user without credentials should fail
 		logger.info("delete user without providing credentials - should fail, exception is ok");
-		response = Unirest.delete(baseUrl + "/user/" + userid.toString()).asString();
+		response = Unirest.delete(baseUrl + "/user/" + username).asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
 
 		// create another user
 		logger.info("create a 2nd user");
-		response = Unirest.post(baseUrl + "/user").queryString("username", "other-user")
+		String otherUsername = "other-user";
+		response = Unirest.post(baseUrl + "/user").queryString("username", otherUsername)
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
-		Long otherUserid = new JSONObject(response.getBody()).getLong("id");
+		String responseOtherUsername = new JSONObject(response.getBody()).getString("name");
+		assertTrue( otherUsername.equals(responseOtherUsername));
 
 //		// delete other user should fail
 //		response = Unirest
@@ -82,7 +85,7 @@ public class UserControllerTest {
 		// delete own user should work
 		logger.info("delete own user - should work");
 		response = Unirest
-				.delete(baseUrl + "/user/" + userid)
+				.delete(baseUrl + "/user/" + username)
 				.header("X-Auth-Token", token).asString();
 		System.err.println(response.getStatus());
 		System.err.println(response.getBody());

@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 import eu.freme.broker.eservices.BaseRestController;
+import eu.freme.broker.security.database.Token;
 import eu.freme.broker.security.token.TokenResponse;
 
 import org.slf4j.Logger;
@@ -112,14 +113,15 @@ public class AuthenticationFilter extends GenericFilterBean {
     	Authentication resultOfAuthentication = tryToAuthenticateWithUsernameAndPassword(username, password);
         SecurityContextHolder.getContext().setAuthentication(resultOfAuthentication);
         httpResponse.setStatus(HttpServletResponse.SC_OK);
-        TokenResponse tokenResponse = new TokenResponse(resultOfAuthentication.getDetails().toString());
+        Token token = (Token)resultOfAuthentication.getDetails();
+        TokenResponse tokenResponse = new TokenResponse(token.getToken());
         String tokenJsonResponse = new ObjectMapper().writeValueAsString(tokenResponse);
         httpResponse.addHeader("Content-Type", "application/json");
         httpResponse.getWriter().print(tokenJsonResponse);
     }
 
     private Authentication tryToAuthenticateWithUsernameAndPassword(Optional<String> username, Optional<String> password) {
-        UsernamePasswordAuthenticationToken requestAuthentication = new UsernamePasswordAuthenticationToken(username, password);
+        UsernamePasswordAuthenticationToken requestAuthentication = new UsernamePasswordAuthenticationToken(username.get(), password.get());
         return tryToAuthenticate(requestAuthentication);
     }
 
