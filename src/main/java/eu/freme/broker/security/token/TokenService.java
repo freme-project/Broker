@@ -21,22 +21,22 @@ import java.util.UUID;
 
 public class TokenService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
-    
-    @Autowired
-    TokenRepository tokenRepository;
-    
-    @Autowired
-    public Token generateNewToken(User user) {
-    	Token token = new Token(UUID.randomUUID().toString(), user);
-    	return token;
-    }
+	private static final Logger logger = LoggerFactory
+			.getLogger(TokenService.class);
 
-    public Token retrieve(String tokenStr) {
+	@Autowired
+	TokenRepository tokenRepository;
+
+	public Token generateNewToken(User user) {
+		Token token = new Token(UUID.randomUUID().toString(), user);
+		return token;
+	}
+
+	public Token retrieve(String tokenStr) {
 		Token token = tokenRepository.findOneByToken(tokenStr);
-		if( token == null ){
+		if (token == null) {
 			throw new BadCredentialsException("invalid token");
 		}
 		return token;
-    }
+	}
 }

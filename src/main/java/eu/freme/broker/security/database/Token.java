@@ -17,6 +17,9 @@ public class Token {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "name")
 	private User user;
+	
+	protected Token() {
+	}
 
 	public Token(String token, User user) {
 		super();
