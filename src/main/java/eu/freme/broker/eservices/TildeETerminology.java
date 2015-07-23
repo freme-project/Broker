@@ -48,7 +48,6 @@ public class TildeETerminology extends BaseRestController {
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "domain", defaultValue = "") String domain) {
 
-		System.err.println(postBody);
 		// merge long and short parameters - long parameters override short
 		// parameters
 		if (input == null) {
