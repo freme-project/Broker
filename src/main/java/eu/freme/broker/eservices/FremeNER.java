@@ -41,21 +41,7 @@ public class FremeNER extends BaseRestController {
 	@Autowired
 	EEntityService entityAPI;
 
-	@ApiOperation(value = "Entity recognition and linking using Freme-NER engine.",
-	   notes = "Enriches Text content with entities gathered from various datasets by the DBPedia-Spotlight Engine. The service accepts plaintext or text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing. This example shows a NIF document that can be processed by the service:"+
-            "\n```" +
-            "\n"+
-            "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
-            "@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .\n" +
-            "\n" +
-            "<http://example.org/document/1#char=0,18>\n" +
-            "    a nif:String , nif:Context , nif:RFC5147String ;\n" +
-            "    nif:isString \"Welcome to Berlin!.\"^^xsd:string;\n" +
-            "    nif:beginIndex \"0\"^^xsd:nonNegativeInteger;\n" +
-            "    nif:endIndex \"18\"^^xsd:nonNegativeInteger;\n" +
-            "    nif:sourceUrl <http://differentday.blogspot.com/2007_01_01_archive.html> ."+
-            "\n```" +
-            "\n")
+	@ApiOperation(value = "Entity recognition and linking using Freme-NER engine.")
 	@ApiResponses(value = {
        @ApiResponse(code = 200, message = "Successful response"),
 	   @ApiResponse(code = 400, message = "Bad request - input validation failed") })
@@ -322,12 +308,13 @@ public class FremeNER extends BaseRestController {
         
         // Updating dataset for use in the e-Entity service.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test?language=en" -X PUT
-    @ApiOperation("Updating dataset for use in the e-Entity service")
+    @ApiOperation(value="Updating dataset for use in the e-Entity service")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
             @ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}",
             method = {RequestMethod.PUT },
+            produces = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"},
             consumes = {"text/turtle", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"})
 	public ResponseEntity<String> updateDataset(
             @ApiParam(value="RDF serialization format of the dataset. Can be "+ NIFParameterFactory.nifFormatsString +". Overrides Content-Type header. Short form is f.",
@@ -338,7 +325,7 @@ public class FremeNER extends BaseRestController {
 
             @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-            @ApiParam(value="The dataset. The format of the body can be "+NIFParameterFactory.nifFormatsMimeString+". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
+            @ApiParam(value="The dataset. The format of the body can be "+NIFParameterFactory.nifFormatsString+". Defaults to \"text/turtle\". The parameter *informat* overrides the Content-Type.")
             @RequestBody(required = false) String postBody,
 
             @ApiParam("The name name of the dataset to update. It can be considered as ID for the dataset. It should include only numbers, letters and should NOT include white spaces.")
