@@ -1,4 +1,4 @@
-package eu.freme.broker.security.token;
+package eu.freme.broker.security.database;
 
 
 import org.springframework.data.repository.CrudRepository;

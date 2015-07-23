@@ -26,8 +26,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
+import eu.freme.broker.security.database.TokenRepository;
 import eu.freme.broker.security.token.TokenAuthenticationProvider;
-import eu.freme.broker.security.token.TokenRepository;
 import eu.freme.broker.security.token.TokenService;
 import eu.freme.broker.security.voter.UserAccessDecisionVoter;
 

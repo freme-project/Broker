@@ -18,8 +18,8 @@ import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.ExternalServiceFailedException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.tools.NIFParameterSet;
-import eu.freme.common.conversion.rdf.RDFConstants;
-import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
+import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 
 /**
  * REST controller for Tilde e-Terminology service

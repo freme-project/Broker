@@ -3,7 +3,7 @@ package eu.freme.broker.security;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
-import eu.freme.broker.security.token.Token;
+import eu.freme.broker.security.database.Token;
 
 import java.util.Collection;
 

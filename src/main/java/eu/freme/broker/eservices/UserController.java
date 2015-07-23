@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.common.security.database.User;
-import eu.freme.common.security.database.UserRepository;
-import eu.freme.common.security.tools.PasswordHasher;
+import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.tools.PasswordHasher;
 
 @RestController
 public class UserController extends BaseRestController {

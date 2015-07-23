@@ -2,7 +2,7 @@ package eu.freme.broker.tools;
 
 import java.util.HashMap;
 
-import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.conversion.rdf.RDFConstants;
 
 @SuppressWarnings("serial")
 public class RDFELinkSerializationFormats extends HashMap<String, RDFConstants.RDFSerialization>{

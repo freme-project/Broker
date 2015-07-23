@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
-import eu.freme.common.ConversionApplicationConfig;
+import eu.freme.conversion.ConversionApplicationConfig;
 import eu.freme.eservices.eentity.EEntityConfig;
 import eu.freme.eservices.elink.ELinkConfig;
 import eu.freme.eservices.epublishing.EPublishingConfig;

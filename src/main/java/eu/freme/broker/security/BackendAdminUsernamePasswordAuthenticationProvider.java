@@ -2,7 +2,7 @@ package eu.freme.broker.security;
 
 import com.google.common.base.Optional;
 
-import eu.freme.common.security.database.User;
+import eu.freme.broker.security.database.User;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;

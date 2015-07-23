@@ -12,7 +12,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
-import eu.freme.common.security.database.User;
+import eu.freme.broker.security.database.Token;
+import eu.freme.broker.security.database.TokenRepository;
+import eu.freme.broker.security.database.User;
 
 import java.util.Collection;
 import java.util.UUID;

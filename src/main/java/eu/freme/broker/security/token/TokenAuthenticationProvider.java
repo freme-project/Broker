@@ -3,6 +3,7 @@ package eu.freme.broker.security.token;
 import com.google.common.base.Optional;
 
 import eu.freme.broker.security.AuthenticationWithToken;
+import eu.freme.broker.security.database.Token;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;

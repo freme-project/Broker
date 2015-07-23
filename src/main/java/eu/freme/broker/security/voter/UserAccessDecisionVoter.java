@@ -6,7 +6,7 @@ import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
-import eu.freme.common.security.database.User;
+import eu.freme.broker.security.database.User;
 
 public class UserAccessDecisionVoter implements AccessDecisionVoter<User> {
 

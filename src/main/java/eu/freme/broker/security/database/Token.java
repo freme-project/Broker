@@ -1,11 +1,12 @@
-package eu.freme.broker.security.token;
+package eu.freme.broker.security.database;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import eu.freme.common.security.database.User;
+import eu.freme.broker.security.database.User;
 
 @Entity
 public class Token {

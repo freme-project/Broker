@@ -3,9 +3,9 @@ package eu.freme.broker.security;
 import java.util.List;
 
 import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.common.security.database.User;
-import eu.freme.common.security.database.UserRepository;
-import eu.freme.common.security.tools.PasswordHasher;
+import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.tools.PasswordHasher;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
