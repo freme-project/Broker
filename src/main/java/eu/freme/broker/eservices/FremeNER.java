@@ -308,7 +308,8 @@ public class FremeNER extends BaseRestController {
         
         // Updating dataset for use in the e-Entity service.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test?language=en" -X PUT
-    @ApiOperation(value="Updating dataset for use in the e-Entity service")
+    @ApiOperation(value="Updating dataset for use in the e-Entity service",
+                  notes="Update a dataset with new data for use in the e-Entity service")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful response"),
             @ApiResponse(code = 400, message = "Bad request - input validation failed") })
@@ -404,7 +405,11 @@ public class FremeNER extends BaseRestController {
         
         // Get info about a specific dataset.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test
-	@ApiOperation("Get info about a specific dataset")
+	@ApiOperation(value="Get info about a specific dataset",
+                  notes= "Get info about a specific dataset specified by its name")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
     @RequestMapping(value = "/e-entity/freme-ner/datasets/{name}",
             method = {RequestMethod.GET })
 	public ResponseEntity<String> getDataset(
@@ -425,6 +430,9 @@ public class FremeNER extends BaseRestController {
         // Get info about all available datasets.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets
     @ApiOperation("Get info about all available datasets")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-entity/freme-ner/datasets",
             method = {RequestMethod.GET })
 	public ResponseEntity<String> getAllDatasets() {
@@ -437,7 +445,12 @@ public class FremeNER extends BaseRestController {
         
         // Removing a specific dataset.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test" -X DELETE
-    @ApiOperation("Removing a specific dataset")
+    @ApiOperation(value="Removing a specific dataset",
+                  notes="Remoce a dataset in the FREME-NER engine specified by its name")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful response"),
+            @ApiResponse(code = 204, message = "No content - Succesful removal"),
+            @ApiResponse(code = 400, message = "Bad request - input validation failed") })
 	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}",
             method = {RequestMethod.DELETE })
 	public ResponseEntity<String> removeDataset(

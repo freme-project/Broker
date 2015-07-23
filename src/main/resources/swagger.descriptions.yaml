@@ -77,7 +77,43 @@ paths:
         \ in the EPUB. For each you provide the title and the corresponding HTML file\
         \ (= resource). If no tableOfContents is provided, the service will do a best\
         \ effort at creating one. However, when no (x)html file is found in the root\
-        \ of the zip, the service will return an invalid EPUB.\n\n**Sample .zips**\n\
+        \ of the zip, the service will return an invalid EPUB.
+        \n\n
+        **Sample Metadata Json**\n
+        \n```
+        \n
+        {\n
+           \"titles\":[\"Alice in Utopia\",\"Alice in Europe\"],\n
+           \"authors\":[\"Joske Vermeulen\", \"Nick Borth\"],\n
+           \"illustrators\":[\"Frans Vervaacke\", \"John Riplosh\"],\n
+           \"creators\":[\"Joske Vermeulen\", \"Nick Borth\"],\n
+           \"subjects\":[\"alice\", \"rabbit\"],\n
+           \"coverImage\":\"cover.jpeg\",\n
+           \"language\":\"en\",\n
+           \"source\":\"\",\n
+           \"description\":\"This is the story about Alice in wonderland, involving a rabbit etc.\",\n
+           \"rights\":\"\",\n
+           \"identifier\":{\n
+              \"scheme\":\"\",\n
+              \"value\":\"urn:1235-568-2235\"\n
+           },\n
+           \"tableOfContents\":[\n
+             {\n
+                 \"title\":\"Chapter 1\",\n
+                 \"resource\":\"01.xhtml\"\n
+             },\n
+             {\n
+                \"title\":\"Chapter 2\",\n
+                \"resource\":\"02.xhtml\"\n
+             }\n
+           ]\n
+         }\n
+         \n
+         ```
+
+        \n
+        \n
+        **Sample .zips**\n\
         * [Alice in wonderland](https://drive.google.com/open?id=0B-qMtkPK-unYbVROT1J2TTRycDg&authuser=0)\n\
         * [A shared culture](https://drive.google.com/open?id=0B-qMtkPK-unYdWlHTWMyS2VaV28&authuser=0)"
 
@@ -172,105 +208,300 @@ paths:
 
 
 
-  /e-link/documents/:
+  /e-link/documents:
     post:
-      description: "This service accepts a NIF document (with annotated entities) and performs enrichment with pre-defined templates. The templates contain \"fields\" marked between three at-signs @@@field-name@@@. If a user, while calling the enrichment endpoint specifies an \"unknown\" parameter (not from the list above), then the values of that \"unknown\" parameters will be used to replace with the corresponding \"field\" in the query template. This feature doesn't work via \"Try-it-out!\"-button.\n
+      description: "This service accepts a NIF document (with annotated entities) and performs enrichment with pre-defined templates. The templates contain \"fields\" marked between three at-signs @@@field-name@@@. If a user, while calling the enrichment endpoint specifies an \"unknown\" parameter (not from the list above), then the values of that \"unknown\" parameters will be used to replace with the corresponding \"field\" in the query template. \n
         \n
         ```\n
 
-        @prefix dc:    <http://purl.org/dc/elements/1.1/> .\n
-        @prefix prov:  <http://www.w3.org/ns/prov#> .\n
-        @prefix nif:   <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .\n
-        @prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .\n
-        @prefix rutp:  <http://rdfunit.aksw.org/data/patterns#> .\n
-        @prefix rlog:  <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#> .\n
-        @prefix oslc:  <http://open-services.net/ns/core#> .\n
-        @prefix dsp:   <http://dublincore.org/dc-dsp#> .\n
-        @prefix dcterms: <http://purl.org/dc/terms/> .\n
-        @prefix rutg:  <http://rdfunit.aksw.org/data/generators#> .\n
-        @prefix schema: <http://schema.org/> .\n
-        @prefix olia:  <http://purl.org/olia/olia.owl#> .\n
-        @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n
-        @prefix p:     <http://127.0.0.1:9995/spotlight#> .\n
-        @prefix rut:   <http://rdfunit.aksw.org/ns/core#> .\n
-        @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n
-        @prefix owl:   <http://www.w3.org/2002/07/owl#> .\n
-        @prefix rutr:  <http://rdfunit.aksw.org/data/results#> .\n
-        @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n
-        @prefix spin:  <http://spinrdf.org/spin#> .\n
-        @prefix rutt:  <http://rdfunit.aksw.org/data/tests#> .\n
-        @prefix ruts:  <http://rdfunit.aksw.org/data/testsuite#> .\n
+      @prefix dc:    <http://purl.org/dc/elements/1.1/> .\n
+      @prefix prov:  <http://www.w3.org/ns/prov#> .\n
+      @prefix nif:   <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .\n
+      @prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .\n
+      @prefix rutp:  <http://rdfunit.aksw.org/data/patterns#> .\n
+      @prefix rlog:  <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#> .\n
+      @prefix oslc:  <http://open-services.net/ns/core#> .\n
+      @prefix dsp:   <http://dublincore.org/dc-dsp#> .\n
+      @prefix dcterms: <http://purl.org/dc/terms/> .\n
+      @prefix rutg:  <http://rdfunit.aksw.org/data/generators#> .\n
+      @prefix schema: <http://schema.org/> .\n
+      @prefix olia:  <http://purl.org/olia/olia.owl#> .\n
+      @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n
+      @prefix p:     <http://127.0.0.1:9995/spotlight#> .\n
+      @prefix rut:   <http://rdfunit.aksw.org/ns/core#> .\n
+      @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n
+      @prefix owl:   <http://www.w3.org/2002/07/owl#> .\n
+      @prefix rutr:  <http://rdfunit.aksw.org/data/results#> .\n
+      @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n
+      @prefix spin:  <http://spinrdf.org/spin#> .\n
+      @prefix rutt:  <http://rdfunit.aksw.org/data/tests#> .\n
+      @prefix ruts:  <http://rdfunit.aksw.org/data/testsuite#> .\n
 
-        <http://127.0.0.1:9995/spotlight#char=5,7>\n
-                a                     nif:Word , nif:RFC5147String ;\n
-                nif:anchorOf          \"is\" ;\n
-                nif:beginIndex        \"5\" ;\n
-                nif:endIndex          \"7\" ;\n
-                nif:nextWord          <http://127.0.0.1:9995/spotlight#char=8,15> ;\n
-                nif:previousWord      <http://127.0.0.1:9995/spotlight#char=0,4> ;\n
-                nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,16> ;\n
-                nif:sentence          <http://127.0.0.1:9995/spotlight#char=0,16> .\n
+      <http://127.0.0.1:9995/spotlight#char=0,15>\n
+              a                     nif:Context , nif:Sentence , nif:RFC5147String ;\n
+              nif:beginIndex        \"0\" ;\n
+              nif:endIndex          \"15\" ;\n
+              nif:isString          \"This is Berlin.\" ;\n
+              nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,15> .\n
 
-        nif:lastWord  a  owl:ObjectProperty .\n
-        nif:previousWord  a  owl:ObjectProperty .\n
+      <http://127.0.0.1:9995/spotlight#char=8,14>\n
+              a                     nif:Word , nif:RFC5147String ;\n
+              nif:anchorOf          \"Berlin\" ;\n
+              nif:beginIndex        \"8\" ;\n
+              nif:endIndex          \"14\" ;\n
+              nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,15> ;\n
+              itsrdf:taIdentRef     <http://dbpedia.org/resource/Berlin> .\n
 
-        <http://127.0.0.1:9995/spotlight#char=0,4>\n
-                a                     nif:Word , nif:RFC5147String ;\n
-                nif:anchorOf          \"This\" ;\n
-                nif:beginIndex        \"0\" ;\n
-                nif:endIndex          \"4\" ;\n
-                nif:nextWord          <http://127.0.0.1:9995/spotlight#char=5,7> ;\n
-                nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,16> ;\n
-                nif:sentence          <http://127.0.0.1:9995/spotlight#char=0,16> ;\n
-                itsrdf:taIdentRef     <http://dbpedia.org/resource/Sathya_Sai_Baba> .\n
-
-        nif:word  a     owl:ObjectProperty .\n
-        nif:isString  a  owl:DatatypeProperty .\n
-        nif:beginIndex  a  owl:DatatypeProperty .\n
-        nif:nextWord  a  owl:ObjectProperty .\n
-        nif:sentence  a  owl:ObjectProperty .\n
-        nif:anchorOf  a  owl:DatatypeProperty .\n
-
-        <http://127.0.0.1:9995/spotlight#char=0,16>\n
-                a                     nif:Context , nif:Sentence , nif:RFC5147String ;\n
-                nif:anchorOf          \"This is Germany.\" ;\n
-                nif:beginIndex        \"0\" ;\n
-                nif:endIndex          \"16\" ;\n
-                nif:firstWord         <http://127.0.0.1:9995/spotlight#char=0,4> ;\n
-                nif:isString          \"This is Germany.\" ;\n
-                nif:lastWord          <http://127.0.0.1:9995/spotlight#char=15,16> ;\n
-                nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,16> ;\n
-                nif:word              <http://127.0.0.1:9995/spotlight#char=5,7> , <http://127.0.0.1:9995/spotlight#char=8,15> .\n
-
-        nif:firstWord  a  owl:ObjectProperty .\n
-        nif:Context  a  owl:Class .\n
-        rlog:message  a  owl:DatatypeProperty .\n
-        nif:Sentence  a  owl:Class .\n
-        nif:referenceContext  a  owl:ObjectProperty .\n
-
-        <http://127.0.0.1:9995/spotlight#char=15,16>\n
-                a                     nif:Word , nif:RFC5147String ;\n
-                nif:anchorOf          \".\" ;\n
-                nif:beginIndex        \"15\" ;\n
-                nif:endIndex          \"16\" ;\n
-                nif:previousWord      <http://127.0.0.1:9995/spotlight#char=8,15> ;\n
-                nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,16> ;\n
-                nif:sentence          <http://127.0.0.1:9995/spotlight#char=0,16> .\n
-
-        nif:endIndex  a  owl:DatatypeProperty .\n
-
-        <http://127.0.0.1:9995/spotlight#char=8,15>\n
-                a                     nif:Word , nif:RFC5147String ;\n
-                nif:anchorOf          \"Germany\" ;\n
-                nif:beginIndex        \"8\" ;\n
-                nif:endIndex          \"15\" ;\n
-                nif:nextWord          <http://127.0.0.1:9995/spotlight#char=15,16> ;\n
-                nif:previousWord      <http://127.0.0.1:9995/spotlight#char=5,7> ;\n
-                nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,16> ;\n
-                nif:sentence          <http://127.0.0.1:9995/spotlight#char=0,16> ;\n
-                itsrdf:taIdentRef     <http://dbpedia.org/resource/Germany> .\n
-
-        nif:RFC5147String  a  owl:Class .\n
-        nif:Word  a     owl:Class .\n
 
         ```\n"
+
+  /e-link/templates:
+    post:
+      description: "Creates a new enrichment template.  \n\n
+        **Example of input in JSON format:**\n
+        \n```
+        \n
+        {\n
+        \"query\":\"here goes the CONSTRUCT SPARQL query\",\n
+        \"endpoint\":\"here goes the SPARQL endpoint. E.g., http://dbpedia.org/sparql/\"\n
+        }\n
+        \n```
+        \n   "
+    get:
+      description: "#Examples - Available templates:
+
+        #Template id: 1 - DBpedia
+
+        Description: enriches named entities in the input document with a list of museums close to that entity. The template is executed for every named entity in the input document.
+
+        \n**SPARQL endpoint http://dbpedia.org/sparql**
+
+        ```
+
+        PREFIX dbpedia: <http://dbpedia.org/resource/>
+        PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+
+        CONSTRUCT {
+            ?museum <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> .
+        }
+        WHERE {
+            <@@@entity_uri@@@> geo:geometry ?citygeo .
+            ?museum rdf:type <http://schema.org/Museum> .
+            ?museum geo:geometry ?museumgeo .
+            FILTER (<bif:st_intersects>(?museumgeo, ?citygeo, 10))
+        } LIMIT 10
+
+        ```
+
+        Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-1.ttl).
+
+        Test query:
+
+        ```
+
+        curl -v -X POST -d @test-for-template-1.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=1\" -H \"Content-Type: text/turtle\"
+
+        ```
+
+        #Template id: 2 - DBpedia live
+
+        Description: enriches named entities in the input document with a list of events close to that entity. The template is executed for every named entity in the input document.
+
+        \n**SPARQL endpoint http://live.dbpedia.org/sparql**
+
+        ```
+
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        CONSTRUCT {
+            ?event <http://dbpedia.org/ontology/place> <@@@entity_uri@@@> .
+        }
+        WHERE {
+            ?event rdf:type <http://dbpedia.org/ontology/Event> .
+            ?event <http://dbpedia.org/ontology/place> <@@@entity_uri@@@> .
+        } LIMIT 10
+
+        ```
+
+        Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-2.ttl).
+
+        Test query:
+
+        ```
+
+        curl -v -X POST -d @test-for-template-2.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=2\" -H \"Content-Type: text/turtle\"
+
+        ```
+
+        #Template id: 3 - GeoKnow
+
+        Description: Enrich place with longitude and latitude coordinates fetched form the GeoKnow database.
+
+        \n**SPARQL endpoint http://factforge.net/sparql**
+
+        ```
+
+        PREFIX geo-pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+        CONSTRUCT {
+            <@@@entity_uri@@@> geo-pos:lat ?long .
+            <@@@entity_uri@@@> geo-pos:lat ?lat .
+        }
+        WHERE {
+            <@@@entity_uri@@@/> geo-pos:lat ?lat .
+            <@@@entity_uri@@@/> geo-pos:long ?long .
+        }
+
+        ```
+
+        Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-3.ttl).
+
+        Test query:
+
+        ```
+
+        curl -v -X POST -d @test-for-template-3.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=3\" -H \"Content-Type: text/turtle\"
+
+        ```
+
+        #Template id: 4 - Linked Geo Data
+
+        Description: Retrieve all bakeries 10km close to a place.
+
+        \n**SPARQL endpoint http://linkedgeodata.org/vsnorql**
+
+        ```
+
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        PREFIX ogc: <http://www.opengis.net/ont/geosparql#>
+        PREFIX geom: <http://geovocab.org/geometry#>
+        PREFIX lgdo: <http://linkedgeodata.org/ontology/>
+        CONSTRUCT {
+            ?s <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> .
+        } WHERE {
+            ?s
+                a lgdo:Bakery ;
+                geom:geometry [ ogc:asWKT ?sg ] .
+            ?a
+                owl:sameAs <@@@entity_uri@@@> ;
+                geom:geometry [ ogc:asWKT ?ag ] .
+            FILTER(bif:st_intersects(?sg, ?ag, 10))
+        } LIMIT 10
+
+        ```
+
+        #Template id: 5 - Europeana
+
+        Description: Retrieve 5 18th century Europeana objects from a place (country).
+
+        \n**SPARQL endpoint http://europeana.ontotext.com/sparql**
+
+        ```
+
+        PREFIX edm: <http://www.europeana.eu/schemas/edm/>
+        PREFIX ore: <http://www.openarchives.org/ore/terms/>
+        CONSTRUCT {
+            ?CHO edm:HasMet <@@@entity_uri@@@>
+        } WHERE {
+            ?EuropeanaObject  edm:year  ?year ;
+            edm:hasMet <@@@entity_uri@@@> .
+            ?EuropeanaObject ore:proxyFor ?CHO .
+            FILTER (?year < \"1800\")
+            FILTER (?year > \"1700\")
+        } LIMIT 5
+
+        ```
+
+        Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-5.ttl).
+
+        Test query:
+
+        ```
+
+        curl -v -X POST -d @test-for-template-5.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=5\" -H \"Content-Type: text/turtle\"
+
+        ```
+
+        Note: there is issue with the SPARQL endpoint.
+
+        #Template id: 6 -  DBpedia live
+
+        Description: enriches named entities in the input document with a list of events close to that entity. This is a template with a user defined parameter event_type, so when calling the endpoint the event_type parameter should be specified.
+
+        \n**SPARQL endpoint http://live.dbpedia.org/sparql**
+
+        ```
+
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        CONSTRUCT {
+            ?event <http://dbpedia.org/ontology/place> <http://dbpedia.org/resource/Berlin> .
+        }
+        WHERE {
+            ?event rdf:type <http://dbpedia.org/ontology/@@@event_type@@@> .
+            ?event <http://dbpedia.org/ontology/place> ?o .
+        } LIMIT 10
+
+        ```
+
+        Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-6.ttl).
+
+        Test query:
+
+        ```
+
+        curl -v -X POST -d @test-for-template-6.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=6&event_type=SocietalEvent\" -H \"Content-Type: text/turtle\"
+
+        ```
+
+        #Template id: 7 -  Linked Geo Data
+
+        Description: enriches a named entity of type place with a list of 10 bakaries in radius of 10km from the place.
+
+        \n**SPARQL endpoint http://linkedgeodata.org/vsnorql/**
+
+        ```
+
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        PREFIX ogc: <http://www.opengis.net/ont/geosparql#>
+        PREFIX geom: <http://geovocab.org/geometry#>
+        PREFIX lgdo: <http://linkedgeodata.org/ontology/>
+        PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+
+        CONSTRUCT {
+            ?s <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> .
+        } WHERE {
+            ?s
+                a lgdo:Bakery ;
+                geom:geometry [ ogc:asWKT ?sg ] .
+            ?a
+                owl:sameAs <@@@entity_uri@@@> ;
+                geom:geometry [ ogc:asWKT ?ag ] .
+            FILTER(bif:st_intersects(?sg, ?ag, 10))
+        } LIMIT 10
+
+        ```
+
+        Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-7.ttl).
+
+        Test query:
+
+        ```
+
+        curl -v -X POST -d @test-for-template-7.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=7\" -H \"Content-Type: text/turtle\"
+
+        ```
+
+        Note: there is an issue with the SPARQL endpoint."
+
+  /e-link/templates/{templateid}:
+    put:
+      description: "Update an enrichment template with specified ID. The new data is submitted as body of a PUT request.\n\n
+         **Example of input in JSON format:**\n
+         \n```
+         \n
+         {\n
+            \"query\":\"here goes the CONSTRUCT SPARQL query\",\n
+            \"endpoint\":\"here goes the SPARQL endpoint. E.g., http://dbpedia.org/sparql/\"\n
+         }\n
+         \n```
+         \n   "
