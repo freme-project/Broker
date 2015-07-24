@@ -6,7 +6,6 @@ import com.google.common.base.Strings;
 
 import eu.freme.broker.eservices.BaseRestController;
 import eu.freme.broker.security.database.Token;
-import eu.freme.broker.security.token.TokenResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

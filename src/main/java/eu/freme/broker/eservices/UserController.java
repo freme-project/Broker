@@ -35,7 +35,8 @@ public class UserController extends BaseRestController {
 			@RequestParam(value = "username", required = true) String username,
 			@RequestParam(value = "password", required = true) String password) {
 
-		if (userRepository.findByName(username).size() > 0) {
+		
+		if (userRepository.findOneByName(username) != null) {
 			throw new BadRequestException("Username already exists");
 		}
 
@@ -50,11 +51,11 @@ public class UserController extends BaseRestController {
 		}
 	}
 
-	@RequestMapping(value = "/user/{userId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/user/{username}", method = RequestMethod.DELETE)
 	// @PreAuthorize("hasRole('" + User.roleUser + "')")
-	public ResponseEntity<String> deleteUser(@PathVariable("userId") long userId) {
+	public ResponseEntity<String> deleteUser(@PathVariable("username") String username) {
 
-		User user = userRepository.findOne((long) userId);
+		User user = userRepository.findOneByName(username);
 		if (user == null) {
 			throw new BadRequestException("User not found");
 		}

@@ -36,7 +36,7 @@ public class UserRepositoryTest {
 		userRepository.save(new User("Peter", "bla", User.roleUser));
 		userRepository.save(new User("Madeleine", "bla", User.roleAdmin));
 		
-		User juergen = userRepository.findByName("Juergen").get(0);
+		User juergen = userRepository.findOneByName("Juergen");
 		assertTrue(juergen!=null);
 		
 		int counter = count(userRepository.findAll());

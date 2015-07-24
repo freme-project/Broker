@@ -35,7 +35,7 @@ public class User {
 
 	@Override
 	public String toString() {
-		return String.format("User[id=%d, name='%s']", name);
+		return String.format("User[name=%s, role=%s]", name, role);
 	}
 
 	public String getName() {

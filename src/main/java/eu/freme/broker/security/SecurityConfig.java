@@ -27,8 +27,6 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 import eu.freme.broker.security.database.TokenRepository;
-import eu.freme.broker.security.token.TokenAuthenticationProvider;
-import eu.freme.broker.security.token.TokenService;
 import eu.freme.broker.security.voter.UserAccessDecisionVoter;
 
 import javax.servlet.ServletException;
@@ -52,8 +50,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Appl
                 csrf().disable().
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
                 and().
-                authorizeRequests().anyRequest().anonymous().
-                and().
+//                authorizeRequests().anyRequest().
+ //               and().
                 exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
 
         http.addFilterBefore(new AuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class).

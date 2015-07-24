@@ -1,4 +1,4 @@
-package eu.freme.broker.security.token;
+package eu.freme.broker.security;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

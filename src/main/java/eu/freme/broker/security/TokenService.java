@@ -1,4 +1,4 @@
-package eu.freme.broker.security.token;
+package eu.freme.broker.security;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -29,6 +29,7 @@ public class TokenService {
 
 	public Token generateNewToken(User user) {
 		Token token = new Token(UUID.randomUUID().toString(), user);
+		tokenRepository.save(token);
 		return token;
 	}
 

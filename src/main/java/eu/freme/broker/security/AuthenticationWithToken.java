@@ -8,11 +8,8 @@ import eu.freme.broker.security.database.Token;
 import java.util.Collection;
 
 public class AuthenticationWithToken extends PreAuthenticatedAuthenticationToken {
-    public AuthenticationWithToken(Object aPrincipal, Object aCredentials) {
-        super(aPrincipal, aCredentials);
-    }
 
-    public AuthenticationWithToken(Object aPrincipal, Object aCredentials, Collection<? extends GrantedAuthority> anAuthorities, Token token) {
+	public AuthenticationWithToken(Object aPrincipal, Object aCredentials, Collection<? extends GrantedAuthority> anAuthorities, Token token) {
         super(aPrincipal, aCredentials, anAuthorities);
         setToken(token);
     }
@@ -21,7 +18,7 @@ public class AuthenticationWithToken extends PreAuthenticatedAuthenticationToken
         setDetails(token);
     }
 
-    public String getToken() {
-        return (String)getDetails();
+    public Token getToken() {
+        return (Token)getDetails();
     }
 }

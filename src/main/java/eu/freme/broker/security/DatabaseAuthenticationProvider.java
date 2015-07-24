@@ -6,7 +6,6 @@ import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.security.database.Token;
 import eu.freme.broker.security.database.User;
 import eu.freme.broker.security.database.UserRepository;
-import eu.freme.broker.security.token.TokenService;
 import eu.freme.broker.security.tools.PasswordHasher;
 
 import org.apache.log4j.Logger;
@@ -35,11 +34,10 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 		String username = (String) authentication.getPrincipal();
 		String password = (String) authentication.getCredentials();
 
-		List<User> userList = userRepository.findByName(username);
-		if (userList.size() == 0) {
+		User user = userRepository.findOneByName(username);
+		if (user == null) {
 			throw new BadCredentialsException("authentication failed");
 		}
-		User user = userList.get(0);
 
 		try {
 			if (!PasswordHasher.check(password, user.getPassword())) {
@@ -56,7 +54,7 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
 		AuthenticationWithToken auth = new AuthenticationWithToken(user, null,
 				AuthorityUtils
-						.commaSeparatedStringToAuthorityList(User.roleAdmin),
+						.commaSeparatedStringToAuthorityList(user.getRole()),
 				token);
 		return auth;
 
