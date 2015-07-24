@@ -24,13 +24,12 @@ public class UserAccessDecisionVoter implements AccessDecisionVoter<User> {
 	public int vote(Authentication authentication, User object,
 			Collection<ConfigAttribute> attributes) {
 		
-		System.err.println();
 		if( authentication.getPrincipal().equals( "anonymousUser" )){
 			return ACCESS_DENIED;
 		}
 
-		User authenticatedUser = (User) authentication.getDetails();
-		if (authenticatedUser.getName() == object.getName()) {
+		User authenticatedUser = (User) authentication.getPrincipal();
+		if (authenticatedUser.getName().equals(object.getName())) {
 			return ACCESS_GRANTED;
 		} else {
 			return ACCESS_DENIED;
