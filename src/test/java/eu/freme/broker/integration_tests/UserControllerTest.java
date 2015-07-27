@@ -21,10 +21,10 @@ public class UserControllerTest {
 	String baseUrl = null;
 	Logger logger = Logger.getLogger(UserControllerTest.class);
 
-	@Value("${backend.admin.username}")
+	@Value("${admin.username}")
 	String adminUsername;
 
-	@Value("${backend.admin.password}")
+	@Value("${admin.password}")
 	String adminPassword;
 
 	@Before
@@ -73,7 +73,7 @@ public class UserControllerTest {
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
 
-		logger.info("create user with dublicate username - should not work, exception is ok");
+		logger.info("login with bad password should fail");
 		response = Unirest
 				.post(baseUrl + BaseRestController.authenticationEndpoint)
 				.header("X-Auth-Username", username)

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,18 +34,7 @@ public class ManagementEndpointAuthenticationFilter extends GenericFilterBean {
 	public ManagementEndpointAuthenticationFilter(
 			AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;
-		prepareManagementEndpointsSet();
-	}
-
-	private void prepareManagementEndpointsSet() {
 		managementEndpoints = new HashSet<>();
-		// managementEndpoints.add(ApiController.AUTOCONFIG_ENDPOINT);
-		// managementEndpoints.add(ApiController.BEANS_ENDPOINT);
-		// managementEndpoints.add(ApiController.CONFIGPROPS_ENDPOINT);
-		// managementEndpoints.add(ApiController.ENV_ENDPOINT);
-		// managementEndpoints.add(ApiController.MAPPINGS_ENDPOINT);
-		// managementEndpoints.add(ApiController.METRICS_ENDPOINT);
-		// managementEndpoints.add(ApiController.SHUTDOWN_ENDPOINT);
 	}
 
 	@Override
@@ -102,7 +92,7 @@ public class ManagementEndpointAuthenticationFilter extends GenericFilterBean {
 
 	private Authentication tryToAuthenticateWithUsernameAndPassword(
 			Optional<String> username, Optional<String> password) {
-		BackendAdminUsernamePasswordAuthenticationToken requestAuthentication = new BackendAdminUsernamePasswordAuthenticationToken(
+		UsernamePasswordAuthenticationToken requestAuthentication = new UsernamePasswordAuthenticationToken (
 				username, password);
 		return tryToAuthenticate(requestAuthentication);
 	}

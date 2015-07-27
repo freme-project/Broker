@@ -1,7 +1,5 @@
 package eu.freme.broker.security;
 
-import java.util.List;
-
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.security.database.Token;
 import eu.freme.broker.security.database.User;

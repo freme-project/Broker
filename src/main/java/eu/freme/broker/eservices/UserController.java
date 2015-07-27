@@ -31,9 +31,6 @@ public class UserController extends BaseRestController {
 
 	@Autowired
 	UserRepository userRepository;
-	
-	@Value("${backend.admin.username}")
-	String adminUsername;
 
 	@RequestMapping(value = "/user", method = RequestMethod.POST)
 	public User createUser(
@@ -54,11 +51,6 @@ public class UserController extends BaseRestController {
 			throw new BadRequestException("The passwords needs to be at least 8 characters long");
 		}
 		
-		// do not allow to use the admin username
-		if( username.equals(adminUsername)){
-			throw new BadRequestException("The username is invalid");
-		}
-
 		try {
 			String hashedPassword = PasswordHasher.getSaltedHash(password);
 			User user = new User(username, hashedPassword, User.roleUser);

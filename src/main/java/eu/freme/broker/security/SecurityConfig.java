@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -12,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.vote.AffirmativeBased;
-import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -24,11 +24,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
-
-import eu.freme.broker.security.database.TokenRepository;
+import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.UserRepository;
 import eu.freme.broker.security.voter.UserAccessDecisionVoter;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,12 +38,32 @@ import javax.servlet.http.HttpServletResponse;
 @EnableScheduling
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements ApplicationContextAware{
-
-    @Value("${backend.admin.role}")
-    private String backendAdminRole;
     
     private ApplicationContext applicationContext;
+    
 
+	@Autowired
+	UserRepository userRepository;
+	
+    @Value("${admin.username}")
+    private String adminUsername;
+
+    @Value("${admin.password}")
+    private String adminPassword;
+
+    @PostConstruct
+    public void init(){
+		// create or promote admin user if it does not exist
+		User admin = userRepository.findOneByName(adminUsername);
+		if( admin == null){
+			admin = new User(adminUsername, adminPassword, User.roleAdmin);
+			userRepository.save(admin);
+		} else if( !admin.getRole().equals(User.roleAdmin)){
+			admin.setRole(User.roleAdmin);
+			userRepository.save(admin);
+		}
+    }
+    
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.
@@ -60,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Appl
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.   authenticationProvider(backendAdminUsernamePasswordAuthenticationProvider()).
+        auth.   
                 authenticationProvider(tokenAuthenticationProvider()).
                 authenticationProvider(databaseAuthenticationProvider());
     }
@@ -73,11 +93,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Appl
     @Bean
     public AuthenticationProvider databaseAuthenticationProvider() {
         return new DatabaseAuthenticationProvider();
-    }
-
-    @Bean
-    public AuthenticationProvider backendAdminUsernamePasswordAuthenticationProvider() {
-        return new BackendAdminUsernamePasswordAuthenticationProvider();
     }
 
     @Bean
@@ -98,7 +113,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Appl
 		};
     }
     
-    public void setApplicationContext(ApplicationContext applicationContext){
+    @Override
+	public void setApplicationContext(ApplicationContext applicationContext){
     	super.setApplicationContext(applicationContext);
     	this.applicationContext = applicationContext;
     }

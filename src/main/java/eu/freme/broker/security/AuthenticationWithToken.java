@@ -7,6 +7,7 @@ import eu.freme.broker.security.database.Token;
 
 import java.util.Collection;
 
+@SuppressWarnings("serial")
 public class AuthenticationWithToken extends PreAuthenticatedAuthenticationToken {
 
 	public AuthenticationWithToken(Object aPrincipal, Object aCredentials, Collection<? extends GrantedAuthority> anAuthorities, Token token) {
