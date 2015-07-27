@@ -6,6 +6,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import eu.freme.broker.security.database.User;
 
 @Entity
@@ -14,6 +16,7 @@ public class Token {
 	@Id
 	String token;
 
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.EAGER)
 	private User user;
 	

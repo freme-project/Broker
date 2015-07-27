@@ -62,7 +62,23 @@ public class UserController extends BaseRestController {
 		}
 	}
 
+	@RequestMapping(value = "/user/{username}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_USER')")
+	public User getUser(@PathVariable("username") String username) {
+
+		User user = userRepository.findOneByName(username);
+		if (user == null) {
+			throw new BadRequestException("User not found");
+		}
+
+		Authentication authentication = SecurityContextHolder.getContext()
+				.getAuthentication();
+		decisionManager.decide(authentication, user, null);
+		return user;
+	}
+
 	@RequestMapping(value = "/user/{username}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasRole('ROLE_USER')")
 	public ResponseEntity<String> deleteUser(@PathVariable("username") String username) {
 
 		User user = userRepository.findOneByName(username);

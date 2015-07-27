@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDecisionVoter;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -114,6 +113,14 @@ public class UserControllerTest {
 				.header("X-Auth-Username", username)
 				.header("X-Auth-Password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
+		
+		logger.info("get user information");
+		response = Unirest
+				.get(baseUrl + "/user/" + username)
+				.header("X-Auth-Token", token).asString();
+		assertTrue(response.getStatus() == HttpStatus.OK.value());
+		responseUsername = new JSONObject(response.getBody()).getString("name");
+		assertTrue(responseUsername.equals(username));
 		
 		logger.info("delete own user - should work");
 		response = Unirest
