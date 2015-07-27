@@ -1,11 +1,10 @@
 package eu.freme.broker.eservices;
 
-import java.util.List;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,9 +34,18 @@ public class UserController extends BaseRestController {
 			@RequestParam(value = "username", required = true) String username,
 			@RequestParam(value = "password", required = true) String password) {
 
-		
 		if (userRepository.findOneByName(username) != null) {
 			throw new BadRequestException("Username already exists");
+		}
+		
+		// validate that username consists only of charachters
+		if( !username.matches("[a-zA-Z]+")){
+			throw new BadRequestException("The username can only consist of normal characters from a-z and A-Z");
+		}
+		
+		// passwords need to have at least 8 characters
+		if( password.length() < 8 ){
+			throw new BadRequestException("The passwords needs to be at least 8 characters long");
 		}
 
 		try {
@@ -52,7 +60,6 @@ public class UserController extends BaseRestController {
 	}
 
 	@RequestMapping(value = "/user/{username}", method = RequestMethod.DELETE)
-	// @PreAuthorize("hasRole('" + User.roleUser + "')")
 	public ResponseEntity<String> deleteUser(@PathVariable("username") String username) {
 
 		User user = userRepository.findOneByName(username);

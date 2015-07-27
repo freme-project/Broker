@@ -28,8 +28,8 @@ public class UserControllerTest {
 	@Test
 	public void testSecurity() throws UnirestException {
 
-		String username = "my-user";
-		String password = "my-password";
+		String username = "myuser";
+		String password = "mypassword";
 
 		logger.info("create user");
 		HttpResponse<String> response = Unirest.post(baseUrl + "/user")
@@ -42,6 +42,22 @@ public class UserControllerTest {
 		logger.info("create user with dublicate username - should not work, exception is ok");
 		response = Unirest.post(baseUrl + "/user")
 				.queryString("username", username)
+				.queryString("password", password).asString();
+		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
+		
+		logger.info("create users with invalid usernames - should not work");
+		response = Unirest.post(baseUrl + "/user")
+				.queryString("username", "123")
+				.queryString("password", password).asString();
+		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
+
+		response = Unirest.post(baseUrl + "/user")
+				.queryString("username", "*abc")
+				.queryString("password", password).asString();
+		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
+
+		response = Unirest.post(baseUrl + "/user")
+				.queryString("username", "")
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
 
@@ -69,26 +85,24 @@ public class UserControllerTest {
 
 		// create another user
 		logger.info("create a 2nd user");
-		String otherUsername = "other-user";
+		String otherUsername = "otheruser";
 		response = Unirest.post(baseUrl + "/user").queryString("username", otherUsername)
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
 		String responseOtherUsername = new JSONObject(response.getBody()).getString("name");
 		assertTrue( otherUsername.equals(responseOtherUsername));
 
-//		// delete other user should fail
-//		response = Unirest
-//				.delete(baseUrl + "/user/" + otherUserid)
-//				.header("X-Auth-Token", token).asString();
-//		assertTrue(response.getStatus() == HttpStatus.FORBIDDEN.value());
+		// delete other user should fail
+		response = Unirest
+				.delete(baseUrl + "/user/" + otherUsername)
+				.header("X-Auth-Token", token).asString();
+		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
 		
 		// delete own user should work
 		logger.info("delete own user - should work");
 		response = Unirest
 				.delete(baseUrl + "/user/" + username)
 				.header("X-Auth-Token", token).asString();
-		System.err.println(response.getStatus());
-		System.err.println(response.getBody());
-		assertTrue(response.getStatus() == HttpStatus.OK.value());
+		assertTrue(response.getStatus() == HttpStatus.NO_CONTENT.value());
 	}
 }
