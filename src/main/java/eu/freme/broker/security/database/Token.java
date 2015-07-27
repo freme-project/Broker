@@ -3,19 +3,18 @@ package eu.freme.broker.security.database;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import eu.freme.broker.security.database.User;
 
 @Entity
+@Table(name = "token")
 public class Token {
 	@Id
 	String token;
 
-
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "name")
 	private User user;
 	
 	protected Token() {

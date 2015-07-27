@@ -1,15 +1,21 @@
 package eu.freme.broker.security.database;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+
+import javax.persistence.CascadeType;
+
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
+@Table(name = "user")
 public class User {
 
 	public static final String roleUser = "ROLE_USER";
@@ -23,6 +29,9 @@ public class User {
 	private String password;
 
 	private String role;
+	
+	@OneToMany(mappedBy = "user", cascade=CascadeType.ALL)
+	private List<Token> tokens;
 
 	protected User() {
 	}
@@ -60,5 +69,10 @@ public class User {
 
 	public void setRole(String role) {
 		this.role = role;
-	}	
+	}
+	
+	public List<Token> getTokens() {
+		return tokens;
+	}
+
 }

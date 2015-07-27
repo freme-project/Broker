@@ -42,7 +42,7 @@ public class UserRepositoryTest {
 		int counter = count(userRepository.findAll());
 		assertTrue(counter==3);
 		
-		userRepository.delete(new Long(2));
+		userRepository.delete(juergen);
 		counter = count(userRepository.findAll());
 		assertTrue(counter==2);
 	}
