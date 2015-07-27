@@ -90,12 +90,10 @@ public class UserControllerTest {
 		assertTrue(token != null);
 		assertTrue(token.length() > 0);
 
-		// delete user without credentials should fail
 		logger.info("delete user without providing credentials - should fail, exception is ok");
 		response = Unirest.delete(baseUrl + "/user/" + username).asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
 
-		// create another user
 		logger.info("create a 2nd user");
 		String otherUsername = "otheruser";
 		response = Unirest.post(baseUrl + "/user").queryString("username", otherUsername)
@@ -104,13 +102,19 @@ public class UserControllerTest {
 		String responseOtherUsername = new JSONObject(response.getBody()).getString("name");
 		assertTrue( otherUsername.equals(responseOtherUsername));
 
-		// delete other user should fail
+		logger.info( "delete other user should fail");
 		response = Unirest
 				.delete(baseUrl + "/user/" + otherUsername)
 				.header("X-Auth-Token", token).asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
 		
-		// delete own user should work
+		logger.info("cannot do authenticated call with username / password, only token should work");
+		response = Unirest
+				.delete(baseUrl + "/user/" + username)
+				.header("X-Auth-Username", username)
+				.header("X-Auth-Password", password).asString();
+		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
+		
 		logger.info("delete own user - should work");
 		response = Unirest
 				.delete(baseUrl + "/user/" + username)
