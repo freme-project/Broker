@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDecisionVoter;
 
@@ -20,13 +21,19 @@ public class UserControllerTest {
 	String baseUrl = null;
 	Logger logger = Logger.getLogger(UserControllerTest.class);
 
+	@Value("${backend.admin.username}")
+	String adminUsername;
+
+	@Value("${backend.admin.password}")
+	String adminPassword;
+
 	@Before
 	public void setup() {
 		baseUrl = IntegrationTestSetup.getURLEndpoint();
 	}
 
 	@Test
-	public void testSecurity() throws UnirestException {
+	public void testUserSecurity() throws UnirestException {
 
 		String username = "myuser";
 		String password = "mypassword";
@@ -53,6 +60,11 @@ public class UserControllerTest {
 
 		response = Unirest.post(baseUrl + "/user")
 				.queryString("username", "*abc")
+				.queryString("password", password).asString();
+		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
+		
+		response = Unirest.post(baseUrl + "/user")
+				.queryString("username", adminUsername)
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
 
@@ -104,5 +116,10 @@ public class UserControllerTest {
 				.delete(baseUrl + "/user/" + username)
 				.header("X-Auth-Token", token).asString();
 		assertTrue(response.getStatus() == HttpStatus.NO_CONTENT.value());
+	}
+	
+	@Test
+	public void testAdmin(){
+		
 	}
 }

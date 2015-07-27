@@ -1,10 +1,13 @@
 package eu.freme.broker.eservices;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +31,9 @@ public class UserController extends BaseRestController {
 
 	@Autowired
 	UserRepository userRepository;
+	
+	@Value("${backend.admin.username}")
+	String adminUsername;
 
 	@RequestMapping(value = "/user", method = RequestMethod.POST)
 	public User createUser(
@@ -38,7 +44,7 @@ public class UserController extends BaseRestController {
 			throw new BadRequestException("Username already exists");
 		}
 		
-		// validate that username consists only of charachters
+		// validate that username consists only of charahters
 		if( !username.matches("[a-zA-Z]+")){
 			throw new BadRequestException("The username can only consist of normal characters from a-z and A-Z");
 		}
@@ -46,6 +52,11 @@ public class UserController extends BaseRestController {
 		// passwords need to have at least 8 characters
 		if( password.length() < 8 ){
 			throw new BadRequestException("The passwords needs to be at least 8 characters long");
+		}
+		
+		// do not allow to use the admin username
+		if( username.equals(adminUsername)){
+			throw new BadRequestException("The username is invalid");
 		}
 
 		try {
@@ -73,6 +84,13 @@ public class UserController extends BaseRestController {
 		userRepository.delete(user);
 
 		return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
+	}
+	
+	@RequestMapping(value="/user", method= RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public Iterable<User> getUsers(){
+		
+		return userRepository.findAll();
 	}
 
 	public void setDecisionManager(AbstractAccessDecisionManager decisionManager) {
