@@ -72,7 +72,11 @@ public class DBpediaSpotlight extends BaseRestController {
             
             if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
                 // input is sent as value of the input parameter
-                textForProcessing = input;
+                if(input == null) {
+                    textForProcessing = postBody;
+                } else {
+                    textForProcessing = input;
+                }
             } else {
                 // input is sent as body of the request
                 inModel = ModelFactory.createDefaultModel();
