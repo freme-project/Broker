@@ -65,7 +65,8 @@ public class FremeNERTest {
                     .asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
-
+            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
+            assertNotNull(model);
 
             //Tests POST
             //Plaintext Input in Body

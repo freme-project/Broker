@@ -37,7 +37,7 @@ public class ELinkTest {
 
     @Before
     public void setup(){
-        url = IntegrationTestSetup.getURLEndpoint() + "/e-entity/freme-ner/";
+        url = IntegrationTestSetup.getURLEndpoint() + "/e-link/";
     }
 
     private HttpRequestWithBody baseRequest( String function) {
@@ -48,17 +48,18 @@ public class ELinkTest {
 
 
     @Test
-    public void TestFremeNER() throws UnirestException, IOException, Exception {
+    public void TestELink() throws UnirestException, IOException, Exception {
         Model model;
         JenaRDFConversionService converter = new JenaRDFConversionService();
 
         HttpResponse<String> response;
 
-        String data = helper.readFile("src/test/resources/rdftest/e-entity/data.ttl");
+        String data = helper.readFile("src/test/resources/rdftest/e-link/data.ttl");
 
         String path_suffix = "templates";
         //Tests GET e-link/templates/
-        response = Unirest.get(url+path_suffix+"/").asString();
+        response = Unirest.get(url+path_suffix+"/?outformat=turtle").asString();
+        System.out.println(url+path_suffix+"/?outformat=turtle");
         assertTrue(response.getStatus() == 200);
         assertTrue(response.getBody().length() > 0);
         model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
