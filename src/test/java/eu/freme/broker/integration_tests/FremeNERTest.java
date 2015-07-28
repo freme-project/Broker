@@ -45,14 +45,9 @@ public class FremeNERTest {
     @Test
     public void TestFremeNER() throws UnirestException, IOException, Exception {
 
-
         HttpResponse<String> response;
-        String data;
         Model model;
         JenaRDFConversionService converter = new JenaRDFConversionService();
-
-        HttpResponse<String> response;
-
         String data = helper.readFile("src/test/resources/rdftest/e-entity/data.ttl");
 
         //Tests every language
