@@ -43,7 +43,7 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>conversion</artifactId>
-			<version>0.2</version>
+			<version>0.21</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
