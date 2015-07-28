@@ -1,5 +1,6 @@
 package eu.freme.broker.integration_tests;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -7,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import eu.freme.conversion.rdf.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,10 +40,14 @@ public class FremeNERTest {
     }
 
     @Test
-    public void TestFremeNER() throws UnirestException, IOException {
+    public void TestFremeNER() throws UnirestException, IOException, Exception {
+
 
         HttpResponse<String> response;
         String data;
+        Model model;
+        JenaRDFConversionService converter = new JenaRDFConversionService();
+
 
         //Tests POST
         for (String lang : availableLanguages) {
@@ -55,7 +62,8 @@ public class FremeNERTest {
                     .asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
-
+            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
+            assertNotNull(model);
 
             //Plaintext Input in Body
             response = baseRequest("documents")
@@ -66,6 +74,8 @@ public class FremeNERTest {
                     .asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
+            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
+            assertNotNull(model);
 
             //NIF Input in Body (Turtle)
             data = readFile("src/test/resources/rdftest/e-translate/data.turtle");
@@ -75,7 +85,8 @@ public class FremeNERTest {
                     .body(data).asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
-
+            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
+            assertNotNull(model);
 
             //Test Prefix
             //Plaintext Input in Query String
@@ -88,6 +99,8 @@ public class FremeNERTest {
                     .asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
+            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
+            assertNotNull(model);
 
             //assertTrue(response.getString() contains prefix)
         }
