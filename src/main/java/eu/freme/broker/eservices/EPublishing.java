@@ -2,16 +2,21 @@ package eu.freme.broker.eservices;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.MalformedJsonException;
+
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.eservices.epublishing.EPublishingService;
 import eu.freme.eservices.epublishing.exception.EPubCreationException;
 import eu.freme.eservices.epublishing.exception.InvalidZipException;
 import eu.freme.eservices.epublishing.webservice.Metadata;
+
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.annotation.MultipartConfig;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +50,9 @@ public class EPublishing {
         try {
             Gson gson = new Gson();
             Metadata metadata = gson.fromJson(jMetadata, Metadata.class);
-            return new ResponseEntity<>(entityAPI.createEPUB(metadata, file.getInputStream()), HttpStatus.OK);
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.add("Content-Disposition", "File Transfer");
+            return new ResponseEntity<>(entityAPI.createEPUB(metadata, file.getInputStream()), responseHeaders, HttpStatus.OK);
         } catch (MalformedJsonException | InvalidZipException | EPubCreationException ex) {
             logger.log(Level.SEVERE, null, ex);
             return new ResponseEntity<>(new byte[0], HttpStatus.BAD_REQUEST);
