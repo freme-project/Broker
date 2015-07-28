@@ -80,7 +80,7 @@ paths:
         \ of the zip, the service will return an invalid EPUB.
         \n\n
         **Sample Metadata Json**\n
-        \n```
+        \n<pre>
         \n
         {\n
            \"titles\":[\"Alice in Utopia\",\"Alice in Europe\"],\n
@@ -109,7 +109,7 @@ paths:
            ]\n
          }\n
          \n
-         ```
+         </pre>
 
         \n
         \n
@@ -122,43 +122,43 @@ paths:
     post:
       description: "Enriches Text content with entities gathered from various datasets by the FREME-NER Engine. The service accepts plaintext or text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing. This example shows a NIF document that can be processed by the service:
         \n
-        ```
+        <pre>
         \n
-        @prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> . \n
-        @prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> . \n
-        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n
+        @prefix nif: &lt;http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#&gt; . \n
+        @prefix itsrdf: &lt;http://www.w3.org/2005/11/its/rdf#&gt; . \n
+        @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .\n
 
 
 
-        <http://example.org/document/1#char=0,21>\n
+        &lt;http://example.org/document/1#char=0,21&gt;\n
            a nif:String , nif:Context , nif:RFC5147String ;\n
-           nif:isString \"Welcome to Berlin\"^^xsd:string;\n
-           nif:beginIndex \"0\"^^xsd:nonNegativeInteger;\n
-           nif:endIndex \"21\"^^xsd:nonNegativeInteger;\n
-           nif:sourceUrl <http://differentday.blogspot.com/2007_01_01_archive.html> .
+           nif:isString &quot;Welcome to Berlin&quot;^^xsd:string;\n
+           nif:beginIndex &quot;0&quot;^^xsd:nonNegativeInteger;\n
+           nif:endIndex &quot;21&quot;^^xsd:nonNegativeInteger;\n
+           nif:sourceUrl &lt;http://differentday.blogspot.com/2007_01_01_archive.html&gt; .
         \n
-        ```
+        </pre>
         \n
         "
     get:
       description: "Enriches Text content with entities gathered from various datasets by the FREME-NER Engine. The service accepts plaintext or text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing. This example shows a NIF document that can be processed by the service:
         \n
-        ```
-        \n
-        @prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> . \n
-        @prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> . \n
-        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n
+        <pre>
+         \n
+         @prefix nif: &lt;http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#&gt; . \n
+         @prefix itsrdf: &lt;http://www.w3.org/2005/11/its/rdf#&gt; . \n
+         @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .\n
 
 
 
-        <http://example.org/document/1#char=0,21>\n
-           a nif:String , nif:Context , nif:RFC5147String ;\n
-           nif:isString \"Welcome to Berlin\"^^xsd:string;\n
-           nif:beginIndex \"0\"^^xsd:nonNegativeInteger;\n
-           nif:endIndex \"21\"^^xsd:nonNegativeInteger;\n
-           nif:sourceUrl <http://differentday.blogspot.com/2007_01_01_archive.html> .
-        \n
-        ```
+         &lt;http://example.org/document/1#char=0,21&gt;\n
+            a nif:String , nif:Context , nif:RFC5147String ;\n
+            nif:isString &quot;Welcome to Berlin&quot;^^xsd:string;\n
+            nif:beginIndex &quot;0&quot;^^xsd:nonNegativeInteger;\n
+            nif:endIndex &quot;21&quot;^^xsd:nonNegativeInteger;\n
+            nif:sourceUrl &lt;http://differentday.blogspot.com/2007_01_01_archive.html&gt; .
+         \n
+        </pre>
         \n
         "
 
@@ -166,43 +166,43 @@ paths:
     post:
       description: "Enriches Text content with entities gathered from various datasets by the DBPedia-Spotlight Engine. The service accepts plaintext or text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing. This example shows a NIF document that can be processed by the service:
         \n
-        ```
-        \n
-        @prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> . \n
-        @prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> . \n
-        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n
+        <pre>
+           \n
+           @prefix nif: &lt;http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#&gt; . \n
+           @prefix itsrdf: &lt;http://www.w3.org/2005/11/its/rdf#&gt; . \n
+           @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .\n
 
 
 
-        <http://example.org/document/1#char=0,21>\n
-           a nif:String , nif:Context , nif:RFC5147String ;\n
-           nif:isString \"Welcome to Berlin\"^^xsd:string;\n
-           nif:beginIndex \"0\"^^xsd:nonNegativeInteger;\n
-           nif:endIndex \"21\"^^xsd:nonNegativeInteger;\n
-           nif:sourceUrl <http://differentday.blogspot.com/2007_01_01_archive.html> .
-        \n
-        ```
+           &lt;http://example.org/document/1#char=0,21&gt;\n
+              a nif:String , nif:Context , nif:RFC5147String ;\n
+              nif:isString &quot;Welcome to Berlin&quot;^^xsd:string;\n
+              nif:beginIndex &quot;0&quot;^^xsd:nonNegativeInteger;\n
+              nif:endIndex &quot;21&quot;^^xsd:nonNegativeInteger;\n
+              nif:sourceUrl &lt;http://differentday.blogspot.com/2007_01_01_archive.html&gt; .
+           \n
+        </pre>
         \n
         "
     get:
       description: "Enriches Text content with entities gathered from various datasets by the DBPedia-Spotlight Engine. The service accepts plaintext or text sent as NIF document. The text of the nif:isString property (attached to the nif:Context document) will be used for processing. This example shows a NIF document that can be processed by the service:
         \n
-        ```
-        \n
-        @prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> . \n
-        @prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> . \n
-        @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n
+        <pre>
+            \n
+            @prefix nif: &lt;http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#&gt; . \n
+            @prefix itsrdf: &lt;http://www.w3.org/2005/11/its/rdf#&gt; . \n
+            @prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .\n
 
 
 
-        <http://example.org/document/1#char=0,21>\n
-           a nif:String , nif:Context , nif:RFC5147String ;\n
-           nif:isString \"Welcome to Berlin\"^^xsd:string;\n
-           nif:beginIndex \"0\"^^xsd:nonNegativeInteger;\n
-           nif:endIndex \"21\"^^xsd:nonNegativeInteger;\n
-           nif:sourceUrl <http://differentday.blogspot.com/2007_01_01_archive.html> .
-        \n
-        ```
+            &lt;http://example.org/document/1#char=0,21&gt;\n
+               a nif:String , nif:Context , nif:RFC5147String ;\n
+               nif:isString &quot;Welcome to Berlin&quot;^^xsd:string;\n
+               nif:beginIndex &quot;0&quot;^^xsd:nonNegativeInteger;\n
+               nif:endIndex &quot;21&quot;^^xsd:nonNegativeInteger;\n
+               nif:sourceUrl &lt;http://differentday.blogspot.com/2007_01_01_archive.html&gt; .
+            \n
+        </pre>
         \n
         "
 
@@ -212,60 +212,61 @@ paths:
     post:
       description: "This service accepts a NIF document (with annotated entities) and performs enrichment with pre-defined templates. The templates contain \"fields\" marked between three at-signs @@@field-name@@@. If a user, while calling the enrichment endpoint specifies an \"unknown\" parameter (not from the list above), then the values of that \"unknown\" parameters will be used to replace with the corresponding \"field\" in the query template. \n
         \n
-        ```\n
+        <pre>\n
 
-      @prefix dc:    <http://purl.org/dc/elements/1.1/> .\n
-      @prefix prov:  <http://www.w3.org/ns/prov#> .\n
-      @prefix nif:   <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .\n
-      @prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .\n
-      @prefix rutp:  <http://rdfunit.aksw.org/data/patterns#> .\n
-      @prefix rlog:  <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#> .\n
-      @prefix oslc:  <http://open-services.net/ns/core#> .\n
-      @prefix dsp:   <http://dublincore.org/dc-dsp#> .\n
-      @prefix dcterms: <http://purl.org/dc/terms/> .\n
-      @prefix rutg:  <http://rdfunit.aksw.org/data/generators#> .\n
-      @prefix schema: <http://schema.org/> .\n
-      @prefix olia:  <http://purl.org/olia/olia.owl#> .\n
-      @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n
-      @prefix p:     <http://127.0.0.1:9995/spotlight#> .\n
-      @prefix rut:   <http://rdfunit.aksw.org/ns/core#> .\n
-      @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n
-      @prefix owl:   <http://www.w3.org/2002/07/owl#> .\n
-      @prefix rutr:  <http://rdfunit.aksw.org/data/results#> .\n
-      @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n
-      @prefix spin:  <http://spinrdf.org/spin#> .\n
-      @prefix rutt:  <http://rdfunit.aksw.org/data/tests#> .\n
-      @prefix ruts:  <http://rdfunit.aksw.org/data/testsuite#> .\n
+      @prefix dc:    &lt;http://purl.org/dc/elements/1.1/&gt; .\n
+      @prefix prov:  &lt;http://www.w3.org/ns/prov#&gt; .\n
+      @prefix nif:   &lt;http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#&gt; .\n
+      @prefix itsrdf: &lt;http://www.w3.org/2005/11/its/rdf#&gt; .\n
+      @prefix rutp:  &lt;http://rdfunit.aksw.org/data/patterns#&gt; .\n
+      @prefix rlog:  &lt;http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#&gt; .\n
+      @prefix oslc:  &lt;http://open-services.net/ns/core#&gt; .\n
+      @prefix dsp:   &lt;http://dublincore.org/dc-dsp#&gt; .\n
+      @prefix dcterms: &lt;http://purl.org/dc/terms/&gt; .\n
+      @prefix rutg:  &lt;http://rdfunit.aksw.org/data/generators#&gt; .\n
+      @prefix schema: &lt;http://schema.org/&gt; .\n
+      @prefix olia:  &lt;http://purl.org/olia/olia.owl#&gt; .\n
+      @prefix rdfs:  &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .\n
+      @prefix p:     &lt;http://127.0.0.1:9995/spotlight#&gt; .\n
+      @prefix rut:   &lt;http://rdfunit.aksw.org/ns/core#&gt; .\n
+      @prefix xsd:   &lt;http://www.w3.org/2001/XMLSchema#&gt; .\n
+      @prefix owl:   &lt;http://www.w3.org/2002/07/owl#&gt; .\n
+      @prefix rutr:  &lt;http://rdfunit.aksw.org/data/results#&gt; .\n
+      @prefix rdf:   &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .\n
+      @prefix spin:  &lt;http://spinrdf.org/spin#&gt; .\n
+      @prefix rutt:  &lt;http://rdfunit.aksw.org/data/tests#&gt; .\n
+      @prefix ruts:  &lt;http://rdfunit.aksw.org/data/testsuite#&gt; .\n
 
-      <http://127.0.0.1:9995/spotlight#char=0,15>\n
+      &lt;http://127.0.0.1:9995/spotlight#char=0,15&gt;\n
               a                     nif:Context , nif:Sentence , nif:RFC5147String ;\n
-              nif:beginIndex        \"0\" ;\n
-              nif:endIndex          \"15\" ;\n
-              nif:isString          \"This is Berlin.\" ;\n
-              nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,15> .\n
+              nif:beginIndex        &quot;0&quot; ;\n
+              nif:endIndex          &quot;15&quot; ;\n
+              nif:isString          &quot;This is Berlin.&quot; ;\n
+              nif:referenceContext  &lt;http://127.0.0.1:9995/spotlight#char=0,15&gt; .\n
 
-      <http://127.0.0.1:9995/spotlight#char=8,14>\n
+      &lt;http://127.0.0.1:9995/spotlight#char=8,14&gt;\n
               a                     nif:Word , nif:RFC5147String ;\n
-              nif:anchorOf          \"Berlin\" ;\n
-              nif:beginIndex        \"8\" ;\n
-              nif:endIndex          \"14\" ;\n
-              nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,15> ;\n
-              itsrdf:taIdentRef     <http://dbpedia.org/resource/Berlin> .\n
+              nif:anchorOf          &quot;Berlin&quot; ;\n
+              nif:beginIndex        &quot;8&quot; ;\n
+              nif:endIndex          &quot;14&quot; ;\n
+              nif:referenceContext  &lt;http://127.0.0.1:9995/spotlight#char=0,15&gt; ;\n
+              itsrdf:taIdentRef     &lt;http://dbpedia.org/resource/Berlin&gt; .\n
 
 
-        ```\n"
+
+        </pre>\n"
 
   /e-link/templates:
     post:
       description: "Creates a new enrichment template.  \n\n
         **Example of input in JSON format:**\n
-        \n```
+        \n<pre>
         \n
         {\n
         \"query\":\"here goes the CONSTRUCT SPARQL query\",\n
         \"endpoint\":\"here goes the SPARQL endpoint. E.g., http://dbpedia.org/sparql/\"\n
         }\n
-        \n```
+        \n</pre>
         \n   "
     get:
       description: "#Examples - Available templates:
@@ -276,34 +277,34 @@ paths:
 
         \n**SPARQL endpoint http://dbpedia.org/sparql**
 
-        ```
+        <pre>
 
-        PREFIX dbpedia: <http://dbpedia.org/resource/>
-        PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+        PREFIX dbpedia: &lt;http://dbpedia.org/resource/&gt;
+        PREFIX dbpedia-owl: &lt;http://dbpedia.org/ontology/&gt;
+        PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+        PREFIX geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;
 
         CONSTRUCT {
-            ?museum <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> .
+            ?museum &lt;http://xmlns.com/foaf/0.1/based_near&gt; &lt;@@@entity_uri@@@&gt; .
         }
         WHERE {
-            <@@@entity_uri@@@> geo:geometry ?citygeo .
-            ?museum rdf:type <http://schema.org/Museum> .
+            &lt;@@@entity_uri@@@&gt; geo:geometry ?citygeo .
+            ?museum rdf:type &lt;http://schema.org/Museum&gt; .
             ?museum geo:geometry ?museumgeo .
-            FILTER (<bif:st_intersects>(?museumgeo, ?citygeo, 10))
+            FILTER (&lt;bif:st_intersects&gt;(?museumgeo, ?citygeo, 10))
         } LIMIT 10
 
-        ```
+        </pre>
 
         Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-1.ttl).
 
         Test query:
 
-        ```
+        <pre>
 
         curl -v -X POST -d @test-for-template-1.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=1\" -H \"Content-Type: text/turtle\"
 
-        ```
+        </pre>
 
         #Template id: 2 - DBpedia live
 
@@ -311,28 +312,28 @@ paths:
 
         \n**SPARQL endpoint http://live.dbpedia.org/sparql**
 
-        ```
+        <pre>
 
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
         CONSTRUCT {
-            ?event <http://dbpedia.org/ontology/place> <@@@entity_uri@@@> .
+            ?event &lt;http://dbpedia.org/ontology/place&gt; &lt;@@@entity_uri@@@&gt; .
         }
         WHERE {
-            ?event rdf:type <http://dbpedia.org/ontology/Event> .
-            ?event <http://dbpedia.org/ontology/place> <@@@entity_uri@@@> .
+            ?event rdf:type &lt;http://dbpedia.org/ontology/Event&gt; .
+            ?event &lt;http://dbpedia.org/ontology/place&gt; &lt;@@@entity_uri@@@&gt; .
         } LIMIT 10
 
-        ```
+        </pre>
 
         Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-2.ttl).
 
         Test query:
 
-        ```
+        <pre>
 
         curl -v -X POST -d @test-for-template-2.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=2\" -H \"Content-Type: text/turtle\"
 
-        ```
+        </pre>
 
         #Template id: 3 - GeoKnow
 
@@ -340,29 +341,29 @@ paths:
 
         \n**SPARQL endpoint http://factforge.net/sparql**
 
-        ```
+        <pre>
 
-        PREFIX geo-pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+        PREFIX geo-pos: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt;
         CONSTRUCT {
-            <@@@entity_uri@@@> geo-pos:lat ?long .
-            <@@@entity_uri@@@> geo-pos:lat ?lat .
+            &lt;@@@entity_uri@@@&gt; geo-pos:lat ?long .
+            &lt;@@@entity_uri@@@&gt; geo-pos:lat ?lat .
         }
         WHERE {
-            <@@@entity_uri@@@/> geo-pos:lat ?lat .
-            <@@@entity_uri@@@/> geo-pos:long ?long .
+            &lt;@@@entity_uri@@@/&gt; geo-pos:lat ?lat .
+            &lt;@@@entity_uri@@@/&gt; geo-pos:long ?long .
         }
 
-        ```
+        </pre>
 
         Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-3.ttl).
 
         Test query:
 
-        ```
+        <pre>
 
         curl -v -X POST -d @test-for-template-3.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=3\" -H \"Content-Type: text/turtle\"
 
-        ```
+        </pre>
 
         #Template id: 4 - Linked Geo Data
 
@@ -370,25 +371,25 @@ paths:
 
         \n**SPARQL endpoint http://linkedgeodata.org/vsnorql**
 
-        ```
+        <pre>
 
-        PREFIX owl: <http://www.w3.org/2002/07/owl#>
-        PREFIX ogc: <http://www.opengis.net/ont/geosparql#>
-        PREFIX geom: <http://geovocab.org/geometry#>
-        PREFIX lgdo: <http://linkedgeodata.org/ontology/>
+        PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+        PREFIX ogc: &lt;http://www.opengis.net/ont/geosparql#&gt;
+        PREFIX geom: &lt;http://geovocab.org/geometry#&gt;
+        PREFIX lgdo: &lt;http://linkedgeodata.org/ontology/&gt;
         CONSTRUCT {
-            ?s <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> .
+            ?s &lt;http://xmlns.com/foaf/0.1/based_near&gt; &lt;@@@entity_uri@@@&gt; .
         } WHERE {
             ?s
                 a lgdo:Bakery ;
                 geom:geometry [ ogc:asWKT ?sg ] .
             ?a
-                owl:sameAs <@@@entity_uri@@@> ;
+                owl:sameAs &lt;@@@entity_uri@@@&gt; ;
                 geom:geometry [ ogc:asWKT ?ag ] .
             FILTER(bif:st_intersects(?sg, ?ag, 10))
         } LIMIT 10
 
-        ```
+        </pre>
 
         #Template id: 5 - Europeana
 
@@ -396,31 +397,31 @@ paths:
 
         \n**SPARQL endpoint http://europeana.ontotext.com/sparql**
 
-        ```
+        <pre>
 
-        PREFIX edm: <http://www.europeana.eu/schemas/edm/>
-        PREFIX ore: <http://www.openarchives.org/ore/terms/>
+        PREFIX edm: &lt;http://www.europeana.eu/schemas/edm/&gt;
+        PREFIX ore: &lt;http://www.openarchives.org/ore/terms/&gt;
         CONSTRUCT {
-            ?CHO edm:HasMet <@@@entity_uri@@@>
+            ?CHO edm:HasMet &lt;@@@entity_uri@@@&gt;
         } WHERE {
             ?EuropeanaObject  edm:year  ?year ;
-            edm:hasMet <@@@entity_uri@@@> .
+            edm:hasMet &lt;@@@entity_uri@@@&gt; .
             ?EuropeanaObject ore:proxyFor ?CHO .
-            FILTER (?year < \"1800\")
-            FILTER (?year > \"1700\")
+            FILTER (?year &lt; &quot;1800&quot;)
+            FILTER (?year &gt; &quot;1700&quot;)
         } LIMIT 5
 
-        ```
+        </pre>
 
         Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-5.ttl).
 
         Test query:
 
-        ```
+        <pre>
 
         curl -v -X POST -d @test-for-template-5.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=5\" -H \"Content-Type: text/turtle\"
 
-        ```
+        </pre>
 
         Note: there is issue with the SPARQL endpoint.
 
@@ -430,28 +431,28 @@ paths:
 
         \n**SPARQL endpoint http://live.dbpedia.org/sparql**
 
-        ```
+        <pre>
 
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
         CONSTRUCT {
-            ?event <http://dbpedia.org/ontology/place> <http://dbpedia.org/resource/Berlin> .
+            ?event &lt;http://dbpedia.org/ontology/place&gt; &lt;http://dbpedia.org/resource/Berlin&gt; .
         }
         WHERE {
-            ?event rdf:type <http://dbpedia.org/ontology/@@@event_type@@@> .
-            ?event <http://dbpedia.org/ontology/place> ?o .
+            ?event rdf:type &lt;http://dbpedia.org/ontology/@@@event_type@@@&gt; .
+            ?event &lt;http://dbpedia.org/ontology/place&gt; ?o .
         } LIMIT 10
 
-        ```
+        </pre>;
 
         Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-6.ttl).
 
         Test query:
 
-        ```
+        <pre>
 
         curl -v -X POST -d @test-for-template-6.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=6&event_type=SocietalEvent\" -H \"Content-Type: text/turtle\"
 
-        ```
+        </pre>
 
         #Template id: 7 -  Linked Geo Data
 
@@ -459,37 +460,38 @@ paths:
 
         \n**SPARQL endpoint http://linkedgeodata.org/vsnorql/**
 
-        ```
+        <pre>
 
-        PREFIX owl: <http://www.w3.org/2002/07/owl#>
-        PREFIX ogc: <http://www.opengis.net/ont/geosparql#>
-        PREFIX geom: <http://geovocab.org/geometry#>
-        PREFIX lgdo: <http://linkedgeodata.org/ontology/>
-        PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+
+        PREFIX owl: &amp;lt;http://www.w3.org/2002/07/owl#&amp;gt;
+        PREFIX ogc: &amp;lt;http://www.opengis.net/ont/geosparql#&amp;gt;
+        PREFIX geom: &amp;lt;http://geovocab.org/geometry#&amp;gt;
+        PREFIX lgdo: &amp;lt;http://linkedgeodata.org/ontology/&amp;gt;
+        PREFIX bif: &amp;lt;http://www.openlinksw.com/schemas/bif#&amp;gt;
 
         CONSTRUCT {
-            ?s <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> .
+            ?s &amp;lt;http://xmlns.com/foaf/0.1/based_near&amp;gt; &amp;lt;@@@entity_uri@@@&amp;gt; .
         } WHERE {
             ?s
                 a lgdo:Bakery ;
                 geom:geometry [ ogc:asWKT ?sg ] .
             ?a
-                owl:sameAs <@@@entity_uri@@@> ;
+                owl:sameAs &amp;lt;@@@entity_uri@@@&amp;gt; ;
                 geom:geometry [ ogc:asWKT ?ag ] .
             FILTER(bif:st_intersects(?sg, ?ag, 10))
         } LIMIT 10
 
-        ```
+        </pre>
 
         Example data for enrichment can be downloaded from [here](https://github.com/freme-project/e-Link/blob/master/src/main/resources/data/test-for-template-7.ttl).
 
         Test query:
 
-        ```
+        <pre>
 
         curl -v -X POST -d @test-for-template-7.ttl \"http://api-dev.freme-project.eu/current/e-link/documents/?outformat=turtle&templateid=7\" -H \"Content-Type: text/turtle\"
 
-        ```
+        </pre>
 
         Note: there is an issue with the SPARQL endpoint."
 
@@ -497,11 +499,11 @@ paths:
     put:
       description: "Update an enrichment template with specified ID. The new data is submitted as body of a PUT request.\n\n
          **Example of input in JSON format:**\n
-         \n```
+         \n<pre>
          \n
          {\n
             \"query\":\"here goes the CONSTRUCT SPARQL query\",\n
             \"endpoint\":\"here goes the SPARQL endpoint. E.g., http://dbpedia.org/sparql/\"\n
          }\n
-         \n```
+         \n</pre>
          \n   "
