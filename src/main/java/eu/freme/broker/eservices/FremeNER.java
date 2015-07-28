@@ -1,6 +1,8 @@
 package eu.freme.broker.eservices;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -23,6 +27,8 @@ import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 
 import java.io.ByteArrayInputStream;
+import java.net.URI;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -229,7 +235,6 @@ public class FremeNER extends BaseRestController {
             // END: Checking the informat parameter
             
             String format = null;
-            HttpHeaders headers = new HttpHeaders();
             switch(thisInformat) {
                 case TURTLE:
                     format = "TTL";
@@ -247,12 +252,10 @@ public class FremeNER extends BaseRestController {
                     format = "N3";
                     break;
             }
-            
-            headers.add("Location",
-                    "http://139.18.2.231:8080/api/datasets?format="+format
+
+            return callBackend("http://139.18.2.231:8080/api/datasets?format="+format
                     + "&name="+name
-                    + "&language="+language);
-            return new ResponseEntity<String>(null,headers,HttpStatus.TEMPORARY_REDIRECT);
+                    + "&language="+language, HttpMethod.POST, postBody);
         }
         
         // Updating dataset for use in the e-Entity service.
@@ -309,7 +312,6 @@ public class FremeNER extends BaseRestController {
             // END: Checking the informat parameter
             
             String format = null;
-            HttpHeaders headers = new HttpHeaders();
             switch(thisInformat) {
                 case TURTLE:
                     format = "TTL";
@@ -327,11 +329,9 @@ public class FremeNER extends BaseRestController {
                     format = "N3";
                     break;
             }
-            headers.add("Location",
-                    "http://139.18.2.231:8080/api/datasets"+name+"?format="+format
-                    + "&language="+language);
-            
-            return new ResponseEntity<String>(null,headers,HttpStatus.TEMPORARY_REDIRECT);
+
+            return callBackend("http://139.18.2.231:8080/api/datasets"+name+"?format="+format
+                    + "&language="+language, HttpMethod.PUT, postBody);
         }
         
         // Get info about a specific dataset.
@@ -346,22 +346,16 @@ public class FremeNER extends BaseRestController {
                 throw new eu.freme.broker.exception.BadRequestException("Unspecified dataset name.");            
             }
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Location",
-                    "http://139.18.2.231:8080/api/datasets/"+name);
-            return new ResponseEntity<String>(null,headers,HttpStatus.TEMPORARY_REDIRECT);
+            return callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.GET, null);
         }
-        
+
         // Get info about all available datasets.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets
 	@RequestMapping(value = "/e-entity/freme-ner/datasets", method = {
             RequestMethod.GET })
 	public ResponseEntity<String> getAllDatasets() {
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Location",
-                    "http://139.18.2.231:8080/api/datasets");
-            return new ResponseEntity<String>(null,headers,HttpStatus.TEMPORARY_REDIRECT);
+
+            return callBackend("http://139.18.2.231:8080/api/datasets", HttpMethod.GET, null);
         }
         
         // Removing a specific dataset.
@@ -375,10 +369,25 @@ public class FremeNER extends BaseRestController {
             if(name == null) {
                 throw new eu.freme.broker.exception.BadRequestException("Unspecified dataset name.");            
             }
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Location",
-                    "http://139.18.2.231:8080/api/datasets/"+name);
-            return new ResponseEntity<String>(null,headers,HttpStatus.TEMPORARY_REDIRECT);
+
+            return callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.DELETE, null);
         }
+
+
+    private ResponseEntity<String> callBackend(String uri, HttpMethod method, String body) {
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            if(body == null) {
+                return restTemplate.exchange(new URI(uri), method, null, String.class);
+            } else {
+                return restTemplate.exchange(new URI(uri), method, new HttpEntity<String>(body), String.class);
+            }
+        } catch (RestClientException rce) {
+            logger.error("failed", rce);
+            throw new eu.freme.broker.exception.ExternalServiceFailedException(rce.getMessage());
+        } catch (Exception e) {
+            logger.error("failed", e);
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
