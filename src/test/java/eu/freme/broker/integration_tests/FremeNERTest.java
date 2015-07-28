@@ -17,7 +17,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
-
+import org.nlp2rdf.cli.Validate;
 
 
 /**
@@ -45,9 +45,7 @@ public class FremeNERTest {
 
         HttpResponse<String> response;
         String data;
-        Model model;
         JenaRDFConversionService converter = new JenaRDFConversionService();
-
 
         //Tests POST
         for (String lang : availableLanguages) {
@@ -62,8 +60,11 @@ public class FremeNERTest {
                     .asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
-            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
-            assertNotNull(model);
+            // validate RDF
+            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            // validate NIF
+            Validate.main(new String[]{"-i", response.getBody()});
+
 
             //Plaintext Input in Body
             response = baseRequest("documents")
@@ -74,8 +75,10 @@ public class FremeNERTest {
                     .asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
-            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
-            assertNotNull(model);
+            // validate RDF
+            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            // validate NIF
+            Validate.main(new String[]{"-i", response.getBody()});
 
             //NIF Input in Body (Turtle)
             data = readFile("src/test/resources/rdftest/e-translate/data.turtle");
@@ -85,8 +88,10 @@ public class FremeNERTest {
                     .body(data).asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
-            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
-            assertNotNull(model);
+            // validate RDF
+            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            // validate NIF
+            Validate.main(new String[]{"-i", response.getBody()});
 
             //Test Prefix
             //Plaintext Input in Query String
@@ -99,11 +104,14 @@ public class FremeNERTest {
                     .asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
-            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
-            assertNotNull(model);
+            // validate RDF
+            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            // validate NIF
+            Validate.main(new String[]{"-i", response.getBody()});
 
             //assertTrue(response.getString() contains prefix)
         }
+
 
 
     }
