@@ -58,7 +58,7 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-publishing</artifactId>
-			<version>0.2</version>
+			<version>0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.isrsal</groupId>
