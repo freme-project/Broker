@@ -4,7 +4,7 @@
 
 	<groupId>eu.freme</groupId>
 	<artifactId>Broker</artifactId>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.21-SNAPSHOT</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -43,22 +43,22 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>conversion</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-entity</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-link</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-publishing</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.isrsal</groupId>
