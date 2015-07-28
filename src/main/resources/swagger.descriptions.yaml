@@ -60,8 +60,8 @@ paths:
     post:
       description: "Creates an eBook in the EPUB3 format from a zip file containing\
         \ HTML Files and more (images etc.) and a json file containing all necessary\
-        \ metadata for the creation of the eBook.\n\n**Example Call**\n\n`curl --form\
-        \ \"htmlZip=@alice.zip\" --form metadata='json-string' http://api-dev.freme-project.eu/current/e-publishing/html`\n\
+        \ metadata for the creation of the eBook.\n\n**Example Call**\n<pre>\ncurl --form\
+        \ &quot;htmlZip=@alice.zip&quot; --form metadata='json-string' http://api-dev.freme-project.eu/current/e-publishing/html &gt; result.epub</pre>\n\
         \n**Metadata JSON may include the following**\n* `titles` - a list of Strings\
         \ where each String represents one title\n* `authors` - a list of Strings\
         \ where each String represents one author\n* `illustrators` - a list of Strings\
@@ -94,8 +94,8 @@ paths:
            \"description\":\"This is the story about Alice in wonderland, involving a rabbit etc.\",\n
            \"rights\":\"\",\n
            \"identifier\":{\n
-              \"scheme\":\"\",\n
-              \"value\":\"urn:1235-568-2235\"\n
+           \t \"scheme\":\"\",\n
+           \t \"value\":\"urn:1235-568-2235\"\n
            },\n
            \"tableOfContents\":[\n
              {\n
