@@ -20,11 +20,8 @@ public class TildeETranslationTest {
 
 	String url = null;
 
-	String clientId = "u-bd13faca-b816-4085-95d5-05373d695ab7";
 	String sourceLang = "en";
 	String targetLang = "de";
-	String translationSystemId = "smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813";
-	
 	@Before
 	public void setup(){
 		url = IntegrationTestSetup.getURLEndpoint() + "/e-translation/tilde";
@@ -43,10 +40,9 @@ public class TildeETranslationTest {
 	}
 
 	private HttpRequestWithBody baseRequest() {
-		return Unirest.post(url).queryString("client-id", clientId)
+		return Unirest.post(url)
 				.queryString("source-lang", sourceLang)
-				.queryString("target-lang", targetLang)
-				.queryString("translation-system-id", translationSystemId);
+				.queryString("target-lang", targetLang);
 	}
 
 	@Test
@@ -65,8 +61,8 @@ public class TildeETranslationTest {
 		assertTrue(response.getBody().length() > 0);
 
 		data = readFile("src/test/resources/rdftest/e-translate/data.json");
-		response = baseRequest().header("Content-Type",
-				"application/json+ld").body(data).asString();
+		response = baseRequest().header("Content-Type", "application/json+ld")
+				.body(data).asString();
 		assertTrue(response.getStatus() == 200);
 		assertTrue(response.getBody().length() > 0);
 		
