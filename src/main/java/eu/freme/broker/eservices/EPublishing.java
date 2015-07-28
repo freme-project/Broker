@@ -50,9 +50,7 @@ public class EPublishing {
         try {
             Gson gson = new Gson();
             Metadata metadata = gson.fromJson(jMetadata, Metadata.class);
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add("Content-Description", "File Transfer");
-            return new ResponseEntity<>(entityAPI.createEPUB(metadata, file.getInputStream()), responseHeaders, HttpStatus.OK);
+            return new ResponseEntity<>(entityAPI.createEPUB(metadata, file.getInputStream()), HttpStatus.OK);
         } catch (MalformedJsonException | InvalidZipException | EPubCreationException ex) {
             logger.log(Level.SEVERE, null, ex);
             return new ResponseEntity<>(new byte[0], HttpStatus.BAD_REQUEST);
