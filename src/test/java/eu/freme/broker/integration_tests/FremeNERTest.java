@@ -19,6 +19,8 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.nlp2rdf.cli.Validate;
 
+import eu.freme.broker.integration_tests.helper;
+
 
 /**
  * Created by jonathan on 28.07.15.
@@ -28,14 +30,15 @@ public class FremeNERTest {
     String url = null;
     String[] availableLanguages = {"en","de","it","nl","fr","es"};
     String dataset = "dbpedia";
-
+    String testinput= "Enrich this Content please";
+    String testinputEncoded= URLEncoder.encode(testinput);
 
     @Before
     public void setup(){
         url = IntegrationTestSetup.getURLEndpoint() + "/e-entity/freme-ner/";
     }
 
-    private HttpRequestWithBody baseRequest(String function) {
+    private HttpRequestWithBody baseRequest( String function) {
         return Unirest.post(url + function);
     }
 
@@ -45,18 +48,23 @@ public class FremeNERTest {
 
         HttpResponse<String> response;
         String data;
+        Model model;
         JenaRDFConversionService converter = new JenaRDFConversionService();
 
-        //Tests POST
+        HttpResponse<String> response;
+
+        String data = helper.readFile("src/test/resources/rdftest/e-entity/data.ttl");
+
+        //Tests every language
         for (String lang : availableLanguages) {
 
-
+            //Tests POST
             //Plaintext Input in Query String
             response = baseRequest("documents")
-                    .queryString("input","Enrich this Content please")
-                    .queryString("language",lang)
-                    .queryString("dataset",dataset)
-                    .queryString("informat","text")
+                    .queryString("input", testinput)
+                    .queryString("language", lang)
+                    .queryString("dataset", dataset)
+                    .queryString("informat", "text")
                     .asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
@@ -65,13 +73,13 @@ public class FremeNERTest {
             // validate NIF
             Validate.main(new String[]{"-i", response.getBody()});
 
-
+            //Tests POST
             //Plaintext Input in Body
             response = baseRequest("documents")
                     .queryString("language", lang)
-                    .queryString("dataset",dataset)
+                    .queryString("dataset", dataset)
                     .header("Content-Type", "text/plain")
-                    .body("Enrich this Content please")
+                    .body(testinput)
                     .asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
@@ -80,10 +88,10 @@ public class FremeNERTest {
             // validate NIF
             Validate.main(new String[]{"-i", response.getBody()});
 
+            //Tests POST
             //NIF Input in Body (Turtle)
-            data = readFile("src/test/resources/rdftest/e-translate/data.turtle");
             response = baseRequest("documents").header("Content-Type", "text/turtle")
-                    .queryString("dataset",dataset)
+                    .queryString("dataset", dataset)
                     .queryString("language", lang)
                     .body(data).asString();
             assertTrue(response.getStatus() == 200);
@@ -93,12 +101,13 @@ public class FremeNERTest {
             // validate NIF
             Validate.main(new String[]{"-i", response.getBody()});
 
+
+            //Tests POST
             //Test Prefix
-            //Plaintext Input in Query String
             response = baseRequest("documents")
-                    .queryString("input", "Enrich this Content please")
-                    .queryString("language",lang)
-                    .queryString("dataset",dataset)
+                    .queryString("input", testinput)
+                    .queryString("language", lang)
+                    .queryString("dataset", dataset)
                     .queryString("informat", "text")
                     .queryString("prefix", "http://test-prefix.com")
                     .asString();
@@ -110,23 +119,23 @@ public class FremeNERTest {
             Validate.main(new String[]{"-i", response.getBody()});
 
             //assertTrue(response.getString() contains prefix)
-        }
 
+            //Tests GET
+            response = Unirest.get(url+"documents?informat=text&input="+testinputEncoded+"&language="+lang+"&dataset="+dataset).asString();
+            assertTrue(response.getStatus() == 200);
+            assertTrue(response.getBody().length() > 0);
+            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
+            assertNotNull(model);
+
+
+
+
+
+        }
 
 
     }
 
-    private String readFile(String file) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-        StringBuilder bldr = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            bldr.append(line);
-            bldr.append("\n");
-        }
-        reader.close();
-        return bldr.toString();
-    }
 
 
 

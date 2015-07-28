@@ -1,0 +1,37 @@
+ @prefix dc:    <http://purl.org/dc/elements/1.1/> .
+ @prefix prov:  <http://www.w3.org/ns/prov#> .
+ @prefix nif:   <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
+ @prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .
+ @prefix rutp:  <http://rdfunit.aksw.org/data/patterns#> .
+ @prefix rlog:  <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#> .
+ @prefix oslc:  <http://open-services.net/ns/core#> .
+ @prefix dsp:   <http://dublincore.org/dc-dsp#> .
+ @prefix dcterms: <http://purl.org/dc/terms/> .
+ @prefix rutg:  <http://rdfunit.aksw.org/data/generators#> .
+ @prefix schema: <http://schema.org/> .
+ @prefix olia:  <http://purl.org/olia/olia.owl#> .
+ @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+ @prefix p:     <http://127.0.0.1:9995/spotlight#> .
+ @prefix rut:   <http://rdfunit.aksw.org/ns/core#> .
+ @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+ @prefix owl:   <http://www.w3.org/2002/07/owl#> .
+ @prefix rutr:  <http://rdfunit.aksw.org/data/results#> .
+ @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+ @prefix spin:  <http://spinrdf.org/spin#> .
+ @prefix rutt:  <http://rdfunit.aksw.org/data/tests#> .
+ @prefix ruts:  <http://rdfunit.aksw.org/data/testsuite#> .
+
+<http://127.0.0.1:9995/spotlight#char=0,15>
+ a                     nif:Context , nif:Sentence , nif:RFC5147String ;
+ nif:beginIndex        "0" ;
+ nif:endIndex          "15" ;
+ nif:isString          "This is Berlin." ;
+ nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,15> .
+
+<http://127.0.0.1:9995/spotlight#char=8,14>
+ a                     nif:Word , nif:RFC5147String ;
+ nif:anchorOf          "Berlin" ;
+ nif:beginIndex        "8" ;
+ nif:endIndex          "14" ;
+ nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,15> ;
+ itsrdf:taIdentRef     <http://dbpedia.org/resource/Berlin> .
