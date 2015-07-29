@@ -1,6 +1,5 @@
 package eu.freme.broker.integration_tests;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.mashape.unirest.http.Unirest;
@@ -11,17 +10,10 @@ import com.mashape.unirest.request.HttpRequestWithBody;
  *
  * @author Pieter Heyvaert <pheyvaer.heyvaert@ugent.be>
  */
-public class EPublishingTest{
+public class EPublishingTest extends IntegrationTest{
 
-	String url = null;
-	
-	@Before
-	public void setup(){
-		url = IntegrationTestSetup.getURLEndpoint() + "/e-publishing/";
-	}
-
-    private HttpRequestWithBody baseRequest(String function) {
-        return Unirest.post(url + function);
+    public EPublishingTest() {
+        super("/e-publishing/");
     }
 
     @Test

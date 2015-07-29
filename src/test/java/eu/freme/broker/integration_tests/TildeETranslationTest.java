@@ -6,37 +6,26 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import eu.freme.conversion.rdf.*;
-import org.junit.Before;
-import org.junit.Test;
 
 
-import eu.freme.broker.integration_tests.helper;
+public class TildeETranslationTest extends IntegrationTest{
 
-
-public class TildeETranslationTest {
-
-	String url = null;
+	//String url = null;
 
 	String sourceLang = "en";
 	String targetLang = "de";
-	@Before
-	public void setup(){
-		url = IntegrationTestSetup.getURLEndpoint() + "/e-translation/tilde";
-	}
 
+	public TildeETranslationTest(){super("/e-translation/tilde");}
 
 	private HttpRequestWithBody baseRequest() {
-		return Unirest.post(url)
+		return baseRequest("")
 				.queryString("source-lang", sourceLang)
 				.queryString("target-lang", targetLang);
 	}
@@ -44,43 +33,35 @@ public class TildeETranslationTest {
 	@Test
 	public void testEtranslate() throws UnirestException, IOException, Exception {
 
-		Model model;
-		JenaRDFConversionService converter = new JenaRDFConversionService();
-
-
 		HttpResponse<String> response = baseRequest()
 				.queryString("input", "hello world")
 				.queryString("informat", "text").asString();
 		assertTrue(response.getStatus() == 200);
 
 		assertTrue(response.getBody().length() > 0);
-		model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
-		assertNotNull(model);
+		assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
 
-		String data = helper.readFile("src/test/resources/rdftest/e-translate/data.turtle");
+		String data = readFile("src/test/resources/rdftest/e-translate/data.turtle");
 		response = baseRequest().header("Content-Type", "text/turtle")
 				.body(data).asString();
 
 		assertTrue(response.getStatus() == 200);
 		assertTrue(response.getBody().length() > 0);
-		model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
-		assertNotNull(model);
+		assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
 
-		data = helper.readFile("src/test/resources/rdftest/e-translate/data.json");
+		data = readFile("src/test/resources/rdftest/e-translate/data.json");
 		response = baseRequest().header("Content-Type", "application/json+ld")
 				.body(data).asString();
 		assertTrue(response.getStatus() == 200);
 		assertTrue(response.getBody().length() > 0);
-		model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
-		assertNotNull(model);
+		assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
 		
-		data = helper.readFile("src/test/resources/rdftest/e-translate/data.txt");
+		data = readFile("src/test/resources/rdftest/e-translate/data.txt");
 		response = baseRequest()
 				.queryString("input", URLEncoder.encode(data, "UTF-8"))
 				.queryString("informat", "text").asString();
 		assertTrue(response.getStatus() == 200);
 		assertTrue(response.getBody().length() > 0);
-		model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
-		assertNotNull(model);
+		assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
 	}
 }

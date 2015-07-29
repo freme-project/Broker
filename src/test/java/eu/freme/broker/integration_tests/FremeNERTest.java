@@ -2,53 +2,50 @@ package eu.freme.broker.integration_tests;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URLEncoder;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.mashape.unirest.request.HttpRequest;
 import eu.freme.conversion.rdf.*;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.nlp2rdf.cli.Validate;
-
-import eu.freme.broker.integration_tests.helper;
 
 
 /**
  * Created by jonathan on 28.07.15.
  */
-public class FremeNERTest {
+public class FremeNERTest extends IntegrationTest{
 
-    String url = null;
+
     String[] availableLanguages = {"en","de","it","nl","fr","es"};
     String dataset = "dbpedia";
     String testinput= "Enrich this Content please";
     String testinputEncoded= URLEncoder.encode(testinput);
 
-    @Before
-    public void setup(){
-        url = IntegrationTestSetup.getURLEndpoint() + "/e-entity/freme-ner/";
+
+    public FremeNERTest(){super("/e-entity/freme-ner/");}
+
+    protected HttpRequestWithBody baseRequest(String function) {
+        return super.baseRequest(function)
+                .queryString("dataset", dataset);
     }
 
-    private HttpRequestWithBody baseRequest( String function) {
-        return Unirest.post(url + function);
+    protected HttpRequest baseRequestGet(String function) {
+        return super.baseRequestGet(function).queryString("dataset", dataset);
     }
+
 
     @Test
     public void TestFremeNER() throws UnirestException, IOException, Exception {
 
         HttpResponse<String> response;
-        Model model;
-        JenaRDFConversionService converter = new JenaRDFConversionService();
-        String data = helper.readFile("src/test/resources/rdftest/e-entity/data.ttl");
+
+        String data = readFile("src/test/resources/rdftest/e-entity/data.ttl");
 
         //Tests every language
         for (String lang : availableLanguages) {
@@ -58,7 +55,6 @@ public class FremeNERTest {
             response = baseRequest("documents")
                     .queryString("input", testinput)
                     .queryString("language", lang)
-                    .queryString("dataset", dataset)
                     .queryString("informat", "text")
                     .asString();
             assertTrue(response.getStatus() == 200);
@@ -72,7 +68,6 @@ public class FremeNERTest {
             //Plaintext Input in Body
             response = baseRequest("documents")
                     .queryString("language", lang)
-                    .queryString("dataset", dataset)
                     .header("Content-Type", "text/plain")
                     .body(testinput)
                     .asString();
@@ -86,7 +81,6 @@ public class FremeNERTest {
             //Tests POST
             //NIF Input in Body (Turtle)
             response = baseRequest("documents").header("Content-Type", "text/turtle")
-                    .queryString("dataset", dataset)
                     .queryString("language", lang)
                     .body(data).asString();
             assertTrue(response.getStatus() == 200);
@@ -116,23 +110,18 @@ public class FremeNERTest {
             //assertTrue(response.getString() contains prefix)
 
             //Tests GET
-            response = Unirest.get(url+"documents?informat=text&input="+testinputEncoded+"&language="+lang+"&dataset="+dataset).asString();
+            //response = Unirest.get(url+"documents?informat=text&input="+testinputEncoded+"&language="+lang+"&dataset="+dataset).asString();
+            response = baseRequestGet("documents")
+                    .queryString("informat", "text")
+                    .queryString("input", testinputEncoded)
+                    .queryString("language", lang)
+                    .asString();
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
-            model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
-            assertNotNull(model);
-
-
-
-
-
+            // validate RDF
+            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            // validate NIF
+            Validate.main(new String[]{"-i", response.getBody()});
         }
-
-
     }
-
-
-
-
-
 }

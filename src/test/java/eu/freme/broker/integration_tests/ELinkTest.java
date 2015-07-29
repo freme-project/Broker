@@ -2,71 +2,175 @@ package eu.freme.broker.integration_tests;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URLEncoder;
 
-import org.junit.Before;
+import java.io.IOException;
+
+import com.hp.hpl.jena.shared.AssertionFailureException;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequestWithBody;
 
-import eu.freme.broker.integration_tests.helper;
-
-import com.hp.hpl.jena.rdf.model.Model;
 import eu.freme.conversion.rdf.*;
-import org.junit.Before;
-import org.junit.Test;
+import org.nlp2rdf.cli.Validate;
 
 
 /**
  * Created by jonathan on 28.07.15.
  */
-public class ELinkTest {
+public class ELinkTest extends IntegrationTest {
 
-
-    String url = null;
-    String dataset = "dbpedia";
-    String testinput= "Enrich this Content please";
-    String testinputEncoded= URLEncoder.encode(testinput);
-
-    @Before
-    public void setup(){
-        url = IntegrationTestSetup.getURLEndpoint() + "/e-link/";
+    public ELinkTest(){
+        super("/e-link/");
     }
 
-    private HttpRequestWithBody baseRequest( String function) {
-        return Unirest.post(url + function);
-    }
-
-
-
-
+    //Tests Creation, fetching, modification and deletion of a template and fetching of all templates
     @Test
-    public void TestELink() throws UnirestException, IOException, Exception {
-        Model model;
-        JenaRDFConversionService converter = new JenaRDFConversionService();
+    public void testTemplateHandling() throws IOException, UnirestException{
+        String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/template1.ttl");
+        testELinkTemplatesId(templateid);
+        testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/template3.ttl", templateid);
+        testELinkTemplates();
+        testELinkTemplatesDelete(templateid);
+    }
 
+    //Tests GET e-link/templates/
+    @Test
+    public void testELinkTemplates() throws UnirestException, IOException {
         HttpResponse<String> response;
 
-        String data = helper.readFile("src/test/resources/rdftest/e-link/data.ttl");
-
-        String path_suffix = "templates";
-        //Tests GET e-link/templates/
-        response = Unirest.get(url+path_suffix+"/?outformat=turtle").asString();
-        System.out.println(url+path_suffix+"/?outformat=turtle");
+        response = baseRequestGet("templates/")
+                .queryString("outformat", "json-ld").asString();
         assertTrue(response.getStatus() == 200);
         assertTrue(response.getBody().length() > 0);
-        model = converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE);
-        assertNotNull(model);
+        // validate RDF
+        try {
+            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.JSON_LD));
+        }catch(Exception e){
+            throw new AssertionFailureException("RDF validation failed");
+        }
+        // validate NIF
+        //Validate.main(new String[]{"-i", response.getBody()});
+    }
 
+    //Tests POST /e-link/documents/
+    @Test
+    public void testELinkDocuments() throws Exception {
 
+        String id = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/template3.ttl");
 
+        String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
+
+        HttpResponse<String> response = baseRequest("documents/")
+                .queryString("templateid", id)
+                .queryString("informat", "turtle")
+                .queryString("outformat", "turtle")
+                .body(nifContent)
+                .asString();
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getBody().length() > 0);
+        // validate RDF
+        assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+        // validate NIF
+        Validate.main(new String[]{"-i", response.getBody()});
+
+        testELinkTemplatesDelete(id);
+    }
+
+    //// HELPER METHODS
+
+    //Tests POST e-link/templates/
+    public String testELinkTemplatesAdd(String filename) throws IOException, UnirestException {
+        String nifTemplate = readFile(filename);
+        nifTemplate = nifTemplate.replaceAll("\n","\\\\n");
+        String json = " {\n" +
+                " \"query\":\""+nifTemplate+"\",\n" +
+                " \"endpoint\":\"http://dbpedia.org/sparql/\"\n" +
+                " }";
+
+        HttpResponse<String> response = baseRequest("templates/")
+                .queryString("informat", "json")
+                .queryString("outformat", "json-ld")
+                .body(json)
+                .asString();
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getBody().length() > 0);
+
+        JSONObject jsonObj = new JSONObject(response.getBody());
+
+        String id = jsonObj.getString("templateId");
+        // check, if id is numerical
+        assertTrue(id.matches("\\d+"));
+
+        // validate RDF
+        try {
+            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.JSON_LD));
+        }catch(Exception e){
+            throw new AssertionFailureException("RDF validation failed");
+        }
+
+        // validate NIF
+        //Validate.main(new String[]{"-i", response.getBody(), "informat", "json-ld"});
+
+        return id;
+    }
+
+    //Tests GET e-link/templates/
+    public void testELinkTemplatesId(String id) throws UnirestException, IOException {
+        HttpResponse<String> response = baseRequestGet("templates/"+id)
+                .queryString("outformat", "turtle")
+                .asString();
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getBody().length() > 0);
+
+        // validate RDF
+        try {
+            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+        }catch(Exception e){
+            throw new AssertionFailureException("RDF validation failed");
+        }
+        // validate NIF
+        Validate.main(new String[]{"-i", response.getBody()});
+    }
+
+    //Tests PUT e-link/templates/
+    public void testELinkTemplatesUpdate(String filename, String id) throws IOException, UnirestException{
+        String nifTemplate = readFile(filename);
+        nifTemplate = nifTemplate.replaceAll("\n","\\\\n");
+
+        String json = " {\n" +
+                " \"query\":\""+nifTemplate+"\",\n" +
+                " \"endpoint\":\"http://dbpedia.org/sparql/\"\n" +
+                " }";
+
+        HttpResponse<String> response = baseRequestPut("templates/"+id)
+                .queryString("informat", "json")
+                .queryString("outformat", "json-ld")
+                .body(json)
+                .asString();
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getBody().length() > 0);
+
+        JSONObject jsonObj = new JSONObject(response.getBody());
+        String newid = jsonObj.getString("templateId");
+        // check, if id is numerical
+        assertTrue(newid.matches("\\d+"));
+        assertTrue(id.equals(newid));
+
+        // validate RDF
+        try {
+            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.JSON_LD));
+        }catch(Exception e){
+            throw new AssertionFailureException("RDF validation failed");
+        }
 
     }
+
+    //Tests DELETE e-link/templates/
+    public void testELinkTemplatesDelete(String id) throws UnirestException{
+        HttpResponse<String> response = baseRequestDelete("templates/" + id).asString();
+        assertTrue(response.getStatus() == 200 || response.getStatus() == 204);
+    }
+
 }
