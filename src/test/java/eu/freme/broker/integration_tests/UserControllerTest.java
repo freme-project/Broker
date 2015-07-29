@@ -6,13 +6,18 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import eu.freme.broker.FremeFullConfig;
 import eu.freme.broker.eservices.BaseRestController;
 
 public class UserControllerTest {
@@ -20,15 +25,17 @@ public class UserControllerTest {
 	String baseUrl = null;
 	Logger logger = Logger.getLogger(UserControllerTest.class);
 
-	@Value("${admin.username}")
 	String adminUsername;
 
-	@Value("${admin.password}")
 	String adminPassword;
 
 	@Before
 	public void setup() {
 		baseUrl = IntegrationTestSetup.getURLEndpoint();
+		
+		ConfigurableApplicationContext context = IntegrationTestSetup.getApplicationContext();
+		adminUsername = context.getEnvironment().getProperty("admin.username");
+		adminPassword = context.getEnvironment().getProperty("admin.password");
 	}
 
 	@Test
@@ -130,7 +137,51 @@ public class UserControllerTest {
 	}
 	
 	@Test
-	public void testAdmin(){
+	public void testAdmin() throws UnirestException{
 		
+		String username = "carlos";
+		String password = "carlosss";
+		logger.info("create user \"" + username + "\" and get token");
+		
+		HttpResponse<String> response = Unirest.post(baseUrl + "/user")
+				.queryString("username", username)
+				.queryString("password", password).asString();
+		
+		response = Unirest
+				.post(baseUrl + BaseRestController.authenticationEndpoint)
+				.header("X-Auth-Username", username)
+				.header("X-Auth-Password", password).asString();
+		String token = new JSONObject(response.getBody()).getString("token");
+		
+//		logger.info("try to access /user endpoint from user account - should not work");
+//		response = Unirest
+//				.get(baseUrl + "/user")
+//				.header("X-Auth-Token", token).asString();
+//		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());		
+
+		logger.info("access /user endpoint with admin credentials");
+		response = Unirest
+				.post(baseUrl + BaseRestController.authenticationEndpoint)
+				.header("X-Auth-Username", adminUsername)
+				.header("X-Auth-Password", adminPassword).asString();
+		token = new JSONObject(response.getBody()).getString("token");
+
+//		response = Unirest
+//				.get(baseUrl + "/user")
+//				.header("X-Auth-Token", token).asString();
+//		assertTrue(response.getStatus() == HttpStatus.OK.value());		
+		
+		logger.info("admin can delete carlos");
+		response = Unirest
+				.delete(baseUrl + "/user/" + username)
+				.header("X-Auth-Token", token).asString();
+		
+		assertTrue(response.getStatus() == HttpStatus.NO_CONTENT.value());			
+		
+		response = Unirest
+				.get(baseUrl + "/user")
+				.header("X-Auth-Token", token).asString();
+		assertTrue(response.getStatus() == HttpStatus.OK.value());		
+
 	}
 }

@@ -1,5 +1,6 @@
 package eu.freme.broker.integration_tests;
 
+import org.apache.catalina.core.ApplicationContext;
 import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -63,6 +64,10 @@ public class IntegrationTestSetup {
 			}
 			return "http://localhost:" + port;
 		}
+	}
+	
+	public static ConfigurableApplicationContext getApplicationContext(){
+		return context;
 	}
 
 }

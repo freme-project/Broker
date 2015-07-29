@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
@@ -21,6 +22,7 @@ import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.security.database.User;
 import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.security.tools.PasswordHasher;
 
 @RestController
@@ -31,6 +33,9 @@ public class UserController extends BaseRestController {
 
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	AccessLevelHelper accessLevelHelper;
 
 	@RequestMapping(value = "/user", method = RequestMethod.POST)
 	public User createUser(
@@ -73,12 +78,12 @@ public class UserController extends BaseRestController {
 
 		Authentication authentication = SecurityContextHolder.getContext()
 				.getAuthentication();
-		decisionManager.decide(authentication, user, null);
+		decisionManager.decide(authentication, user, accessLevelHelper.readAccess());
 		return user;
-	}
+	} 
 
 	@RequestMapping(value = "/user/{username}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasRole('ROLE_USER')")
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> deleteUser(@PathVariable("username") String username) {
 
 		User user = userRepository.findOneByName(username);
@@ -88,7 +93,7 @@ public class UserController extends BaseRestController {
 
 		Authentication authentication = SecurityContextHolder.getContext()
 				.getAuthentication();
-		decisionManager.decide(authentication, user, null);
+		decisionManager.decide(authentication, user, accessLevelHelper.writeAccess());
 		userRepository.delete(user);
 
 		return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
@@ -97,7 +102,6 @@ public class UserController extends BaseRestController {
 	@RequestMapping(value="/user", method= RequestMethod.GET)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Iterable<User> getUsers(){
-		
 		return userRepository.findAll();
 	}
 

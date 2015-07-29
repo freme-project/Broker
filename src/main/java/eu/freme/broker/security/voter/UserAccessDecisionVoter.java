@@ -29,7 +29,10 @@ public class UserAccessDecisionVoter implements AccessDecisionVoter<User> {
 		}
 
 		User authenticatedUser = (User) authentication.getPrincipal();
-		if (authenticatedUser.getName().equals(object.getName())) {
+		
+		if( authenticatedUser.getRole().equals(User.roleAdmin)){
+			return ACCESS_GRANTED;
+		} else if (authenticatedUser.getName().equals(object.getName())) {
 			return ACCESS_GRANTED;
 		} else {
 			return ACCESS_DENIED;
