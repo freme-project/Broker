@@ -1,5 +1,6 @@
 package eu.freme.broker.tools;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import eu.freme.conversion.rdf.RDFConstants;
@@ -10,27 +11,51 @@ import eu.freme.conversion.rdf.RDFConstants;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @SuppressWarnings("serial")
-public class RDFSerializationFormats extends HashMap<String, RDFConstants.RDFSerialization>{
-
-	public RDFSerializationFormats(){
+public class RDFSerializationFormats extends
+		HashMap<String, RDFConstants.RDFSerialization> {
+	
+	public RDFSerializationFormats() {
 		super();
 		put("text/turtle", RDFConstants.RDFSerialization.TURTLE);
 		put("application/x-turtle", RDFConstants.RDFSerialization.TURTLE);
 		put("turtle", RDFConstants.RDFSerialization.TURTLE);
-                
-		put("application/json+ld",RDFConstants.RDFSerialization.JSON_LD);
-		put("json-ld",RDFConstants.RDFSerialization.JSON_LD);
-                
+
+		put("application/json+ld", RDFConstants.RDFSerialization.JSON_LD);
+		put("json-ld", RDFConstants.RDFSerialization.JSON_LD);
+
 		put("application/n-triples", RDFConstants.RDFSerialization.N_TRIPLES);
 		put("n-triples", RDFConstants.RDFSerialization.N_TRIPLES);
-                
+
 		put("text/plain", RDFConstants.RDFSerialization.PLAINTEXT);
 		put("text", RDFConstants.RDFSerialization.PLAINTEXT);
-                
+
 		put("application/rdf+xml", RDFConstants.RDFSerialization.RDF_XML);
 		put("rdf-xml", RDFConstants.RDFSerialization.RDF_XML);
-                
+
 		put("text/n3", RDFConstants.RDFSerialization.N3);
 		put("n3", RDFConstants.RDFSerialization.N3);
+	}
+
+	/**
+	 * Get the Content-Type header of an RDF serialization format.
+	 * 
+	 * @param format
+	 * @return
+	 */
+	public String getContentTypeHeader(RDFConstants.RDFSerialization format) {
+		switch(format){
+		case TURTLE:
+			return "text/turtle";
+		case JSON_LD:
+			return "application/json+ld";
+		case RDF_XML:
+			return "application/rdf+xml";
+		case N3:
+			return "text/n3";
+		case N_TRIPLES:
+			return "application/n-triples";
+		default:
+			throw new RuntimeException("Unknown rdf serializiation format " + format);
+		}
 	}
 }

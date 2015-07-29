@@ -125,16 +125,6 @@ public class TildeETranslation extends BaseRestController {
 			}
 		}
 
-		// get output format
-		String serialization;
-		try {
-			serialization = rdfConversionService.serializeRDF(responseModel,
-					parameters.getOutformat());
-		} catch (Exception e) {
-			logger.error("failed", e);
-			throw new InternalServerErrorException("internal server error");
-		}
-
-		return new ResponseEntity<String>(serialization, HttpStatus.OK);
+		return createSuccessResponse(responseModel, parameters.getOutformat());
 	}
 }

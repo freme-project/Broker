@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.InternalServerErrorException;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -46,6 +47,20 @@ public abstract class BaseRestController {
 	@Autowired
 	RDFELinkSerializationFormats rdfELinkSerializationFormats;
 
+	/**
+	 * Create a NIFParameterSet to make dealing with NIF API specifications
+	 * easier. It handles informat overwrites Content-Type header, input
+	 * overwrites post body, and more.
+	 * 
+	 * @param input
+	 * @param informat
+	 * @param outformat
+	 * @param postBody
+	 * @param acceptHeader
+	 * @param contentTypeHeader
+	 * @param prefix
+	 * @return
+	 */
 	protected NIFParameterSet normalizeNif(String input, String informat,
 			String outformat, String postBody, String acceptHeader,
 			String contentTypeHeader, String prefix) {
@@ -53,16 +68,40 @@ public abstract class BaseRestController {
 				outformat, postBody, acceptHeader, contentTypeHeader, prefix);
 	}
 
+	/**
+	 * Convert Jena model to string.
+	 * 
+	 * @param model
+	 * @param format
+	 * @return
+	 * @throws Exception
+	 */
 	protected String serializeNif(Model model,
 			RDFConstants.RDFSerialization format) throws Exception {
 		return rdfConversionService.serializeRDF(model, format);
 	}
 
+	/**
+	 * Convert string to Jena model.
+	 * 
+	 * @param nif
+	 * @param format
+	 * @return
+	 * @throws Exception
+	 */
 	protected Model unserializeNif(String nif,
 			RDFConstants.RDFSerialization format) throws Exception {
 		return rdfConversionService.unserializeRDF(nif, format);
 	}
 
+	/**
+	 * Custom exception handler for all FREME endpoints. All exceptions (except
+	 * security exceptions) get here.
+	 * 
+	 * @param req
+	 * @param exception
+	 * @return
+	 */
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleError(HttpServletRequest req,
 			Exception exception) {
@@ -101,6 +140,30 @@ public abstract class BaseRestController {
 
 		return new ResponseEntity<String>(json.toString(2), responseHeaders,
 				statusCode);
+	}
+
+	/**
+	 * Create a ResponseEntity for a REST API method. It accepts a Jena Model
+	 * and an RDFSerialization format. It converts the model to a string in the
+	 * desired serialization format and sets the right Content-Type header.
+	 * 
+	 * @param rdf
+	 * @param rdfFormat
+	 * @return
+	 */
+	public ResponseEntity<String> createSuccessResponse(Model rdf,
+			RDFConstants.RDFSerialization rdfFormat) {
+		HttpHeaders responseHeaders = new HttpHeaders();
+		String contentTypeHeader = rdfSerializationFormats
+				.getContentTypeHeader(rdfFormat);
+		responseHeaders.add("Content-Type", contentTypeHeader);
+		String rdfString;
+		try {
+			rdfString = serializeNif(rdf, rdfFormat);
+		} catch (Exception e) {
+			throw new InternalServerErrorException();
+		}
+		return new ResponseEntity<>(rdfString, responseHeaders, HttpStatus.OK);
 	}
 
 }
