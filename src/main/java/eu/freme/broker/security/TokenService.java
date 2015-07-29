@@ -9,7 +9,9 @@ import eu.freme.broker.security.database.TokenRepository;
 import eu.freme.broker.security.database.User;
 
 import java.util.UUID;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class TokenService {
 
 	private static final Logger logger = LoggerFactory

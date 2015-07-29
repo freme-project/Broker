@@ -6,7 +6,9 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import eu.freme.broker.security.database.Token;
 
 import java.util.Collection;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 @SuppressWarnings("serial")
 public class AuthenticationWithToken extends PreAuthenticatedAuthenticationToken {
 

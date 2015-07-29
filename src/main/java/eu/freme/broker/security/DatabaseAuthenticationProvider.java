@@ -14,7 +14,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
 	@Autowired

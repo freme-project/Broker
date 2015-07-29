@@ -13,7 +13,9 @@ import javax.persistence.CascadeType;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 @Entity
 @Table(name = "user")
 public class User {

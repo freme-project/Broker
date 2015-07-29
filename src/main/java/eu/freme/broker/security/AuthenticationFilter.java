@@ -29,7 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class AuthenticationFilter extends GenericFilterBean {
 
     private final static Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);

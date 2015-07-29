@@ -9,7 +9,9 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.freme.broker.security.database.User;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 @Entity
 @Table(name = "token")
 public class Token {

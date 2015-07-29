@@ -41,15 +41,15 @@ import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 @Configuration
 @EnableWebMvcSecurity
 @EnableScheduling
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 		ApplicationContextAware {
-
-	private ApplicationContext applicationContext;
 
 	Logger logger = Logger.getLogger(SecurityConfig.class);
 
@@ -148,12 +148,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			}
 		};
-	}
-
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) {
-		super.setApplicationContext(applicationContext);
-		this.applicationContext = applicationContext;
 	}
 
 	@Bean

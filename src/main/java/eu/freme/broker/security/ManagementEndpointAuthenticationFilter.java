@@ -23,7 +23,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class ManagementEndpointAuthenticationFilter extends GenericFilterBean {
 
 	private final static Logger logger = LoggerFactory

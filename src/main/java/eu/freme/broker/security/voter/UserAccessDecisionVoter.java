@@ -7,7 +7,9 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
 import eu.freme.broker.security.database.User;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class UserAccessDecisionVoter implements AccessDecisionVoter<User> {
 
 	@Override
