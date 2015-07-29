@@ -5,7 +5,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import eu.freme.broker.security.tools.PasswordHasher;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class PasswordHasherTest {
 
 	private boolean checkPassword(String password) throws Exception {
@@ -16,8 +18,8 @@ public class PasswordHasherTest {
 	@Test
 	public void testPasswordHasher() throws Exception {
 		assertTrue(checkPassword("abcdef"));
-		assertTrue(checkPassword("_.'\"$!\\\"�()(/)"));
-		assertTrue(checkPassword("���"));
+		assertTrue(checkPassword("_.'\"$!\\\"()(/)"));
+		assertTrue(checkPassword("-"));
 		try {
 			checkPassword("");
 			assertTrue(false);

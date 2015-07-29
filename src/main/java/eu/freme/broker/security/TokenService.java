@@ -1,7 +1,5 @@
 package eu.freme.broker.security;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import eu.freme.broker.security.database.Token;
@@ -13,9 +11,6 @@ import java.util.UUID;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 public class TokenService {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(TokenService.class);
 
 	@Autowired
 	TokenRepository tokenRepository;

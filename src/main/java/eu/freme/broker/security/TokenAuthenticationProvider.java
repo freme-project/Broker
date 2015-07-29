@@ -25,7 +25,8 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public Authentication authenticate(Authentication authentication)
 			throws AuthenticationException {
-		Optional<String> token = (Optional) authentication.getPrincipal();
+		@SuppressWarnings("unchecked")
+		Optional<String> token = (Optional<String>) authentication.getPrincipal();
 		if (!token.isPresent() || token.get().isEmpty()) {
 			throw new BadCredentialsException("Invalid token");
 		}

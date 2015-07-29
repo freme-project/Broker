@@ -2,22 +2,16 @@ package eu.freme.broker.security;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.xerces.impl.dv.xs.DecimalDV;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.access.AccessDecisionVoter;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.vote.AffirmativeBased;
-import org.springframework.security.access.vote.RoleHierarchyVoter;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -27,8 +21,6 @@ import org.springframework.security.config.annotation.web.servlet.configuration.
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
-import org.springframework.security.web.access.expression.WebExpressionVoter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import eu.freme.broker.security.database.User;
@@ -152,6 +144,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 
 	@Bean
 	public AffirmativeBased defaultAccessDecisionManager() {
+		@SuppressWarnings("rawtypes")
 		ArrayList<AccessDecisionVoter> list = new ArrayList<AccessDecisionVoter>();
 		list.add(new UserAccessDecisionVoter());
 		AffirmativeBased ab = new AffirmativeBased(list);

@@ -4,7 +4,9 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 @RunWith(Suite.class)
 @SuiteClasses({ TildeETranslationTest.class, TildeETerminologyTest.class,
 		TildeETranslationTest.class })
