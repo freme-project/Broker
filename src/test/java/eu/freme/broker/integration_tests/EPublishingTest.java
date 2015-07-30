@@ -32,7 +32,7 @@ public class EPublishingTest extends IntegrationTest{
         byte[] buffer = new byte[response.getBody().available()];
         response.getBody().read(buffer);
 
-        File targetFile = new File("src/test/resources/e-publishing/result.epub");
+        File targetFile = new File("target/test-classes/e-publishing/result.epub");
         OutputStream outStream = new FileOutputStream(targetFile);
         outStream.write(buffer);
         //TODO: validate epub??
