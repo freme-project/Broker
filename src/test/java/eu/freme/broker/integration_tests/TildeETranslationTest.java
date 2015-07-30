@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import com.hp.hpl.jena.vocabulary.RDF;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -39,22 +40,14 @@ public class TildeETranslationTest extends IntegrationTest{
 				.queryString("informat", "text")
 				.queryString("outformat","rdf-xml")
 				.asString();
-		assertTrue(response.getStatus() == 200);
+		validateNIFResponse(response, RDFConstants.RDFSerialization.RDF_XML);
 
-		assertTrue(response.getBody().length() > 0);
-		assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.RDF_XML));
-		// validate NIF
-		Validate.main(new String[]{"-i", response.getBody(), "--informat", "rdfxml"});
 
 		String data = readFile("src/test/resources/rdftest/e-translate/data.turtle");
 		response = baseRequest().header("Content-Type", "text/turtle")
 				.body(data).asString();
+		validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
-		assertTrue(response.getStatus() == 200);
-		assertTrue(response.getBody().length() > 0);
-		assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
-		// validate NIF
-		Validate.main(new String[]{"-i", response.getBody(),"--informat","turtle"});
 
 		data = readFile("src/test/resources/rdftest/e-translate/data.json");
 		response = baseRequest().header("Content-Type", "application/json+ld")
@@ -62,10 +55,7 @@ public class TildeETranslationTest extends IntegrationTest{
 				.body(data).asString();
 		assertTrue(response.getStatus() == 200);
 		assertTrue(response.getBody().length() > 0);
-		assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.JSON_LD));
-		// validate NIF
-		//// Validator: informat=json-ld not implemented yet
-		//Validate.main(new String[]{"-i", response.getBody(), "--informat", "json-ld"});
+		validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 		
 		data = readFile("src/test/resources/rdftest/e-translate/data.txt");
 		response = baseRequest()
@@ -73,12 +63,7 @@ public class TildeETranslationTest extends IntegrationTest{
 				.queryString("informat", "text")
 				.queryString("outformat","n3")
 				.asString();
-		assertTrue(response.getStatus() == 200);
-		assertTrue(response.getBody().length() > 0);
-		assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.N3));
-		// validate NIF
-		//// Validator: informat=n3 not implemented yet
-		//Validate.main(new String[]{"-i", response.getBody(), "--informat","n3"});
+		validateNIFResponse(response, RDFConstants.RDFSerialization.N3);
 
 
 		response = baseRequest()
@@ -86,11 +71,6 @@ public class TildeETranslationTest extends IntegrationTest{
 				.queryString("informat", "text")
 				.queryString("outformat","n-triples")
 				.asString();
-		assertTrue(response.getStatus() == 200);
-		assertTrue(response.getBody().length() > 0);
-		assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.N_TRIPLES));
-		// validate NIF
-		//// Validator: informat=ntriples not implemented yet
-		//Validate.main(new String[]{"-i", response.getBody(), "--informat","ntriples"});
+		validateNIFResponse(response, RDFConstants.RDFSerialization.N_TRIPLES);
 	}
 }

@@ -59,16 +59,7 @@ public class FremeNERTest extends IntegrationTest{
                     .queryString("language", lang)
                     .queryString("informat", "text")
                     .asString();
-            assertTrue(response.getStatus() == 200);
-            assertTrue(response.getBody().length() > 0);
-            // validate RDF
-            try {
-                assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
-            }catch(Exception e){
-                throw new AssertionFailureException("RDF validation failed");
-            }
-            // validate NIF
-            Validate.main(new String[]{"-i", response.getBody()});
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
             //Tests POST
             //Plaintext Input in Body
@@ -77,32 +68,13 @@ public class FremeNERTest extends IntegrationTest{
                     .header("Content-Type", "text/plain")
                     .body(testinput)
                     .asString();
-            assertTrue(response.getStatus() == 200);
-            assertTrue(response.getBody().length() > 0);
-            // validate RDF
-            try {
-                assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
-            }catch(Exception e){
-                throw new AssertionFailureException("RDF validation failed");
-            }
-            // validate NIF
-            Validate.main(new String[]{"-i", response.getBody()});
-
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
             //Tests POST
             //NIF Input in Body (Turtle)
             response = baseRequestPost("documents").header("Content-Type", "text/turtle")
                     .queryString("language", lang)
                     .body(data).asString();
-            assertTrue(response.getStatus() == 200);
-            assertTrue(response.getBody().length() > 0);
-            // validate RDF
-            try {
-                assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
-            }catch(Exception e){
-                throw new AssertionFailureException("RDF validation failed");
-            }
-            // validate NIF
-            Validate.main(new String[]{"-i", response.getBody()});
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
 
             //Tests POST
@@ -114,16 +86,7 @@ public class FremeNERTest extends IntegrationTest{
                     .queryString("informat", "text")
                     .queryString("prefix", "http://test-prefix.com")
                     .asString();
-            assertTrue(response.getStatus() == 200);
-            assertTrue(response.getBody().length() > 0);
-            // validate RDF
-            try {
-                assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
-            }catch(Exception e){
-                throw new AssertionFailureException("RDF validation failed");
-            }
-            // validate NIF
-            Validate.main(new String[]{"-i", response.getBody()});
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
             //assertTrue(response.getString() contains prefix)
 
@@ -134,16 +97,7 @@ public class FremeNERTest extends IntegrationTest{
                     .queryString("input", testinputEncoded)
                     .queryString("language", lang)
                     .asString();
-            assertTrue(response.getStatus() == 200);
-            assertTrue(response.getBody().length() > 0);
-            // validate RDF
-            try {
-                assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
-            }catch(Exception e){
-                throw new AssertionFailureException("RDF validation failed");
-            }
-            // validate NIF
-            Validate.main(new String[]{"-i", response.getBody()});
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
         }
     }
 }

@@ -49,22 +49,14 @@ public class ELinkTest extends IntegrationTest {
 
         response = baseRequestGet("templates/")
                 .queryString("outformat", "json-ld").asString();
-        assertTrue(response.getStatus() == 200);
-        assertTrue(response.getBody().length() > 0);
-        // validate RDF
-        try {
-            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.JSON_LD));
-        }catch(Exception e){
-            throw new AssertionFailureException("RDF validation failed");
-        }
-        // validate NIF
-        //Validate.main(new String[]{"-i", response.getBody()});
+        validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
+
     }
 
     //Tests POST /e-link/documents/
     @Test
     public void testELinkDocuments() throws Exception {
-
+        //Adds template temporarily
         String id = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql3.ttl");
 
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
@@ -75,13 +67,9 @@ public class ELinkTest extends IntegrationTest {
                 .queryString("outformat", "turtle")
                 .body(nifContent)
                 .asString();
-        assertTrue(response.getStatus() == 200);
-        assertTrue(response.getBody().length() > 0);
-        // validate RDF
-        assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
-        // validate NIF
-        Validate.main(new String[]{"-i", response.getBody()});
 
+        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        //Deletes temporary template
         testELinkTemplatesDelete(id);
     }
 
@@ -98,24 +86,13 @@ public class ELinkTest extends IntegrationTest {
                 .queryString("outformat", "json-ld")
                 .body(constructTemplate(query, "http://dbpedia.org/sparql/"))
         .asString();
-        assertTrue(response.getStatus() == 200);
-        assertTrue(response.getBody().length() > 0);
+        validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
+
 
         JSONObject jsonObj = new JSONObject(response.getBody());
-
         String id = jsonObj.getString("templateId");
         // check, if id is numerical
         assertTrue(id.matches("\\d+"));
-
-        // validate RDF
-        try {
-            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.JSON_LD));
-        }catch(Exception e){
-            throw new AssertionFailureException("RDF validation failed");
-        }
-
-        // validate NIF
-        //Validate.main(new String[]{"-i", response.getBody(), "informat", "json-ld"});
 
         return id;
     }
@@ -125,17 +102,7 @@ public class ELinkTest extends IntegrationTest {
         HttpResponse<String> response = baseRequestGet("templates/"+id)
                 .queryString("outformat", "turtle")
                 .asString();
-        assertTrue(response.getStatus() == 200);
-        assertTrue(response.getBody().length() > 0);
-
-        // validate RDF
-        try {
-            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
-        }catch(Exception e){
-            throw new AssertionFailureException("RDF validation failed");
-        }
-        // validate NIF
-        Validate.main(new String[]{"-i", response.getBody()});
+        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
     }
 
     //Tests PUT e-link/templates/
@@ -147,8 +114,8 @@ public class ELinkTest extends IntegrationTest {
                 .queryString("outformat", "json-ld")
                 .body(constructTemplate(query, "http://dbpedia.org/sparql/"))
                 .asString();
-        assertTrue(response.getStatus() == 200);
-        assertTrue(response.getBody().length() > 0);
+
+        validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 
         JSONObject jsonObj = new JSONObject(response.getBody());
         String newid = jsonObj.getString("templateId");
@@ -156,12 +123,7 @@ public class ELinkTest extends IntegrationTest {
         assertTrue(newid.matches("\\d+"));
         assertTrue(id.equals(newid));
 
-        // validate RDF
-        try {
-            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.JSON_LD));
-        }catch(Exception e){
-            throw new AssertionFailureException("RDF validation failed");
-        }
+
 
     }
 

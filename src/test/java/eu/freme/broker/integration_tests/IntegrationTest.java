@@ -1,15 +1,22 @@
 package eu.freme.broker.integration_tests;
 
+import com.hp.hpl.jena.shared.AssertionFailureException;
+import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.conversion.rdf.JenaRDFConversionService;
+import eu.freme.conversion.rdf.RDFConstants;
 import org.junit.Before;
+import org.nlp2rdf.cli.Validate;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Arne on 29.07.2015.
@@ -61,6 +68,28 @@ public abstract class IntegrationTest {
         }
         reader.close();
         return bldr.toString();
+    }
+
+    public void validateNIFResponse(HttpResponse<String> response, RDFConstants.RDFSerialization nifformat) throws IOException {
+
+        assertTrue(response.getStatus() == 200);
+        assertTrue(response.getBody().length() > 0);
+        // validate RDF
+        try {
+            assertNotNull(converter.unserializeRDF(response.getBody(), nifformat));
+        } catch (Exception e) {
+            throw new AssertionFailureException("RDF validation failed");
+        }
+        // validate NIF
+        if (nifformat == RDFConstants.RDFSerialization.TURTLE) {
+            Validate.main(new String[]{"-i", response.getBody(), "--informat","turtle"});
+        } else if (nifformat == RDFConstants.RDFSerialization.RDF_XML) {
+            Validate.main(new String[]{"-i", response.getBody(), "--informat","rdfxml"});
+        } else {
+            //Not implemented yet: n3, n-triples, json-ld
+//            Validate.main(new String[]{"-i", response.getBody()});
+        }
+
     }
 
 
