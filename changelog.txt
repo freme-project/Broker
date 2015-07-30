@@ -1,0 +1,68 @@
+FREME Changelog
+
+---------------------------
+FREME 0.2 - 16.07.2015
+---------------------------
+
+Broker 0.2
+* Change e-Translation endpoint to Tildes new NIF ready API
+* Add e-Terminology endpoint
+* Add CORS support
+* Create beautiful API urls for freme-dev and freme-live
+* Add foundation and basic codes for integration tests
+
+---------------------------
+
+e-Entity 0.2
+* Create FREME NER, our novel named entity recognition software
+* Create REST endpoint to create, read, update and delete datasets
+
+---------------------------
+
+e-Link 0.2
+* Create REST endpoint to create, read, update and delete templates
+* add more templates 
+ 
+---------------------------
+
+e-Publishing 0.1
+* add e-Publishing endpoint that converts HTML to EPUB3
+
+---------------------------
+
+ConversionServices 0.2
+* Add NIF serialization formats N3, RDF-XMLn N-TRIPLES 
+
+---------------------------
+
+Documentation 0.2
+* Create interactive documentation in new design using Swagger     
+
+
+                           
+---------------------------
+FREME 0.1 - 31.6.2015
+---------------------------
+
+Broker 0.1
+* Create basic broker
+* Create common codes across all e-Services
+* Add proxy endpoint to Tilde MT API
+
+---------------------------
+
+e-Entity 0.1
+* Create proxy endpoint to DBPedia Spotlight
+
+---------------------------
+
+e-Link 0.1
+* Create query template mechanism
+* Create demo query templates
+
+---------------------------
+
+ConversionServices 0.1
+* Create basic conversion routines for conversion from / to NIF
+* Support RDF serialization formats Turtle and JSON-LD
+

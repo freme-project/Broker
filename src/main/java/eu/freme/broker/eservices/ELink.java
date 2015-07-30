@@ -30,9 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.ws.rs.NotFoundException;
-
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -224,22 +221,27 @@ public class ELink extends BaseRestController {
                     case TURTLE:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        t.setId(templateDAO.generateTemplateId());
                         break;
                     case JSON_LD:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "JSON-LD");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        t.setId(templateDAO.generateTemplateId());
                         break;
                     case RDF_XML:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "RDF/XML");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        t.setId(templateDAO.generateTemplateId());
                         break;
                     case N_TRIPLES:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "N-Triples");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        t.setId(templateDAO.generateTemplateId());
                         break;
                     case N3:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "N3");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        t.setId(templateDAO.generateTemplateId());
                         break;                        
                 }
                 

@@ -2,8 +2,13 @@
 .classpath
 .project
 .settings
+.idea
+*.iml
 /logs/
 *~
 .springBeans
 /bin/
+<<<<<<< HEAD
 .springBeansnbactions.xml
+=======
+>>>>>>> refs/heads/master
