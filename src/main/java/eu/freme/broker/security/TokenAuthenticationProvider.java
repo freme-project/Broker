@@ -35,6 +35,8 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
 		if (tokenObject == null) {
 			throw new BadCredentialsException("Invalid token");
 		}
+		
+		tokenService.updateLastUsed(tokenObject);
 
 		User user = tokenObject.getUser();
 		return new AuthenticationWithToken(user, null,

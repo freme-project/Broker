@@ -1,5 +1,7 @@
 package eu.freme.broker.security.database;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -22,13 +24,27 @@ public class Token {
 	@ManyToOne(fetch = FetchType.EAGER)
 	private User user;
 	
+	Date creationDate;
+	
+	Date lastUsedDate;
+	
 	protected Token() {
+	}
+
+	public Token(String token, User user, Date creationDate, Date lastUsedDate) {
+		super();
+		this.token = token;
+		this.user = user;
+		this.creationDate = creationDate;
+		this.lastUsedDate = lastUsedDate;
 	}
 
 	public Token(String token, User user) {
 		super();
 		this.token = token;
 		this.user = user;
+		this.creationDate = new Date();
+		this.lastUsedDate = creationDate;
 	}
 
 	public String getToken() {
@@ -46,4 +62,22 @@ public class Token {
 	public void setUser(User user) {
 		this.user = user;
 	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public Date getLastUsedDate() {
+		return lastUsedDate;
+	}
+
+	public void setLastUsedDate(Date lastUsedDate) {
+		this.lastUsedDate = lastUsedDate;
+	}
+
+	
 }
