@@ -27,7 +27,9 @@ public class EPublishingTest extends IntegrationTest{
                 .field("htmlZip", new File("src/test/resources/e-publishing/alice.zip"))
                 .field("metadata", (Object) readFile("src/test/resources/e-publishing/metadata.json"))
                 .asBinary();
+
         assertTrue(response.getStatus() == 200);
+
 
         byte[] buffer = new byte[response.getBody().available()];
         response.getBody().read(buffer);
@@ -35,6 +37,8 @@ public class EPublishingTest extends IntegrationTest{
         File targetFile = new File("target/test-classes/e-publishing/result.epub");
         OutputStream outStream = new FileOutputStream(targetFile);
         outStream.write(buffer);
+        outStream.flush();
+        assertTrue(targetFile.length()>0);
         //TODO: validate epub??
     }
 
