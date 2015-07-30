@@ -2,6 +2,7 @@ package eu.freme.broker.integration_tests;
 
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
@@ -12,6 +13,7 @@ import com.mashape.unirest.http.HttpResponse;
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
+@Ignore
 public class TildeETerminologyTest extends IntegrationTest {
 
 

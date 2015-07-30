@@ -25,8 +25,8 @@ public abstract class IntegrationTest {
 
     private String url = null;
     private String service;
-    public static JenaRDFConversionService converter = new JenaRDFConversionService();
-
+    public RDFConversionService converter;
+    
     public IntegrationTest(String service){
         this.service = service;
     }
@@ -34,6 +34,7 @@ public abstract class IntegrationTest {
     @Before
     public void setup(){
         url = IntegrationTestSetup.getURLEndpoint() + service;
+        converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
     }
 
     protected HttpRequestWithBody baseRequestPost(String function) {

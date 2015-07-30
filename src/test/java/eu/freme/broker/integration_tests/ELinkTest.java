@@ -35,7 +35,7 @@ public class ELinkTest extends IntegrationTest {
 
     //Tests Creation, fetching, modification and deletion of a template and fetching of all templates
     @Test
-    public void testTemplateHandling() throws IOException, UnirestException{
+    public void testTemplateHandling() throws Exception{
         String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl");
         testELinkTemplatesId(templateid);
         testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid);
@@ -47,7 +47,7 @@ public class ELinkTest extends IntegrationTest {
     public void testELinkTemplates() throws UnirestException, IOException {
         HttpResponse<String> response;
 
-        response = baseRequestGet("templates/")
+        response = baseRequestGet("templates")
                 .queryString("outformat", "json-ld").asString();
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 
@@ -61,7 +61,7 @@ public class ELinkTest extends IntegrationTest {
 
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
 
-        HttpResponse<String> response = baseRequestPost("documents/")
+        HttpResponse<String> response = baseRequestPost("documents")
                 .queryString("templateid", id)
                 .queryString("informat", "turtle")
                 .queryString("outformat", "turtle")
@@ -76,20 +76,20 @@ public class ELinkTest extends IntegrationTest {
     //// HELPER METHODS
 
     //Tests POST e-link/templates/
-    public String testELinkTemplatesAdd(String filename) throws IOException, UnirestException {
+    public String testELinkTemplatesAdd(String filename) throws Exception {
         String query = readFile(filename);
 
 
 
-        HttpResponse<String> response = baseRequestPost("templates/")
+        HttpResponse<String> response = baseRequestPost("templates")
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
                 .body(constructTemplate(query, "http://dbpedia.org/sparql/"))
         .asString();
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 
-
         JSONObject jsonObj = new JSONObject(response.getBody());
+
         String id = jsonObj.getString("templateId");
         // check, if id is numerical
         assertTrue(id.matches("\\d+"));
