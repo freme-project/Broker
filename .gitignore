@@ -8,7 +8,5 @@
 *~
 .springBeans
 /bin/
-<<<<<<< HEAD
 .springBeansnbactions.xml
-=======
->>>>>>> refs/heads/master
+/workspace/
