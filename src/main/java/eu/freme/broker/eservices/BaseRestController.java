@@ -24,6 +24,7 @@ import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.RDFSerializationFormats;
 import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 import eu.freme.conversion.rdf.RDFConversionService;
 
 /**
@@ -154,9 +155,7 @@ public abstract class BaseRestController {
 	public ResponseEntity<String> createSuccessResponse(Model rdf,
 			RDFConstants.RDFSerialization rdfFormat) {
 		HttpHeaders responseHeaders = new HttpHeaders();
-		String contentTypeHeader = rdfSerializationFormats
-				.getContentTypeHeader(rdfFormat);
-		responseHeaders.add("Content-Type", contentTypeHeader);
+		responseHeaders.add("Content-Type", rdfFormat.contentType());
 		String rdfString;
 		try {
 			rdfString = serializeNif(rdf, rdfFormat);

@@ -35,27 +35,4 @@ public class RDFSerializationFormats extends
 		put("text/n3", RDFConstants.RDFSerialization.N3);
 		put("n3", RDFConstants.RDFSerialization.N3);
 	}
-
-	/**
-	 * Get the Content-Type header of an RDF serialization format.
-	 * 
-	 * @param format
-	 * @return
-	 */
-	public String getContentTypeHeader(RDFConstants.RDFSerialization format) {
-		switch(format){
-		case TURTLE:
-			return "text/turtle";
-		case JSON_LD:
-			return "application/json+ld";
-		case RDF_XML:
-			return "application/rdf+xml";
-		case N3:
-			return "text/n3";
-		case N_TRIPLES:
-			return "application/n-triples";
-		default:
-			throw new RuntimeException("Unknown rdf serializiation format " + format);
-		}
-	}
 }
