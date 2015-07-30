@@ -121,29 +121,6 @@ public class DBpediaSpotlight extends BaseRestController {
                 throw new ExternalServiceFailedException();
             }
             
-            String serialization;
-            try {
-                switch(parameters.getOutformat()) {
-                    case TURTLE:
-                        serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.TURTLE);
-                        return new ResponseEntity<String>(serialization, HttpStatus.OK);                
-                    case JSON_LD:
-                        serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.JSON_LD);
-                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
-                    case RDF_XML:
-                        serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.RDF_XML);
-                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
-                    case N_TRIPLES:
-                        serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.N_TRIPLES);
-                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
-                    case N3:
-                        serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.N3);
-                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
-                }
-            } catch (Exception e) {
-                logger.error("failed", e);
-                return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return createSuccessResponse(outModel, parameters.getOutformat());
         }
 }

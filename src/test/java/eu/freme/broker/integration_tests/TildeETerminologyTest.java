@@ -2,11 +2,18 @@ package eu.freme.broker.integration_tests;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 
 /**
  * Test Tilde e-Terminology broker endpoint.
@@ -15,7 +22,6 @@ import com.mashape.unirest.http.HttpResponse;
  */
 @Ignore
 public class TildeETerminologyTest extends IntegrationTest {
-
 
 	public TildeETerminologyTest() {
 		super("/e-terminology/tilde");
