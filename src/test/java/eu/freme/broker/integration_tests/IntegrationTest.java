@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -76,6 +77,12 @@ public abstract class IntegrationTest {
 
         assertTrue(response.getStatus() == 200);
         assertTrue(response.getBody().length() > 0);
+
+        assertTrue(!response.getHeaders().isEmpty());
+        assertNotNull(response.getHeaders().get("content-type"));
+        String contentType= response.getHeaders().get("content-type").get(0).split(";")[0];
+        assertTrue(contentType.equals(nifformat.contentType()));
+
         // validate RDF
         try {
             assertNotNull(converter.unserializeRDF(response.getBody(), nifformat));
