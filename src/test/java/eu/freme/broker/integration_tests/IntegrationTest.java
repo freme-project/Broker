@@ -3,8 +3,12 @@ package eu.freme.broker.integration_tests;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+
 import eu.freme.conversion.rdf.JenaRDFConversionService;
+import eu.freme.conversion.rdf.RDFConversionService;
+
 import org.junit.Before;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -18,8 +22,8 @@ public abstract class IntegrationTest {
 
     private String url = null;
     private String service;
-    public static JenaRDFConversionService converter = new JenaRDFConversionService();
-
+    public RDFConversionService converter;
+    
     public IntegrationTest(String service){
         this.service = service;
     }
@@ -27,6 +31,7 @@ public abstract class IntegrationTest {
     @Before
     public void setup(){
         url = IntegrationTestSetup.getURLEndpoint() + service;
+        converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
     }
 
     protected HttpRequestWithBody baseRequestPost(String function) {

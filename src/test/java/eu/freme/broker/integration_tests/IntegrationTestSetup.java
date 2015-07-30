@@ -65,4 +65,9 @@ public class IntegrationTestSetup {
 		}
 	}
 
+	public static ConfigurableApplicationContext getContext() {
+		return context;
+	}
+
+	
 }
