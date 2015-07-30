@@ -80,8 +80,12 @@ public abstract class IntegrationTest {
 
         assertTrue(!response.getHeaders().isEmpty());
         assertNotNull(response.getHeaders().get("content-type"));
-        String contentType= response.getHeaders().get("content-type").get(0).split(";")[0];
-        assertTrue(contentType.equals(nifformat.contentType()));
+        String contentType = response.getHeaders().get("content-type").get(0).split(";")[0];
+        //Special Case due to WRONG Mime Type application/json+ld
+        if (contentType.equals("application/ld+json") && nifformat.contentType().equals("application/json+ld")) {
+        } else {
+            assertTrue(contentType.equals(nifformat.contentType()));
+        }
 
         // validate RDF
         try {
