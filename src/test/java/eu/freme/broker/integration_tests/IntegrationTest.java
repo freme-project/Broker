@@ -7,6 +7,7 @@ import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.conversion.rdf.JenaRDFConversionService;
 import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.conversion.rdf.RDFConversionService;
 import org.junit.Before;
 import org.nlp2rdf.cli.Validate;
 
