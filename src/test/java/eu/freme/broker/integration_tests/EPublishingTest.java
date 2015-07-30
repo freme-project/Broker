@@ -1,6 +1,7 @@
 package eu.freme.broker.integration_tests;
 
 import com.mashape.unirest.http.HttpResponse;
+import org.junit.Assume;
 import org.junit.Test;
 
 import com.mashape.unirest.http.Unirest;
@@ -23,6 +24,9 @@ public class EPublishingTest extends IntegrationTest{
 
     @Test
     public void testValidJSON() throws UnirestException, IOException {
+        // Avoid java.io.IOException: Unable to delete temporary files on windows machines
+        Assume.assumeTrue(!System.getProperty( "os.name" ).startsWith( "Windows" ));
+
         HttpResponse<InputStream> response = Unirest.post(getUrl()+"html")
                 .field("htmlZip", new File("src/test/resources/e-publishing/alice.zip"))
                 .field("metadata", (Object) readFile("src/test/resources/e-publishing/metadata.json"))
