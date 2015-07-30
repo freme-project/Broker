@@ -1,10 +1,15 @@
 package eu.freme.broker.integration_tests;
 
+import com.mashape.unirest.http.HttpResponse;
 import org.junit.Test;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
+
+import java.io.*;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -17,16 +22,42 @@ public class EPublishingTest extends IntegrationTest{
     }
 
     @Test
-    public void testInvalidJSON() throws UnirestException {
-//        HttpRequestWithBody baseRequest = baseRequest("html");
-//        baseRequest.field("htmlZip", new File("src/test/resources/e-publishing/alice.zip"));
-//        baseRequest.field("metadata", "{fdfdff, ffdf : dfdf}");
-//        HttpResponse<InputStream> asBinary = baseRequest.asBinary();
-//        
+    public void testValidJSON() throws UnirestException, IOException {
+        HttpResponse<InputStream> response = Unirest.post(getUrl()+"html")
+                .field("htmlZip", new File("src/test/resources/e-publishing/alice.zip"))
+                .field("metadata", (Object) readFile("src/test/resources/e-publishing/metadata.json"))
+                .asBinary();
+        assertTrue(response.getStatus() == 200);
+
+        byte[] buffer = new byte[response.getBody().available()];
+        response.getBody().read(buffer);
+
+        File targetFile = new File("src/test/resources/e-publishing/result.epub");
+        OutputStream outStream = new FileOutputStream(targetFile);
+        outStream.write(buffer);
+        //TODO: validate epub??
+    }
+
+/*
+    @Test
+    public void testInvalidJSON() throws UnirestException, IOException {
+        HttpResponse<InputStream> response = Unirest.post(getUrl() + "html")
+                .field("htmlZip", new File("src/test/resources/e-publishing/alice.zip"))
+                .field("metadata", (Object) "{\"ffdf\" : \"dfdf\"}")
+                .asBinary();
+
+        System.out.println(response.getStatus());
+        assertTrue(response.getStatus() == 400);
+
+
+
+
+        //assertTrue(asBinary.getBody(). .length() > 0);
 //        File f = new File("src/test/resources/e-publishing/alice.zip");
 //        System.out.println(f.getAbsolutePath());
-//        
+//
 //        int status = asBinary.getStatus();
         //Assert.assertEquals(400, status);
     }
+    */
 }

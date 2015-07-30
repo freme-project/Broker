@@ -26,7 +26,7 @@ public class TildeETranslationTest extends IntegrationTest{
 	public TildeETranslationTest(){super("/e-translation/tilde");}
 
 	private HttpRequestWithBody baseRequest() {
-		return baseRequest("")
+		return baseRequestPost("")
 				.queryString("source-lang", sourceLang)
 				.queryString("target-lang", targetLang);
 	}

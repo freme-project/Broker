@@ -31,8 +31,8 @@ public class FremeNERTest extends IntegrationTest{
 
     public FremeNERTest(){super("/e-entity/freme-ner/");}
 
-    protected HttpRequestWithBody baseRequest(String function) {
-        return super.baseRequest(function)
+    protected HttpRequestWithBody baseRequestPost(String function) {
+        return super.baseRequestPost(function)
                 .queryString("dataset", dataset);
     }
 
@@ -54,7 +54,7 @@ public class FremeNERTest extends IntegrationTest{
 
             //Tests POST
             //Plaintext Input in Query String
-            response = baseRequest("documents")
+            response = baseRequestPost("documents")
                     .queryString("input", testinput)
                     .queryString("language", lang)
                     .queryString("informat", "text")
@@ -72,7 +72,7 @@ public class FremeNERTest extends IntegrationTest{
 
             //Tests POST
             //Plaintext Input in Body
-            response = baseRequest("documents")
+            response = baseRequestPost("documents")
                     .queryString("language", lang)
                     .header("Content-Type", "text/plain")
                     .body(testinput)
@@ -90,7 +90,7 @@ public class FremeNERTest extends IntegrationTest{
 
             //Tests POST
             //NIF Input in Body (Turtle)
-            response = baseRequest("documents").header("Content-Type", "text/turtle")
+            response = baseRequestPost("documents").header("Content-Type", "text/turtle")
                     .queryString("language", lang)
                     .body(data).asString();
             assertTrue(response.getStatus() == 200);
@@ -107,7 +107,7 @@ public class FremeNERTest extends IntegrationTest{
 
             //Tests POST
             //Test Prefix
-            response = baseRequest("documents")
+            response = baseRequestPost("documents")
                     .queryString("input", testinput)
                     .queryString("language", lang)
                     .queryString("dataset", dataset)

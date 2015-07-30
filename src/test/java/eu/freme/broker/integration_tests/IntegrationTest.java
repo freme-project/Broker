@@ -29,8 +29,12 @@ public abstract class IntegrationTest {
         url = IntegrationTestSetup.getURLEndpoint() + service;
     }
 
-    protected HttpRequestWithBody baseRequest( String function) {
+    protected HttpRequestWithBody baseRequestPost(String function) {
         return Unirest.post(url + function);
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     protected HttpRequest baseRequestGet( String function) {

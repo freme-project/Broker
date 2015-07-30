@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 
 /**
  * Test Tilde e-Terminology broker endpoint.
@@ -24,7 +23,7 @@ public class TildeETerminologyTest extends IntegrationTest {
 	public void testETerminology() throws Exception {
 
 		String nif = readFile("src/test/resources/rdftest/e-terminology/example1.ttl");
-		HttpResponse<String> response = baseRequest("")
+		HttpResponse<String> response = baseRequestPost("")
 				.queryString("source-lang", "en")
 				.queryString("target-lang", "de")
 				.queryString("informat", "turtle")

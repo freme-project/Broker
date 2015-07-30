@@ -69,7 +69,7 @@ public class ELinkTest extends IntegrationTest {
 
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
 
-        HttpResponse<String> response = baseRequest("documents/")
+        HttpResponse<String> response = baseRequestPost("documents/")
                 .queryString("templateid", id)
                 .queryString("informat", "turtle")
                 .queryString("outformat", "turtle")
@@ -93,7 +93,7 @@ public class ELinkTest extends IntegrationTest {
 
 
 
-        HttpResponse<String> response = baseRequest("templates/")
+        HttpResponse<String> response = baseRequestPost("templates/")
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
                 .body(constructTemplate(query, "http://dbpedia.org/sparql/"))
