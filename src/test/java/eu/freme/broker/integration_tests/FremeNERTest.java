@@ -4,8 +4,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import com.hp.hpl.jena.shared.AssertionFailureException;
 import com.mashape.unirest.request.HttpRequest;
 import eu.freme.conversion.rdf.*;
 import org.junit.Test;
@@ -25,7 +27,6 @@ public class FremeNERTest extends IntegrationTest{
     String[] availableLanguages = {"en","de","it","nl","fr","es"};
     String dataset = "dbpedia";
     String testinput= "Enrich this Content please";
-    String testinputEncoded= URLEncoder.encode(testinput);
 
 
     public FremeNERTest(){super("/e-entity/freme-ner/");}
@@ -41,10 +42,11 @@ public class FremeNERTest extends IntegrationTest{
 
 
     @Test
-    public void TestFremeNER() throws UnirestException, IOException, Exception {
+    public void TestFremeNER() throws UnirestException, IOException, UnsupportedEncodingException {
 
         HttpResponse<String> response;
 
+        String testinputEncoded= URLEncoder.encode(testinput, "UTF-8");
         String data = readFile("src/test/resources/rdftest/e-entity/data.ttl");
 
         //Tests every language
@@ -60,7 +62,11 @@ public class FremeNERTest extends IntegrationTest{
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
             // validate RDF
-            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            try {
+                assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            }catch(Exception e){
+                throw new AssertionFailureException("RDF validation failed");
+            }
             // validate NIF
             Validate.main(new String[]{"-i", response.getBody()});
 
@@ -74,7 +80,11 @@ public class FremeNERTest extends IntegrationTest{
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
             // validate RDF
-            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            try {
+                assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            }catch(Exception e){
+                throw new AssertionFailureException("RDF validation failed");
+            }
             // validate NIF
             Validate.main(new String[]{"-i", response.getBody()});
 
@@ -86,7 +96,11 @@ public class FremeNERTest extends IntegrationTest{
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
             // validate RDF
-            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            try {
+                assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            }catch(Exception e){
+                throw new AssertionFailureException("RDF validation failed");
+            }
             // validate NIF
             Validate.main(new String[]{"-i", response.getBody()});
 
@@ -103,7 +117,11 @@ public class FremeNERTest extends IntegrationTest{
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
             // validate RDF
-            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            try {
+                assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            }catch(Exception e){
+                throw new AssertionFailureException("RDF validation failed");
+            }
             // validate NIF
             Validate.main(new String[]{"-i", response.getBody()});
 
@@ -119,7 +137,11 @@ public class FremeNERTest extends IntegrationTest{
             assertTrue(response.getStatus() == 200);
             assertTrue(response.getBody().length() > 0);
             // validate RDF
-            assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            try {
+                assertNotNull(converter.unserializeRDF(response.getBody(), RDFConstants.RDFSerialization.TURTLE));
+            }catch(Exception e){
+                throw new AssertionFailureException("RDF validation failed");
+            }
             // validate NIF
             Validate.main(new String[]{"-i", response.getBody()});
         }
