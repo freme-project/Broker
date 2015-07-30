@@ -1,8 +1,10 @@
 package eu.freme.broker.eservices;
 
+import java.io.ByteArrayInputStream;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,10 +23,6 @@ import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
-
-import java.io.ByteArrayInputStream;
-
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 public class DBpediaSpotlight extends BaseRestController {

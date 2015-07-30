@@ -1,16 +1,16 @@
 package eu.freme.broker.security;
 
-import com.google.common.base.Optional;
-
-import eu.freme.broker.security.database.Token;
-import eu.freme.broker.security.database.User;
-
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+
+import com.google.common.base.Optional;
+
+import eu.freme.broker.security.database.Token;
+import eu.freme.broker.security.database.User;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

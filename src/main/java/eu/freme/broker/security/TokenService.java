@@ -1,14 +1,14 @@
 package eu.freme.broker.security;
 
+import java.util.Date;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 
 import eu.freme.broker.security.database.Token;
 import eu.freme.broker.security.database.TokenRepository;
 import eu.freme.broker.security.database.User;
-
-import java.util.Date;
-import java.util.UUID;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

@@ -25,7 +25,6 @@ import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.RDFSerializationFormats;
 import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 import eu.freme.conversion.rdf.RDFConversionService;
 
 /**
