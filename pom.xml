@@ -47,6 +47,11 @@
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
+			<artifactId>pipelines</artifactId>
+			<version>0.3-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.freme</groupId>
 			<artifactId>e-entity</artifactId>
 			<version>0.3-SNAPSHOT</version>
 		</dependency>
