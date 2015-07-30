@@ -12,6 +12,11 @@
 		<version>1.2.3.RELEASE</version>
 	</parent>
 
+	<properties>
+		<!--<swagger.yaml>../Documentation/swagger.yaml</swagger.yaml>-->
+		<swagger.yaml>src/docs/swagger/swagger.yaml</swagger.yaml>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -88,6 +93,23 @@
 			<groupId>io.swagger</groupId>
 			<artifactId>swagger-jersey2-jaxrs</artifactId>
 			<version>1.5.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.robwin</groupId>
+			<artifactId>swagger2markup</artifactId>
+			<version>0.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.asciidoctor</groupId>
+			<artifactId>asciidoctorj</artifactId>
+			<version>1.5.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.asciidoctor</groupId>
+			<artifactId>asciidoctorj-pdf</artifactId>
+			<version>1.5.0-alpha.8</version>
 		</dependency>
 	</dependencies>
 
@@ -185,7 +207,7 @@
 				<version>0.1-SNAPSHOT</version>
 				<configuration>
 					<jsonfile>target/doc/swagger-ui/swagger.json</jsonfile>
-					<yamlfile>../Documentation/swagger.yaml</yamlfile>
+					<yamlfile>${swagger.yaml}</yamlfile>
 					<mergeYamlFile>src/main/resources/swagger.descriptions.yaml</mergeYamlFile>
 					<excludeKey>description</excludeKey>
 					<excludeValue>HIDDEN</excludeValue>
@@ -198,6 +220,35 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<version>1.5.2.1</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.asciidoctor</groupId>
+						<artifactId>asciidoctorj-pdf</artifactId>
+						<version>1.5.0-alpha.8</version>
+					</dependency>
+				</dependencies>
+
+				<executions>
+					<execution>
+						<id>output-pdf</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+						<configuration>
+							<sourceDirectory>${basedir}/src/docs/asciidoc</sourceDirectory>
+							<backend>pdf</backend>
+							<doctype>book</doctype>
+						</configuration>
+					</execution>
+				</executions>
+
 			</plugin>
 		</plugins>
 	</build>
