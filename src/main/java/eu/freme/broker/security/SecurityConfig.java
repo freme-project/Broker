@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.AuthenticationManagerConfiguration;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +19,7 @@ import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,6 +36,7 @@ import eu.freme.broker.security.database.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.security.tools.PasswordHasher;
 import eu.freme.broker.security.voter.UserAccessDecisionVoter;
+
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */
@@ -94,21 +95,38 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 				.exceptionHandling()
 				.authenticationEntryPoint(unauthorizedEntryPoint());
-		
+
 		http.addFilterBefore(new AuthenticationFilter(authenticationManager()),
 				BasicAuthenticationFilter.class).addFilterBefore(
 				new ManagementEndpointAuthenticationFilter(
 						authenticationManager()),
 				BasicAuthenticationFilter.class);
 	}
-	
+
 	@Bean
-	public AuthenticationManager authenticationManager(){
-		return new FREMEAuthenticationManager();
+	public AuthenticationManager authenticationManager() {
+		return new AuthenticationManager() {
+			@Autowired
+			AuthenticationProvider[] authenticationProviders;
+
+			@Override
+			public Authentication authenticate(Authentication authentication)
+					throws ProviderNotFoundException {
+
+				for (AuthenticationProvider auth : authenticationProviders) {
+					if (auth.supports(authentication.getClass())) {
+						return auth.authenticate(authentication);
+					}
+				}
+
+				throw new ProviderNotFoundException(
+						"No AuthenticationProvider found for "
+								+ authentication.getClass());
+			}
+		};
 	}
 
 	@Bean
@@ -148,7 +166,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 		AffirmativeBased ab = new AffirmativeBased(list);
 		return ab;
 	}
-	
+
 	@Bean
 	public AccessLevelHelper accessLevelHelper() {
 		return new AccessLevelHelper();
