@@ -63,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 	@PostConstruct
 	public void init() {
 		// create or promote admin user if it does not exist
-		if( adminUsername != null){
+		if( createAdminUser && adminUsername != null){
 			createAdminUser();
 		}
 	}
