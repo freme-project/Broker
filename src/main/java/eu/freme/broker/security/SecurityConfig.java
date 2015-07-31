@@ -51,11 +51,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 	@Autowired
 	UserRepository userRepository;
 
-	@Value("${admin.username}")
+	@Value("${admin.username:default}")
 	private String adminUsername;
 
-	@Value("${admin.password}")
+	@Value("${admin.password:default}")
 	private String adminPassword;
+	
+	@Value("${admin.create:false}")
+	private boolean createAdminUser;
 
 	@PostConstruct
 	public void init() {
