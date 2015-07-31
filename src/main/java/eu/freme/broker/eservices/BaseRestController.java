@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -24,7 +25,6 @@ import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.RDFSerializationFormats;
 import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 import eu.freme.conversion.rdf.RDFConversionService;
 
 /**
@@ -47,6 +47,8 @@ public abstract class BaseRestController {
 
 	@Autowired
 	RDFELinkSerializationFormats rdfELinkSerializationFormats;
+	
+	public static final String authenticationEndpoint = "/authenticate";
 
 	/**
 	 * Create a NIFParameterSet to make dealing with NIF API specifications
@@ -116,6 +118,8 @@ public abstract class BaseRestController {
 				&& ((FREMEHttpException) exception).getHttpStatusCode() != null) {
 			// get response code from FREMEHttpException
 			statusCode = ((FREMEHttpException) exception).getHttpStatusCode();
+		} else if( exception instanceof AccessDeniedException ){
+			statusCode = HttpStatus.UNAUTHORIZED;
 		} else {
 			// get status code from exception class annotation
 			Annotation responseStatusAnnotation = exception.getClass()

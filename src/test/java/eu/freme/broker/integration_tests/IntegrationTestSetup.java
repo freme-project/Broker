@@ -64,5 +64,9 @@ public class IntegrationTestSetup {
 			return "http://localhost:" + port;
 		}
 	}
+	
+	public static ConfigurableApplicationContext getApplicationContext(){
+		return context;
+	}
 
 }

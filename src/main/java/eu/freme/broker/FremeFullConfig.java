@@ -9,19 +9,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
+import eu.freme.conversion.ConversionApplicationConfig;
 import eu.freme.eservices.eentity.EEntityConfig;
 import eu.freme.eservices.elink.ELinkConfig;
 import eu.freme.eservices.epublishing.EPublishingConfig;
 import eu.freme.eservices.pipelines.api.PipelineConfig;
 
 /**
- * loads BrokerConfig + API endpoints
+ * loads BrokerConfig and API endpoints
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @SpringBootApplication
 @ComponentScan(basePackages="eu.freme.broker.eservices")
-@Import({BrokerConfig.class, EEntityConfig.class, ELinkConfig.class, EPublishingConfig.class, PipelineConfig.class})
+@Import({BrokerConfig.class, EEntityConfig.class, ELinkConfig.class, EPublishingConfig.class, ConversionApplicationConfig.class, PipelineConfig.class})
 public class FremeFullConfig {
 
 	@Value("${workspace.location}")

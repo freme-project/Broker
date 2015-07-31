@@ -1,6 +1,5 @@
 package eu.freme.broker.tools;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import eu.freme.conversion.rdf.RDFConstants;

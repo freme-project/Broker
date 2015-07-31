@@ -15,7 +15,9 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class TildeETranslationTest {
 
 	String url = null;
