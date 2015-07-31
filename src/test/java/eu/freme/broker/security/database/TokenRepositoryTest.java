@@ -53,6 +53,5 @@ public class TokenRepositoryTest {
 		userRepository.delete(userFromDb);
 		
 		assertFalse(tokenRepository.findAll().iterator().hasNext());
-		assertFalse(userRepository.findAll().iterator().hasNext());
 	}
 }

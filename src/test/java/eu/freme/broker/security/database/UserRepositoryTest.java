@@ -40,10 +40,11 @@ public class UserRepositoryTest {
 		assertTrue(juergen!=null);
 		
 		int counter = count(userRepository.findAll());
-		assertTrue(counter==3);
+		// admin user is one more
+		assertTrue(counter==4);
 		
 		userRepository.delete(juergen);
 		counter = count(userRepository.findAll());
-		assertTrue(counter==2);
+		assertTrue(counter==3);
 	}
 }
