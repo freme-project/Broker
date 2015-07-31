@@ -2,6 +2,7 @@ package eu.freme.broker.eservices;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.eservices.pipelines.core.PipelineService;
+import eu.freme.eservices.pipelines.requests.RequestBuilder;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,17 @@ public class Pipelines {
 	@Autowired
 	PipelineService pipelineAPI;
 
+	/**
+	 * <p>Calls the pipelining service.</p>
+	 * <p>Some predefined Requests can be formed using the class {@link RequestFactory}. It also converts request objects
+	 * from and to JSON.</p>
+	 * <p><To create custom requests, use the {@link RequestBuilder}.</p>
+	 * <p>Examples can be found in the unit tests in the Pipelines repository.</p>
+	 * @param requests	The requests to send to the service.
+	 * @return          The response of the last request.
+	 * @throws IOException
+	 * @throws UnirestException
+	 */
 	@RequestMapping(value = "/pipelining/chain", method = RequestMethod.POST)
 	public ResponseEntity<String> pipeline(@RequestBody String requests) throws IOException, UnirestException {
 		MultiValueMap<String, String> headers = new HttpHeaders();
