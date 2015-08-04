@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -33,6 +34,7 @@ public class TildeETranslationTest extends IntegrationTest{
 	}
 
 	@Test
+	@Ignore //TODO: wait for Issue: Timeouts on e-Terminology https://github.com/freme-project/Broker/issues/43
 	public void testEtranslate() throws UnirestException, IOException, Exception {
 
 		HttpResponse<String> response = baseRequest()

@@ -24,6 +24,8 @@ public class EPublishingTest extends IntegrationTest{
 
     @Test
     public void testValidJSON() throws UnirestException, IOException {
+
+        // TODO: wait for issue: Unit tests on windows #15 https://github.com/freme-project/e-Publishing/issues/15
         // Avoid java.io.IOException: Unable to delete temporary files on windows machines
         Assume.assumeTrue(!System.getProperty( "os.name" ).startsWith( "Windows" ));
 
