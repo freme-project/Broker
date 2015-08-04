@@ -16,7 +16,6 @@ import com.mashape.unirest.http.Unirest;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.ExternalServiceFailedException;
-import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;

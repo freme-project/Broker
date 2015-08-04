@@ -11,26 +11,28 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
-
-import eu.freme.conversion.rdf.*;
-import org.nlp2rdf.cli.Validate;
-
-
+/**
+ * @author Jan Nehring - jan.nehring@dfki.de
+ */
 public class TildeETranslationTest extends IntegrationTest{
 
-	//String url = null;
 
+	String clientId = "u-bd13faca-b816-4085-95d5-05373d695ab7";
 	String sourceLang = "en";
 	String targetLang = "de";
+	String translationSystemId = "smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813";
+	
 
 	public TildeETranslationTest(){super("/e-translation/tilde");}
 
 	private HttpRequestWithBody baseRequest() {
-		return baseRequestPost("")
+		return baseRequestPost("").queryString("client-id", clientId)
 				.queryString("source-lang", sourceLang)
-				.queryString("target-lang", targetLang);
+				.queryString("target-lang", targetLang)
+				.queryString("translation-system-id", translationSystemId);
 	}
 
 	@Test
@@ -50,6 +52,8 @@ public class TildeETranslationTest extends IntegrationTest{
 				.body(data).asString();
 		validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
+		assertTrue(response.getStatus() == 200);
+		assertTrue(response.getBody().length() > 0);
 
 		data = readFile("src/test/resources/rdftest/e-translate/data.json");
 		response = baseRequest().header("Content-Type", "application/json+ld")
