@@ -9,7 +9,6 @@ import eu.freme.conversion.rdf.JenaRDFConversionService;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConversionService;
 import org.junit.Before;
-import org.nlp2rdf.cli.Validate;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -94,6 +93,7 @@ public abstract class IntegrationTest {
             throw new AssertionFailureException("RDF validation failed");
         }
         // validate NIF
+        /* the Validate modul is available just as SNAPSHOT
         if (nifformat == RDFConstants.RDFSerialization.TURTLE) {
             Validate.main(new String[]{"-i", response.getBody(), "--informat","turtle"});
         } else if (nifformat == RDFConstants.RDFSerialization.RDF_XML) {
@@ -102,6 +102,7 @@ public abstract class IntegrationTest {
             //Not implemented yet: n3, n-triples, json-ld
 //            Validate.main(new String[]{"-i", response.getBody()});
         }
+        */
 
     }
 

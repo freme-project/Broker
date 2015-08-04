@@ -83,11 +83,6 @@
 			<artifactId>json</artifactId>
 			<version>20140107</version>
 		</dependency>
-		<dependency>
-			<groupId>org.nlp2rdf.software</groupId>
-			<artifactId>jena</artifactId>
-			<version>2.0.1-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -176,6 +171,7 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
+		<!-- provides just a SNAPSHOT org.nlp2rdf.software.jena:2.0.1-SNAPSHOT
 		<repository>
 			<id>maven.aksw.internal</id>
 			<name>University Leipzig, AKSW Maven2 Repository</name>
@@ -186,6 +182,7 @@
 			<name>University Leipzig, AKSW Maven2 Repository</name>
 			<url>http://maven.aksw.org/repository/snapshots</url>
 		</repository>
+		-->
 	</repositories>
 
 
