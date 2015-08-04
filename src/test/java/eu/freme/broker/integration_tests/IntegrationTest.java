@@ -81,7 +81,6 @@ public abstract class IntegrationTest {
         //TODO: Special Case due to WRONG Mime Type application/json+ld
         if (contentType.equals("application/ld+json") && nifformat.contentType().equals("application/json+ld")) {
         } else {
-
             assertTrue(contentType.equals(nifformat.contentType()));
         }
 

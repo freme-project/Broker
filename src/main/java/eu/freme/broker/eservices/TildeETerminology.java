@@ -16,7 +16,6 @@ import com.mashape.unirest.http.Unirest;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.ExternalServiceFailedException;
-import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
@@ -48,7 +47,6 @@ public class TildeETerminology extends BaseRestController {
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "domain", defaultValue = "") String domain) {
 
-		System.err.println(postBody);
 		// merge long and short parameters - long parameters override short
 		// parameters
 		if (input == null) {
@@ -124,17 +122,7 @@ public class TildeETerminology extends BaseRestController {
 				throw new ExternalServiceFailedException(e.getMessage());
 			}
 		}
-
-		// get output format
-		String serialization;
-		try {
-			serialization = rdfConversionService.serializeRDF(responseModel,
-					parameters.getOutformat());
-		} catch (Exception e) {
-			logger.error("failed", e);
-			throw new InternalServerErrorException("internal server error");
-		}
-
-		return new ResponseEntity<String>(serialization, HttpStatus.OK);
+		
+		return createSuccessResponse(responseModel, parameters.getOutformat());
 	}
 }

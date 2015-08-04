@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en-us" trgLang="fr-fr" xmlns:its="http://www.w3.org/2005/11/its" xmlns:itsxlf="http://www.w3.org/ns/its-xliff/" its:version="2.0">
+<file id="f1" original="/D:/Projects/Expedia/Freme/Bray.xml">
+<unit id="1">
+<segment>
+<source>Bray Vacations</source>
+<target>Bray Vacations</target>
+</segment>
+</unit>
+<unit id="2">
+<segment>
+<source>Bray Vacations</source>
+<target>Bray Vacations</target>
+</segment>
+</unit>
+<unit id="3">
+<segment>
+<source>Bray Vacations</source>
+<target>Welcome to Bray</target>
+</segment>
+</unit>
+<unit id="4">
+<segment>
+<source>&lt;p>19 miles (31 kilometers) to the northeast of Wicklow, is Bray, a popular spot for visitors wishing to discover more of the region. Coming from Dublin Airport in Wicklow, Bray lies 17 miles (27 kilometers) to the south.&lt;/p></source>
+<target>&lt;p>19 miles (31 kilometers) to the northeast of Wicklow, is Bray, a popular spot for visitors wishing to discover more of the region. Coming from Dublin Airport in Wicklow, Bray lies 17 miles (27 kilometers) to the south.&lt;/p></target>
+</segment>
+</unit>
+<unit id="5">
+<segment>
+<source>&lt;p>Bray is a great place to base yourself while you are in Wicklow as many of the city s most popular attractions are within easy driving distance. The Bray Heritage Centre and the National Sealife Centre are two of the interesting place to visit here. Also, be sure to check out Bray Beach and the Killruddery House and Gardens.&lt;br/>&lt;br/></source>
+<target>&lt;p>Bray is a great place to base yourself while you are in Wicklow as many of the city’s most popular attractions are within easy driving distance. The Bray Heritage Centre and the National Sealife Centre are two of the interesting place to visit here. Also, be sure to check out Bray Beach and the Killruddery House and Gardens.&lt;br/>&lt;br/></target>
+</segment>
+</unit>
+<unit id="6">
+<its:locQualityIssues xml:id="OcelotLQI6">
+ <its:locQualityIssue locQualityIssueType="mistranslation" locQualityIssueComment="" locQualityIssueSeverity="10"/>
+</its:locQualityIssues>
+<segment>
+<source>If the sun is shining get outdoors and enjoy the nearby green spaces. Grab your camera and explore the popular ecological parks for which this area is well known, like Bray Head.&lt;br/>&lt;br/></source>
+<target><mrk id="2" type="its:any" its:locQualityIssuesRef="#its=OcelotLQI6">If the sun is shining get outdoors and enjoy the nearby green spaces. Grab your camera and explore the popular ecological parks for which this area is well known, like Bray Head.&amp;lt;br/></mrk></target>
+</segment>
+</unit>
+<unit id="7">
+<segment>
+<source>One of the best ways to experience the natural environs is to book a round at one of the area s challenging golf courses such as the Bray Golf Club.&lt;br/>&lt;br/></source>
+<target>One of the best ways to experience the natural environs is to book a round at one of the area s challenging golf courses such as the Bray Golf Club.&lt;br/>&lt;br/></target>
+</segment>
+</unit>
+<unit id="8">
+<segment>
+<source>After spending the day seeing the sights around Bray, get a good nights sleep in one of the area s popular bed-and-breakfasts, hotels or short-stay apartments. If you’re looking for a warm welcome and a good nights sleep check out the amenities at the Royal Hotel and Merrill Leisure Club, the Martello Hotel, and the popular Esplanade Hotel Bray.&lt;/p></source>
+<target>After spending the day seeing the sights around Bray, get a good nights sleep in one of the area s popular bed-and-breakfasts, hotels or short-stay apartments. If you’re looking for a warm welcome and a good nights sleep check out the amenities at the Royal Hotel and Merrill Leisure Club, the Martello Hotel, and the popular Esplanade Hotel Bray.&lt;/p></target>
+</segment>
+</unit>
+</file>
+</xliff>

@@ -1,8 +1,21 @@
 package eu.freme.broker.eservices;
 
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +27,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
+import eu.freme.broker.exception.TemplateNotFoundException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
@@ -21,22 +35,6 @@ import eu.freme.eservices.elink.DataEnricher;
 import eu.freme.eservices.elink.Exporter;
 import eu.freme.eservices.elink.Template;
 import eu.freme.eservices.elink.TemplateDAO;
-import eu.freme.broker.exception.TemplateNotFoundException;
-
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.json.JSONObject;
-
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 public class ELink extends BaseRestController {
@@ -50,7 +48,7 @@ public class ELink extends BaseRestController {
         // Enriching using a template.        
         // POST /e-link/enrich/
         // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
-	@RequestMapping(value = "/e-link/documents/", method = RequestMethod.POST)
+	@RequestMapping(value = "/e-link/documents", method = RequestMethod.POST)
 	public ResponseEntity<String> enrich(
 			@RequestParam(value = "templateid",    required=true)  int    templateId,
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
@@ -152,7 +150,7 @@ public class ELink extends BaseRestController {
         // Creating a template.
         // POST /e-link/templates/
         // Example: curl -X POST -d @template.json "http://localhost:8080/e-link/templates/" -H "Content-Type: application/json" -H "Accept: application/json" -v
-	@RequestMapping(value = "/e-link/templates/", method = RequestMethod.POST)
+	@RequestMapping(value = "/e-link/templates", method = RequestMethod.POST)
 	public ResponseEntity<String> createTemplate(
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
@@ -387,7 +385,7 @@ public class ELink extends BaseRestController {
         // Retrieve all templates.
         // GET /e-link/templates/
         // curl -v http://api-dev.freme-project.eu/current/e-link/templates/
-	@RequestMapping(value = "/e-link/templates/", method = RequestMethod.GET)
+	@RequestMapping(value = "/e-link/templates", method = RequestMethod.GET)
 	public ResponseEntity<String> getAllTemplates(
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,

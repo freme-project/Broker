@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Import;
 
 import com.github.isrsal.logging.LoggingFilter;
 
-import eu.freme.broker.tools.CORSFilter;
 import eu.freme.broker.tools.NIFParameterFactory;
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.RDFSerializationFormats;
@@ -54,5 +53,4 @@ public class BrokerConfig {
     public NIFParameterFactory getNifParameterFactory(){
     	return new NIFParameterFactory();
     }
-
 }

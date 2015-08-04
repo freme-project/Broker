@@ -1,0 +1,10 @@
+@prefix nif:<http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
+@prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/document/1#char=0,21>
+  a nif:String , nif:Context, nif:RFC5147String ;
+  nif:isString "Welcome to Berlin"^^xsd:string;
+  nif:beginIndex "0"^^xsd:nonNegativeInteger;
+  nif:endIndex "21"^^xsd:nonNegativeInteger;
+  nif:sourceUrl <http://differentday.blogspot.com/2007_01_01_archive.html>.

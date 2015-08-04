@@ -1,17 +1,11 @@
 package eu.freme.broker.eservices;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.MalformedJsonException;
-import eu.freme.broker.exception.BadRequestException;
-import eu.freme.eservices.epublishing.EPublishingService;
-import eu.freme.eservices.epublishing.exception.EPubCreationException;
-import eu.freme.eservices.epublishing.exception.InvalidZipException;
-import eu.freme.eservices.epublishing.webservice.Metadata;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.annotation.MultipartConfig;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +13,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.google.gson.Gson;
+import com.google.gson.stream.MalformedJsonException;
+
+import eu.freme.eservices.epublishing.EPublishingService;
+import eu.freme.eservices.epublishing.exception.EPubCreationException;
+import eu.freme.eservices.epublishing.exception.InvalidZipException;
+import eu.freme.eservices.epublishing.webservice.Metadata;
 
 /**
  *
@@ -45,6 +47,8 @@ public class EPublishing {
         try {
             Gson gson = new Gson();
             Metadata metadata = gson.fromJson(jMetadata, Metadata.class);
+    		HttpHeaders responseHeaders = new HttpHeaders();
+    		responseHeaders.add("Content-Type", "application/epub+zip");
             return new ResponseEntity<>(entityAPI.createEPUB(metadata, file.getInputStream()), HttpStatus.OK);
         } catch (MalformedJsonException | InvalidZipException | EPubCreationException ex) {
             logger.log(Level.SEVERE, null, ex);

@@ -1,0 +1,41 @@
+{
+  "titles":[
+    "Alice in Utopia",
+    "Alice in Europe"
+  ],
+  "authors":[
+    "Joske Vermeulen",
+    "Nick Borth"
+  ],
+  "illustrators":[
+    "Frans Vervaacke",
+    "John Riplosh"
+  ],
+  "creators":[
+    "Joske Vermeulen",
+    "Nick Borth"
+  ],
+  "subjects":[
+    "alice",
+    "rabbit"
+  ],
+  "coverImage":"cover.jpeg",
+  "language":"en",
+  "source":"",
+  "description":"This is the story about Alice in wonderland, involving a rabbit etc.",
+  "rights":"",
+  "identifier":{
+    "scheme":"",
+    "value":"urn:1235-568-2235"
+  },
+  "tableOfContents":[
+    {
+      "title":"Chapter 1",
+      "resource":"01.xhtml"
+    },
+    {
+      "title":"Chapter 2",
+      "resource":"02.xhtml"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+PREFIX geo-pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+CONSTRUCT
+{
+    <@@@entity_uri@@@> geo-pos:lat ?lat .
+    <@@@entity_uri@@@> geo-pos:long ?long .
+}
+WHERE
+{
+    <@@@entity_uri@@@> geo-pos:lat ?lat .
+    <@@@entity_uri@@@> geo-pos:long ?long .
+}

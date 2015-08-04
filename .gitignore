@@ -8,3 +8,5 @@
 *~
 .springBeans
 /bin/
+.springBeansnbactions.xml
+/workspace/
