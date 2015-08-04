@@ -207,6 +207,7 @@
 						<exclude>logs/**</exclude>
 						<exclude>changelog.txt</exclude>
 						<exclude>LICENSE</exclude>
+						<exclude>3RD-PARTY-LICENCES</exclude>
 					</excludes>
 				</configuration>
 				<executions>
