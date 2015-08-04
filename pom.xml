@@ -206,6 +206,7 @@
 						<exclude>src/main/resources/**</exclude>
 						<exclude>logs/**</exclude>
 						<exclude>changelog.txt</exclude>
+						<exclude>LICENSE</exclude>
 					</excludes>
 				</configuration>
 				<executions>
