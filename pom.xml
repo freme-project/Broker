@@ -197,8 +197,8 @@
 				<configuration>
 					<header>https://raw.githubusercontent.com/mycila/license-maven-plugin/master/license-maven-plugin/src/main/resources/com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
 					<properties>
-						<owner>Felix Sasaki</owner>
-						<email>Felix.Sasaki@dfki.de</email>
+						<owner>Deutsches Forschungszentrum für Künstliche Intelligenz</owner>
+						<email>http://freme-project.eu</email>
 					</properties>
 					<excludes>
 						<exclude>**/README</exclude>
