@@ -14,6 +14,7 @@ import eu.freme.eservices.eentity.EEntityConfig;
 import eu.freme.eservices.elink.ELinkConfig;
 import eu.freme.eservices.epublishing.EPublishingConfig;
 import eu.freme.eservices.pipelines.api.PipelineConfig;
+import eu.freme.i18n.api.EInternationalizationConfig;
 
 /**
  * loads BrokerConfig and API endpoints
@@ -21,18 +22,20 @@ import eu.freme.eservices.pipelines.api.PipelineConfig;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @SpringBootApplication
-@ComponentScan(basePackages="eu.freme.broker.eservices")
-@Import({BrokerConfig.class, EEntityConfig.class, ELinkConfig.class, EPublishingConfig.class, ConversionApplicationConfig.class, PipelineConfig.class})
+@ComponentScan(basePackages = "eu.freme.broker.eservices")
+@Import({ BrokerConfig.class, EEntityConfig.class, ELinkConfig.class,
+		EPublishingConfig.class, ConversionApplicationConfig.class,
+		PipelineConfig.class, EInternationalizationConfig.class })
 public class FremeFullConfig {
 
 	@Value("${workspace.location}")
 	String workspaceLocation;
-	
+
 	@PostConstruct
 	public void init() {
 		// create workspace folder
 		File workspace = new File(workspaceLocation);
-		if( !workspace.exists() ){
+		if (!workspace.exists()) {
 			workspace.mkdirs();
 		}
 	}
