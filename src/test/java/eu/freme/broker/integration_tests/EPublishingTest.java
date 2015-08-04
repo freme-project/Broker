@@ -1,12 +1,10 @@
 package eu.freme.broker.integration_tests;
 
 import com.mashape.unirest.http.HttpResponse;
-import org.junit.Assume;
-import org.junit.Test;
-
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequestWithBody;
+import org.junit.Assume;
+import org.junit.Test;
 
 import java.io.*;
 

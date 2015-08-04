@@ -1,21 +1,15 @@
 package eu.freme.broker.integration_tests;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
+import eu.freme.conversion.rdf.RDFConstants;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-
-import com.hp.hpl.jena.shared.AssertionFailureException;
-import com.mashape.unirest.request.HttpRequest;
-import eu.freme.conversion.rdf.*;
-import org.junit.Test;
-
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequestWithBody;
-import org.nlp2rdf.cli.Validate;
 
 
 /**

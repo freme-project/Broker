@@ -1,20 +1,15 @@
 package eu.freme.broker.integration_tests;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
-import com.hp.hpl.jena.shared.AssertionFailureException;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.freme.conversion.rdf.RDFConstants;
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import java.io.IOException;
 
-import eu.freme.conversion.rdf.*;
-import org.nlp2rdf.cli.Validate;
+import static org.junit.Assert.assertTrue;
 
 
 /**
