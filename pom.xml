@@ -218,6 +218,20 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.jasig.maven</groupId>
+				<artifactId>maven-notice-plugin</artifactId>
+				<version>1.0.4</version>
+				<configuration>
+					<noticeTemplate>https://source.jasig.org/licenses/NOTICE.template</noticeTemplate>
+
+					<licenseMapping>
+						<param>https://source.jasig.org/licenses/license-mappings.xml</param>
+						<param>src/main/resources/license-mappings.xml</param>
+					</licenseMapping>
+					<fileName>N</fileName>
+				</configuration>
+			</plugin>
 
 		</plugins>
 	</build>
