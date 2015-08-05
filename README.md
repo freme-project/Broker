@@ -19,4 +19,4 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-This project uses 3rd party tools. You can find the list of 3rd party tools including their authors and licenses [here](LICENSE-3RD-PARTY)
+This project uses 3rd party tools. You can find the list of 3rd party tools including their authors and licenses [here](3RD-PARTY-LICENCES).
