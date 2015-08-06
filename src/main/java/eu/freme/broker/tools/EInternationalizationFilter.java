@@ -42,8 +42,8 @@ public class EInternationalizationFilter implements Filter {
 
 	public EInternationalizationFilter() {
 		contentTypes = new HashSet<String>();
-		contentTypes.add(EInternationalizationAPI.MIME_TYPE_HTML);
-		contentTypes.add(EInternationalizationAPI.MIME_TYPE_XLIFF_1_2);
+		contentTypes.add(EInternationalizationAPI.MIME_TYPE_HTML.toLowerCase());
+		contentTypes.add(EInternationalizationAPI.MIME_TYPE_XLIFF_1_2.toLowerCase());
 	}
 
 	public void doFilter(ServletRequest req, ServletResponse res,
@@ -52,6 +52,11 @@ public class EInternationalizationFilter implements Filter {
 		String informat = req.getParameter("informat");
 		if( informat == null ){
 			informat = req.getContentType();
+			
+			String[] parts = informat.split(";");
+			if( parts.length>1){
+				informat = parts[0].trim();
+			}
 		}
 		
 		if( informat == null ){
