@@ -1,0 +1,16 @@
+PREFIX dbpedia: <http://dbpedia.org/resource/>
+PREFIX dbpedia-owl: <http://dbpedia.org/ontology/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+CONSTRUCT
+{
+  ?museum <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> .
+}
+WHERE
+{
+    <@@@entity_uri@@@> geo:geometry ?citygeo .
+    ?museum rdf:type <http://schema.org/Museum> .
+    ?museum geo:geometry ?museumgeo .
+    FILTER (<bif:st_intersects>(?museumgeo, ?citygeo, 10))
+}
+LIMIT 10

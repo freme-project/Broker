@@ -1,10 +1,9 @@
 package eu.freme.broker.integration_tests;
 
+import eu.freme.broker.FremeFullConfig;
 import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import eu.freme.broker.FremeFullConfig;
 
 /**
  * This class sets up FREME integration tests. It can start FREME but can be
@@ -69,4 +68,9 @@ public class IntegrationTestSetup {
 		return context;
 	}
 
+	public static ConfigurableApplicationContext getContext() {
+		return context;
+	}
+
+	
 }

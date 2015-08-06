@@ -8,8 +8,8 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TildeETranslationTest.class, TildeETerminologyTest.class,
-		TildeETranslationTest.class })
+@SuiteClasses({ TildeETranslationTest.class, // TildeETerminologyTest.class,
+		TildeETranslationTest.class, FremeNERTest.class, ELinkTest.class })
 public class TestRunner {
 
 	public static void main(String[] args) {
