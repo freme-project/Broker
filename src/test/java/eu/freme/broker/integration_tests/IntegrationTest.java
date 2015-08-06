@@ -59,14 +59,14 @@ public abstract class IntegrationTest {
 
 
     public static String readFile(String file) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
         StringBuilder bldr = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            bldr.append(line);
-            bldr.append("\n");
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                bldr.append(line);
+                bldr.append("\n");
+            }
         }
-        reader.close();
         return bldr.toString();
     }
 
