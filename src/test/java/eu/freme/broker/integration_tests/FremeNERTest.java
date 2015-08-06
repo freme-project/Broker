@@ -18,10 +18,10 @@ import java.net.URLEncoder;
 public class FremeNERTest extends IntegrationTest{
 
 
-    String[] availableLanguages = {"en","de","it","nl","fr","es"};
-    String dataset = "dbpedia";
-    String testinput= "Enrich this Content please";
-
+    private String[] availableLanguages = {"en","de","it","nl","fr","es"};
+    private String dataset = "dbpedia";
+    private String testinput= "Enrich this Content please";
+    private RDFConstants.RDFSerialization contentType = RDFConstants.RDFSerialization.TURTLE;
 
     public FremeNERTest(){super("/e-entity/freme-ner/");}
 
@@ -53,7 +53,7 @@ public class FremeNERTest extends IntegrationTest{
                     .queryString("language", lang)
                     .queryString("informat", "text")
                     .asString();
-            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+            validateNIFResponse(response, this.contentType);
 
             //Tests POST
             //Plaintext Input in Body
@@ -62,13 +62,13 @@ public class FremeNERTest extends IntegrationTest{
                     .header("Content-Type", "text/plain")
                     .body(testinput)
                     .asString();
-            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+            validateNIFResponse(response, this.contentType);
             //Tests POST
             //NIF Input in Body (Turtle)
             response = baseRequestPost("documents").header("Content-Type", "text/turtle")
                     .queryString("language", lang)
                     .body(data).asString();
-            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+            validateNIFResponse(response, this.contentType);
 
 
             //Tests POST
@@ -80,7 +80,7 @@ public class FremeNERTest extends IntegrationTest{
                     .queryString("informat", "text")
                     .queryString("prefix", "http://test-prefix.com")
                     .asString();
-            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+            validateNIFResponse(response, this.contentType);
 
             //assertTrue(response.getString() contains prefix)
 
@@ -91,7 +91,7 @@ public class FremeNERTest extends IntegrationTest{
                     .queryString("input", testinputEncoded)
                     .queryString("language", lang)
                     .asString();
-            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+            validateNIFResponse(response, this.contentType);
         }
     }
 }
