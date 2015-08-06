@@ -5,6 +5,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.conversion.rdf.RDFConstants;
+import org.hibernate.annotations.SourceType;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -19,51 +20,39 @@ public class EInternationalizationTest extends IntegrationTest {
     public EInternationalizationTest(){super("/e-entity/freme-ner/documents");}
 
     String dataset = "dbpedia";
+    String[] sample_xliff = {"test1.xlf"};
+    String[] sample_html = {"aa324.html","test10.html","test12.html"};
+    String resourcepath= "src/test/resources/e-internationalization/";
+
+    @Test
+    public void TestEInternationalization() throws IOException, UnirestException {
+        for (String sample_file : sample_xliff) {
+            testContentTypeandInformat("application/x-xliff+xml",readFile(resourcepath+sample_file));
+        }
+        for (String sample_file : sample_html) {
+            testContentTypeandInformat("text/html",readFile(resourcepath+sample_file));
+        }
+    }
 
     protected HttpRequestWithBody baseRequestPost() {
         return super.baseRequestPost("")
                 .queryString("dataset", dataset);
     }
 
-    @Test
-    public void TestEInternationalization() throws IOException, UnirestException {
+    private void testContentTypeandInformat(String format, String data) throws UnirestException, IOException {
         HttpResponse<String> response;
-        String data;
-
-        //Tests text/html Input
-        data = readFile("src/test/resources/e-internationalization/aa324.html");
-
         //With Content-Type header
         response = baseRequestPost()
-                .header("Content-Type", "text/html")
+                .header("Content-Type", format)
                 .queryString("language", "en")
                 .body(data)
                 .asString();
+
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
         //With informat QueryString
         response = baseRequestPost()
-                .queryString("informat", "text/html")
-                .queryString("language", "en")
-                .body(data)
-                .asString();
-        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
-
-
-        //Tests application/x-xliff+xml
-        data = readFile("src/test/resources/e-internationalization/test1.xlf");
-
-        //With Content-Type header
-        response = baseRequestPost()
-                .header("Content-Type", "application/x-xliff+xml")
-                .queryString("language", "en")
-                .body(data)
-                .asString();
-        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
-
-        //With informat QueryString
-        response = baseRequestPost()
-                .queryString("informat", "application/x-xliff+xml")
+                .queryString("informat", format)
                 .queryString("language", "en")
                 .body(data)
                 .asString();

@@ -13,7 +13,7 @@ import java.net.URLEncoder;
 
 
 /**
- * Created by jonathan on 28.07.15.
+ * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 28.07.15.
  */
 public class FremeNERTest extends IntegrationTest{
 
