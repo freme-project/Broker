@@ -9,4 +9,4 @@ This repository hosts the Broker of the FREME project.
 * [FREME Wiki](https://github.com/freme-project/technical-discussion/wiki)
 * [FREME technical discussion forum](https://github.com/freme-project/technical-discussion/issues)
 * [FREME API documentation, current release](http://api.freme-project.eu/doc/current)
-* {FREME API docuemntation, release candidate](http://api-dev.freme-project.eu/doc)
+* [FREME API docuemntation, release candidate](http://api-dev.freme-project.eu/doc)
