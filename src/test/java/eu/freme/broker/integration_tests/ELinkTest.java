@@ -3,6 +3,7 @@ package eu.freme.broker.integration_tests;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.conversion.rdf.RDFConstants;
+import org.hibernate.annotations.SourceType;
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -96,9 +97,11 @@ public class ELinkTest extends IntegrationTest {
 
     //Tests GET e-link/templates/
     public void testELinkTemplatesId(String id) throws UnirestException, IOException {
+        System.out.println(id);
         HttpResponse<String> response = baseRequestGet("templates/"+id)
                 .queryString("outformat", "turtle")
                 .asString();
+        System.out.println(response.getStatus());
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
     }
 
