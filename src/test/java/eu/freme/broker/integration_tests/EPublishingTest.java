@@ -1,5 +1,6 @@
 package eu.freme.broker.integration_tests;
 
+import com.adobe.epubcheck.api.EpubCheck;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -44,6 +45,13 @@ public class EPublishingTest extends IntegrationTest{
         outStream.flush();
         assertTrue(targetFile.length()>0);
         //TODO: validate epub??
+        //File epubFile = new File("/path/to/your/epub/file.epub");
+
+        // simple constructor; errors are printed on stderr stream
+        EpubCheck epubcheck = new EpubCheck(targetFile);
+
+        // validate() returns true if no errors or warnings are found
+        assertTrue(epubcheck.validate());
     }
 
 /*
