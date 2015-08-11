@@ -45,6 +45,12 @@
 			<groupId>eu.freme</groupId>
 			<artifactId>conversion</artifactId>
 			<version>0.3-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
@@ -65,6 +71,16 @@
 			<groupId>eu.freme</groupId>
 			<artifactId>e-publishing</artifactId>
 			<version>0.2-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-slf4j-impl</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.github.isrsal</groupId>
@@ -115,6 +131,12 @@
 			<groupId>eu.freme</groupId>
 			<artifactId>e-internationalization</artifactId>
 			<version>0.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>	
 		</dependency>
 	</dependencies>
 
@@ -204,18 +226,12 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
-		<!-- provides just a SNAPSHOT org.nlp2rdf.software.jena:2.0.1-SNAPSHOT
-		<repository>
-			<id>maven.aksw.internal</id>
-			<name>University Leipzig, AKSW Maven2 Repository</name>
-			<url>http://maven.aksw.org/repository/internal</url>
-		</repository>
-		<repository>
-			<id>maven.aksw.snapshots</id>
-			<name>University Leipzig, AKSW Maven2 Repository</name>
-			<url>http://maven.aksw.org/repository/snapshots</url>
-		</repository>
-		-->
+		<!-- provides just a SNAPSHOT org.nlp2rdf.software.jena:2.0.1-SNAPSHOT 
+			<repository> <id>maven.aksw.internal</id> <name>University Leipzig, AKSW 
+			Maven2 Repository</name> <url>http://maven.aksw.org/repository/internal</url> 
+			</repository> <repository> <id>maven.aksw.snapshots</id> <name>University 
+			Leipzig, AKSW Maven2 Repository</name> <url>http://maven.aksw.org/repository/snapshots</url> 
+			</repository> -->
 	</repositories>
 
 
