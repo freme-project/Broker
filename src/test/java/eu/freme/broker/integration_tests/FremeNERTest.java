@@ -78,7 +78,7 @@ public class FremeNERTest extends IntegrationTest{
                     .queryString("language", lang)
                     .queryString("dataset", dataset)
                     .queryString("informat", "text")
-                    .queryString("prefix", "http://test-prefix.com")
+                    .queryString("prefix", "http://test-prefix.com/")
                     .asString();
             validateNIFResponse(response, this.contentType);
 
