@@ -21,7 +21,7 @@ public class DatasetAccessDecisionVoter implements AccessDecisionVoter<Dataset> 
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return clazz == User.class;
+		return clazz == Dataset.class;
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public class DatasetAccessDecisionVoter implements AccessDecisionVoter<Dataset> 
 		}
 
 		User authenticatedUser = (User) authentication.getPrincipal();
-		
+
 		if( authenticatedUser.getRole().equals(User.roleAdmin)) {
 			return ACCESS_GRANTED;
 		} else if (object.getAccessLevel().equals(OwnedResource.AccessLevel.PUBLIC)) {

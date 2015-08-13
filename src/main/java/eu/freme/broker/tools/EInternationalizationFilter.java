@@ -55,10 +55,11 @@ public class EInternationalizationFilter implements Filter {
 		if (informat == null) {
 			informat = req.getContentType();
 
-			String[] parts = informat.split(";");
+			//TODO: Attention, this produces an error for security integration tests!
+			/*String[] parts = informat.split(";");
 			if (parts.length > 1) {
 				informat = parts[0].trim();
-			}
+			}*/
 		}
 
 		if (informat == null) {

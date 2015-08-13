@@ -172,7 +172,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 		@SuppressWarnings("rawtypes")
 		ArrayList<AccessDecisionVoter> list = new ArrayList<AccessDecisionVoter>();
 		list.add(new UserAccessDecisionVoter());
-		list.add(new DatasetAccessDecisionVoter());
+		//list.add(new DatasetAccessDecisionVoter());
 		AffirmativeBased ab = new AffirmativeBased(list);
 		return ab;
 	}
