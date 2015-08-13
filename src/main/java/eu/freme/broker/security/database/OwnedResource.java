@@ -1,34 +1,35 @@
 package eu.freme.broker.security.database;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.eclipse.persistence.internal.codegen.AccessLevel;
 
 import javax.persistence.*;
-import java.util.List;
 
 /**
  * @author Jonathan Sauder jsauder@campus.tu-berlin.de
  */
+
 @Entity
-@Table(name = "template")
-public class Template {
+@Table(name = "dataset")
+public class OwnedResource {
 
 	public enum AccessLevel {PRIVATE,PUBLIC}
+
 
 	@Id
 	@Column(name = "id")
 	private String id;
 
 	@JsonIgnore
-	@ManyToOne(optional= false, targetEntity = User.class )
+	@ManyToOne(optional=false,targetEntity = User.class)
 	private User owner;
 
 	private AccessLevel accessLevel;
 
-	protected Template() {
+
+	protected OwnedResource() {
 	}
 
-	public Template(String id, User owner, AccessLevel accessLevel) {
+	public OwnedResource(String id, User owner, AccessLevel accessLevel) {
 		this.id = id;
 		this.owner= owner;
 		this.accessLevel = accessLevel;

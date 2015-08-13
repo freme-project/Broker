@@ -8,14 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.lang.reflect.Type;
-import java.util.Iterator;
-
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BrokerConfig.class)
-public class TemplateRepositoryTest {
+public class OwnedResourceRepositoryTest {
 
 	Logger logger = Logger.getLogger(TokenRepositoryTest.class);
 
@@ -23,7 +20,7 @@ public class TemplateRepositoryTest {
 	UserRepository userRepository;
 
 	@Autowired
-	TemplateRepository templateRepository;
+	OwnedResourceRepository datasetRepository;
 
 	@Test
 	public void testUserRepository(){
@@ -32,25 +29,25 @@ public class TemplateRepositoryTest {
 		User testuser= new User("Juergen", "bla", User.roleUser);
 		userRepository.save(testuser);
 
-		logger.info("create template \"1\" and save it");
-		templateRepository.save(new Template("1", testuser, Template.AccessLevel.PUBLIC));
-		logger.info("create template \"2\" and save it");
-		templateRepository.save(new Template("2", testuser, Template.AccessLevel.PUBLIC));
-		logger.info("create template \"3\" and save it");
-		templateRepository.save(new Template("3", testuser, Template.AccessLevel.PUBLIC));
+		logger.info("create dataset \"1\" and save it");
+		datasetRepository.save(new OwnedResource("1", testuser, OwnedResource.AccessLevel.PUBLIC));
+		logger.info("create dataset \"2\" and save it");
+		datasetRepository.save(new OwnedResource("2", testuser, OwnedResource.AccessLevel.PUBLIC));
+		logger.info("create dataset \"3\" and save it");
+		datasetRepository.save(new OwnedResource("3", testuser, OwnedResource.AccessLevel.PUBLIC));
 
-		logger.info("fetch template \"2\"");
-		Template two = templateRepository.findOneById("2");
+		logger.info("fetch dataset \"2\"");
+		OwnedResource two = datasetRepository.findOneByName("2");
 		assertTrue(two!=null);
 
-		logger.info("count templates");
-		int counter = Helper.count(templateRepository.findAll());
+		logger.info("count datasets");
+		int counter = Helper.count(datasetRepository.findAll());
 		// admin user is one more
 		assertTrue(counter==3);
 
-		logger.info("delete template \"2\"");
-		templateRepository.delete(two);
-		counter = Helper.count(templateRepository.findAll());
+		logger.info("delete dataset \"2\"");
+		datasetRepository.delete(two);
+		counter = Helper.count(datasetRepository.findAll());
 		assertTrue(counter==2);
 	}
 }

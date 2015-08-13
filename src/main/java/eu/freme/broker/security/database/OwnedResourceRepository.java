@@ -5,8 +5,8 @@ import org.springframework.data.repository.CrudRepository;
 /**
  * @author Jonathan Sauder jsauder@campus.tu-berlin.de
  */
-public interface TemplateRepository extends CrudRepository<Template, Long> {
+public interface OwnedResourceRepository extends CrudRepository<OwnedResource, Long> {
 
-    Template findOneById(String id);
+    OwnedResource findOneByName(String name);
     
 }

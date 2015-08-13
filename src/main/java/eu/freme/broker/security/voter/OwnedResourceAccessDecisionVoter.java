@@ -1,16 +1,17 @@
 package eu.freme.broker.security.voter;
 
-import java.util.Collection;
-
+import eu.freme.broker.security.database.OwnedResource;
+import eu.freme.broker.security.database.User;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
-import eu.freme.broker.security.database.User;
+import java.util.Collection;
+
 /**
- * @author Jonathan Sauder jsauder@campus.tu-berlin.de
+ * @author Jan Nehring - jan.nehring@dfki.de
  */
-public class UserAccessDecisionVoter implements AccessDecisionVoter<User> {
+public class OwnedResourceAccessDecisionVoter implements AccessDecisionVoter<OwnedResource> {
 
 	@Override
 	public boolean supports(ConfigAttribute attribute) {
@@ -23,7 +24,7 @@ public class UserAccessDecisionVoter implements AccessDecisionVoter<User> {
 	}
 
 	@Override
-	public int vote(Authentication authentication, User object,
+	public int vote(Authentication authentication, OwnedResource object,
 			Collection<ConfigAttribute> attributes) {
 		
 		if( authentication.getPrincipal().equals( "anonymousUser" )){
@@ -32,9 +33,11 @@ public class UserAccessDecisionVoter implements AccessDecisionVoter<User> {
 
 		User authenticatedUser = (User) authentication.getPrincipal();
 		
-		if( authenticatedUser.getRole().equals(User.roleAdmin)){
+		if( authenticatedUser.getRole().equals(User.roleAdmin)) {
 			return ACCESS_GRANTED;
-		} else if (authenticatedUser.getName().equals(object.getName())) {
+		} else if (object.getAccessLevel().equals(OwnedResource.AccessLevel.PUBLIC)) {
+			return ACCESS_GRANTED;
+		} else if (authenticatedUser.getName().equals(object.getOwner().getName())) {
 			return ACCESS_GRANTED;
 		} else {
 			return ACCESS_DENIED;
