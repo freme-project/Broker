@@ -19,7 +19,7 @@ public class Dataset extends OwnedResource{
     @ManyToOne(optional=false,targetEntity = User.class)
     protected User owner;
 
-    protected Dataset() {
+    Dataset() {
     }
 
     public Dataset(String id, User owner, AccessLevel accessLevel) {

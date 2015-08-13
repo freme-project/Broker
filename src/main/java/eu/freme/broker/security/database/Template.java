@@ -19,6 +19,7 @@ public class Template extends OwnedResource {
     @ManyToOne(optional=false,targetEntity = User.class)
     protected User owner;
 
+    Template(){ }
 
 
     public Template(String id, User owner, AccessLevel accessLevel) {
