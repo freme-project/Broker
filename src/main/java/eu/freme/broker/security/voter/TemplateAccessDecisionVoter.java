@@ -1,6 +1,7 @@
 package eu.freme.broker.security.voter;
 
 import eu.freme.broker.security.database.OwnedResource;
+import eu.freme.broker.security.database.Template;
 import eu.freme.broker.security.database.User;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
@@ -11,7 +12,7 @@ import java.util.Collection;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */
-public class OwnedResourceAccessDecisionVoter implements AccessDecisionVoter<OwnedResource> {
+public class TemplateAccessDecisionVoter implements AccessDecisionVoter<Template> {
 
 	@Override
 	public boolean supports(ConfigAttribute attribute) {
@@ -24,7 +25,7 @@ public class OwnedResourceAccessDecisionVoter implements AccessDecisionVoter<Own
 	}
 
 	@Override
-	public int vote(Authentication authentication, OwnedResource object,
+	public int vote(Authentication authentication, Template object,
 			Collection<ConfigAttribute> attributes) {
 		
 		if( authentication.getPrincipal().equals( "anonymousUser" )){

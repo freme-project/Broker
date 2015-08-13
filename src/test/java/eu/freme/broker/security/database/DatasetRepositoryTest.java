@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BrokerConfig.class)
-public class OwnedResourceRepositoryTest {
+public class DatasetRepositoryTest {
 
 	Logger logger = Logger.getLogger(TokenRepositoryTest.class);
 
@@ -20,7 +20,7 @@ public class OwnedResourceRepositoryTest {
 	UserRepository userRepository;
 
 	@Autowired
-	OwnedResourceRepository datasetRepository;
+	DatasetRepository datasetRepository;
 
 	@Test
 	public void testUserRepository(){
@@ -30,14 +30,14 @@ public class OwnedResourceRepositoryTest {
 		userRepository.save(testuser);
 
 		logger.info("create dataset \"1\" and save it");
-		datasetRepository.save(new OwnedResource("1", testuser, OwnedResource.AccessLevel.PUBLIC));
+		datasetRepository.save(new Dataset("1", testuser, OwnedResource.AccessLevel.PUBLIC));
 		logger.info("create dataset \"2\" and save it");
-		datasetRepository.save(new OwnedResource("2", testuser, OwnedResource.AccessLevel.PUBLIC));
+		datasetRepository.save(new Dataset("2", testuser, OwnedResource.AccessLevel.PUBLIC));
 		logger.info("create dataset \"3\" and save it");
-		datasetRepository.save(new OwnedResource("3", testuser, OwnedResource.AccessLevel.PUBLIC));
+		datasetRepository.save(new Dataset("3", testuser, OwnedResource.AccessLevel.PUBLIC));
 
 		logger.info("fetch dataset \"2\"");
-		OwnedResource two = datasetRepository.findOneByName("2");
+		Dataset two = datasetRepository.findOneById("2");
 		assertTrue(two!=null);
 
 		logger.info("count datasets");

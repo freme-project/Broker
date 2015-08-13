@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import eu.freme.broker.security.voter.DatasetAccessDecisionVoter;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -171,6 +172,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 		@SuppressWarnings("rawtypes")
 		ArrayList<AccessDecisionVoter> list = new ArrayList<AccessDecisionVoter>();
 		list.add(new UserAccessDecisionVoter());
+		list.add(new DatasetAccessDecisionVoter());
 		AffirmativeBased ab = new AffirmativeBased(list);
 		return ab;
 	}
