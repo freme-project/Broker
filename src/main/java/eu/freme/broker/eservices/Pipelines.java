@@ -1,7 +1,6 @@
 package eu.freme.broker.eservices;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.eservices.pipelines.core.PipelineService;
 import eu.freme.eservices.pipelines.core.ServiceException;
 import eu.freme.eservices.pipelines.requests.RequestBuilder;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import eu.freme.eservices.pipelines.core.PipelineResponse;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -39,11 +37,10 @@ public class Pipelines {
 	 * <p>Examples can be found in the unit tests in the Pipelines repository.</p>
 	 * @param requests	The requests to send to the service.
 	 * @return          The response of the last request.
-	 * @throws IOException
-	 * @throws UnirestException
+	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
 	 */
 	@RequestMapping(value = "/pipelining/chain", method = RequestMethod.POST)
-	public ResponseEntity<String> pipeline(@RequestBody String requests) throws IOException, UnirestException {
+	public ResponseEntity<String> pipeline(@RequestBody String requests) {
 		List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
 		try {
 			PipelineResponse pipelineResult = pipelineAPI.chain(serializedRequests);
@@ -54,6 +51,9 @@ public class Pipelines {
 			MultiValueMap<String, String> headers = new HttpHeaders();
 			headers.add(HttpHeaders.CONTENT_TYPE, serviceError.getResponse().getContentType());
 			return new ResponseEntity<>(serviceError.getMessage(), headers, serviceError.getStatus());
+		} catch (Throwable t) {
+			// throw a FREME exception if anything goes really wrong...
+			throw new InternalServerErrorException(t.getMessage());
 		}
 	}
 }
