@@ -19,16 +19,7 @@ public class UserRepositoryTest {
 
 	@Autowired
 	UserRepository userRepository;
-	
-	private int count(Iterable<User> itr){
-		Iterator<User> itr2 = itr.iterator();
-		int counter=0;
-		while(itr2.hasNext()){
-			counter++;
-			itr2.next();
-		}
-		return counter;
-	}
+
 	
 	@Test
 	public void testUserRepository(){
@@ -39,12 +30,12 @@ public class UserRepositoryTest {
 		User juergen = userRepository.findOneByName("Juergen");
 		assertTrue(juergen!=null);
 		
-		int counter = count(userRepository.findAll());
+		int counter = Helper.count(userRepository.findAll());
 		// admin user is one more
 		assertTrue(counter==4);
 		
 		userRepository.delete(juergen);
-		counter = count(userRepository.findAll());
+		counter = Helper.count(userRepository.findAll());
 		assertTrue(counter==3);
 	}
 }
