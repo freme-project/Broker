@@ -51,7 +51,7 @@ public class UserController extends BaseRestController {
 		if( password.length() < 8 ){
 			throw new BadRequestException("The passwords needs to be at least 8 characters long");
 		}
-		
+
 		try {
 			String hashedPassword = PasswordHasher.getSaltedHash(password);
 			User user = new User(username, hashedPassword, User.roleUser);

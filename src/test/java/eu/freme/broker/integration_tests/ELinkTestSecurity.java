@@ -1,11 +1,20 @@
 package eu.freme.broker.integration_tests;
 
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.freme.broker.eservices.BaseRestController;
+import eu.freme.broker.security.database.TemplateRepository;
+import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.conversion.rdf.RDFConstants;
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 
 import java.io.IOException;
 
@@ -15,13 +24,60 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by jonathan on 28.07.15.
  */
-public class ELinkTest extends IntegrationTest {
+public class ELinkTestSecurity extends IntegrationTest {
 
-    public ELinkTest(){
+
+    @Autowired
+    AbstractAccessDecisionManager decisionManager;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    AccessLevelHelper accessLevelHelper;
+
+    @Autowired
+    TemplateRepository templateRepository;
+
+    String token;
+
+    public ELinkTestSecurity() throws UnirestException{
         super("/e-link/");
+
+
     }
 
 
+    public void createAndAuthenticateUser() throws UnirestException{
+
+        String username = "testuser";
+        String password  = "testpassword";
+        //System.out.println("ASDASD "+getBaseURL());
+        HttpResponse<String> response = Unirest.post(getBaseURL() + "/user")
+                .queryString("username", username)
+                .queryString("password", password).asString();
+        logger.debug("STATUS: "+response.getStatus());
+        assertTrue(response.getStatus() == HttpStatus.OK.value());
+
+
+        /*
+        logger.info("login with new user / create token");
+        response = Unirest
+                .post(getBaseURL()  + BaseRestController.authenticationEndpoint)
+                .header("X-Auth-Username", username)
+                .header("X-Auth-Password", password).asString();
+        assertTrue(response.getStatus() == HttpStatus.OK.value());
+        token = new JSONObject(response.getBody()).getString("token");
+        //String responseUsername = new JSONObject(response.getBody()).getString("name");
+        //assertTrue(username.equals(responseUsername));
+*/
+    }
+
+    @Test
+    public void testSmal() throws Exception{
+        createAndAuthenticateUser();
+        String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl");
+    }
 
     //Tests Creation, fetching, modification and deletion of a template and fetching of all templates
     @Test
@@ -73,6 +129,7 @@ public class ELinkTest extends IntegrationTest {
 
 
         HttpResponse<String> response = baseRequestPost("templates")
+                .header("X-Auth-Token", token)
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
                 .body(constructTemplate(query, "http://dbpedia.org/sparql/"))

@@ -7,7 +7,9 @@ import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConversionService;
+import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -25,6 +27,17 @@ public abstract class IntegrationTest {
     private String url = null;
     private String service;
     public RDFConversionService converter;
+    public Logger logger = Logger.getLogger(IntegrationTest.class);
+
+    public String getBaseURL() {
+        return baseURL;
+    }
+
+    private String baseURL;
+
+
+    //String adminUsername;
+    //String adminPassword;
     
     public IntegrationTest(String service){
         this.service = service;
@@ -32,8 +45,12 @@ public abstract class IntegrationTest {
 
     @Before
     public void setup(){
-        url = IntegrationTestSetup.getURLEndpoint() + service;
+        baseURL = IntegrationTestSetup.getURLEndpoint();
+        url = baseURL + service;
         converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
+        //ConfigurableApplicationContext context = IntegrationTestSetup.getApplicationContext();
+        //adminUsername = context.getEnvironment().getProperty("admin.username");
+        //adminPassword = context.getEnvironment().getProperty("admin.password");
     }
 
     protected HttpRequestWithBody baseRequestPost(String function) {
@@ -98,6 +115,14 @@ public abstract class IntegrationTest {
         }
         */
 
+    }
+
+    public static String constructTemplate(String query, String endpoint) {
+        query = query.replaceAll("\n","\\\\n");
+        return  " {\n" +
+                " \"query\":\""+query+"\",\n" +
+                " \"endpoint\":\""+endpoint+"\"\n" +
+                " }";
     }
 
 
