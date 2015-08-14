@@ -11,10 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import eu.freme.eservices.pipelines.core.PipelineResponse;
 
 import java.util.List;
@@ -24,7 +21,7 @@ import java.util.List;
  */
 @RestController
 @SuppressWarnings("unused")
-public class Pipelines {
+public class Pipelines extends BaseRestController {
 
 	@Autowired
 	PipelineService pipelineAPI;
@@ -42,7 +39,7 @@ public class Pipelines {
 	@RequestMapping(value = "/pipelining/chain",
 			method = RequestMethod.POST,
 			consumes = "application/json",
-			produces = {"text/turtle", "application/json+ld", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"}
+			produces = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3"}
 	)
 	public ResponseEntity<String> pipeline(@RequestBody String requests) {
 		List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
