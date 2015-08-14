@@ -39,7 +39,11 @@ public class Pipelines {
 	 * @return          The response of the last request.
 	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
 	 */
-	@RequestMapping(value = "/pipelining/chain", method = RequestMethod.POST)
+	@RequestMapping(value = "/pipelining/chain",
+			method = RequestMethod.POST,
+			consumes = "application/json",
+			produces = {"text/turtle", "application/json+ld", "application/json+ld", "application/n-triples", "application/rdf+xml", "text/n3"}
+	)
 	public ResponseEntity<String> pipeline(@RequestBody String requests) {
 		List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
 		try {
