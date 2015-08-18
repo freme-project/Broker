@@ -31,6 +31,10 @@ import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 public class FremeNER extends BaseRestController {
@@ -54,6 +58,7 @@ public class FremeNER extends BaseRestController {
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 			@RequestParam(value = "language", required = false) String language,
 			@RequestParam(value = "dataset", required = false) String dataset,
+			@RequestParam(value = "numLinks", required = false) String numLinksParam,
                         @RequestBody(required = false) String postBody) {
             
             // Check the language parameter.
@@ -78,6 +83,15 @@ public class FremeNER extends BaseRestController {
                 throw new eu.freme.broker.exception.BadRequestException("Dataset language is not specified");            
             } else {
                 // OK, dataset specified.
+            }
+            
+            int numLinks = 1;
+            // Check the dataset parameter.
+            if(numLinksParam != null) {
+                numLinks = Integer.parseInt(numLinksParam);
+                if(numLinks > 5) {
+                    numLinks = 1;
+                }
             }
             
             NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
@@ -138,7 +152,7 @@ public class FremeNER extends BaseRestController {
             }
             
             try {
-                String fremeNERRes = entityAPI.callFremeNER(textForProcessing, language, parameters.getPrefix(), dataset);
+                String fremeNERRes = entityAPI.callFremeNER(textForProcessing, language, parameters.getPrefix(), dataset, numLinks);
                 outModel.read(new ByteArrayInputStream(fremeNERRes.getBytes()), null, "TTL");
             } catch (BadRequestException e) {
                 logger.error("failed", e);
@@ -158,9 +172,12 @@ public class FremeNER extends BaseRestController {
 	public ResponseEntity<String> createDataset(
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
 			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "description", required = false) String description,
 			@RequestParam(value = "language", required = false) String language,
 			@RequestParam(value = "informat", required = false) String informat,
 			@RequestParam(value = "f", required = false) String f,
+			@RequestParam(value = "endpoint", required = false) String endpoint,
+			@RequestParam(value = "sparql", required = false) String sparql,
                         @RequestBody(required = false) String postBody) {
             
             // merge long and short parameters - long parameters override short parameters.
@@ -170,6 +187,10 @@ public class FremeNER extends BaseRestController {
             // Check the dataset name parameter.
             if(name == null) {
                 throw new eu.freme.broker.exception.BadRequestException("Parameter name is not specified");            
+            }
+            // Check the dataset name parameter.
+            if(description == null) {
+                throw new eu.freme.broker.exception.BadRequestException("Parameter description is not specified");            
             }
             // Check the language parameter.
             if(language == null) {
@@ -187,8 +208,18 @@ public class FremeNER extends BaseRestController {
                     throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
                 }
             }
-            // Check if data was sent.
-            if( postBody == null || postBody.trim().length() == 0 ){
+            // first check if user wants to submit data via SPARQL
+            if(endpoint != null) {
+                if(sparql != null) {
+                    
+                } else {
+                    // endpoint specified, but not sparql => throw exception
+                    throw new eu.freme.broker.exception.BadRequestException("SPARQL endpoint was specified but not a SPARQL query.");
+                }
+            }
+            // if not, then check the body of the request
+            else if( postBody == null || postBody.trim().length() == 0 ){
+                // Check if data was sent.
                 throw new eu.freme.broker.exception.BadRequestException("No data to process could be found in the input.");
             }
             
@@ -227,10 +258,26 @@ public class FremeNER extends BaseRestController {
                     format = "N3";
                     break;
             }
-
-            return callBackend("http://139.18.2.231:8080/api/datasets?format="+format
+            
+            if(endpoint != null && sparql != null) {
+                try {
+                    // fed via SPARQL endpoint
+                    return callBackend("http://139.18.2.231:8080/api/datasets?format="+format
+                            + "&name="+name
+                            + "&description="+URLEncoder.encode(description,"UTF-8")
+                            + "&language="+language
+                            + "&endpoint="+endpoint
+                            + "&sparql="+URLEncoder.encode(sparql,"UTF-8"), HttpMethod.POST, null);
+                } catch (UnsupportedEncodingException ex) {
+                    Logger.getLogger(FremeNER.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                // datasets is sent
+                return callBackend("http://139.18.2.231:8080/api/datasets?format="+format
                     + "&name="+name
                     + "&language="+language, HttpMethod.POST, postBody);
+            }
+            return null;
         }
         
         // Updating dataset for use in the e-Entity service.
