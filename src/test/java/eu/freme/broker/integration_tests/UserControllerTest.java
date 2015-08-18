@@ -33,7 +33,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	@Ignore
+	//@Ignore
 	public void testUserSecurity() throws UnirestException {
 
 		String username = "myuser";

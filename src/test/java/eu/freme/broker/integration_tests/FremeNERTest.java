@@ -5,6 +5,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.conversion.rdf.RDFConstants;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -28,14 +29,15 @@ public class FremeNERTest extends IntegrationTest{
     protected HttpRequestWithBody baseRequestPost(String function) {
         return super.baseRequestPost(function)
                 .queryString("dataset", dataset);
+
     }
 
     protected HttpRequest baseRequestGet(String function) {
         return super.baseRequestGet(function).queryString("dataset", dataset);
     }
 
-
     @Test
+    @Ignore
     public void TestFremeNER() throws UnirestException, IOException, UnsupportedEncodingException {
 
         HttpResponse<String> response;
@@ -76,7 +78,6 @@ public class FremeNERTest extends IntegrationTest{
             response = baseRequestPost("documents")
                     .queryString("input", testinput)
                     .queryString("language", lang)
-                    .queryString("dataset", dataset)
                     .queryString("informat", "text")
                     .queryString("prefix", "http://test-prefix.com/")
                     .asString();
