@@ -5,6 +5,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -22,6 +23,7 @@ public class EPublishingTest extends IntegrationTest{
     }
 
     @Test
+    @Ignore
     public void testValidJSON() throws UnirestException, IOException {
 
         // TODO: wait for issue: Unit tests on windows #15 https://github.com/freme-project/e-Publishing/issues/15
