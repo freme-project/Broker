@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import eu.freme.broker.exception.ExternalServiceFailedException;
@@ -111,6 +114,16 @@ public class DBpediaSpotlight extends BaseRestController {
             try {
                 String dbpediaSpotlightRes = entityAPI.callDBpediaSpotlight(textForProcessing, confidenceParam, languageParam, parameters.getPrefix());
                 outModel.read(new ByteArrayInputStream(dbpediaSpotlightRes.getBytes()), null, "TTL");
+                // remove unwanted info
+                outModel.removeAll(null, RDF.type, OWL.ObjectProperty);
+                outModel.removeAll(null, RDF.type, OWL.DatatypeProperty);
+                outModel.removeAll(null, RDF.type, OWL.Class);
+                outModel.removeAll(null, RDF.type, OWL.Class);
+                ResIterator resIter = outModel.listResourcesWithProperty(RDF.type, outModel.getResource("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#Entry"));
+                while(resIter.hasNext()) {
+                    Resource res = resIter.next();
+                    outModel.removeAll(res, null, (RDFNode)null);
+                }
             } catch (BadRequestException e) {
                 logger.error("failed", e);
                 throw new eu.freme.broker.exception.BadRequestException(e.getMessage());
