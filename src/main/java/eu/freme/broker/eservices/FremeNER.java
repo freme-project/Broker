@@ -80,7 +80,7 @@ public class FremeNER extends BaseRestController {
             
             // Check the dataset parameter.
             if(dataset == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Dataset language is not specified");            
+                throw new eu.freme.broker.exception.BadRequestException("Dataset parameter is not specified");            
             } else {
                 // OK, dataset specified.
             }
