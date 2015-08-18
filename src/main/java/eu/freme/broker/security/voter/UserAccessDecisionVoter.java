@@ -10,7 +10,7 @@ import eu.freme.broker.security.database.User;
 /**
  * @author Jonathan Sauder jsauder@campus.tu-berlin.de
  */
-public class UserAccessDecisionVoter implements AccessDecisionVoter<User> {
+public class UserAccessDecisionVoter implements AccessDecisionVoter<Object> {
 
 	@Override
 	public boolean supports(ConfigAttribute attribute) {
@@ -23,21 +23,31 @@ public class UserAccessDecisionVoter implements AccessDecisionVoter<User> {
 	}
 
 	@Override
-	public int vote(Authentication authentication, User object,
-			Collection<ConfigAttribute> attributes) {
-		
-		if( authentication.getPrincipal().equals( "anonymousUser" )){
-			return ACCESS_DENIED;
-		}
+	public int vote(Authentication authentication, Object object,
+					Collection<ConfigAttribute> attributes) {
+		try {
+			User user = (User) object;
 
-		User authenticatedUser = (User) authentication.getPrincipal();
-		
-		if( authenticatedUser.getRole().equals(User.roleAdmin)){
-			return ACCESS_GRANTED;
-		} else if (authenticatedUser.getName().equals(object.getName())) {
-			return ACCESS_GRANTED;
-		} else {
-			return ACCESS_DENIED;
+			//temporary
+			System.out.println("Successfully casted from Object to User");
+
+			if (authentication.getPrincipal().equals("anonymousUser")) {
+				return ACCESS_DENIED;
+			}
+
+			User authenticatedUser = (User) authentication.getPrincipal();
+
+			if (authenticatedUser.getRole().equals(User.roleAdmin)) {
+				return ACCESS_GRANTED;
+			} else if (authenticatedUser.getName().equals(user.getName())) {
+				return ACCESS_GRANTED;
+			} else {
+				return ACCESS_DENIED;
+			}
+		} catch (ClassCastException e) {
+			//temporary
+			System.out.println("Handled ClassCastException from some Object to User");
+			return ACCESS_ABSTAIN;
 		}
 	}
 }

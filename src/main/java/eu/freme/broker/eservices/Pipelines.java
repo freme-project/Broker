@@ -46,7 +46,7 @@ public class Pipelines {
 		headers.add(HttpHeaders.CONTENT_TYPE, "text/plain");
 		List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
 		try {
-			return new ResponseEntity<>(pipelineAPI.chain(serializedRequests), headers, HttpStatus.OK);
+			return new ResponseEntity<>(pipelineAPI.chain(serializedRequests).toString(), headers, HttpStatus.OK);
 		} catch (ServiceException serviceError) {
 			return new ResponseEntity<>(serviceError.getMessage(), serviceError.getStatus());
 		}

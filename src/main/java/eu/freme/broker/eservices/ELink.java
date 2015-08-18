@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -501,6 +502,7 @@ public class ELink extends BaseRestController {
         // Update one template.
         // PUT /e-link/templates/{template-id}
 	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.PUT)
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> updateTemplateById(
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
@@ -641,7 +643,14 @@ public class ELink extends BaseRestController {
         // Removing a template.
         // DELETE /e-link/templates/{template-id}
 	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.DELETE)
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> removeTemplateById(@PathVariable("templateid") String id) {
+
+        Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        decisionManager.decide(authentication, user, accessLevelHelper.writeAccess());
+        templateRepository.delete(templateRepository.findOneById(id));
 
             if(templateDAO.removeTemplateById(id)) {
                 return new ResponseEntity<String>("The template was sucessfully removed.", HttpStatus.NO_CONTENT);
