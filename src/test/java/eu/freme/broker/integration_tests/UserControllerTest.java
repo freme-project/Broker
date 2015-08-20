@@ -7,6 +7,7 @@ import eu.freme.broker.eservices.BaseRestController;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,7 @@ public class UserControllerTest {
 	}
 
 	@Test
+	@Ignore
 	public void testUserSecurity() throws UnirestException {
 
 		String username = "myuser";
@@ -132,6 +134,7 @@ public class UserControllerTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testAdmin() throws UnirestException{
 		
 		String username = "carlos";

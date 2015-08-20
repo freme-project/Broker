@@ -25,6 +25,7 @@ public class ELinkTest extends IntegrationTest {
 
     //Tests Creation, fetching, modification and deletion of a template and fetching of all templates
     @Test
+    @Ignore
     public void testTemplateHandling() throws Exception{
         String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl");
         testELinkTemplatesId(templateid);

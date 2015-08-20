@@ -8,22 +8,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import eu.freme.broker.security.database.OwnedResource;
-import eu.freme.broker.security.database.TemplateRepository;
-import eu.freme.broker.security.database.User;
-import eu.freme.broker.security.database.UserRepository;
-import eu.freme.broker.security.tools.AccessLevelHelper;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.vote.AbstractAccessDecisionManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -37,37 +27,32 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.broker.exception.TemplateNotFoundException;
+import eu.freme.broker.exception.InvalidNIFException;
+import eu.freme.broker.exception.InvalidTemplateEndpointException;
 import eu.freme.broker.tools.NIFParameterSet;
+import eu.freme.broker.tools.TemplateValidator;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
-import eu.freme.eservices.elink.DataEnricher;
+import eu.freme.eservices.elink.api.DataEnricher;
 import eu.freme.eservices.elink.Exporter;
 import eu.freme.eservices.elink.Template;
 import eu.freme.eservices.elink.TemplateDAO;
+import eu.freme.eservices.elink.exceptions.TemplateNotFoundException;
+import org.apache.commons.validator.routines.UrlValidator;
 
 @RestController
 public class ELink extends BaseRestController {
-
+    
         @Autowired
         DataEnricher dataEnricher;
 
         @Autowired
         TemplateDAO templateDAO;
-
+        
         @Autowired
-        AbstractAccessDecisionManager decisionManager;
-
-        @Autowired
-        UserRepository userRepository;
-
-        @Autowired
-        TemplateRepository templateRepository;
-
-        @Autowired
-        AccessLevelHelper accessLevelHelper;
-
-        // Enriching using a template.
+        TemplateValidator templateValidator;
+        
+        // Enriching using a template.        
         // POST /e-link/enrich/
         // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
 	@RequestMapping(value = "/e-link/documents", method = RequestMethod.POST)
@@ -82,9 +67,9 @@ public class ELink extends BaseRestController {
                 String f         = null;
                 String outformat = null;
                 String o         = null;
-
+                
                 HashMap<String, String> templateParams = new HashMap();
-
+                
                 for (Map.Entry<String, String> entry : allParams.entrySet()) {
                     switch(entry.getKey()) {
                         case "informat":
@@ -104,7 +89,7 @@ public class ELink extends BaseRestController {
                             break;
                     }
                 }
-
+                
                 // merge long and short parameters - long parameters override short parameters.
                 if( informat == null ){
                     informat = f;
@@ -112,15 +97,15 @@ public class ELink extends BaseRestController {
                 if( outformat == null ){
                     outformat = o;
                 }
-
+                
                 if( postBody == null || postBody.trim().length() == 0 ){
                     throw new eu.freme.broker.exception.BadRequestException("No data to process could be found in the input.");
                 }
-
+                
                 NIFParameterSet parameters = this.normalizeNif(postBody, informat, outformat, postBody, acceptHeader, contentTypeHeader, null);
 
                 Model inModel = ModelFactory.createDefaultModel();
-
+                
                 switch(parameters.getInformat()) {
                     case TURTLE:
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
@@ -136,44 +121,58 @@ public class ELink extends BaseRestController {
                         break;
                     case N3:
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N3");
-                        break;
+                        break;                        
                 }
-
+                
+//                System.out.println(inModel);
+//                System.out.println(inModel.size());
+                
                 inModel = dataEnricher.enrichNIF(inModel, templateId, templateParams);
-
+                
+//                System.out.println(inModel);
+//                System.out.println(inModel.size());
+                
+                HttpHeaders responseHeaders = new HttpHeaders();
                 String serialization;
                 switch(parameters.getOutformat()) {
                     case TURTLE:
                         serialization = rdfConversionService.serializeRDF(inModel, RDFSerialization.TURTLE);
-                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
+                        responseHeaders.add("Content-Type", "text/turtle");
+                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                     case JSON_LD:
                         serialization = rdfConversionService.serializeRDF(inModel, RDFSerialization.JSON_LD);
-                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
+                        responseHeaders.add("Content-Type", "application/ld+json");
+                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                     case RDF_XML:
                         serialization = rdfConversionService.serializeRDF(inModel, RDFSerialization.RDF_XML);
-                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
+                        responseHeaders.add("Content-Type", "application/rdf+xml");
+                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                     case N_TRIPLES:
                         serialization = rdfConversionService.serializeRDF(inModel, RDFSerialization.N_TRIPLES);
-                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
+                        responseHeaders.add("Content-Type", "application/n-triples");
+                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                     case N3:
                         serialization = rdfConversionService.serializeRDF(inModel, RDFSerialization.N3);
-                        return new ResponseEntity<String>(serialization, HttpStatus.OK);
+                        responseHeaders.add("Content-Type", "text/n3");
+                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                 }
             } catch (TemplateNotFoundException ex) {
                 logger.warn("The template with the specified ID has not been found.", ex);
                 throw new TemplateNotFoundException("The template with the specified ID has not been found.");
+            } catch (org.apache.jena.riot.RiotException ex) {
+                logger.error("Invalid NIF document.", ex);
+                throw new InvalidNIFException(ex.getMessage());                
             } catch (Exception ex) {
                 logger.error("Internal service problem. Please contact the service provider.", ex);
                 throw new InternalServerErrorException("Unknown problem. Please contact us.");
             }
             throw new InternalServerErrorException("Unknown problem. Please contact us.");
 	}
-
+        
         // Creating a template.
         // POST /e-link/templates/
         // Example: curl -X POST -d @template.json "http://localhost:8080/e-link/templates/" -H "Content-Type: application/json" -H "Accept: application/json" -v
 	@RequestMapping(value = "/e-link/templates", method = RequestMethod.POST)
-    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> createTemplate(
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
@@ -182,20 +181,20 @@ public class ELink extends BaseRestController {
                         @RequestParam(value = "outformat",     required=false) String outformat,
                         @RequestParam(value = "o",             required=false) String o,
                         @RequestBody String postBody) {
-
+            
             try {
-
+                
                 if( informat == null ){
                     informat = f;
                 }
                 if( outformat == null ){
                     outformat = o;
                 }
-
+            
                 if( postBody == null || postBody.trim().length() == 0 ) {
                     return new ResponseEntity<String>("Empty body of the request.", HttpStatus.BAD_REQUEST);
                 }
-
+                
                 // Checking the informat parameter
                 RDFSerialization thisInformat;
                 if (informat == null && contentTypeHeader == null) {
@@ -212,7 +211,7 @@ public class ELink extends BaseRestController {
                     thisInformat = rdfELinkSerializationFormats.get(contentTypeHeader);
 		}
                 // END: Checking the informat parameter
-
+                
                 // Checking the outformat parameter
                 RDFSerialization thisOutformat;
 		if( acceptHeader != null && acceptHeader.equals("*/*")) {
@@ -232,67 +231,63 @@ public class ELink extends BaseRestController {
                     thisOutformat = rdfELinkSerializationFormats.get(acceptHeader);
 		}
                 // END: Checking the outformat parameter
-
+                
                 Template t = null;
                 Model model = ModelFactory.createDefaultModel();
-
+                
                 switch(thisInformat) {
                     case JSON:
                         JSONObject jsonObj = new JSONObject(postBody);
-                        t = new Template(templateDAO.generateTemplateId(), jsonObj.getString("endpoint"), jsonObj.getString("query"));
+                        templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
+                        t = new Template(
+                                templateDAO.generateTemplateId(),
+                                jsonObj.getString("endpoint"),
+                                jsonObj.getString("query"),
+                                jsonObj.getString("label"),
+                                jsonObj.getString("description")
+                        );
                         break;
                     case TURTLE:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        templateValidator.validateTemplateEndpoint(t.getEndpoint());
                         t.setId(templateDAO.generateTemplateId());
                         break;
                     case JSON_LD:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "JSON-LD");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        templateValidator.validateTemplateEndpoint(t.getEndpoint());
                         t.setId(templateDAO.generateTemplateId());
                         break;
                     case RDF_XML:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "RDF/XML");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        templateValidator.validateTemplateEndpoint(t.getEndpoint());
                         t.setId(templateDAO.generateTemplateId());
                         break;
                     case N_TRIPLES:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "N-Triples");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        templateValidator.validateTemplateEndpoint(t.getEndpoint());
                         t.setId(templateDAO.generateTemplateId());
                         break;
                     case N3:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "N3");
                         t = Exporter.getInstance().model2OneTemplate(model);
+                        templateValidator.validateTemplateEndpoint(t.getEndpoint());
                         t.setId(templateDAO.generateTemplateId());
-                        break;
+                        break;                        
                 }
-
+                
                 templateDAO.addTemplate(t);
-
-                String templateId = t.getId();
-
-                if (templateRepository.findOneById(templateId) != null) {
-                    throw new BadRequestException("template metadata for templateId=\""+templateId+"\" already exists");
-                }
-
-
-
-                Authentication authentication = SecurityContextHolder.getContext()
-                        .getAuthentication();
-                User user = (User) authentication.getPrincipal();
-                decisionManager.decide(authentication, user, accessLevelHelper.writeAccess());
-
-                templateRepository.save(new eu.freme.broker.security.database.Template(templateId, user, OwnedResource.AccessLevel.PRIVATE));
-
-
+                
                 HttpHeaders responseHeaders = new HttpHeaders();
                 URI location = new URI("/e-link/templates/"+t.getId());
                 responseHeaders.setLocation(location);
-
+                
                 Model outModel;
                 String serialization;
-
+                
                 switch(thisOutformat) {
                     case JSON:
                         responseHeaders.set("Content-Type", "application/json");
@@ -301,12 +296,12 @@ public class ELink extends BaseRestController {
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.TURTLE);
                         responseHeaders.set("Content-Type", "text/turtle");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);                
                     case JSON_LD:
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.JSON_LD);
                         responseHeaders.set("Content-Type", "application/ld+json");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);                        
                     case RDF_XML:
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.RDF_XML);
@@ -322,17 +317,21 @@ public class ELink extends BaseRestController {
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.N3);
                         responseHeaders.set("Content-Type", "text/n3");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
-                }
-
+                }                
             } catch (URISyntaxException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+                throw new BadRequestException(ex.getMessage());
+            } catch (InvalidTemplateEndpointException ex) {
+                Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+                throw new InvalidTemplateEndpointException(ex.getMessage());
             } catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+                throw new InternalServerErrorException(ex.getMessage());
             }
-
+            
             throw new InternalServerErrorException("Unknown problem. Please contact us.");
 	}
-
+        
         // Get one template.
         // GET /e-link/templates/{template-id}
         // curl -v http://api-dev.freme-project.eu/current/e-link/templates/1
@@ -342,9 +341,9 @@ public class ELink extends BaseRestController {
                 @PathVariable("templateid") String id,
                 @RequestParam(value = "outformat",     required=false) String outformat,
                 @RequestParam(value = "o",             required=false) String o) {
-
+            
             try {
-
+                
                 if( outformat == null ){
                     outformat = o;
                 }
@@ -370,15 +369,11 @@ public class ELink extends BaseRestController {
                 // END: Checking the outformat parameter
 
                 Template t = templateDAO.getTemplateById(id);
-
-                if(t == null) {
-                    throw new TemplateNotFoundException("Template with id: \"" + id + "\" does not exist.");
-                }
-
+                
                 HttpHeaders responseHeaders = new HttpHeaders();
                 Model model = ModelFactory.createDefaultModel();
                 String serialization;
-
+                
                 switch(thisOutformat) {
                     case JSON:
                         responseHeaders.set("Content-Type", "application/json");
@@ -409,15 +404,14 @@ public class ELink extends BaseRestController {
                         responseHeaders.set("Content-Type", "text/n3");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                 }
-
-            }
-            catch (TemplateNotFoundException e){
+                
+            } catch (TemplateNotFoundException e){
                 throw new TemplateNotFoundException("Template not found.");
             }
             catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            
             throw new InternalServerErrorException("Unknown problem. Please contact us.");
         }
 
@@ -434,33 +428,18 @@ public class ELink extends BaseRestController {
                 if( outformat == null ) {
                     outformat = o;
                 }
-
+                
                 // Checking the outformat parameter
-                RDFSerialization thisOutformat;
-                if( acceptHeader != null && acceptHeader.equals("*/*")) {
-                    acceptHeader = "text/turtle";
-                }
-                if (outformat == null && acceptHeader == null) {
-                    thisOutformat = RDFSerialization.JSON;
-                } else if (outformat != null) {
-                    if (!rdfELinkSerializationFormats.containsKey(outformat)) {
-                        throw new BadRequestException("Parameter outformat has invalid value \"" + outformat + "\"");
-                    }
-                    thisOutformat = rdfELinkSerializationFormats.get(outformat);
-                } else {
-                    if (!rdfELinkSerializationFormats.containsKey(acceptHeader)) {
-                        throw new BadRequestException("Parameter outformat has invalid value \"" + acceptHeader + "\"");
-                    }
-                    thisOutformat = rdfELinkSerializationFormats.get(acceptHeader);
-                }
+                RDFSerialization thisOutformat = null;
+                thisOutformat = checkOutFormat(outformat, acceptHeader);
                 // END: Checking the outformat parameter
-
-
+                
+                
                 HttpHeaders responseHeaders = new HttpHeaders();
                 responseHeaders.setContentType(MediaType.APPLICATION_JSON);
                 String serialization;
                 Model model = ModelFactory.createDefaultModel();
-
+                
                 switch(thisOutformat) {
                     case JSON:
                         responseHeaders.set("Content-Type", "application/json");
@@ -491,18 +470,18 @@ public class ELink extends BaseRestController {
                         responseHeaders.set("Content-Type", "text/n3");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                 }
-
+            } catch (BadRequestException ex) {
+                throw new BadRequestException(ex.getMessage());
             } catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             }
             throw new InternalServerErrorException("Unknown problem. Please contact us.");
 //            return new ResponseEntity<String>("Unknown problem. Please contact us.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
+       
         // Update one template.
         // PUT /e-link/templates/{template-id}
 	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.PUT)
-    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> updateTemplateById(
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
@@ -513,18 +492,18 @@ public class ELink extends BaseRestController {
                         @PathVariable("templateid") String templateId,
                         @RequestBody String postBody) {
             try {
-
+                
                 if( informat == null ){
                     informat = f;
                 }
                 if( outformat == null ){
                     outformat = o;
                 }
-
+            
                 if( postBody == null || postBody.trim().length() == 0 ) {
                     return new ResponseEntity<String>("Empty body of the request.", HttpStatus.BAD_REQUEST);
                 }
-
+                
                 // Checking the informat parameter
                 RDFSerialization thisInformat;
                 if (informat == null && contentTypeHeader == null) {
@@ -541,7 +520,7 @@ public class ELink extends BaseRestController {
                     thisInformat = rdfELinkSerializationFormats.get(contentTypeHeader);
 		}
                 // END: Checking the informat parameter
-
+                
                 // Checking the outformat parameter
                 RDFSerialization thisOutformat;
 		if( acceptHeader != null && acceptHeader.equals("*/*")) {
@@ -564,11 +543,17 @@ public class ELink extends BaseRestController {
 
                 Template t = null;
                 Model model = ModelFactory.createDefaultModel();
-
+                
                 switch(thisInformat) {
                     case JSON:
                         JSONObject jsonObj = new JSONObject(postBody);
-                        t = new Template(templateId, jsonObj.getString("endpoint"), jsonObj.getString("query"));
+                        t = new Template(
+                                templateId,
+                                jsonObj.getString("endpoint"),
+                                jsonObj.getString("query"),
+                                jsonObj.getString("label"),
+                                jsonObj.getString("descripton")
+                        );
                         break;
                     case TURTLE:
                         model.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
@@ -591,16 +576,16 @@ public class ELink extends BaseRestController {
                         t = Exporter.getInstance().model2OneTemplate(model);
                         break;
                 }
-
+               
                 templateDAO.updateTemplate(t);
-
+                
                 HttpHeaders responseHeaders = new HttpHeaders();
                 URI location = new URI("/e-link/templates/"+t.getId());
                 responseHeaders.setLocation(location);
-
+               
                 Model outModel;
                 String serialization;
-
+                
                 switch(thisOutformat) {
                     case JSON:
                         responseHeaders.set("Content-Type", "application/json");
@@ -609,12 +594,12 @@ public class ELink extends BaseRestController {
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.TURTLE);
                         responseHeaders.set("Content-Type", "text/turtle");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);                
                     case JSON_LD:
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.JSON_LD);
                         responseHeaders.set("Content-Type", "application/ld+json");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);                        
                     case RDF_XML:
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.RDF_XML);
@@ -636,26 +621,39 @@ public class ELink extends BaseRestController {
             } catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-            throw new InternalServerErrorException("Unknown problem. Please contact us.");
+            
+            throw new InternalServerErrorException("Unknown problem. Please contact us.");            
         }
-
+                
         // Removing a template.
         // DELETE /e-link/templates/{template-id}
 	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.DELETE)
-    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> removeTemplateById(@PathVariable("templateid") String id) {
-
-        Authentication authentication = SecurityContextHolder.getContext()
-                .getAuthentication();
-        User user = (User) authentication.getPrincipal();
-        decisionManager.decide(authentication, user, accessLevelHelper.writeAccess());
-        templateRepository.delete(templateRepository.findOneById(id));
-
+            
             if(templateDAO.removeTemplateById(id)) {
                 return new ResponseEntity<String>("The template was sucessfully removed.", HttpStatus.NO_CONTENT);
             } else {
                 throw new TemplateNotFoundException("A template with such id was not found.");
             }
         }
+
+    private RDFSerialization checkOutFormat(String outformat, String acceptHeader) {
+        if( acceptHeader != null && acceptHeader.equals("*/*")) {
+            acceptHeader = "text/turtle";
+        }
+        if (outformat == null && acceptHeader == null) {
+            return RDFSerialization.JSON;
+        } else if (outformat != null) {
+            if (!rdfELinkSerializationFormats.containsKey(outformat)) {
+                throw new BadRequestException("Parameter outformat has invalid value \"" + outformat + "\"");
+            }
+            return rdfELinkSerializationFormats.get(outformat);
+        } else {
+            if (!rdfELinkSerializationFormats.containsKey(acceptHeader)) {
+                throw new BadRequestException("Parameter outformat has invalid value \"" + acceptHeader + "\"");
+            }
+            return rdfELinkSerializationFormats.get(acceptHeader);
+        }
+    }
+    
 }

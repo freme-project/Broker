@@ -20,6 +20,7 @@ import com.google.gson.stream.MalformedJsonException;
 import eu.freme.eservices.epublishing.EPublishingService;
 import eu.freme.eservices.epublishing.exception.EPubCreationException;
 import eu.freme.eservices.epublishing.exception.InvalidZipException;
+import eu.freme.eservices.epublishing.exception.MissingMetadataException;
 import eu.freme.eservices.epublishing.webservice.Metadata;
 
 /**
@@ -36,7 +37,7 @@ public class EPublishing {
     EPublishingService entityAPI;
 
     @RequestMapping(value = "/e-publishing/html", method = RequestMethod.POST)
-    public ResponseEntity<byte[]> htmlToEPub(@RequestParam("htmlZip") MultipartFile file, @RequestParam("metadata") String jMetadata) {
+    public ResponseEntity<byte[]> htmlToEPub(@RequestParam("htmlZip") MultipartFile file, @RequestParam("metadata") String jMetadata) throws InvalidZipException, EPubCreationException, IOException, MissingMetadataException {
 
         if (file.getSize() > maxUploadSize) {
             double size = maxUploadSize / (1024.0 * 1024);
@@ -44,18 +45,15 @@ public class EPublishing {
             //throw new BadRequestException(String.format("The uploaded file is too large. The maximum file size for uploads is %.2f MB", size));
         }
 
+        Gson gson = new Gson();
+        Metadata metadata = gson.fromJson(jMetadata, Metadata.class);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Content-Type", "application/epub+zip");
         try {
-            Gson gson = new Gson();
-            Metadata metadata = gson.fromJson(jMetadata, Metadata.class);
-    		HttpHeaders responseHeaders = new HttpHeaders();
-    		responseHeaders.add("Content-Type", "application/epub+zip");
             return new ResponseEntity<>(entityAPI.createEPUB(metadata, file.getInputStream()), HttpStatus.OK);
-        } catch (MalformedJsonException | InvalidZipException | EPubCreationException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            return new ResponseEntity<>(new byte[0], HttpStatus.BAD_REQUEST);
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-            return new ResponseEntity<>(new byte[0], HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (InvalidZipException | EPubCreationException | IOException | MissingMetadataException ex) {
+            logger.log(Level.SEVERE, ex.getMessage());
+            throw ex;
         }
     }
 }
