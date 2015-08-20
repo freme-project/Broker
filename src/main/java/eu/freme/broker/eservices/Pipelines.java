@@ -56,7 +56,8 @@ public class Pipelines extends BaseRestController {
 			headers.add(HttpHeaders.CONTENT_TYPE, serviceError.getResponse().getContentType());
 			return new ResponseEntity<>(serviceError.getMessage(), headers, serviceError.getStatus());
 		} catch (JsonSyntaxException jsonException) {
-			throw new NotAcceptableException("Error parsing the JSON body contents: " + jsonException.getCause().getMessage());
+			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
+			throw new NotAcceptableException("Error detected in the JSON body contents: " + errormsg);
 		} catch (Throwable t) {
 			// throw a FREME exception if anything goes really wrong...
 			throw new InternalServerErrorException(t.getMessage());
