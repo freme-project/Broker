@@ -6,6 +6,7 @@ import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.conversion.rdf.RDFConstants;
 import org.hibernate.annotations.SourceType;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ public class EInternationalizationTest extends IntegrationTest {
     String resourcepath= "src/test/resources/e-internationalization/";
 
     @Test
+    @Ignore
     public void TestEInternationalization() throws IOException, UnirestException {
         for (String sample_file : sample_xliff) {
             testContentTypeandInformat("application/x-xliff+xml",readFile(resourcepath+sample_file));

@@ -132,7 +132,7 @@ public class UserControllerTest {
 	}
 	
 	@Test
-	@Ignore
+	//@Ignore
 	public void testAdmin() throws UnirestException{
 		
 		String username = "carlos";
