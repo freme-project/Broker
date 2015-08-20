@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author Gerald Haesendonck
  */
 @SuppressWarnings("serial")
-@ResponseStatus(value= HttpStatus.BAD_REQUEST, reason="Invalid input")
+@ResponseStatus(value= HttpStatus.NOT_ACCEPTABLE, reason="Invalid input")
 public class NotAcceptableException extends FREMEHttpException {
 	public NotAcceptableException(String msg) {
 		super(msg);
