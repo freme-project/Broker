@@ -1,6 +1,7 @@
 package eu.freme.broker.eservices;
 
 import com.google.gson.JsonSyntaxException;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.exception.NotAcceptableException;
@@ -58,6 +59,8 @@ public class Pipelines extends BaseRestController {
 		} catch (JsonSyntaxException jsonException) {
 			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
 			throw new NotAcceptableException("Error detected in the JSON body contents: " + errormsg);
+		} catch (UnirestException unirestException) {
+			throw new BadRequestException(unirestException.getMessage());
 		} catch (Throwable t) {
 			// throw a FREME exception if anything goes really wrong...
 			throw new InternalServerErrorException(t.getMessage());
