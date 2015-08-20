@@ -28,6 +28,7 @@ public class EInternationalizationTest extends IntegrationTest {
     @Test
     @Ignore
     public void TestEInternationalization() throws IOException, UnirestException {
+        //See EInternationalizationFilter
         for (String sample_file : sample_xliff) {
             testContentTypeandInformat("application/x-xliff+xml",readFile(resourcepath+sample_file));
         }
