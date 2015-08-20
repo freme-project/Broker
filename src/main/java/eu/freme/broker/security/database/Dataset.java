@@ -19,6 +19,7 @@ public class Dataset extends OwnedResource{
     @ManyToOne(optional=false,targetEntity = User.class)
     protected User owner;
 
+    private AccessLevel accessLevel;
     Dataset() {
     }
 
@@ -27,6 +28,15 @@ public class Dataset extends OwnedResource{
         this.owner= owner;
         this.accessLevel = accessLevel;
     }
+
+    public AccessLevel getAccessLevel() {
+        return accessLevel;
+    }
+
+    public void setAccessLevel(AccessLevel accessLevel) {
+        this.accessLevel = accessLevel;
+    }
+
 
     public User getOwner() {
         return owner;

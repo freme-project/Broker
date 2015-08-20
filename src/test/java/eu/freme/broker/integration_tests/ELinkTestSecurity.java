@@ -3,7 +3,9 @@ package eu.freme.broker.integration_tests;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.broker.eservices.BaseRestController;
+import eu.freme.broker.security.database.Template;
 import eu.freme.broker.security.database.TemplateRepository;
 import eu.freme.broker.security.database.User;
 import eu.freme.broker.security.database.UserRepository;
@@ -18,6 +20,7 @@ import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 
@@ -40,7 +43,7 @@ public class ELinkTestSecurity extends IntegrationTest {
     @Autowired
     TemplateRepository templateRepository;
 
-    String token;
+
 
     String usernameWithPermission = "userwithpermission";
     String passwordWithPermission  = "testpassword";
@@ -50,50 +53,37 @@ public class ELinkTestSecurity extends IntegrationTest {
 
     public ELinkTestSecurity() throws UnirestException{
         super("/e-link/");
-
-
     }
 
-
-    public void createAndAuthenticateUser(String username, String password) throws UnirestException{
-
-        //System.out.println("ASDASD "+getBaseURL());
-        HttpResponse<String> response = Unirest.post(getBaseURL() + "/user")
-                .queryString("username", username)
-                .queryString("password", password).asString();
-        logger.debug("STATUS: " + response.getStatus());
-        assertTrue(response.getStatus() == HttpStatus.OK.value());
-
-
-
-        logger.info("login with new user / create token");
-        response = Unirest
-                .post(getBaseURL()  + BaseRestController.authenticationEndpoint)
-                .header("X-Auth-Username", username)
-                .header("X-Auth-Password", password).asString();
-        assertTrue(response.getStatus() == HttpStatus.OK.value());
-        token = new JSONObject(response.getBody()).getString("token");
-
-        //String responseUsername = new JSONObject(response.getBody()).getString("name");
-        //assertTrue(username.equals(responseUsername));
-
-    }
-
-
-
-    //Tests Creation, fetching, modification and deletion of a template and fetching of all templates
     @Test
     public void testTemplateHandlingWithSecurity() throws Exception{
 
-        //Tests if user can create, update his own template
-        createAndAuthenticateUser(usernameWithPermission, passwordWithPermission);
-        String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl");
-//        testELinkTemplatesId(templateid);
-        testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid);
-//        testELinkTemplates();
 
-        createAndAuthenticateUser(usernameWithoutPermission, passwordWithoutPermission);
-        assertFalse(testELinkTemplatesDelete(templateid));
+        //Creates two users, one intended to have permission, the other not
+        createUser(usernameWithPermission, passwordWithPermission);
+        String tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
+        createUser(usernameWithoutPermission, passwordWithoutPermission);
+        String tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
+
+        //Tests if users can add  and update Templates
+        String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl", tokenWithPermission);
+        assertNotNull(templateid);
+
+        //Tests if template is successfully created and has right attributes
+        /*
+        Template fromDB = templateRepository.findOneById(templateid);
+        assertNotNull(fromDB);
+        assertTrue(fromDB.getOwner().getName().equals(usernameWithPermission));
+        */
+        testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission);
+
+
+        //User without permission should not be able to delete another user's template
+        assertFalse(testELinkTemplatesDelete(templateid,tokenWithOutPermission));
+
+        //User with permission should
+        assertTrue(testELinkTemplatesDelete(templateid, tokenWithPermission));
+
     }
 
     //Tests GET e-link/templates/
@@ -105,10 +95,9 @@ public class ELinkTestSecurity extends IntegrationTest {
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 
     }
-    //// HELPER METHODS
 
     //Tests POST e-link/templates/
-    public String testELinkTemplatesAdd(String filename) throws Exception {
+    public String testELinkTemplatesAdd(String filename, String token) throws Exception {
         String query = readFile(filename);
 
 
@@ -117,7 +106,7 @@ public class ELinkTestSecurity extends IntegrationTest {
                 .header("X-Auth-Token", token)
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
-                .body(constructTemplate(query, "http://dbpedia.org/sparql/"))
+                .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description"))
         .asString();
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 
@@ -139,14 +128,14 @@ public class ELinkTestSecurity extends IntegrationTest {
     }
 
     //Tests PUT e-link/templates/
-    public void testELinkTemplatesUpdate(String filename, String id) throws IOException, UnirestException{
+    public void testELinkTemplatesUpdate(String filename, String id, String token) throws IOException, UnirestException{
         String query = readFile(filename);
 
-        HttpResponse<String> response = baseRequestPut("templates/"+id)
+        HttpResponse<String> response = baseRequestPut("templates/" + id)
                 .header("X-Auth-Token",token)
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
-                .body(constructTemplate(query, "http://dbpedia.org/sparql/"))
+                .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description"))
                 .asString();
 
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
@@ -162,11 +151,35 @@ public class ELinkTestSecurity extends IntegrationTest {
     }
 
     //Tests DELETE e-link/templates/
-    public boolean testELinkTemplatesDelete(String id) throws UnirestException{
+    public boolean testELinkTemplatesDelete(String id, String token) throws UnirestException{
         HttpResponse<String> response = baseRequestDelete("templates/" + id)
                 .header("X-Auth-Token", token)
                 .asString();
         return (response.getStatus() == 200 || response.getStatus() == 204);
     }
+
+    public void createUser(String username, String password) throws UnirestException{
+
+        //System.out.println("ASDASD "+getBaseURL());
+        HttpResponse<String> response = Unirest.post(getBaseURL() + "/user")
+                .queryString("username", username)
+                .queryString("password", password).asString();
+        logger.debug("STATUS: " + response.getStatus());
+        assertTrue(response.getStatus() == HttpStatus.OK.value());
+    }
+
+    public String authenticateUser(String username, String password) throws UnirestException{
+        HttpResponse<String> response;
+
+        logger.info("login with new user / create token");
+        response = Unirest
+                .post(getBaseURL()  + BaseRestController.authenticationEndpoint)
+                .header("X-Auth-Username", username)
+                .header("X-Auth-Password", password).asString();
+        assertTrue(response.getStatus() == HttpStatus.OK.value());
+        String token = new JSONObject(response.getBody()).getString("token");
+        return token;
+    }
+
 
 }

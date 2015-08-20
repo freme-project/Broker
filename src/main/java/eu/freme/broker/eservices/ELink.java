@@ -8,12 +8,22 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import eu.freme.broker.security.database.OwnedResource;
+import eu.freme.broker.security.database.TemplateRepository;
+import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.tools.AccessLevelHelper;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.vote.AbstractAccessDecisionManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -40,19 +50,38 @@ import eu.freme.eservices.elink.TemplateDAO;
 import eu.freme.eservices.elink.exceptions.TemplateNotFoundException;
 import org.apache.commons.validator.routines.UrlValidator;
 
+import javax.xml.bind.SchemaOutputResolver;
+
 @RestController
 public class ELink extends BaseRestController {
-    
+
         @Autowired
         DataEnricher dataEnricher;
 
         @Autowired
         TemplateDAO templateDAO;
-        
+
+
+        @Autowired
+        AbstractAccessDecisionManager decisionManager;
+
+        @Autowired
+        UserRepository userRepository;
+
+        @Autowired
+        TemplateRepository templateRepository;
+
+        @Autowired
+        AccessLevelHelper accessLevelHelper;
+
+        // Enriching using a template.
+
+
         @Autowired
         TemplateValidator templateValidator;
         
         // Enriching using a template.        
+
         // POST /e-link/enrich/
         // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
 	@RequestMapping(value = "/e-link/documents", method = RequestMethod.POST)
@@ -67,9 +96,9 @@ public class ELink extends BaseRestController {
                 String f         = null;
                 String outformat = null;
                 String o         = null;
-                
+
                 HashMap<String, String> templateParams = new HashMap();
-                
+
                 for (Map.Entry<String, String> entry : allParams.entrySet()) {
                     switch(entry.getKey()) {
                         case "informat":
@@ -124,6 +153,10 @@ public class ELink extends BaseRestController {
                         break;                        
                 }
                 
+                inModel = dataEnricher.enrichNIF(inModel, templateId, templateParams);
+
+
+
 //                System.out.println(inModel);
 //                System.out.println(inModel.size());
                 
@@ -173,6 +206,7 @@ public class ELink extends BaseRestController {
         // POST /e-link/templates/
         // Example: curl -X POST -d @template.json "http://localhost:8080/e-link/templates/" -H "Content-Type: application/json" -H "Accept: application/json" -v
 	@RequestMapping(value = "/e-link/templates", method = RequestMethod.POST)
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> createTemplate(
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
@@ -281,6 +315,26 @@ public class ELink extends BaseRestController {
                 
                 templateDAO.addTemplate(t);
                 
+                String templateId = t.getId();
+
+                if (templateRepository.findOneById(templateId) != null) {
+                    throw new BadRequestException("template metadata for templateId=\""+templateId+"\" already exists");
+                }
+
+
+
+                Authentication authentication = SecurityContextHolder.getContext()
+                        .getAuthentication();
+                User user = (User) authentication.getPrincipal();
+                decisionManager.decide(authentication, user, accessLevelHelper.writeAccess());
+
+                eu.freme.broker.security.database.Template templ = new eu.freme.broker.security.database.Template(templateId, user, OwnedResource.AccessLevel.PRIVATE);
+                templateRepository.save(templ);
+                System.out.println(templ.getAccessLevel());
+                eu.freme.broker.security.database.Template templ2=templateRepository.findOneById(templateId);
+                System.out.println(templ2.getId()+"   "+templateId);
+                System.out.println(templ2.getAccessLevel()+ "kakakakakaka");
+
                 HttpHeaders responseHeaders = new HttpHeaders();
                 URI location = new URI("/e-link/templates/"+t.getId());
                 responseHeaders.setLocation(location);
@@ -370,6 +424,11 @@ public class ELink extends BaseRestController {
 
                 Template t = templateDAO.getTemplateById(id);
                 
+                if(t == null) {
+                    throw new TemplateNotFoundException("Template with id: \"" + id + "\" does not exist.");
+                }
+
+
                 HttpHeaders responseHeaders = new HttpHeaders();
                 Model model = ModelFactory.createDefaultModel();
                 String serialization;
@@ -482,6 +541,7 @@ public class ELink extends BaseRestController {
         // Update one template.
         // PUT /e-link/templates/{template-id}
 	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.PUT)
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> updateTemplateById(
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
@@ -552,7 +612,7 @@ public class ELink extends BaseRestController {
                                 jsonObj.getString("endpoint"),
                                 jsonObj.getString("query"),
                                 jsonObj.getString("label"),
-                                jsonObj.getString("descripton")
+                                jsonObj.getString("description")
                         );
                         break;
                     case TURTLE:
@@ -628,8 +688,15 @@ public class ELink extends BaseRestController {
         // Removing a template.
         // DELETE /e-link/templates/{template-id}
 	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.DELETE)
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> removeTemplateById(@PathVariable("templateid") String id) {
-            
+
+        Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
+        eu.freme.broker.security.database.Template templ = templateRepository.findOneById(id);
+        decisionManager.decide(authentication, templ, accessLevelHelper.writeAccess());
+        templateRepository.delete(templ);
+
             if(templateDAO.removeTemplateById(id)) {
                 return new ResponseEntity<String>("The template was sucessfully removed.", HttpStatus.NO_CONTENT);
             } else {

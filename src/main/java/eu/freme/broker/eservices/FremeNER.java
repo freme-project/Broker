@@ -152,7 +152,7 @@ public class FremeNER extends BaseRestController {
             }
             
             try {
-                String fremeNERRes = entityAPI.callFremeNER(textForProcessing, language, parameters.getPrefix(), dataset);
+                String fremeNERRes = entityAPI.callFremeNER(textForProcessing,language,parameters.getPrefix(), dataset, numLinks);
                 outModel.read(new ByteArrayInputStream(fremeNERRes.getBytes()), null, "TTL");
             } catch (BadRequestException e) {
                 logger.error("failed", e);

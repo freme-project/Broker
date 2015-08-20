@@ -13,12 +13,12 @@ public class Template extends OwnedResource {
 
     @Id
     @Column(name = "id")
-    protected String id;
+    private String id;
 
     @JsonIgnore
     @ManyToOne(optional=false,targetEntity = User.class)
-    protected User owner;
-
+    private User owner;
+    private AccessLevel accessLevel;
     Template(){ }
 
 
@@ -26,7 +26,18 @@ public class Template extends OwnedResource {
         this.id = id;
         this.owner= owner;
         this.accessLevel = accessLevel;
+        System.out.println(this.accessLevel+"kikikik");
     }
+
+
+    public AccessLevel getAccessLevel() {
+        return accessLevel;
+    }
+
+    public void setAccessLevel(AccessLevel accessLevel) {
+        this.accessLevel = accessLevel;
+    }
+
 
     public User getOwner() {
         return owner;

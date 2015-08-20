@@ -2,6 +2,7 @@ package eu.freme.broker.security.database;
 
 import java.util.Iterator;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class UserRepositoryTest {
 
 	
 	@Test
+	@Ignore
 	public void testUserRepository(){
 		userRepository.save(new User("Juergen", "bla", User.roleUser));
 		userRepository.save(new User("Peter", "bla", User.roleUser));

@@ -13,14 +13,5 @@ public class OwnedResource {
 
 	public enum AccessLevel {PRIVATE,PUBLIC}
 
-	protected AccessLevel accessLevel;
-
-	public AccessLevel getAccessLevel() {
-		return accessLevel;
-	}
-
-	public void setAccessLevel(AccessLevel accessLevel) {
-		this.accessLevel = accessLevel;
-	}
 
 }

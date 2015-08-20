@@ -117,11 +117,13 @@ public abstract class IntegrationTest {
 
     }
 
-    public static String constructTemplate(String query, String endpoint) {
+    public static String constructTemplate(String label, String query, String endpoint, String description) {
         query = query.replaceAll("\n","\\\\n");
         return  " {\n" +
+                " \"label\":\""+label+"\",\n" +
                 " \"query\":\""+query+"\",\n" +
-                " \"endpoint\":\""+endpoint+"\"\n" +
+                " \"endpoint\":\""+endpoint+"\",\n" +
+                " \"description\":\""+description+"\"\n" +
                 " }";
     }
 
