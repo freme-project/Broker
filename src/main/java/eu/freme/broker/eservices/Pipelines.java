@@ -1,6 +1,9 @@
 package eu.freme.broker.eservices;
 
+import com.google.gson.JsonSyntaxException;
+import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
+import eu.freme.broker.exception.NotAcceptableException;
 import eu.freme.eservices.pipelines.core.PipelineService;
 import eu.freme.eservices.pipelines.core.ServiceException;
 import eu.freme.eservices.pipelines.requests.RequestBuilder;
@@ -42,8 +45,8 @@ public class Pipelines extends BaseRestController {
 			produces = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3"}
 	)
 	public ResponseEntity<String> pipeline(@RequestBody String requests) {
-		List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
 		try {
+			List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
 			PipelineResponse pipelineResult = pipelineAPI.chain(serializedRequests);
 			MultiValueMap<String, String> headers = new HttpHeaders();
 			headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getContentType());
@@ -52,6 +55,8 @@ public class Pipelines extends BaseRestController {
 			MultiValueMap<String, String> headers = new HttpHeaders();
 			headers.add(HttpHeaders.CONTENT_TYPE, serviceError.getResponse().getContentType());
 			return new ResponseEntity<>(serviceError.getMessage(), headers, serviceError.getStatus());
+		} catch (JsonSyntaxException jsonException) {
+			throw new NotAcceptableException("Error parsing the JSON body contents: " + jsonException.getCause().getMessage());
 		} catch (Throwable t) {
 			// throw a FREME exception if anything goes really wrong...
 			throw new InternalServerErrorException(t.getMessage());
