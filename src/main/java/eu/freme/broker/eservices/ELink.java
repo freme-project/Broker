@@ -558,7 +558,7 @@ public class ELink extends BaseRestController {
                                 jsonObj.getString("endpoint"),
                                 jsonObj.getString("query"),
                                 jsonObj.getString("label"),
-                                jsonObj.getString("descripton")
+                                jsonObj.getString("description")
                         );
                         break;
                     case TURTLE:
