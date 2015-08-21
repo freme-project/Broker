@@ -344,7 +344,7 @@ public class ELink extends BaseRestController {
 	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.GET)
 	public ResponseEntity<String> getTemplateById(
                 @RequestHeader(value = "Accept",       required=false) String acceptHeader,
-                @PathVariable("templateid") String id,
+                @PathVariable("templateid") String idStr,
                 @RequestParam(value = "outformat",     required=false) String outformat,
                 @RequestParam(value = "o",             required=false) String o) {
             
@@ -353,7 +353,10 @@ public class ELink extends BaseRestController {
                 if( outformat == null ){
                     outformat = o;
                 }
+                
+                int id = validateTemplateID(idStr);
 
+                
                 // Checking the outformat parameter
                 RDFSerialization thisOutformat;
                 if( acceptHeader != null && acceptHeader.equals("*/*")) {
@@ -374,7 +377,7 @@ public class ELink extends BaseRestController {
                 }
                 // END: Checking the outformat parameter
 
-                Template t = templateDAO.getTemplateById(id);
+                Template t = templateDAO.getTemplateById(id+"");
                 
                 HttpHeaders responseHeaders = new HttpHeaders();
                 Model model = ModelFactory.createDefaultModel();
@@ -390,7 +393,7 @@ public class ELink extends BaseRestController {
                         responseHeaders.set("Content-Type", "text/turtle");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                     case JSON_LD:
-                        model = templateDAO.getTemplateInRDFById(id);
+                        model = templateDAO.getTemplateInRDFById(id+"");
                         serialization = rdfConversionService.serializeRDF(model, RDFConstants.RDFSerialization.JSON_LD);
                         responseHeaders.set("Content-Type", "application/ld+json");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
@@ -413,8 +416,10 @@ public class ELink extends BaseRestController {
                 
             } catch (TemplateNotFoundException e){
                 throw new TemplateNotFoundException("Template not found.");
-            }
-            catch (Exception ex) {
+            } catch (BadRequestException ex) {
+                logger.error(ex.getMessage(), ex);
+                throw ex;
+            } catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             }
             
