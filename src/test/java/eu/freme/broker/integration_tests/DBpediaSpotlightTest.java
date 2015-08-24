@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import org.junit.Ignore;
 
 
 /**
@@ -19,7 +20,7 @@ public class DBpediaSpotlightTest extends IntegrationTest{
 
 
     String[] availableLanguages = {"en","de","it","nl","fr","es"};
-    String testinput= "Enrich this Content please";
+    String testinput= "Berlin";
 
 
     public DBpediaSpotlightTest(){super("/e-entity/dbpedia-spotlight/");}
@@ -34,6 +35,7 @@ public class DBpediaSpotlightTest extends IntegrationTest{
 
 
     @Test
+    @Ignore
     public void TestDBpediaSpotlightNER() throws UnirestException, IOException, UnsupportedEncodingException {
 
         HttpResponse<String> response;
