@@ -95,7 +95,7 @@ public class FremeNER extends BaseRestController {
             
             NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
            
-            Model inModel;
+            Model inModel = ModelFactory.createDefaultModel();
             Model outModel = ModelFactory.createDefaultModel();;
 
             // merge long and short parameters - long parameters override short parameters
@@ -119,7 +119,6 @@ public class FremeNER extends BaseRestController {
                 textForProcessing = parameters.getInput();
             } else {
                 // input is sent as body of the request
-                inModel = ModelFactory.createDefaultModel();
                 switch(parameters.getInformat()) {
                     case TURTLE:
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
@@ -162,6 +161,7 @@ public class FremeNER extends BaseRestController {
             try {
                 String fremeNERRes = entityAPI.callFremeNER(textForProcessing, language, parameters.getPrefix(), dataset, numLinks);
                 outModel.read(new ByteArrayInputStream(fremeNERRes.getBytes()), null, "TTL");
+                outModel.add(inModel);
             } catch (BadRequestException e) {
                 logger.error("failed", e);
                 throw new eu.freme.broker.exception.BadRequestException(e.getMessage());

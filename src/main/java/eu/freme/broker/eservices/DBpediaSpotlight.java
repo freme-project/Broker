@@ -52,7 +52,7 @@ public class DBpediaSpotlight extends BaseRestController {
             
             NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
            
-            Model inModel;
+            Model inModel = ModelFactory.createDefaultModel();
             Model outModel = ModelFactory.createDefaultModel();;
 
             // Check the language parameter.
@@ -92,7 +92,6 @@ public class DBpediaSpotlight extends BaseRestController {
                 }
             } else {
                 // input is sent as body of the request
-                inModel = ModelFactory.createDefaultModel();
                 switch(parameters.getInformat()) {
                     case TURTLE:
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
@@ -119,9 +118,9 @@ public class DBpediaSpotlight extends BaseRestController {
                 while(!textFound) {
                     Resource contextRes = iter.nextStatement().getSubject();
                     tmpPrefix = contextRes.getURI().split("#")[0];
-                    System.out.println(tmpPrefix);
+//                    System.out.println(tmpPrefix);
                     parameters.setPrefix(tmpPrefix+"#");
-                    System.out.println(parameters.getPrefix());
+//                    System.out.println(parameters.getPrefix());
                     Statement isStringStm = contextRes.getProperty(inModel.getProperty("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#isString"));
                     if(isStringStm != null) {
                         textForProcessing = isStringStm.getObject().asLiteral().getString();
@@ -140,6 +139,7 @@ public class DBpediaSpotlight extends BaseRestController {
                 
                 String dbpediaSpotlightRes = entityAPI.callDBpediaSpotlight(textForProcessing, confidenceParam, languageParam, parameters.getPrefix());
                 outModel.read(new ByteArrayInputStream(dbpediaSpotlightRes.getBytes()), null, "TTL");
+                outModel.add(inModel);
                 // remove unwanted info
                 outModel.removeAll(null, RDF.type, OWL.ObjectProperty);
                 outModel.removeAll(null, RDF.type, OWL.DatatypeProperty);
