@@ -119,7 +119,9 @@ public class DBpediaSpotlight extends BaseRestController {
                 while(!textFound) {
                     Resource contextRes = iter.nextStatement().getSubject();
                     tmpPrefix = contextRes.getURI().split("#")[0];
+                    System.out.println(tmpPrefix);
                     parameters.setPrefix(tmpPrefix+"#");
+                    System.out.println(parameters.getPrefix());
                     Statement isStringStm = contextRes.getProperty(inModel.getProperty("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#isString"));
                     if(isStringStm != null) {
                         textForProcessing = isStringStm.getObject().asLiteral().getString();
