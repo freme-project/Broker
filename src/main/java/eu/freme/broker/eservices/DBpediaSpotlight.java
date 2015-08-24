@@ -55,6 +55,18 @@ public class DBpediaSpotlight extends BaseRestController {
             Model inModel;
             Model outModel = ModelFactory.createDefaultModel();;
 
+            // Check the language parameter.
+            if(languageParam == null) {
+                throw new eu.freme.broker.exception.BadRequestException("Parameter language is not specified");            
+            } else {
+                if(languageParam.equals("en")) {
+                    // OK, the language is supported.
+                } else {
+                    // The language specified with the langauge parameter is not supported.
+                    throw new eu.freme.broker.exception.BadRequestException("Unsupported language ["+languageParam+"].");
+                }
+            }
+            
             // merge long and short parameters - long parameters override short parameters
             if( input == null ){
                 input = i;
@@ -100,18 +112,30 @@ public class DBpediaSpotlight extends BaseRestController {
                 }
                 
                 StmtIterator iter = inModel.listStatements(null, RDF.type, inModel.getResource("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#Context"));
-                if(iter.hasNext()) {
+                                
+                boolean textFound = false;
+                String tmpPrefix = "http://freme-project.eu/#";
+                // The first nif:Context with assigned nif:isString will be processed.
+                while(!textFound) {
                     Resource contextRes = iter.nextStatement().getSubject();
+                    tmpPrefix = contextRes.getURI().split("#")[0];
+                    parameters.setPrefix(tmpPrefix+"%23");
                     Statement isStringStm = contextRes.getProperty(inModel.getProperty("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#isString"));
-                    textForProcessing = isStringStm.getObject().asLiteral().getString();                    
+                    if(isStringStm != null) {
+                        textForProcessing = isStringStm.getObject().asLiteral().getString();
+                        textFound = true;
+                    }                    
                 }
                 
                 if(textForProcessing == null) {
-                    throw new eu.freme.broker.exception.BadRequestException("No text to process could be found in the input.");
+                    throw new eu.freme.broker.exception.BadRequestException("No text to process.");
                 }
             }
-            
+//            System.out.println("the prefix: "+parameters.getPrefix());
             try {
+                
+                validateConfidenceScore(confidenceParam);
+                
                 String dbpediaSpotlightRes = entityAPI.callDBpediaSpotlight(textForProcessing, confidenceParam, languageParam, parameters.getPrefix());
                 outModel.read(new ByteArrayInputStream(dbpediaSpotlightRes.getBytes()), null, "TTL");
                 // remove unwanted info
@@ -134,4 +158,15 @@ public class DBpediaSpotlight extends BaseRestController {
             
             return createSuccessResponse(outModel, parameters.getOutformat());
         }
+
+    private void validateConfidenceScore(String confidenceParam) {
+        if(confidenceParam == null)
+            return;
+        double confVal = Double.parseDouble(confidenceParam);
+        if(confVal >= .00 && confVal <= 1.0) {
+            // the conf value is OK.
+        } else {
+            throw new BadRequestException("The value of the confidence parameter is out of the range [0..1].");
+        }
+    }
 }

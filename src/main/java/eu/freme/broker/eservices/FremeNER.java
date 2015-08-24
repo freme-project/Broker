@@ -139,14 +139,23 @@ public class FremeNER extends BaseRestController {
                 }
                 
                 StmtIterator iter = inModel.listStatements(null, RDF.type, inModel.getResource("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#Context"));
-                if(iter.hasNext()) {
+                
+                boolean textFound = false;
+                String tmpPrefix = "http://freme-project.eu/#";
+                // The first nif:Context with assigned nif:isString will be processed.
+                while(!textFound) {
                     Resource contextRes = iter.nextStatement().getSubject();
+                    tmpPrefix = contextRes.getURI().split("#")[0];
+                    parameters.setPrefix(tmpPrefix+"%23");
                     Statement isStringStm = contextRes.getProperty(inModel.getProperty("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#isString"));
-                    textForProcessing = isStringStm.getObject().asLiteral().getString();                    
+                    if(isStringStm != null) {
+                        textForProcessing = isStringStm.getObject().asLiteral().getString();
+                        textFound = true;
+                    }                    
                 }
                 
                 if(textForProcessing == null) {
-                    throw new eu.freme.broker.exception.BadRequestException("No text to process could be found in the input.");
+                    throw new eu.freme.broker.exception.BadRequestException("No text to process.");
                 }
             }
             
