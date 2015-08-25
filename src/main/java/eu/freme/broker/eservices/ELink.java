@@ -327,6 +327,9 @@ public class ELink extends BaseRestController {
             } catch (URISyntaxException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
                 throw new BadRequestException(ex.getMessage());
+            } catch (org.json.JSONException ex) {
+                Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+                throw new BadRequestException(ex.getMessage());
             } catch (InvalidTemplateEndpointException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
                 throw new InvalidTemplateEndpointException(ex.getMessage());
