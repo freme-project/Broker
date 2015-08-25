@@ -26,12 +26,11 @@ public class EInternationalizationTest extends IntegrationTest {
     String resourcepath= "src/test/resources/e-internationalization/";
 
     @Test
-    @Ignore
     public void TestEInternationalization() throws IOException, UnirestException {
         //See EInternationalizationFilter
-        for (String sample_file : sample_xliff) {
-            testContentTypeandInformat("application/x-xliff+xml",readFile(resourcepath+sample_file));
-        }
+//        for (String sample_file : sample_xliff) {
+//            testContentTypeandInformat("application/x-xliff+xml",readFile(resourcepath+sample_file));
+//        }
         for (String sample_file : sample_html) {
             testContentTypeandInformat("text/html",readFile(resourcepath+sample_file));
         }
