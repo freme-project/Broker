@@ -1,11 +1,9 @@
 package eu.freme.broker.integration_tests;
 
-import com.adobe.epubcheck.api.EpubCheck;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.junit.Assume;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -23,7 +21,6 @@ public class EPublishingTest extends IntegrationTest{
     }
 
     @Test
-    @Ignore
     public void testValidJSON() throws UnirestException, IOException {
 
         // TODO: wait for issue: Unit tests on windows #15 https://github.com/freme-project/e-Publishing/issues/15
@@ -50,32 +47,9 @@ public class EPublishingTest extends IntegrationTest{
         //File epubFile = new File("/path/to/your/epub/file.epub");
 
         // simple constructor; errors are printed on stderr stream
-        EpubCheck epubcheck = new EpubCheck(targetFile);
+        // EpubCheck epubcheck = new EpubCheck(targetFile);
 
         // validate() returns true if no errors or warnings are found
-        assertTrue(epubcheck.validate());
+        // assertTrue(epubcheck.validate());
     }
-
-/*
-    @Test
-    public void testInvalidJSON() throws UnirestException, IOException {
-        HttpResponse<InputStream> response = Unirest.post(getUrl() + "html")
-                .field("htmlZip", new File("src/test/resources/e-publishing/alice.zip"))
-                .field("metadata", (Object) "{\"ffdf\" : \"dfdf\"}")
-                .asBinary();
-
-        System.out.println(response.getStatus());
-        assertTrue(response.getStatus() == 400);
-
-
-
-
-        //assertTrue(asBinary.getBody(). .length() > 0);
-//        File f = new File("src/test/resources/e-publishing/alice.zip");
-//        System.out.println(f.getAbsolutePath());
-//
-//        int status = asBinary.getStatus();
-        //Assert.assertEquals(400, status);
-    }
-    */
 }
