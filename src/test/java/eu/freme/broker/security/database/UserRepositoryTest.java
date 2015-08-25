@@ -2,6 +2,7 @@ package eu.freme.broker.security.database;
 
 import java.util.Iterator;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,10 @@ public class UserRepositoryTest {
 	
 	@Test
 	public void testUserRepository(){
+
+
+		int preexisting = count(userRepository.findAll());
+		System.out.println("Preexisting"+preexisting);
 		userRepository.save(new User("Juergen", "bla", User.roleUser));
 		userRepository.save(new User("Peter", "bla", User.roleUser));
 		userRepository.save(new User("Madeleine", "bla", User.roleAdmin));
@@ -41,10 +46,10 @@ public class UserRepositoryTest {
 		
 		int counter = count(userRepository.findAll());
 		// admin user is one more
-		assertTrue(counter==4);
+		assertTrue(counter==(preexisting+3));
 		
 		userRepository.delete(juergen);
 		counter = count(userRepository.findAll());
-		assertTrue(counter==3);
+		assertTrue(counter==(preexisting+2));
 	}
 }

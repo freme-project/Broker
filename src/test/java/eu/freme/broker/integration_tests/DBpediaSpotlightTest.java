@@ -77,7 +77,7 @@ public class DBpediaSpotlightTest extends IntegrationTest{
                     .queryString("input", testinput)
                     .queryString("language", lang)
                     .queryString("informat", "text")
-                    .queryString("prefix", "http://test-prefix.com")
+                    .queryString("prefix", "http://test-prefix.com/")
                     .asString();
             validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 

@@ -33,6 +33,7 @@ public abstract class IntegrationTest {
     @Before
     public void setup(){
         url = IntegrationTestSetup.getURLEndpoint() + service;
+
         converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
     }
 
