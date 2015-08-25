@@ -1,10 +1,11 @@
 package eu.freme.broker.integration_tests;
 
-import com.mashape.unirest.http.HttpResponse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
-import static org.junit.Assert.assertTrue;
+import com.mashape.unirest.http.HttpResponse;
 
 /**
  * Test Tilde e-Terminology broker endpoint.

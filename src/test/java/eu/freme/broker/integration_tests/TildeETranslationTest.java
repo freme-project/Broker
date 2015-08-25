@@ -1,15 +1,17 @@
 package eu.freme.broker.integration_tests;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequestWithBody;
-import eu.freme.conversion.rdf.RDFConstants;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequestWithBody;
+
+import eu.freme.conversion.rdf.RDFConstants;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

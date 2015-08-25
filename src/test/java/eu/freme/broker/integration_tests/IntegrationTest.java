@@ -1,21 +1,23 @@
 package eu.freme.broker.integration_tests;
 
-import com.hp.hpl.jena.shared.AssertionFailureException;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
-import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.conversion.rdf.RDFConversionService;
-import org.junit.Before;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+
+import com.hp.hpl.jena.shared.AssertionFailureException;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
+
+import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.conversion.rdf.RDFConversionService;
 
 /**
  * Created by Arne on 29.07.2015.
