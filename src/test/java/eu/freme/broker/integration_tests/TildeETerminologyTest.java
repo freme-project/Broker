@@ -1,7 +1,6 @@
 package eu.freme.broker.integration_tests;
 
 import com.mashape.unirest.http.HttpResponse;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
@@ -32,15 +31,13 @@ public class TildeETerminologyTest extends IntegrationTest {
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
 
 		// not working due to bug in tilde terminology api
-		// String input =
-		// response = Unirest.post(url)
-		// .queryString("source-lang", "en")
-		// .queryString("target-lang", "de")
-		// .queryString("informat", "text")
-		// .queryString("outformat", "turtle")
-		// .body("hello world")
-		// .asString();
-		//
-		// assertTrue(response.getStatus() == HttpStatus.OK.value());
+		response = baseRequestPost("")
+				.queryString("source-lang", "en")
+				.queryString("target-lang", "de")
+				.queryString("informat", "text")
+				.queryString("outformat", "turtle").body("hello world")
+				.asString();
+
+		assertTrue(response.getStatus() == HttpStatus.OK.value());
 	}
 }
