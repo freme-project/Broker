@@ -19,7 +19,8 @@ import org.junit.Ignore;
 public class DBpediaSpotlightTest extends IntegrationTest{
 
 
-    String[] availableLanguages = {"en","de","it","nl","fr","es"};
+    String[] availableLanguages = {"en"};
+    //String[] availableLanguages = {"en","de","it","nl","fr","es"};
     String testinput= "Berlin";
 
 
@@ -35,7 +36,6 @@ public class DBpediaSpotlightTest extends IntegrationTest{
 
 
     @Test
-    @Ignore
     public void TestDBpediaSpotlightNER() throws UnirestException, IOException, UnsupportedEncodingException {
 
         HttpResponse<String> response;
