@@ -1,6 +1,6 @@
 # FREME Broker
 
-This repository hosts the Broker of the FREME project.
+This repository hosts the Broker of the FREME project. 
 
 ## Useful links
 

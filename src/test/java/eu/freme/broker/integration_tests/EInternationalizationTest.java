@@ -1,15 +1,14 @@
 package eu.freme.broker.integration_tests;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
-import eu.freme.conversion.rdf.RDFConstants;
-import org.hibernate.annotations.SourceType;
-import org.junit.Ignore;
+import java.io.IOException;
+
 import org.junit.Test;
 
-import java.io.IOException;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequestWithBody;
+
+import eu.freme.conversion.rdf.RDFConstants;
 
 /**
  * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 06.08.15.
@@ -26,12 +25,11 @@ public class EInternationalizationTest extends IntegrationTest {
     String resourcepath= "src/test/resources/e-internationalization/";
 
     @Test
-    @Ignore
     public void TestEInternationalization() throws IOException, UnirestException {
         //See EInternationalizationFilter
-        for (String sample_file : sample_xliff) {
-            testContentTypeandInformat("application/x-xliff+xml",readFile(resourcepath+sample_file));
-        }
+//        for (String sample_file : sample_xliff) {
+//            testContentTypeandInformat("application/x-xliff+xml",readFile(resourcepath+sample_file));
+//        }
         for (String sample_file : sample_html) {
             testContentTypeandInformat("text/html",readFile(resourcepath+sample_file));
         }

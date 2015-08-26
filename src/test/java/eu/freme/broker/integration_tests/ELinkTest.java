@@ -1,16 +1,16 @@
 package eu.freme.broker.integration_tests;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.freme.conversion.rdf.RDFConstants;
-import org.hibernate.annotations.SourceType;
-import org.json.JSONObject;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import org.json.JSONObject;
+import org.junit.Test;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+import eu.freme.conversion.rdf.RDFConstants;
 
 
 /**

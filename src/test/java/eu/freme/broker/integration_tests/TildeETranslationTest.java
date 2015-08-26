@@ -1,45 +1,42 @@
 package eu.freme.broker.integration_tests;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequestWithBody;
-import eu.freme.conversion.rdf.RDFConstants;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequestWithBody;
+
+import eu.freme.conversion.rdf.RDFConstants;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 public class TildeETranslationTest extends IntegrationTest{
 
-
-	String clientId = "u-bd13faca-b816-4085-95d5-05373d695ab7";
 	String sourceLang = "en";
 	String targetLang = "de";
-	String translationSystemId = "smt-76cd2e73-05c6-4d51-b02f-4fc9c4d40813";
-	
 
 	public TildeETranslationTest(){super("/e-translation/tilde");}
 
 	private HttpRequestWithBody baseRequest() {
-		return baseRequestPost("").queryString("client-id", clientId)
+		return baseRequestPost("")
 				.queryString("source-lang", sourceLang)
-				.queryString("target-lang", targetLang)
-				.queryString("translation-system-id", translationSystemId);
+				.queryString("target-lang", targetLang);
 	}
 
 	@Test
 	public void testEtranslate() throws UnirestException, IOException, Exception {
 
 		HttpResponse<String> response = baseRequest()
-				.queryString("input", "hello world")
 				.queryString("informat", "text")
+				.queryString("input", "hello world")
 				.queryString("outformat","rdf-xml")
 				.asString();
+		
 		validateNIFResponse(response, RDFConstants.RDFSerialization.RDF_XML);
 
 

@@ -86,12 +86,15 @@ public class ELink extends BaseRestController {
         // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
 	@RequestMapping(value = "/e-link/documents", method = RequestMethod.POST)
 	public ResponseEntity<String> enrich(
-			@RequestParam(value = "templateid",    required=true)  int    templateId,
+			@RequestParam(value = "templateid",    required=true)  String templateIdStr,
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
                         @RequestBody String postBody,
                         @RequestParam Map<String,String> allParams) {
             try {
+                
+                int templateId = validateTemplateID(templateIdStr);
+                
                 String informat  = null;
                 String f         = null;
                 String outformat = null;
@@ -195,6 +198,9 @@ public class ELink extends BaseRestController {
             } catch (org.apache.jena.riot.RiotException ex) {
                 logger.error("Invalid NIF document.", ex);
                 throw new InvalidNIFException(ex.getMessage());                
+            } catch (BadRequestException ex) {
+                logger.error(ex.getMessage(), ex);
+                throw ex;
             } catch (Exception ex) {
                 logger.error("Internal service problem. Please contact the service provider.", ex);
                 throw new InternalServerErrorException("Unknown problem. Please contact us.");
@@ -375,6 +381,9 @@ public class ELink extends BaseRestController {
             } catch (URISyntaxException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
                 throw new BadRequestException(ex.getMessage());
+            } catch (org.json.JSONException ex) {
+                Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+                throw new BadRequestException(ex.getMessage());
             } catch (InvalidTemplateEndpointException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
                 throw new InvalidTemplateEndpointException(ex.getMessage());
@@ -392,7 +401,7 @@ public class ELink extends BaseRestController {
 	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.GET)
 	public ResponseEntity<String> getTemplateById(
                 @RequestHeader(value = "Accept",       required=false) String acceptHeader,
-                @PathVariable("templateid") String id,
+                @PathVariable("templateid") String idStr,
                 @RequestParam(value = "outformat",     required=false) String outformat,
                 @RequestParam(value = "o",             required=false) String o) {
             
@@ -401,7 +410,10 @@ public class ELink extends BaseRestController {
                 if( outformat == null ){
                     outformat = o;
                 }
+                
+                int id = validateTemplateID(idStr);
 
+                
                 // Checking the outformat parameter
                 RDFSerialization thisOutformat;
                 if( acceptHeader != null && acceptHeader.equals("*/*")) {
@@ -422,7 +434,7 @@ public class ELink extends BaseRestController {
                 }
                 // END: Checking the outformat parameter
 
-                Template t = templateDAO.getTemplateById(id);
+                Template t = templateDAO.getTemplateById(id+"");
                 
                 if(t == null) {
                     throw new TemplateNotFoundException("Template with id: \"" + id + "\" does not exist.");
@@ -443,7 +455,7 @@ public class ELink extends BaseRestController {
                         responseHeaders.set("Content-Type", "text/turtle");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                     case JSON_LD:
-                        model = templateDAO.getTemplateInRDFById(id);
+                        model = templateDAO.getTemplateInRDFById(id+"");
                         serialization = rdfConversionService.serializeRDF(model, RDFConstants.RDFSerialization.JSON_LD);
                         responseHeaders.set("Content-Type", "application/ld+json");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
@@ -466,8 +478,10 @@ public class ELink extends BaseRestController {
                 
             } catch (TemplateNotFoundException e){
                 throw new TemplateNotFoundException("Template not found.");
-            }
-            catch (Exception ex) {
+            } catch (BadRequestException ex) {
+                logger.error(ex.getMessage(), ex);
+                throw ex;
+            } catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             }
             
@@ -722,5 +736,22 @@ public class ELink extends BaseRestController {
             return rdfELinkSerializationFormats.get(acceptHeader);
         }
     }
-    
+
+    private int validateTemplateID(String templateId) {
+        if(templateId.isEmpty()){
+            throw new BadRequestException("Empty templateid parameter.");
+        }
+        for(int i = 0; i < templateId.length(); i++) {
+            if(i == 0 && templateId.charAt(i) == '-') {
+                if(templateId.length() == 1) {
+                    throw new BadRequestException("The templateid parameter is not integer.");
+                }
+                else continue;
+            }
+            if(Character.digit(templateId.charAt(i),10) < 0) {
+                    throw new BadRequestException("The templateid parameter is not integer.");
+            }
+        }
+        return Integer.parseInt(templateId);
+    }
 }
