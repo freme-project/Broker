@@ -33,7 +33,6 @@ public class UserControllerTest {
 	}
 
 	@Test
-	//@Ignore
 	public void testUserSecurity() throws UnirestException {
 
 		String username = "myuser";
@@ -134,7 +133,6 @@ public class UserControllerTest {
 	}
 	
 	@Test
-	//@Ignore
 	public void testAdmin() throws UnirestException{
 		
 		String username = "carlos";

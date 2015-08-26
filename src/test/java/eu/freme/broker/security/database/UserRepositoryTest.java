@@ -20,11 +20,23 @@ public class UserRepositoryTest {
 
 	@Autowired
 	UserRepository userRepository;
-
+	
+	private int count(Iterable<User> itr){
+		Iterator<User> itr2 = itr.iterator();
+		int counter=0;
+		while(itr2.hasNext()){
+			counter++;
+			itr2.next();
+		}
+		return counter;
+	}
 	
 	@Test
-	@Ignore
 	public void testUserRepository(){
+
+
+		int preexisting = count(userRepository.findAll());
+		System.out.println("Preexisting"+preexisting);
 		userRepository.save(new User("Juergen", "bla", User.roleUser));
 		userRepository.save(new User("Peter", "bla", User.roleUser));
 		userRepository.save(new User("Madeleine", "bla", User.roleAdmin));
@@ -32,12 +44,12 @@ public class UserRepositoryTest {
 		User juergen = userRepository.findOneByName("Juergen");
 		assertTrue(juergen!=null);
 		
-		int counter = Helper.count(userRepository.findAll());
+		int counter = count(userRepository.findAll());
 		// admin user is one more
-		assertTrue(counter==4);
+		assertTrue(counter==(preexisting+3));
 		
 		userRepository.delete(juergen);
-		counter = Helper.count(userRepository.findAll());
-		assertTrue(counter==3);
+		counter = count(userRepository.findAll());
+		assertTrue(counter==(preexisting+2));
 	}
 }

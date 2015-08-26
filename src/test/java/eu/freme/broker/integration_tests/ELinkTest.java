@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * Created by jonathan on 28.07.15.
+ * Created by Jonathan Sauder (jsauder@campus-tu-berlin.de) on 28.07.15.
  */
 public class ELinkTest extends IntegrationTest {
     String label = "My Label";
@@ -24,13 +24,19 @@ public class ELinkTest extends IntegrationTest {
     public ELinkTest(){
         super("/e-link/");
     }
-
-
+    private String constructTemplate(String label, String query, String endpoint, String description) {
+        query = query.replaceAll("\n","\\\\n");
+        return  " {\n" +
+                "\"label\":\""+ label + "\",\n"+
+                " \"query\":\""+query+"\",\n" +
+                " \"endpoint\":\""+endpoint+"\",\n" +
+                "\"description\":\""+ description + "\"\n"+
+                " }";
+    }
 
 
     //Tests Creation, fetching, modification and deletion of a template and fetching of all templates
     @Test
-    @Ignore
     public void testTemplateHandling() throws Exception{
         String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl");
         testELinkTemplatesId(templateid);
@@ -51,7 +57,6 @@ public class ELinkTest extends IntegrationTest {
 
     //Tests POST /e-link/documents/
     @Test
-    @Ignore //TODO: wait for issue: POST /e-link/documents response has wrong Content-Type header #26 https://github.com/freme-project/e-Link/issues/26
     public void testELinkDocuments() throws Exception {
         //Adds template temporarily
         String id = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql3.ttl");

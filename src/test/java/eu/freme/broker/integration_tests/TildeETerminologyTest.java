@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
-@Ignore //TODO: wait for issue:  Timeouts on e-Terminology #43 https://github.com/freme-project/Broker/issues/43
+
 public class TildeETerminologyTest extends IntegrationTest {
 
 	public TildeETerminologyTest() {

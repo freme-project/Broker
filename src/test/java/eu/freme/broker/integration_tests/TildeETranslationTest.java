@@ -33,7 +33,6 @@ public class TildeETranslationTest extends IntegrationTest{
 	}
 
 	@Test
-	//@Ignore //TODO: wait for Issue: Timeouts on e-Terminology https://github.com/freme-project/Broker/issues/43
 	public void testEtranslate() throws UnirestException, IOException, Exception {
 
 		HttpResponse<String> response = baseRequest()
