@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
 
 import com.hp.hpl.jena.shared.AssertionFailureException;
@@ -25,17 +26,20 @@ import eu.freme.conversion.rdf.RDFConversionService;
 public abstract class IntegrationTest {
 
     private String url = null;
+    private String baseUrl = null;
     private String service;
     public RDFConversionService converter;
-    
+    public Logger logger = Logger.getLogger(IntegrationTest.class);
+
+
     public IntegrationTest(String service){
         this.service = service;
     }
 
     @Before
     public void setup(){
-
-        url = IntegrationTestSetup.getURLEndpoint() + service;
+        baseUrl = IntegrationTestSetup.getURLEndpoint();
+        url=baseUrl+service;
         converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
     }
 
@@ -56,6 +60,9 @@ public abstract class IntegrationTest {
     //Simple getter which returns the url to the endpoint
     public String getUrl() {
         return url;
+    }
+    public String getBaseUrl() {
+        return baseUrl;
     }
 
 
@@ -109,5 +116,14 @@ public abstract class IntegrationTest {
 
     }
 
-
+    //Used for constructiong Templates with sparql queries in E-link and E-Link Security Test
+    String constructTemplate(String label, String query, String endpoint, String description) {
+        query = query.replaceAll("\n","\\\\n");
+        return  " {\n" +
+                "\"label\":\""+ label + "\",\n"+
+                " \"query\":\""+query+"\",\n" +
+                " \"endpoint\":\""+endpoint+"\",\n" +
+                "\"description\":\""+ description + "\"\n"+
+                " }";
+    }
 }

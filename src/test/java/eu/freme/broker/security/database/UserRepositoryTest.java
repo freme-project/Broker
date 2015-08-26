@@ -2,6 +2,7 @@ package eu.freme.broker.security.database;
 
 import java.util.Iterator;
 
+import com.sun.xml.internal.bind.v2.runtime.output.SAXOutput;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +37,6 @@ public class UserRepositoryTest {
 
 
 		int preexisting = count(userRepository.findAll());
-		System.out.println("Preexisting"+preexisting);
 		userRepository.save(new User("Juergen", "bla", User.roleUser));
 		userRepository.save(new User("Peter", "bla", User.roleUser));
 		userRepository.save(new User("Madeleine", "bla", User.roleAdmin));
@@ -46,6 +46,7 @@ public class UserRepositoryTest {
 		
 		int counter = count(userRepository.findAll());
 		// admin user is one more
+
 		assertTrue(counter==(preexisting+3));
 		
 		userRepository.delete(juergen);

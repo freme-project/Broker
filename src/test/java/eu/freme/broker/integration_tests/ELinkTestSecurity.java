@@ -161,7 +161,7 @@ public class ELinkTestSecurity extends IntegrationTest {
     public void createUser(String username, String password) throws UnirestException{
 
         //System.out.println("ASDASD "+getBaseURL());
-        HttpResponse<String> response = Unirest.post(getBaseURL() + "/user")
+        HttpResponse<String> response = Unirest.post(getBaseUrl() + "/user")
                 .queryString("username", username)
                 .queryString("password", password).asString();
         logger.debug("STATUS: " + response.getStatus());
@@ -173,7 +173,7 @@ public class ELinkTestSecurity extends IntegrationTest {
 
         logger.info("login with new user / create token");
         response = Unirest
-                .post(getBaseURL()  + BaseRestController.authenticationEndpoint)
+                .post(getBaseUrl()  + BaseRestController.authenticationEndpoint)
                 .header("X-Auth-Username", username)
                 .header("X-Auth-Password", password).asString();
         assertTrue(response.getStatus() == HttpStatus.OK.value());

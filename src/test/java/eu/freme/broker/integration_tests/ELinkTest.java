@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -24,19 +25,12 @@ public class ELinkTest extends IntegrationTest {
     public ELinkTest(){
         super("/e-link/");
     }
-    private String constructTemplate(String label, String query, String endpoint, String description) {
-        query = query.replaceAll("\n","\\\\n");
-        return  " {\n" +
-                "\"label\":\""+ label + "\",\n"+
-                " \"query\":\""+query+"\",\n" +
-                " \"endpoint\":\""+endpoint+"\",\n" +
-                "\"description\":\""+ description + "\"\n"+
-                " }";
-    }
+
 
 
     //Tests Creation, fetching, modification and deletion of a template and fetching of all templates
     @Test
+    @Ignore
     public void testTemplateHandling() throws Exception{
         String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl");
         testELinkTemplatesId(templateid);
@@ -57,6 +51,7 @@ public class ELinkTest extends IntegrationTest {
 
     //Tests POST /e-link/documents/
     @Test
+    @Ignore
     public void testELinkDocuments() throws Exception {
         //Adds template temporarily
         String id = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql3.ttl");
