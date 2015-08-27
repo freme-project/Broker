@@ -127,13 +127,7 @@ public class ELink extends BaseRestController {
                         break;                        
                 }
                 
-//                System.out.println(inModel);
-//                System.out.println(inModel.size());
-                
                 inModel = dataEnricher.enrichNIF(inModel, templateId, templateParams);
-                
-//                System.out.println(inModel);
-//                System.out.println(inModel.size());
                 
                 HttpHeaders responseHeaders = new HttpHeaders();
                 String serialization;
