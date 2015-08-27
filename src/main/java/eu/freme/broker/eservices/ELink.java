@@ -632,6 +632,9 @@ public class ELink extends BaseRestController {
                 }
             } catch (URISyntaxException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (org.json.JSONException ex) {
+                Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+                throw new BadRequestException("The JSON object is incorrectly formatted. Problem description: " + ex.getMessage());
             } catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             }
