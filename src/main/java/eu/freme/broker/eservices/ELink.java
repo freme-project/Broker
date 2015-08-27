@@ -165,7 +165,7 @@ public class ELink extends BaseRestController {
             } catch (org.apache.jena.riot.RiotException ex) {
                 logger.error("Invalid NIF document.", ex);
                 throw new InvalidNIFException(ex.getMessage());                
-            } catch (BadRequestException ex) {
+            } catch (eu.freme.eservices.elink.exceptions.BadRequestException ex) {
                 logger.error(ex.getMessage(), ex);
                 throw ex;
             } catch (Exception ex) {
