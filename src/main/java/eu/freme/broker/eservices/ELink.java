@@ -246,7 +246,7 @@ public class ELink extends BaseRestController {
                         JSONObject jsonObj = new JSONObject(postBody);
                         templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
                         t = new Template(
-                                templateDAO.generateTemplateId(),
+//                                templateDAO.generateTemplateId(),
                                 jsonObj.getString("endpoint"),
                                 jsonObj.getString("query"),
                                 jsonObj.getString("label"),
