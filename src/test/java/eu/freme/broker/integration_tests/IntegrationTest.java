@@ -1,21 +1,23 @@
 package eu.freme.broker.integration_tests;
 
-import com.hp.hpl.jena.shared.AssertionFailureException;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
-import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.conversion.rdf.RDFConversionService;
-import org.junit.Before;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+
+import com.hp.hpl.jena.shared.AssertionFailureException;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
+
+import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.conversion.rdf.RDFConversionService;
 
 /**
  * Created by Arne on 29.07.2015.
@@ -32,32 +34,32 @@ public abstract class IntegrationTest {
 
     @Before
     public void setup(){
+
         url = IntegrationTestSetup.getURLEndpoint() + service;
         converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
     }
 
+    //All HTTP Methods used in FREME are defined.
     protected HttpRequestWithBody baseRequestPost(String function) {
         return Unirest.post(url + function);
     }
-
-    public String getUrl() {
-        return url;
-    }
-
     protected HttpRequest baseRequestGet( String function) {
         return Unirest.get(url + function);
     }
-
     protected HttpRequestWithBody baseRequestDelete( String function) {
         return Unirest.delete(url + function);
     }
-
     protected HttpRequestWithBody baseRequestPut( String function) {
         return Unirest.put(url + function);
     }
 
+    //Simple getter which returns the url to the endpoint
+    public String getUrl() {
+        return url;
+    }
 
 
+    //Reads a text file line by line. Use this when testing API with examples from /test/resources/
     public static String readFile(String file) throws IOException {
         StringBuilder bldr = new StringBuilder();
         for (String line: Files.readAllLines(Paths.get(file), StandardCharsets.UTF_8)) {
@@ -66,15 +68,19 @@ public abstract class IntegrationTest {
         return bldr.toString();
     }
 
+    //General NIF Validation: can be used to test all NiF Responses on their validity.
     public void validateNIFResponse(HttpResponse<String> response, RDFConstants.RDFSerialization nifformat) throws IOException {
 
+        //basic tests on response
         assertTrue(response.getStatus() == 200);
         assertTrue(response.getBody().length() > 0);
-
         assertTrue(!response.getHeaders().isEmpty());
         assertNotNull(response.getHeaders().get("content-type"));
+
+        //Tests if headers are correct.
         String contentType = response.getHeaders().get("content-type").get(0).split(";")[0];
-        //TODO: Special Case due to WRONG Mime Type application/json+ld
+        //TODO: Special Case due to WRONG Mime Type application/json+ld.
+        // We wait for https://github.com/freme-project/technical-discussion/issues/40
         if (contentType.equals("application/ld+json") && nifformat.contentType().equals("application/json+ld")) {
         } else {
             assertTrue(contentType.equals(nifformat.contentType()));
@@ -86,15 +92,18 @@ public abstract class IntegrationTest {
         } catch (Exception e) {
             throw new AssertionFailureException("RDF validation failed");
         }
+
+
+
         // validate NIF
-        /* the Validate modul is available just as SNAPSHOT
+        /* the Validate modul is available just as SNAPSHOT.
         if (nifformat == RDFConstants.RDFSerialization.TURTLE) {
             Validate.main(new String[]{"-i", response.getBody(), "--informat","turtle"});
         } else if (nifformat == RDFConstants.RDFSerialization.RDF_XML) {
             Validate.main(new String[]{"-i", response.getBody(), "--informat","rdfxml"});
         } else {
             //Not implemented yet: n3, n-triples, json-ld
-//            Validate.main(new String[]{"-i", response.getBody()});
+            Validate.main(new String[]{"-i", response.getBody()});
         }
         */
 

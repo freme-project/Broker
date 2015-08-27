@@ -1,16 +1,17 @@
 package eu.freme.broker.integration_tests;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.junit.Test;
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
-import eu.freme.conversion.rdf.RDFConstants;
-import org.junit.Test;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import org.junit.Ignore;
+import eu.freme.conversion.rdf.RDFConstants;
 
 
 /**
@@ -19,7 +20,8 @@ import org.junit.Ignore;
 public class DBpediaSpotlightTest extends IntegrationTest{
 
 
-    String[] availableLanguages = {"en","de","it","nl","fr","es"};
+    String[] availableLanguages = {"en"};
+    //String[] availableLanguages = {"en","de","it","nl","fr","es"};
     String testinput= "Berlin";
 
 
@@ -35,7 +37,6 @@ public class DBpediaSpotlightTest extends IntegrationTest{
 
 
     @Test
-    @Ignore
     public void TestDBpediaSpotlightNER() throws UnirestException, IOException, UnsupportedEncodingException {
 
         HttpResponse<String> response;
@@ -77,7 +78,7 @@ public class DBpediaSpotlightTest extends IntegrationTest{
                     .queryString("input", testinput)
                     .queryString("language", lang)
                     .queryString("informat", "text")
-                    .queryString("prefix", "http://test-prefix.com")
+                    .queryString("prefix", "http://test-prefix.com/")
                     .asString();
             validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 

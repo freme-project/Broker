@@ -85,7 +85,7 @@ public class EInternationalizationFilter implements Filter {
 			is = req.getInputStream();
 		} else {
 			// read data from query string input parameter
-			is = new ReaderInputStream(new StringReader("hello world"), "UTF-8");
+			is = new ReaderInputStream(new StringReader(inputQueryString), "UTF-8");
 		}
 
 		Reader nif;

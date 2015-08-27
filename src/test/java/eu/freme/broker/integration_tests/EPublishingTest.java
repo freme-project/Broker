@@ -1,15 +1,20 @@
 package eu.freme.broker.integration_tests;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.*;
-
-import static org.junit.Assert.assertTrue;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 /**
  *
@@ -46,28 +51,12 @@ public class EPublishingTest extends IntegrationTest{
         outStream.flush();
         assertTrue(targetFile.length()>0);
         //TODO: validate epub??
+        //File epubFile = new File("/path/to/your/epub/file.epub");
+
+        // simple constructor; errors are printed on stderr stream
+        // EpubCheck epubcheck = new EpubCheck(targetFile);
+
+        // validate() returns true if no errors or warnings are found
+        // assertTrue(epubcheck.validate());
     }
-
-/*
-    @Test
-    public void testInvalidJSON() throws UnirestException, IOException {
-        HttpResponse<InputStream> response = Unirest.post(getUrl() + "html")
-                .field("htmlZip", new File("src/test/resources/e-publishing/alice.zip"))
-                .field("metadata", (Object) "{\"ffdf\" : \"dfdf\"}")
-                .asBinary();
-
-        System.out.println(response.getStatus());
-        assertTrue(response.getStatus() == 400);
-
-
-
-
-        //assertTrue(asBinary.getBody(). .length() > 0);
-//        File f = new File("src/test/resources/e-publishing/alice.zip");
-//        System.out.println(f.getAbsolutePath());
-//
-//        int status = asBinary.getStatus();
-        //Assert.assertEquals(400, status);
-    }
-    */
 }
