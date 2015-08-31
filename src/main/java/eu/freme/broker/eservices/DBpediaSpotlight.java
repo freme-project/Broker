@@ -85,27 +85,33 @@ public class DBpediaSpotlight extends BaseRestController {
             
             if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
                 // input is sent as value of the input parameter
-                if(input == null) {
-                    textForProcessing = postBody;
-                } else {
-                    textForProcessing = input;
-                }
+                textForProcessing = input;
             } else {
                 // input is sent as body of the request
                 switch(parameters.getInformat()) {
                     case TURTLE:
+                        if(postBody ==null)
+                            throw new BadRequestException("No content in the body of the response.");
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
                         break;
                     case JSON_LD:
+                        if(postBody ==null)
+                            throw new BadRequestException("No content in the body of the response.");
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "JSON-LD");
                         break;
                     case RDF_XML:
+                        if(postBody ==null)
+                            throw new BadRequestException("No content in the body of the response.");
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "RDF/XML");
                         break;
                     case N_TRIPLES:
+                        if(postBody ==null)
+                            throw new BadRequestException("No content in the body of the response.");
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N-TRIPLE");
                         break;
                     case N3:
+                        if(postBody ==null)
+                            throw new BadRequestException("No content in the body of the response.");
                         inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N3");
                         break;                        
                 }
