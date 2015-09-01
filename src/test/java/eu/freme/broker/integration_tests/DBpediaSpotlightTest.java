@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -37,6 +38,7 @@ public class DBpediaSpotlightTest extends IntegrationTest{
 
 
     @Test
+    @Ignore
     public void TestDBpediaSpotlightNER() throws UnirestException, IOException, UnsupportedEncodingException {
 
         HttpResponse<String> response;
