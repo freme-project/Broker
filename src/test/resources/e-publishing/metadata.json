@@ -3,17 +3,29 @@
     "Alice in Utopia",
     "Alice in Europe"
   ],
-  "authors":[
-    "Joske Vermeulen",
-    "Nick Borth"
-  ],
-  "illustrators":[
-    "Frans Vervaacke",
-    "John Riplosh"
-  ],
   "creators":[
-    "Joske Vermeulen",
-    "Nick Borth"
+    {
+      "firstName": "Joske",
+      "lastName": "Vermeulen",
+      "roles":["author"]
+    },
+    {
+      "firstName": "Nick",
+      "lastName": "Borth",
+      "roles":["author"]
+    }
+  ],
+  "contributors":[
+    {
+      "firstName": "Frans",
+      "lastName": "Vervaacke",
+      "roles":["illustrator"]
+    },
+    {
+      "firstName": "John",
+      "lastName": "Riplosh",
+      "roles":["illustrator"]
+    }
   ],
   "subjects":[
     "alice",
@@ -21,11 +33,8 @@
   ],
   "coverImage":"cover.jpeg",
   "language":"en",
-  "source":"",
-  "description":"This is the story about Alice in wonderland, involving a rabbit etc.",
-  "rights":"",
+  "descriptions":["This is the story about Alice in wonderland, involving a rabbit etc."],
   "identifier":{
-    "scheme":"",
     "value":"urn:1235-568-2235"
   },
   "tableOfContents":[
