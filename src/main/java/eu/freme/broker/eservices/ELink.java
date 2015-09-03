@@ -54,14 +54,13 @@ import javax.xml.bind.SchemaOutputResolver;
 
 @RestController
 public class ELink extends BaseRestController {
-
+    
         @Autowired
         DataEnricher dataEnricher;
 
         @Autowired
         TemplateDAO templateDAO;
-
-
+        
         @Autowired
         AbstractAccessDecisionManager decisionManager;
 
@@ -81,7 +80,6 @@ public class ELink extends BaseRestController {
         TemplateValidator templateValidator;
         
         // Enriching using a template.        
-
         // POST /e-link/enrich/
         // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
 	@RequestMapping(value = "/e-link/documents", method = RequestMethod.POST)
@@ -99,9 +97,9 @@ public class ELink extends BaseRestController {
                 String f         = null;
                 String outformat = null;
                 String o         = null;
-
+                
                 HashMap<String, String> templateParams = new HashMap();
-
+                
                 for (Map.Entry<String, String> entry : allParams.entrySet()) {
                     switch(entry.getKey()) {
                         case "informat":
@@ -157,16 +155,6 @@ public class ELink extends BaseRestController {
                 }
                 
                 inModel = dataEnricher.enrichNIF(inModel, templateId, templateParams);
-
-
-
-//                System.out.println(inModel);
-//                System.out.println(inModel.size());
-                
-                inModel = dataEnricher.enrichNIF(inModel, templateId, templateParams);
-                
-//                System.out.println(inModel);
-//                System.out.println(inModel.size());
                 
                 HttpHeaders responseHeaders = new HttpHeaders();
                 String serialization;
@@ -198,7 +186,7 @@ public class ELink extends BaseRestController {
             } catch (org.apache.jena.riot.RiotException ex) {
                 logger.error("Invalid NIF document.", ex);
                 throw new InvalidNIFException(ex.getMessage());                
-            } catch (BadRequestException ex) {
+            } catch (eu.freme.eservices.elink.exceptions.BadRequestException ex) {
                 logger.error(ex.getMessage(), ex);
                 throw ex;
             } catch (Exception ex) {
@@ -280,7 +268,7 @@ public class ELink extends BaseRestController {
                         JSONObject jsonObj = new JSONObject(postBody);
                         templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
                         t = new Template(
-                                templateDAO.generateTemplateId(),
+//                                templateDAO.generateTemplateId(),
                                 jsonObj.getString("endpoint"),
                                 jsonObj.getString("query"),
                                 jsonObj.getString("label"),
@@ -436,11 +424,6 @@ public class ELink extends BaseRestController {
 
                 Template t = templateDAO.getTemplateById(id+"");
                 
-                if(t == null) {
-                    throw new TemplateNotFoundException("Template with id: \"" + id + "\" does not exist.");
-                }
-
-
                 HttpHeaders responseHeaders = new HttpHeaders();
                 Model model = ModelFactory.createDefaultModel();
                 String serialization;
@@ -692,6 +675,9 @@ public class ELink extends BaseRestController {
                 }
             } catch (URISyntaxException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (org.json.JSONException ex) {
+                Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+                throw new BadRequestException("The JSON object is incorrectly formatted. Problem description: " + ex.getMessage());
             } catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             }

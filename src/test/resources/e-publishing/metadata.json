@@ -33,7 +33,7 @@
   ],
   "coverImage":"cover.jpeg",
   "language":"en",
-  "descriptions":"This is the story about Alice in wonderland, involving a rabbit etc.",
+  "descriptions":["This is the story about Alice in wonderland, involving a rabbit etc."],
   "identifier":{
     "value":"urn:1235-568-2235"
   },

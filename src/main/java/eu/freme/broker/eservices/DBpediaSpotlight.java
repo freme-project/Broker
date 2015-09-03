@@ -49,24 +49,7 @@ public class DBpediaSpotlight extends BaseRestController {
 			@RequestParam(value = "language", required = false) String languageParam,
 			@RequestParam(value = "confidence", required = false) String confidenceParam,
                         @RequestBody(required = false) String postBody) {
-            
-            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
-           
-            Model inModel = ModelFactory.createDefaultModel();
-            Model outModel = ModelFactory.createDefaultModel();;
 
-            // Check the language parameter.
-            if(languageParam == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Parameter language is not specified");            
-            } else {
-                if(languageParam.equals("en")) {
-                    // OK, the language is supported.
-                } else {
-                    // The language specified with the langauge parameter is not supported.
-                    throw new eu.freme.broker.exception.BadRequestException("Unsupported language ["+languageParam+"].");
-                }
-            }
-            
             // merge long and short parameters - long parameters override short parameters
             if( input == null ){
                 input = i;
@@ -80,33 +63,46 @@ public class DBpediaSpotlight extends BaseRestController {
             if( prefix == null ){
                 prefix = p;
             }
-            
+
+            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
+
+            Model inModel = ModelFactory.createDefaultModel();
+            Model outModel = ModelFactory.createDefaultModel();
+
+            // Check the language parameter.
+            if(languageParam == null) {
+                throw new eu.freme.broker.exception.BadRequestException("Parameter language is not specified");            
+            } else {
+                if(languageParam.equals("en")) {
+                    // OK, the language is supported.
+                } else {
+                    // The language specified with the langauge parameter is not supported.
+                    throw new eu.freme.broker.exception.BadRequestException("Unsupported language ["+languageParam+"].");
+                }
+            }
+
             String textForProcessing = null;
             
             if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
                 // input is sent as value of the input parameter
-                if(input == null) {
-                    textForProcessing = postBody;
-                } else {
-                    textForProcessing = input;
-                }
+                textForProcessing = parameters.getInput();
             } else {
                 // input is sent as body of the request
                 switch(parameters.getInformat()) {
                     case TURTLE:
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
+                        inModel.read(new ByteArrayInputStream(parameters.getInput().getBytes()), null, "TTL");
                         break;
                     case JSON_LD:
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "JSON-LD");
+                        inModel.read(new ByteArrayInputStream(parameters.getInput().getBytes()), null, "JSON-LD");
                         break;
                     case RDF_XML:
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "RDF/XML");
+                        inModel.read(new ByteArrayInputStream(parameters.getInput().getBytes()), null, "RDF/XML");
                         break;
                     case N_TRIPLES:
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N-TRIPLE");
+                        inModel.read(new ByteArrayInputStream(parameters.getInput().getBytes()), null, "N-TRIPLE");
                         break;
                     case N3:
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N3");
+                        inModel.read(new ByteArrayInputStream(parameters.getInput().getBytes()), null, "N3");
                         break;                        
                 }
                 
