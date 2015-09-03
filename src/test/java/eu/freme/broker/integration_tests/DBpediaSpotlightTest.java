@@ -38,7 +38,6 @@ public class DBpediaSpotlightTest extends IntegrationTest{
 
 
     @Test
-    @Ignore
     public void TestDBpediaSpotlightNER() throws UnirestException, IOException, UnsupportedEncodingException {
 
         HttpResponse<String> response;
