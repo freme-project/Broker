@@ -127,13 +127,7 @@ public class ELink extends BaseRestController {
                         break;                        
                 }
                 
-//                System.out.println(inModel);
-//                System.out.println(inModel.size());
-                
                 inModel = dataEnricher.enrichNIF(inModel, templateId, templateParams);
-                
-//                System.out.println(inModel);
-//                System.out.println(inModel.size());
                 
                 HttpHeaders responseHeaders = new HttpHeaders();
                 String serialization;
@@ -165,7 +159,7 @@ public class ELink extends BaseRestController {
             } catch (org.apache.jena.riot.RiotException ex) {
                 logger.error("Invalid NIF document.", ex);
                 throw new InvalidNIFException(ex.getMessage());                
-            } catch (BadRequestException ex) {
+            } catch (eu.freme.eservices.elink.exceptions.BadRequestException ex) {
                 logger.error(ex.getMessage(), ex);
                 throw ex;
             } catch (Exception ex) {
@@ -246,7 +240,7 @@ public class ELink extends BaseRestController {
                         JSONObject jsonObj = new JSONObject(postBody);
                         templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
                         t = new Template(
-                                templateDAO.generateTemplateId(),
+//                                templateDAO.generateTemplateId(),
                                 jsonObj.getString("endpoint"),
                                 jsonObj.getString("query"),
                                 jsonObj.getString("label"),
@@ -632,6 +626,9 @@ public class ELink extends BaseRestController {
                 }
             } catch (URISyntaxException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (org.json.JSONException ex) {
+                Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+                throw new BadRequestException("The JSON object is incorrectly formatted. Problem description: " + ex.getMessage());
             } catch (Exception ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             }
