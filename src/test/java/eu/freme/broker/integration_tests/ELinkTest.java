@@ -15,31 +15,37 @@
  */
 package eu.freme.broker.integration_tests;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.freme.conversion.rdf.RDFConstants;
-import org.json.JSONObject;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
+import org.json.JSONObject;
+import org.junit.Test;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+import eu.freme.conversion.rdf.RDFConstants;
 
 
 /**
- * Created by jonathan on 28.07.15.
+ * Created by Jonathan Sauder (jsauder@campus-tu-berlin.de) on 28.07.15.
  */
 public class ELinkTest extends IntegrationTest {
+    String label = "My Label";
+    String endpoint = "http://dbpedia.org/sparql/";
+    String description = "My description for this tenmplate";
 
     public ELinkTest(){
         super("/e-link/");
     }
-    private String constructTemplate(String query, String endpoint) {
+    private String constructTemplate(String label, String query, String endpoint, String description) {
         query = query.replaceAll("\n","\\\\n");
         return  " {\n" +
+                "\"label\":\""+ label + "\",\n"+
                 " \"query\":\""+query+"\",\n" +
-                " \"endpoint\":\""+endpoint+"\"\n" +
+                " \"endpoint\":\""+endpoint+"\",\n" +
+                "\"description\":\""+ description + "\"\n"+
                 " }";
     }
 
@@ -66,7 +72,6 @@ public class ELinkTest extends IntegrationTest {
 
     //Tests POST /e-link/documents/
     @Test
-    @Ignore //TODO: wait for issue: POST /e-link/documents response has wrong Content-Type header #26 https://github.com/freme-project/e-Link/issues/26
     public void testELinkDocuments() throws Exception {
         //Adds template temporarily
         String id = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql3.ttl");
@@ -89,14 +94,14 @@ public class ELinkTest extends IntegrationTest {
 
     //Tests POST e-link/templates/
     public String testELinkTemplatesAdd(String filename) throws Exception {
-        String query = readFile(filename);
 
+        String query = readFile(filename);
 
 
         HttpResponse<String> response = baseRequestPost("templates")
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
-                .body(constructTemplate(query, "http://dbpedia.org/sparql/"))
+                .body(constructTemplate(label, query, endpoint, description))
         .asString();
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 
@@ -111,20 +116,24 @@ public class ELinkTest extends IntegrationTest {
 
     //Tests GET e-link/templates/
     public void testELinkTemplatesId(String id) throws UnirestException, IOException {
+
         HttpResponse<String> response = baseRequestGet("templates/"+id)
                 .queryString("outformat", "turtle")
                 .asString();
+
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
     }
 
     //Tests PUT e-link/templates/
     public void testELinkTemplatesUpdate(String filename, String id) throws IOException, UnirestException{
+
+
         String query = readFile(filename);
 
         HttpResponse<String> response = baseRequestPut("templates/"+id)
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
-                .body(constructTemplate(query, "http://dbpedia.org/sparql/"))
+                .body(constructTemplate(label, query, endpoint, description))
                 .asString();
 
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);

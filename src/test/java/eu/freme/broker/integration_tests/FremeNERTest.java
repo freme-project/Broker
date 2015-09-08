@@ -15,16 +15,19 @@
  */
 package eu.freme.broker.integration_tests;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
-import eu.freme.conversion.rdf.RDFConstants;
-import org.junit.Test;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+
+import org.junit.Test;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
+
+import eu.freme.conversion.rdf.RDFConstants;
 
 
 /**
@@ -91,16 +94,14 @@ public class FremeNERTest extends IntegrationTest{
             response = baseRequestPost("documents")
                     .queryString("input", testinput)
                     .queryString("language", lang)
-                    .queryString("dataset", dataset)
                     .queryString("informat", "text")
                     .queryString("prefix", "http://test-prefix.com")
                     .asString();
             validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
-
             //assertTrue(response.getString() contains prefix)
 
             //Tests GET
-            //response = Unirest.get(url+"documents?informat=text&input="+testinputEncoded+"&language="+lang+"&dataset="+dataset).asString();
+            response = Unirest.get(getUrl() + "documents?informat=text&input=" + testinputEncoded + "&language=" + lang + "&dataset=" + dataset).asString();
             response = baseRequestGet("documents")
                     .queryString("informat", "text")
                     .queryString("input", testinputEncoded)

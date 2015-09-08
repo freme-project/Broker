@@ -1,6 +1,38 @@
 FREME Changelog
 
 ---------------------------
+FREME 0.3 - 01.09.2015
+---------------------------
+
+Creation of new multilingual datasets
+* Global airports
+* Geopolitical ontology
+* DatasIAF dataset
+* ORCID dataset
+* VIAF
+* ONLD
+* ORCID
+
+Broker
+* Integration tests
+* Basic user management
+
+Improve API Documentation
+
+Pipelining / Chaining of e-Services
+
+Create first version of FREME NER
+
+e-Internationalization
+* Enable FREME e-Services to consume XLIFF and HTML
+
+e-Link
+* Add label and description to templates
+
+e-Entity
+* Add label and description to datasets
+
+---------------------------
 FREME 0.2 - 16.07.2015
 ---------------------------
 

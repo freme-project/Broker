@@ -51,6 +51,8 @@ public class BodySwappingServletRequest extends HttpServletRequestWrapper {
 	public String getParameter(String name){
 		if( name.toLowerCase().equals("informat")){
 			return "turtle";
+		} if( name.equals("input") ){
+			return null;
 		} else{
 			return super.getParameter(name);
 		}
@@ -62,6 +64,7 @@ public class BodySwappingServletRequest extends HttpServletRequestWrapper {
     	TreeMap<String, String[]> map = new TreeMap<String, String[]>();
     	map.putAll(super.getParameterMap());
     	map.put("informat", new String[]{"turtle"});
+    	map.remove("input");
     	
         return Collections.unmodifiableMap(map);
     }   

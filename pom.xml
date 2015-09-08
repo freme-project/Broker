@@ -24,6 +24,7 @@
 	<artifactId>Broker</artifactId>
 	<version>0.3-SNAPSHOT</version>
 	<inceptionYear>2015</inceptionYear>
+	<version>0.4-SNAPSHOT</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -62,27 +63,44 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>conversion</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.4-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>pipelines</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-entity</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-link</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-publishing</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>0.4-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-slf4j-impl</artifactId>
+				</exclusion>
+			</exclusions>
+
 		</dependency>
 		<dependency>
 			<groupId>com.github.isrsal</groupId>
@@ -132,7 +150,13 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-internationalization</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>0.2-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>	
 		</dependency>
 	</dependencies>
 
