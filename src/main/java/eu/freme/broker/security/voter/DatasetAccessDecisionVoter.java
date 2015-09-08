@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */
-public class DatasetAccessDecisionVoter implements AccessDecisionVoter<Dataset> {
+public class DatasetAccessDecisionVoter implements AccessDecisionVoter<Object> {
 
 	@Override
 	public boolean supports(ConfigAttribute attribute) {
@@ -21,27 +21,31 @@ public class DatasetAccessDecisionVoter implements AccessDecisionVoter<Dataset> 
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return clazz == Dataset.class;
+		return clazz == Object.class;
 	}
 
 	@Override
-	public int vote(Authentication authentication, Dataset object,
+	public int vote(Authentication authentication, Object object,
 			Collection<ConfigAttribute> attributes) {
-		
-		if( authentication.getPrincipal().equals( "anonymousUser" )){
-			return ACCESS_DENIED;
-		}
+		if (object instanceof Dataset) {
+			Dataset casted= (Dataset) object;
+			if (authentication.getPrincipal().equals("anonymousUser")) {
+				return ACCESS_DENIED;
+			}
 
-		User authenticatedUser = (User) authentication.getPrincipal();
+			User authenticatedUser = (User) authentication.getPrincipal();
 
-		if( authenticatedUser.getRole().equals(User.roleAdmin)) {
-			return ACCESS_GRANTED;
-		} else if (object.getAccessLevel().equals(OwnedResource.AccessLevel.PUBLIC)) {
-			return ACCESS_GRANTED;
-		} else if (authenticatedUser.getName().equals(object.getOwner().getName())) {
-			return ACCESS_GRANTED;
-		} else {
-			return ACCESS_DENIED;
-		}
+			if (authenticatedUser.getRole().equals(User.roleAdmin)) {
+				return ACCESS_GRANTED;
+			} else if (casted.getAccessLevel().equals(OwnedResource.AccessLevel.PUBLIC)) {
+				return ACCESS_GRANTED;
+			} else if (authenticatedUser.getName().equals(casted.getOwner().getName())) {
+				return ACCESS_GRANTED;
+			} else {
+				return ACCESS_DENIED;
+			}
+
+		} else return ACCESS_ABSTAIN;
+
 	}
 }

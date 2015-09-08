@@ -324,10 +324,10 @@ public class ELink extends BaseRestController {
 
                 eu.freme.broker.security.database.Template templ = new eu.freme.broker.security.database.Template(templateId, user, OwnedResource.AccessLevel.PRIVATE);
                 templateRepository.save(templ);
-                System.out.println(templ.getAccessLevel());
-                eu.freme.broker.security.database.Template templ2=templateRepository.findOneById(templateId);
-                System.out.println(templ2.getId()+"   "+templateId);
-                System.out.println(templ2.getAccessLevel()+ "kakakakakaka");
+                //System.out.println(templ.getAccessLevel());
+                //eu.freme.broker.security.database.Template templ2=templateRepository.findOneById(templateId);
+                //System.out.println(templ2.getId()+"   "+templateId);
+                //System.out.println(templ2.getAccessLevel()+ "kakakakakaka");
 
                 HttpHeaders responseHeaders = new HttpHeaders();
                 URI location = new URI("/e-link/templates/"+t.getId());

@@ -1,36 +1,30 @@
 package eu.freme.broker.eservices;
 
-import java.io.ByteArrayInputStream;
-import java.net.URI;
-
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.RDF;
+import eu.freme.broker.exception.ExternalServiceFailedException;
+import eu.freme.broker.security.database.*;
+import eu.freme.broker.security.tools.AccessLevelHelper;
+import eu.freme.broker.tools.NIFParameterSet;
+import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.eservices.eentity.api.EEntityService;
+import eu.freme.eservices.eentity.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.vote.AbstractAccessDecisionManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
-
-import eu.freme.broker.exception.ExternalServiceFailedException;
-import eu.freme.broker.tools.NIFParameterSet;
-import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.eservices.eentity.api.EEntityService;
-import eu.freme.eservices.eentity.exceptions.BadRequestException;
+import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +34,18 @@ public class FremeNER extends BaseRestController {
 
 	@Autowired
 	EEntityService entityAPI;
+
+    @Autowired
+    AbstractAccessDecisionManager decisionManager;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    DatasetRepository datasetRepository;
+
+    @Autowired
+    AccessLevelHelper accessLevelHelper;
 
         // Submitting document for processing.
 	@RequestMapping(value = "/e-entity/freme-ner/documents", method = {
@@ -266,11 +272,12 @@ public class FremeNER extends BaseRestController {
                     format = "N3";
                     break;
             }
-            
+
+            ResponseEntity<String> result = null;
             if(endpoint != null && sparql != null) {
                 try {
                     // fed via SPARQL endpoint
-                    return callBackend("http://139.18.2.231:8080/api/datasets?format="+format
+                    result = callBackend("http://139.18.2.231:8080/api/datasets?format="+format
                             + "&name="+name
                             + "&description="+URLEncoder.encode(description,"UTF-8")
                             + "&language="+language
@@ -281,17 +288,26 @@ public class FremeNER extends BaseRestController {
                 }
             } else {
                 // datasets is sent
-                return callBackend("http://139.18.2.231:8080/api/datasets?format="+format
+                result = callBackend("http://139.18.2.231:8080/api/datasets?format="+format
                     + "&name="+name
                     + "&language="+language, HttpMethod.POST, postBody);
             }
-            return null;
+            if(result!= null && result.getStatusCode().is2xxSuccessful()) {
+                Authentication authentication = SecurityContextHolder.getContext()
+                        .getAuthentication();
+                User user = (User) authentication.getPrincipal();
+
+                Dataset dataset = new Dataset(name, user, OwnedResource.AccessLevel.PRIVATE);
+                datasetRepository.save(dataset);
+            }
+            return result;
         }
         
         // Updating dataset for use in the e-Entity service.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test?language=en" -X PUT
 	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}", method = {
             RequestMethod.PUT })
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> updateDataset(
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
 			@PathVariable(value = "name") String name,
@@ -392,15 +408,27 @@ public class FremeNER extends BaseRestController {
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test" -X DELETE
 	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}", method = {
             RequestMethod.DELETE })
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> removeDataset(
 			@PathVariable(value = "name") String name) {
-            
+
             // Check the dataset name parameter.
             if(name == null) {
                 throw new eu.freme.broker.exception.BadRequestException("Unspecified dataset name.");            
             }
 
-            return callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.DELETE, null);
+            Authentication authentication = SecurityContextHolder.getContext()
+                    .getAuthentication();
+
+            Dataset dataset = datasetRepository.findOneById(name);
+            decisionManager.decide(authentication, dataset, accessLevelHelper.writeAccess());
+
+
+            ResponseEntity<String> result = callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.DELETE, null);
+            if(result.getStatusCode().is2xxSuccessful()) {
+                datasetRepository.delete(dataset);
+            }
+            return result;
         }
 
 

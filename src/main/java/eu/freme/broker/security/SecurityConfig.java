@@ -174,6 +174,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 		ArrayList<AccessDecisionVoter> list = new ArrayList<AccessDecisionVoter>();
 		list.add(new TemplateAccessDecisionVoter());
 		list.add(new UserAccessDecisionVoter());
+		list.add(new DatasetAccessDecisionVoter());
 		AffirmativeBased ab = new AffirmativeBased(list);
 		return ab;
 	}

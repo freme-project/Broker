@@ -8,7 +8,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.freme.broker.eservices.BaseRestController;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import org.junit.Before;
 
 import com.hp.hpl.jena.shared.AssertionFailureException;
@@ -19,6 +22,7 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.conversion.rdf.RDFConversionService;
+import org.springframework.http.HttpStatus;
 
 /**
  * Created by Arne on 29.07.2015.
@@ -125,5 +129,28 @@ public abstract class IntegrationTest {
                 " \"endpoint\":\""+endpoint+"\",\n" +
                 "\"description\":\""+ description + "\"\n"+
                 " }";
+    }
+
+
+    public void createUser(String username, String password) throws UnirestException {
+
+        HttpResponse<String> response = Unirest.post(getBaseUrl() + "/user")
+                .queryString("username", username)
+                .queryString("password", password).asString();
+        logger.debug("STATUS: " + response.getStatus());
+        assertTrue(response.getStatus() == HttpStatus.OK.value());
+    }
+
+    public String authenticateUser(String username, String password) throws UnirestException{
+        HttpResponse<String> response;
+
+        logger.info("login with new user / create token");
+        response = Unirest
+                .post(getBaseUrl()  + BaseRestController.authenticationEndpoint)
+                .header("X-Auth-Username", username)
+                .header("X-Auth-Password", password).asString();
+        assertTrue(response.getStatus() == HttpStatus.OK.value());
+        String token = new JSONObject(response.getBody()).getString("token");
+        return token;
     }
 }
