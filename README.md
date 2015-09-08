@@ -1,5 +1,6 @@
-# Broker
-FREME Broker
+# FREME Broker
+
+This repository hosts the Broker of the FREME project. 
 
 ## Useful links
 
@@ -26,7 +27,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-This project uses 3rd party tools. You can find the list of 3rd party tools including their authors and licenses [here](3RD-PARTY-LICENCES).# FREME Broker
+This project uses 3rd party tools. You can find the list of 3rd party tools including their authors and licenses [here](3RD-PARTY-LICENCES).
 
-This repository hosts the Broker of the FREME project. 
+
 
