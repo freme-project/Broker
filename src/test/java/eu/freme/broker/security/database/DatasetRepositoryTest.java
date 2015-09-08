@@ -48,6 +48,11 @@ public class DatasetRepositoryTest {
 		logger.info("delete dataset \"2\"");
 		datasetRepository.delete(two);
 		counter = Helper.count(datasetRepository.findAll());
-		assertTrue(counter==2);
+		assertTrue(counter == 2);
+
+		userRepository.delete(testuser);
+		counter = Helper.count(datasetRepository.findAll());
+		assertTrue(counter == 0);
+
 	}
 }

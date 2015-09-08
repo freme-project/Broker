@@ -32,6 +32,9 @@ public class User {
 	@OneToMany(mappedBy = "user", cascade=CascadeType.ALL)
 	private List<Token> tokens;
 
+	@OneToMany(mappedBy = "owner", cascade=CascadeType.ALL)
+	private List<Dataset> datasets;
+
 	protected User() {
 	}
 
@@ -74,4 +77,11 @@ public class User {
 		return tokens;
 	}
 
+	public List<Dataset> getDatasets() {
+		return datasets;
+	}
+
+	public void setDatasets(List<Dataset> datasets) {
+		this.datasets = datasets;
+	}
 }
