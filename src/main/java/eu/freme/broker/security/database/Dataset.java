@@ -12,18 +12,18 @@ import javax.persistence.*;
 public class Dataset extends OwnedResource{
 
     @Id
-    @Column(name = "id")
-    protected String id;
+    String id;
 
     @JsonIgnore
-    @ManyToOne(optional=false,targetEntity = User.class)
-    protected User owner;
+    @ManyToOne(fetch = FetchType.EAGER) //(optional=false,targetEntity = User.class)
+    private User owner;
 
     private AccessLevel accessLevel;
-    Dataset() {
+    protected Dataset() {
     }
 
     public Dataset(String id, User owner, AccessLevel accessLevel) {
+        super();
         this.id = id;
         this.owner= owner;
         this.accessLevel = accessLevel;
@@ -54,5 +54,8 @@ public class Dataset extends OwnedResource{
         this.id = id;
     }
 
+    public String toString(){
+        return "Dataset[id="+id+", owner="+owner.toString()+", accessLevel="+accessLevel.toString()+"]";
+    }
 
 }

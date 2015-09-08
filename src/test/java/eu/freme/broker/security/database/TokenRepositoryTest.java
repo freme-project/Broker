@@ -37,6 +37,9 @@ public class TokenRepositoryTest {
 	
 	@Autowired
 	TokenRepository tokenRepository;
+
+	@Autowired
+	DatasetRepository datasetRepository;
 	
 	@Test
 	public void testTokenRepository(){
@@ -54,11 +57,14 @@ public class TokenRepositoryTest {
 		logger.info("load token, see if it has the right user attached");
 		Token fromDb = tokenRepository.findOneByToken(token.getToken());
 		assertTrue(fromDb.getUser().getName().equals(user.getName()));
-		
+
+		logger.info("token count: "+Helper.count(tokenRepository.findAll()));
 		logger.info("create 2nd token and delete 1st");
 		Token token2 = new Token("t2", user);
 		tokenRepository.save(token2);
+		logger.info("token count: " + Helper.count(tokenRepository.findAll()));
 		tokenRepository.delete(token);
+		logger.info("token count: " + Helper.count(tokenRepository.findAll()));
 
 		assertTrue(tokenRepository.findAll().iterator().hasNext());
 		assertTrue(userRepository.findAll().iterator().hasNext());
