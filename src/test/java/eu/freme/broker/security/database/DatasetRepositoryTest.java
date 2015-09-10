@@ -1,7 +1,13 @@
 package eu.freme.broker.security.database;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+
 import eu.freme.broker.BrokerConfig;
+
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,28 +28,36 @@ public class DatasetRepositoryTest {
 	@Autowired
 	DatasetRepository datasetRepository;
 
+	@PersistenceContext
+	EntityManager entityManager;
+
 	@Test
-	public void testDatasetRepository(){
+	public void testDatasetRepository() {
 
 		logger.info("create user and save it");
-		User testuser= new User("Juergen", "bla", User.roleUser);
+		User testuser = new User("Juergen", "bla", User.roleUser);
 		userRepository.save(testuser);
+		
+		entityManager.flush();
 
 		logger.info("create dataset \"1\" and save it");
-		datasetRepository.save(new Dataset("1", testuser, OwnedResource.AccessLevel.PUBLIC));
+		datasetRepository.save(new Dataset("1", testuser,
+				OwnedResource.AccessLevel.PUBLIC));
 		logger.info("create dataset \"2\" and save it");
-		datasetRepository.save(new Dataset("2", testuser, OwnedResource.AccessLevel.PUBLIC));
+		datasetRepository.save(new Dataset("2", testuser,
+				OwnedResource.AccessLevel.PUBLIC));
 		logger.info("create dataset \"3\" and save it");
-		datasetRepository.save(new Dataset("3", testuser, OwnedResource.AccessLevel.PUBLIC));
+		datasetRepository.save(new Dataset("3", testuser,
+				OwnedResource.AccessLevel.PUBLIC));
 
 		logger.info("fetch dataset \"2\"");
 		Dataset two = datasetRepository.findOneById("2");
-		assertTrue(two!=null);
+		assertTrue(two != null);
 
 		logger.info("count datasets");
 		int counter = Helper.count(datasetRepository.findAll());
 		// admin user is one more
-		assertTrue(counter==3);
+		assertTrue(counter == 3);
 
 		logger.info("delete dataset \"2\"");
 		datasetRepository.delete(two);
@@ -56,13 +70,16 @@ public class DatasetRepositoryTest {
 
 	}
 
-	@Test
-	public void testDatasetRepository2(){
+	@Test	
+	@Transactional
+	public void testDatasetRepository2() {
+
 		logger.info("create user and dataset");
 		User user = new User("hallo", "welt", User.roleUser);
 		userRepository.save(user);
-
-		Dataset dataset = new Dataset("t1", user, OwnedResource.AccessLevel.PUBLIC);
+		
+		Dataset dataset = new Dataset("t1", user,
+				OwnedResource.AccessLevel.PUBLIC);
 		datasetRepository.save(dataset);
 
 		assertTrue(datasetRepository.findAll().iterator().hasNext());
@@ -72,54 +89,55 @@ public class DatasetRepositoryTest {
 		Dataset fromDb = datasetRepository.findOneById(dataset.getId());
 		assertTrue(fromDb.getOwner().getName().equals(user.getName()));
 
-		logger.info("dataset count: " + Helper.count(datasetRepository.findAll()));
+		logger.info("dataset count: "
+				+ Helper.count(datasetRepository.findAll()));
 		logger.info("create 2nd dataset and delete 1st");
-		Dataset dataset2 = new Dataset("t2", user, OwnedResource.AccessLevel.PUBLIC);
+		Dataset dataset2 = new Dataset("t2", user,
+				OwnedResource.AccessLevel.PUBLIC);
 		datasetRepository.save(dataset2);
-		logger.info("token count (before delete): " + Helper.count(datasetRepository.findAll()));
+		logger.info("token count (before delete): "
+				+ Helper.count(datasetRepository.findAll()));
 		datasetRepository.delete(dataset);
-		logger.info("token count (after delete): " + Helper.count(datasetRepository.findAll()));
+
+		entityManager.flush();
+		logger.info("token count (after delete): "
+				+ Helper.count(datasetRepository.findAll()));
 
 		assertTrue(datasetRepository.findAll().iterator().hasNext());
 		assertTrue(userRepository.findAll().iterator().hasNext());
 
-		/*logger.info("create dataset \"1\" and save it");
-		datasetRepository.save(new Dataset("1", user, OwnedResource.AccessLevel.PUBLIC));
-		logger.info("create dataset \"2\" and save it");
-		datasetRepository.save(new Dataset("2", user, OwnedResource.AccessLevel.PUBLIC));
-		logger.info("create dataset \"3\" and save it");
-		datasetRepository.save(new Dataset("3", user, OwnedResource.AccessLevel.PUBLIC));
-
-		logger.info("fetch dataset \"2\"");
-		Dataset two = datasetRepository.findOneById("2");
-		assertTrue(two != null);
-
-		logger.info("display current datasets:");
-		for(Dataset dataset:datasetRepository.findAll()){
-			logger.info(dataset);
-		}
-		logger.info("count datasets");
-		int counter = Helper.count(datasetRepository.findAll());
-		// admin user is one more
-		assertTrue(counter == 3);
-
-		logger.info("delete dataset \"2\"");
-		datasetRepository.delete(two);
-		logger.info("display current datasets:");
-		for(Dataset dataset:datasetRepository.findAll()){
-			logger.info(dataset);
-		}
-		counter = Helper.count(datasetRepository.findAll());
-		assertTrue(counter == 2);
-
-		userRepository.delete(user);
-
-		logger.info("display current datasets:");
-		for(Dataset dataset:datasetRepository.findAll()){
-			logger.info(dataset);
-		}
-		counter = Helper.count(datasetRepository.findAll());
-		assertTrue(counter == 0);
-*/
+		/*
+		 * logger.info("create dataset \"1\" and save it");
+		 * datasetRepository.save(new Dataset("1", user,
+		 * OwnedResource.AccessLevel.PUBLIC));
+		 * logger.info("create dataset \"2\" and save it");
+		 * datasetRepository.save(new Dataset("2", user,
+		 * OwnedResource.AccessLevel.PUBLIC));
+		 * logger.info("create dataset \"3\" and save it");
+		 * datasetRepository.save(new Dataset("3", user,
+		 * OwnedResource.AccessLevel.PUBLIC));
+		 * 
+		 * logger.info("fetch dataset \"2\""); Dataset two =
+		 * datasetRepository.findOneById("2"); assertTrue(two != null);
+		 * 
+		 * logger.info("display current datasets:"); for(Dataset
+		 * dataset:datasetRepository.findAll()){ logger.info(dataset); }
+		 * logger.info("count datasets"); int counter =
+		 * Helper.count(datasetRepository.findAll()); // admin user is one more
+		 * assertTrue(counter == 3);
+		 * 
+		 * logger.info("delete dataset \"2\""); datasetRepository.delete(two);
+		 * logger.info("display current datasets:"); for(Dataset
+		 * dataset:datasetRepository.findAll()){ logger.info(dataset); } counter
+		 * = Helper.count(datasetRepository.findAll()); assertTrue(counter ==
+		 * 2);
+		 * 
+		 * userRepository.delete(user);
+		 * 
+		 * logger.info("display current datasets:"); for(Dataset
+		 * dataset:datasetRepository.findAll()){ logger.info(dataset); } counter
+		 * = Helper.count(datasetRepository.findAll()); assertTrue(counter ==
+		 * 0);
+		 */
 	}
 }
