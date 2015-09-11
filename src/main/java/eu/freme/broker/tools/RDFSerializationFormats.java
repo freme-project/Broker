@@ -35,6 +35,7 @@ public class RDFSerializationFormats extends
 		put("turtle", RDFConstants.RDFSerialization.TURTLE);
 
 		put("application/json+ld", RDFConstants.RDFSerialization.JSON_LD);
+		put("application/ld+json", RDFConstants.RDFSerialization.JSON_LD);
 		put("json-ld", RDFConstants.RDFSerialization.JSON_LD);
 
 		put("application/n-triples", RDFConstants.RDFSerialization.N_TRIPLES);
