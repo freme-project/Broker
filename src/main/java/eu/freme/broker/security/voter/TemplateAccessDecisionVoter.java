@@ -1,8 +1,9 @@
 package eu.freme.broker.security.voter;
 
 import eu.freme.broker.security.database.OwnedResource;
-import eu.freme.broker.security.database.Template;
-import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.model.Template;
+import eu.freme.broker.security.database.model.User;
+
 import org.hibernate.metamodel.domain.Entity;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;

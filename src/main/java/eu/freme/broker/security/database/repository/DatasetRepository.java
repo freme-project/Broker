@@ -1,6 +1,8 @@
-package eu.freme.broker.security.database;
+package eu.freme.broker.security.database.repository;
 
 import org.springframework.data.repository.CrudRepository;
+
+import eu.freme.broker.security.database.model.Dataset;
 
 /**
  * @author Jonathan Sauder jsauder@campus.tu-berlin.de

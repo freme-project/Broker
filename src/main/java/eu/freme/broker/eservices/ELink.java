@@ -24,10 +24,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import eu.freme.broker.security.database.OwnedResource;
-import eu.freme.broker.security.database.TemplateRepository;
-import eu.freme.broker.security.database.User;
-import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.database.model.User;
+import eu.freme.broker.security.database.repository.TemplateRepository;
+import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
+
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -63,6 +64,7 @@ import eu.freme.eservices.elink.Exporter;
 import eu.freme.eservices.elink.Template;
 import eu.freme.eservices.elink.TemplateDAO;
 import eu.freme.eservices.elink.exceptions.TemplateNotFoundException;
+
 import org.apache.commons.validator.routines.UrlValidator;
 
 import javax.xml.bind.SchemaOutputResolver;
@@ -337,7 +339,7 @@ public class ELink extends BaseRestController {
                 User user = (User) authentication.getPrincipal();
                 decisionManager.decide(authentication, user, accessLevelHelper.writeAccess());
 
-                eu.freme.broker.security.database.Template templ = new eu.freme.broker.security.database.Template(templateId, user, OwnedResource.AccessLevel.PRIVATE);
+                eu.freme.broker.security.database.model.Template templ = new eu.freme.broker.security.database.model.Template(templateId, user, OwnedResource.AccessLevel.PRIVATE);
                 templateRepository.save(templ);
                 //System.out.println(templ.getAccessLevel());
                 //eu.freme.broker.security.database.Template templ2=templateRepository.findOneById(templateId);
@@ -708,7 +710,7 @@ public class ELink extends BaseRestController {
 
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
-        eu.freme.broker.security.database.Template templ = templateRepository.findOneById(id);
+        eu.freme.broker.security.database.model.Template templ = templateRepository.findOneById(id);
         decisionManager.decide(authentication, templ, accessLevelHelper.writeAccess());
         templateRepository.delete(templ);
 

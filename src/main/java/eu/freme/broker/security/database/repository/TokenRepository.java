@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.freme.broker.security.database;
+package eu.freme.broker.security.database.repository;
 
 
 import org.springframework.data.repository.CrudRepository;
+
+import eu.freme.broker.security.database.model.Token;
 
 /**
  * @author Jan Nehring - jan.nehring@dfki.de

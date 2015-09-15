@@ -1,6 +1,9 @@
-package eu.freme.broker.security.database;
+package eu.freme.broker.security.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import eu.freme.broker.security.database.OwnedResource;
+import eu.freme.broker.security.database.OwnedResource.AccessLevel;
 
 import javax.persistence.*;
 
@@ -8,27 +11,26 @@ import javax.persistence.*;
  * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 13.08.15.
  */
 @Entity
-@Table(name = "template")
-public class Template extends OwnedResource {
+@Table(name = "dataset")
+public class Dataset extends OwnedResource{
 
     @Id
-    @Column(name = "id")
-    private String id;
+    String id;
 
     @JsonIgnore
-    @ManyToOne(optional=false,targetEntity = User.class)
+    @ManyToOne(fetch = FetchType.EAGER) //(optional=false,targetEntity = User.class)
     private User owner;
+
     private AccessLevel accessLevel;
-    Template(){ }
+    protected Dataset() {
+    }
 
-
-    public Template(String id, User owner, AccessLevel accessLevel) {
+    public Dataset(String id, User owner, AccessLevel accessLevel) {
+        super();
         this.id = id;
         this.owner= owner;
         this.accessLevel = accessLevel;
-        System.out.println(this.accessLevel+"kikikik");
     }
-
 
     public AccessLevel getAccessLevel() {
         return accessLevel;
@@ -55,5 +57,8 @@ public class Template extends OwnedResource {
         this.id = id;
     }
 
+    public String toString(){
+        return "Dataset[id="+id+", owner="+owner.toString()+", accessLevel="+accessLevel.toString()+"]";
+    }
 
 }

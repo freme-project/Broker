@@ -21,7 +21,7 @@ import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
-import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.model.User;
 /**
  * @author Jonathan Sauder jsauder@campus.tu-berlin.de
  */

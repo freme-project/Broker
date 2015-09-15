@@ -5,6 +5,10 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import eu.freme.broker.BrokerConfig;
+import eu.freme.broker.security.database.model.Dataset;
+import eu.freme.broker.security.database.model.User;
+import eu.freme.broker.security.database.repository.DatasetRepository;
+import eu.freme.broker.security.database.repository.UserRepository;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;

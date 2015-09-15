@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.broker.security.database.User;
-import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.database.model.User;
+import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.security.tools.PasswordHasher;
 

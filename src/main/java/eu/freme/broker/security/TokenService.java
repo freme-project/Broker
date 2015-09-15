@@ -21,9 +21,9 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 
-import eu.freme.broker.security.database.Token;
-import eu.freme.broker.security.database.TokenRepository;
-import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.model.Token;
+import eu.freme.broker.security.database.model.User;
+import eu.freme.broker.security.database.repository.TokenRepository;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

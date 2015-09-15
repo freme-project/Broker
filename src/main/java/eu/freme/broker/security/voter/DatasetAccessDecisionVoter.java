@@ -1,8 +1,9 @@
 package eu.freme.broker.security.voter;
 
-import eu.freme.broker.security.database.Dataset;
 import eu.freme.broker.security.database.OwnedResource;
-import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.model.Dataset;
+import eu.freme.broker.security.database.model.User;
+
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;

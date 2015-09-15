@@ -25,9 +25,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.broker.security.database.Token;
-import eu.freme.broker.security.database.User;
-import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.database.model.Token;
+import eu.freme.broker.security.database.model.User;
+import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.PasswordHasher;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de

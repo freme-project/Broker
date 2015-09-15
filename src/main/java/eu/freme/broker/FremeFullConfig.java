@@ -21,9 +21,11 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
+import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.conversion.ConversionApplicationConfig;
 import eu.freme.eservices.eentity.EEntityConfig;
 import eu.freme.eservices.elink.ELinkConfig;
@@ -57,5 +59,10 @@ public class FremeFullConfig {
 
 	public void setWorkspaceLocation(String workspaceLocation) {
 		this.workspaceLocation = workspaceLocation;
+	}
+	
+	@Bean
+	public UserDAO getUserDAO(){
+		return new UserDAO();
 	}
 }

@@ -24,8 +24,8 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 
 import com.google.common.base.Optional;
 
-import eu.freme.broker.security.database.Token;
-import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.model.Token;
+import eu.freme.broker.security.database.model.User;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

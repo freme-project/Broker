@@ -20,7 +20,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
-import eu.freme.broker.security.database.Token;
+import eu.freme.broker.security.database.model.Token;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.freme.broker.security.database;
+package eu.freme.broker.security.database.model;
 
 import java.util.List;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.Cascade;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 /**

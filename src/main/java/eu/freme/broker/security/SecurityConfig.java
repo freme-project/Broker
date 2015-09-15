@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import eu.freme.broker.security.voter.DatasetAccessDecisionVoter;
 import eu.freme.broker.security.voter.TemplateAccessDecisionVoter;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,8 +48,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import eu.freme.broker.security.database.User;
-import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.database.model.User;
+import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.security.tools.PasswordHasher;
 import eu.freme.broker.security.voter.UserAccessDecisionVoter;

@@ -4,13 +4,15 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
+
 import eu.freme.broker.eservices.BaseRestController;
-import eu.freme.broker.security.database.Template;
-import eu.freme.broker.security.database.TemplateRepository;
-import eu.freme.broker.security.database.User;
-import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.database.model.Template;
+import eu.freme.broker.security.database.model.User;
+import eu.freme.broker.security.database.repository.TemplateRepository;
+import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.conversion.rdf.RDFConstants;
+
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;

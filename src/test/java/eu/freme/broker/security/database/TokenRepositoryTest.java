@@ -15,6 +15,8 @@
  */
 package eu.freme.broker.security.database;
 
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +27,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import eu.freme.broker.BrokerConfig;
+import eu.freme.broker.security.database.dao.UserDAO;
+import eu.freme.broker.security.database.model.Token;
+import eu.freme.broker.security.database.model.User;
+import eu.freme.broker.security.database.repository.DatasetRepository;
+import eu.freme.broker.security.database.repository.TokenRepository;
+import eu.freme.broker.security.database.repository.UserRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -41,12 +49,34 @@ public class TokenRepositoryTest {
 	
 	@Autowired
 	TokenRepository tokenRepository;
-
+	
 	@Autowired
-	DatasetRepository datasetRepository;
+	UserDAO userDAO;
 
 	@PersistenceContext
 	EntityManager entityManager;
+	
+	@Test
+	@Transactional
+	public void testTest(){
+		
+		User user = new User("hallo", "welt", User.roleUser);
+		userRepository.save(user);
+
+		Token token = new Token("t1", user);
+		tokenRepository.save(token);
+		
+		entityManager.flush();
+		
+		user = userRepository.findOneByName(user.getName());
+		userDAO.deleteUser(user);
+		entityManager.flush();
+		
+		Iterator<Token> itr = tokenRepository.findAll().iterator();
+		while( itr.hasNext()){
+			System.out.println(itr.next().getToken());
+		}
+	}
 	
 	@Test
 	@Transactional

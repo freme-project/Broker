@@ -1,6 +1,11 @@
 package eu.freme.broker.security.database;
 
 import eu.freme.broker.BrokerConfig;
+import eu.freme.broker.security.database.model.Template;
+import eu.freme.broker.security.database.model.User;
+import eu.freme.broker.security.database.repository.TemplateRepository;
+import eu.freme.broker.security.database.repository.UserRepository;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;

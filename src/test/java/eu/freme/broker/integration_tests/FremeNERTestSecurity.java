@@ -2,9 +2,11 @@ package eu.freme.broker.integration_tests;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.freme.broker.security.database.DatasetRepository;
-import eu.freme.broker.security.database.UserRepository;
+
+import eu.freme.broker.security.database.repository.DatasetRepository;
+import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;

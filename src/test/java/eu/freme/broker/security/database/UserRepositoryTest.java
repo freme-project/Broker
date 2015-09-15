@@ -18,6 +18,7 @@ package eu.freme.broker.security.database;
 import java.util.Iterator;
 
 import com.sun.xml.internal.bind.v2.runtime.output.SAXOutput;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,8 +28,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertTrue;
 import eu.freme.broker.BrokerConfig;
-import eu.freme.broker.security.database.User;
-import eu.freme.broker.security.database.UserRepository;
+import eu.freme.broker.security.database.model.User;
+import eu.freme.broker.security.database.repository.UserRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BrokerConfig.class)
