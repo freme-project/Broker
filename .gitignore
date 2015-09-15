@@ -5,6 +5,7 @@
 .idea
 *.iml
 /logs/
+/log/
 *~
 .springBeans
 /bin/
