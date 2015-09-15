@@ -16,8 +16,7 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>eu.freme</groupId>
@@ -62,7 +61,7 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>conversion</artifactId>
-			<version>0.4-SNAPSHOT</version>
+			<version>0.3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -73,22 +72,22 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>pipelines</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-entity</artifactId>
-			<version>0.4-SNAPSHOT</version>
+			<version>0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-link</artifactId>
-			<version>0.4-SNAPSHOT</version>
+			<version>0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-publishing</artifactId>
-			<version>0.4-SNAPSHOT</version>
+			<version>0.3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -149,7 +148,7 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-internationalization</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>0.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -287,18 +286,6 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
-		<!-- provides just a SNAPSHOT org.nlp2rdf.software.jena:2.0.1-SNAPSHOT
-		<repository>
-			<id>maven.aksw.internal</id>
-			<name>University Leipzig, AKSW Maven2 Repository</name>
-			<url>http://maven.aksw.org/repository/internal</url>
-		</repository>
-		<repository>
-			<id>maven.aksw.snapshots</id>
-			<name>University Leipzig, AKSW Maven2 Repository</name>
-			<url>http://maven.aksw.org/repository/snapshots</url>
-		</repository>
-		-->
 	</repositories>
 
 
