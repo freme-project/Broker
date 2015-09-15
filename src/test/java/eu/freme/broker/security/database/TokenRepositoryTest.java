@@ -81,7 +81,7 @@ public class TokenRepositoryTest {
 		entityManager.flush();
 		logger.info("delete user, should delete token also");
 		userRepository.delete(userFromDb);
-		logger.info("token count (after user delete): " + Helper.count(tokenRepository.findAll()));
+		logger.info("token count (after user delete): " + tokenRepository.count());
 		entityManager.flush();
 
 		assertFalse(tokenRepository.findAll().iterator().hasNext());

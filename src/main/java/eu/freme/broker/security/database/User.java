@@ -44,10 +44,10 @@ public class User {
 
 	private String role;
 	
-	@OneToMany(mappedBy = "user", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy = "user", cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Token> tokens;
 
-	@OneToMany(mappedBy = "owner", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy = "owner", cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Dataset> datasets;
 
 	protected User() {
