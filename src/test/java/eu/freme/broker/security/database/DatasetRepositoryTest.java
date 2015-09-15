@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -95,49 +97,24 @@ public class DatasetRepositoryTest {
 		Dataset dataset2 = new Dataset("t2", user,
 				OwnedResource.AccessLevel.PUBLIC);
 		datasetRepository.save(dataset2);
-		logger.info("token count (before delete): "
+		logger.info("dataset count (before delete): "
 				+ Helper.count(datasetRepository.findAll()));
 		datasetRepository.delete(dataset);
 
 		entityManager.flush();
-		logger.info("token count (after delete): "
-				+ Helper.count(datasetRepository.findAll()));
+		logger.info("dataset count (after delete): " + Helper.count(datasetRepository.findAll()));
+		assertEquals(1, Helper.count(datasetRepository.findAll()));
 
 		assertTrue(datasetRepository.findAll().iterator().hasNext());
 		assertTrue(userRepository.findAll().iterator().hasNext());
 
-		/*
-		 * logger.info("create dataset \"1\" and save it");
-		 * datasetRepository.save(new Dataset("1", user,
-		 * OwnedResource.AccessLevel.PUBLIC));
-		 * logger.info("create dataset \"2\" and save it");
-		 * datasetRepository.save(new Dataset("2", user,
-		 * OwnedResource.AccessLevel.PUBLIC));
-		 * logger.info("create dataset \"3\" and save it");
-		 * datasetRepository.save(new Dataset("3", user,
-		 * OwnedResource.AccessLevel.PUBLIC));
-		 * 
-		 * logger.info("fetch dataset \"2\""); Dataset two =
-		 * datasetRepository.findOneById("2"); assertTrue(two != null);
-		 * 
-		 * logger.info("display current datasets:"); for(Dataset
-		 * dataset:datasetRepository.findAll()){ logger.info(dataset); }
-		 * logger.info("count datasets"); int counter =
-		 * Helper.count(datasetRepository.findAll()); // admin user is one more
-		 * assertTrue(counter == 3);
-		 * 
-		 * logger.info("delete dataset \"2\""); datasetRepository.delete(two);
-		 * logger.info("display current datasets:"); for(Dataset
-		 * dataset:datasetRepository.findAll()){ logger.info(dataset); } counter
-		 * = Helper.count(datasetRepository.findAll()); assertTrue(counter ==
-		 * 2);
-		 * 
-		 * userRepository.delete(user);
-		 * 
-		 * logger.info("display current datasets:"); for(Dataset
-		 * dataset:datasetRepository.findAll()){ logger.info(dataset); } counter
-		 * = Helper.count(datasetRepository.findAll()); assertTrue(counter ==
-		 * 0);
-		 */
+		User userFromDb = userRepository.findOneByName(user.getName());
+		logger.info("delete user, should delete token also");
+		userRepository.delete(userFromDb);
+		entityManager.flush();
+		assertFalse(userRepository.findAll().iterator().hasNext());
+
+		assertFalse(datasetRepository.findAll().iterator().hasNext());
+
 	}
 }

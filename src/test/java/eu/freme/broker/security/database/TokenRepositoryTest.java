@@ -26,6 +26,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import eu.freme.broker.BrokerConfig;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BrokerConfig.class)
 public class TokenRepositoryTest {
@@ -40,10 +44,14 @@ public class TokenRepositoryTest {
 
 	@Autowired
 	DatasetRepository datasetRepository;
+
+	@PersistenceContext
+	EntityManager entityManager;
 	
 	@Test
+	@Transactional
 	public void testTokenRepository(){
-		
+		entityManager.flush();
 		logger.info("create user and token");
 		User user = new User("hallo", "welt", User.roleUser);
 		userRepository.save(user);
@@ -58,21 +66,24 @@ public class TokenRepositoryTest {
 		Token fromDb = tokenRepository.findOneByToken(token.getToken());
 		assertTrue(fromDb.getUser().getName().equals(user.getName()));
 
-		logger.info("token count: "+Helper.count(tokenRepository.findAll()));
+		logger.info("token count: " + Helper.count(tokenRepository.findAll()));
 		logger.info("create 2nd token and delete 1st");
 		Token token2 = new Token("t2", user);
 		tokenRepository.save(token2);
-		logger.info("token count: " + Helper.count(tokenRepository.findAll()));
+		logger.info("token count (before delete): " + Helper.count(tokenRepository.findAll()));
 		tokenRepository.delete(token);
-		logger.info("token count: " + Helper.count(tokenRepository.findAll()));
+		logger.info("token count (after delete): " + Helper.count(tokenRepository.findAll()));
 
 		assertTrue(tokenRepository.findAll().iterator().hasNext());
 		assertTrue(userRepository.findAll().iterator().hasNext());
 
 		User userFromDb = userRepository.findOneByName(user.getName());
+		entityManager.flush();
 		logger.info("delete user, should delete token also");
 		userRepository.delete(userFromDb);
-		
+		logger.info("token count (after user delete): " + Helper.count(tokenRepository.findAll()));
+		entityManager.flush();
+
 		assertFalse(tokenRepository.findAll().iterator().hasNext());
 	}
 }
