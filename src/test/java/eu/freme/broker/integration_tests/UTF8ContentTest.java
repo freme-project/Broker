@@ -3,7 +3,10 @@ package eu.freme.broker.integration_tests;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.conversion.rdf.RDFConstants;
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.SimpleLayout;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -11,16 +14,26 @@ import java.io.IOException;
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 15.09.2015.
  */
+@Ignore
 public class UTF8ContentTest extends IntegrationTest{
 
-    String inputSimple = "Hello Berlin";//"Madrid (/məˈdrɪd/, Spanish: [maˈðɾið], locally: [maˈðɾiθ, -ˈðɾi]) is a south-western European city and the capital and largest municipality of Spain.";
+    String inputSimple = "Madrid (/məˈdrɪd/, Spanish: [maˈðɾið], locally: [maˈðɾiθ, -ˈðɾi]) is a south-western European city and the capital and largest municipality of Spain.";
     String inputNifTurtle;
 
     Logger logger = Logger.getLogger(UTF8ContentTest.class);
 
     public UTF8ContentTest() throws Exception{
         super("");
+        SimpleLayout layout = new SimpleLayout();
+        FileAppender fileAppender = new FileAppender( layout, "logs/utf8-integration-test.log", false );
+        fileAppender.setEncoding("UTF-8");
+        fileAppender.activateOptions();
+        logger.addAppender(fileAppender);
+
+
         inputNifTurtle = readFile("src/test/resources/rdftest/utf8.ttl");
+
+        logger.info("\n"+inputNifTurtle);
     }
 
     @Test
@@ -34,6 +47,7 @@ public class UTF8ContentTest extends IntegrationTest{
                 .queryString("confidence", "0.2")
                 .body(inputNifTurtle)
                 .asString();
+        logger.info("\n"+response.getBody());
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
     }
 
@@ -72,18 +86,18 @@ public class UTF8ContentTest extends IntegrationTest{
     @Test
     public void testFremeNer() throws UnirestException, IOException{
         HttpResponse<String> response;
-        logger.info("Test DBPediaSpotlight");
-        setService("/e-entity/dbpedia-spotlight/");
+        logger.info("Test e-entity/freme-ner/");
+        setService("/e-entity/freme-ner/");
         response = baseRequestPost("documents")
                 .queryString("language", "en")
-                .queryString("informat", "text")
-                .queryString("confidence", "0.2")
-                .body("Hello Berlin")
+                .queryString("informat", "turtle")
+                .queryString("dataset", "dbpedia")
+                .body(inputNifTurtle)
                 .asString();
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
     }
 
-    @Test
+    /*@Test
     public void testEPublishing() throws UnirestException, IOException{
         HttpResponse<String> response;
         logger.info("Test DBPediaSpotlight");
@@ -95,18 +109,18 @@ public class UTF8ContentTest extends IntegrationTest{
                 .body("Hello Berlin")
                 .asString();
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
-    }
+    }*/
 
     @Test
     public void testTiledETerminology() throws UnirestException, IOException{
         HttpResponse<String> response;
-        logger.info("Test DBPediaSpotlight");
-        setService("/e-entity/dbpedia-spotlight/");
-        response = baseRequestPost("documents")
-                .queryString("language", "en")
-                .queryString("informat", "text")
-                .queryString("confidence", "0.2")
-                .body("Hello Berlin")
+        logger.info("Test /e-terminology/tilde");
+        setService("/e-terminology/tilde");
+        response = baseRequestPost("")
+                .queryString("informat", "turtle")
+                .queryString("source-lang", "en")
+                .queryString("target-lang", "de")
+                .body(inputNifTurtle)
                 .asString();
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
     }
@@ -114,13 +128,13 @@ public class UTF8ContentTest extends IntegrationTest{
     @Test
     public void testTiledETranslation() throws UnirestException, IOException{
         HttpResponse<String> response;
-        logger.info("Test DBPediaSpotlight");
-        setService("/e-entity/dbpedia-spotlight/");
-        response = baseRequestPost("documents")
-                .queryString("language", "en")
-                .queryString("informat", "text")
-                .queryString("confidence", "0.2")
-                .body("Hello Berlin")
+        logger.info("Test /e-translation/tilde");
+        setService("/e-translation/tilde");
+        response = baseRequestPost("")
+                .queryString("informat", "turtle")
+                .queryString("source-lang", "en")
+                .queryString("target-lang", "de")
+                .body(inputNifTurtle)
                 .asString();
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
     }
