@@ -44,7 +44,6 @@ public class UTF8ContentTest extends IntegrationTest{
         response = baseRequestPost("documents")
                 .queryString("language", "en")
                 .queryString("informat", "turtle")
-                .queryString("confidence", "0.2")
                 .body(inputNifTurtle)
                 .asString();
         logger.info("\n"+response.getBody());
