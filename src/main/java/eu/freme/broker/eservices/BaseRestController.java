@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -135,6 +136,8 @@ public abstract class BaseRestController {
 			statusCode = ((FREMEHttpException) exception).getHttpStatusCode();
 		} else if( exception instanceof AccessDeniedException ){
 			statusCode = HttpStatus.UNAUTHORIZED;
+		} else if ( exception instanceof HttpMessageNotReadableException ) {
+			statusCode = HttpStatus.BAD_REQUEST;
 		} else {
 			// get status code from exception class annotation
 			Annotation responseStatusAnnotation = exception.getClass()
