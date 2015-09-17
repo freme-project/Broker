@@ -15,6 +15,7 @@
  */
 package eu.freme.broker.security.database.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
@@ -41,10 +42,10 @@ public class User {
 
 	private String role;
 	
-	@OneToMany(mappedBy = "user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
 	private List<Token> tokens;
 
-	@OneToMany(mappedBy = "owner", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
 	private List<Dataset> datasets;
 
 	protected User() {
@@ -54,6 +55,9 @@ public class User {
 		this.name = name;
 		this.password = password;
 		this.role = role;
+		
+		tokens = new ArrayList<Token>();
+		datasets = new ArrayList<Dataset>();
 	}
 
 	@Override

@@ -15,8 +15,6 @@
  */
 package eu.freme.broker.security.database;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,12 +23,12 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import eu.freme.broker.BrokerConfig;
 import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.Token;
 import eu.freme.broker.security.database.model.User;
-import eu.freme.broker.security.database.repository.DatasetRepository;
 import eu.freme.broker.security.database.repository.TokenRepository;
 import eu.freme.broker.security.database.repository.UserRepository;
 
@@ -58,28 +56,6 @@ public class TokenRepositoryTest {
 	
 	@Test
 	@Transactional
-	public void testTest(){
-		
-		User user = new User("hallo", "welt", User.roleUser);
-		userRepository.save(user);
-
-		Token token = new Token("t1", user);
-		tokenRepository.save(token);
-		
-		entityManager.flush();
-		
-		user = userRepository.findOneByName(user.getName());
-		userDAO.deleteUser(user);
-		entityManager.flush();
-		
-		Iterator<Token> itr = tokenRepository.findAll().iterator();
-		while( itr.hasNext()){
-			System.out.println(itr.next().getToken());
-		}
-	}
-	
-	@Test
-	@Transactional
 	public void testTokenRepository(){
 		entityManager.flush();
 		logger.info("create user and token");
@@ -100,17 +76,22 @@ public class TokenRepositoryTest {
 		logger.info("create 2nd token and delete 1st");
 		Token token2 = new Token("t2", user);
 		tokenRepository.save(token2);
-		logger.info("token count (before delete): " + Helper.count(tokenRepository.findAll()));
+		logger.info("token count (before delete): " + tokenRepository.count());
+		assertEquals((long)2, tokenRepository.count());
 		tokenRepository.delete(token);
-		logger.info("token count (after delete): " + Helper.count(tokenRepository.findAll()));
+		logger.info("token count (after delete): " + tokenRepository.count());
 
-		assertTrue(tokenRepository.findAll().iterator().hasNext());
-		assertTrue(userRepository.findAll().iterator().hasNext());
+		assertEquals((long)1, tokenRepository.count());
+		// one user is automatically generated admin user
+		assertEquals((long)2, userRepository.count());
+		
+		entityManager.flush();
+		entityManager.clear();
 
 		User userFromDb = userRepository.findOneByName(user.getName());
 		entityManager.flush();
 		logger.info("delete user, should delete token also");
-		userRepository.delete(userFromDb);
+		userDAO.deleteUser(userFromDb);
 		logger.info("token count (after user delete): " + tokenRepository.count());
 		entityManager.flush();
 

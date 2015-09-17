@@ -35,7 +35,7 @@ public class Token {
 	String token;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private User user;
 	
 	Date creationDate;
