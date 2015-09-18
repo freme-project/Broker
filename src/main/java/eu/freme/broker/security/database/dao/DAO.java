@@ -15,11 +15,13 @@
  */
 package eu.freme.broker.security.database.dao;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TransactionRequiredException;
 
 /**
  * Created by Arne on 18.09.2015.
@@ -32,16 +34,22 @@ public class DAO<Repository  extends CrudRepository<Entity, Long>, Entity> {
     @Autowired
     Repository repository;
 
+    Logger logger = Logger.getLogger(DAO.class);
+
     public void delete(Entity entity){
         repository.delete(entity);
-        entityManager.flush();
-        entityManager.clear();
+        try {
+            entityManager.flush();
+            entityManager.clear();
+        }catch(TransactionRequiredException e){
+            logger.warn("Tried to flush and clear the entity manager, but didn't work! ("+e.getMessage()+")");
+        }
     }
 
     public void save(Entity entity){
         repository.save(entity);
-        entityManager.flush();
-        entityManager.clear();
+        //entityManager.flush();
+        //entityManager.clear();
     }
 
     public long count(){

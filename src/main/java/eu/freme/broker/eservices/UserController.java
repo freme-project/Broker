@@ -15,6 +15,7 @@
  */
 package eu.freme.broker.eservices;
 
+import eu.freme.broker.security.database.dao.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,8 @@ public class UserController extends BaseRestController {
 	AbstractAccessDecisionManager decisionManager;
 
 	@Autowired
-	UserRepository userRepository;
+	UserDAO userDAO;
+	//UserRepository userRepository;
 	
 	@Autowired
 	AccessLevelHelper accessLevelHelper;
@@ -53,7 +55,7 @@ public class UserController extends BaseRestController {
 			@RequestParam(value = "username", required = true) String username,
 			@RequestParam(value = "password", required = true) String password) {
 
-		if (userRepository.findOneByName(username) != null) {
+		if (userDAO.getRepository().findOneByName(username) != null) {
 			throw new BadRequestException("Username already exists");
 		}
 		
@@ -70,7 +72,7 @@ public class UserController extends BaseRestController {
 		try {
 			String hashedPassword = PasswordHasher.getSaltedHash(password);
 			User user = new User(username, hashedPassword, User.roleUser);
-			userRepository.save(user);
+			userDAO.save(user);
 			return user;
 		} catch (Exception e) {
 			logger.error(e);
@@ -82,7 +84,7 @@ public class UserController extends BaseRestController {
 	@PreAuthorize("hasRole('ROLE_USER')")
 	public User getUser(@PathVariable("username") String username) {
 
-		User user = userRepository.findOneByName(username);
+		User user = userDAO.getRepository().findOneByName(username);
 		if (user == null) {
 			throw new BadRequestException("User not found");
 		}
@@ -97,7 +99,7 @@ public class UserController extends BaseRestController {
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> deleteUser(@PathVariable("username") String username) {
 
-		User user = userRepository.findOneByName(username);
+		User user = userDAO.getRepository().findOneByName(username);
 		if (user == null) {
 			throw new BadRequestException("User not found");
 		}
@@ -105,7 +107,7 @@ public class UserController extends BaseRestController {
 		Authentication authentication = SecurityContextHolder.getContext()
 				.getAuthentication();
 		decisionManager.decide(authentication, user, accessLevelHelper.writeAccess());
-		userRepository.delete(user);
+		userDAO.delete(user);
 
 		return new ResponseEntity<String>(HttpStatus.NO_CONTENT);
 	}
@@ -113,7 +115,7 @@ public class UserController extends BaseRestController {
 	@RequestMapping(value="/user", method= RequestMethod.GET)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public Iterable<User> getUsers(){
-		return userRepository.findAll();
+		return userDAO.findAll();
 	}
 
 	public void setDecisionManager(AbstractAccessDecisionManager decisionManager) {
@@ -121,6 +123,6 @@ public class UserController extends BaseRestController {
 	}
 
 	public UserRepository getUserRepository() {
-		return userRepository;
+		return userDAO.getRepository();
 	}
 }

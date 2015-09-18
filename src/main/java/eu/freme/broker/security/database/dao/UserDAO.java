@@ -32,7 +32,7 @@ public class UserDAO extends DAO<UserRepository, User> {
 	
 	@Autowired
 	TokenRepository tokenRepository;
-	
+
 	@Autowired
 	DatasetRepository datasetRepository;
 	
@@ -48,8 +48,11 @@ public class UserDAO extends DAO<UserRepository, User> {
 			datasetRepository.delete(dataset);
 		}
 
-		for( Template template : entity.getTemplates()){
-			templateRepository.delete(template);
+		// TODO: Why is entity.getTemplates() sometimes null??
+		if(entity.getTemplates()!=null) {
+			for (Template template : entity.getTemplates()) {
+				templateRepository.delete(template);
+			}
 		}
 		super.delete(entity);
 	}
