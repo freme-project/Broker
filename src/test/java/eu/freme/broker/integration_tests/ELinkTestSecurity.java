@@ -28,7 +28,9 @@ import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.conversion.rdf.RDFConstants;
 
+import eu.freme.conversion.rdf.RDFConversionService;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,24 +55,34 @@ public class ELinkTestSecurity extends IntegrationTest {
     AccessLevelHelper accessLevelHelper;
 
 
-    String usernameWithPermission = "userwithpermission";
-    String passwordWithPermission  = "testpassword";
-    String usernameWithoutPermission = "userwithoutpermission";
-    String passwordWithoutPermission  = "testpassword";
+    private static final String usernameWithPermission = "userwithpermission";
+    private static final String passwordWithPermission  = "testpassword";
+    private static final String usernameWithoutPermission = "userwithoutpermission";
+    private static final String passwordWithoutPermission  = "testpassword";
+    private static String tokenWithPermission;
+    private static String tokenWithOutPermission;
+    private static boolean initialized = false;
 
 
     public ELinkTestSecurity() throws UnirestException{
         super("/e-link/");
     }
 
+
+    public void initUser() throws UnirestException {
+        //Creates two users, one intended to have permission, the other not
+        createUser(usernameWithPermission, passwordWithPermission);
+        tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
+        createUser(usernameWithoutPermission, passwordWithoutPermission);
+        tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
+        initialized = true;
+    }
+
     @Test
     public void testTemplateHandlingWithSecurity() throws Exception{
 
-        //Creates two users, one intended to have permission, the other not
-        createUser(usernameWithPermission, passwordWithPermission);
-        String tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
-        createUser(usernameWithoutPermission, passwordWithoutPermission);
-        String tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
+        if(!initialized)
+            initUser();
 
         // add a template for the first user
         String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl", tokenWithPermission);
@@ -93,11 +105,8 @@ public class ELinkTestSecurity extends IntegrationTest {
     @Test
     public void testELinkDocuments() throws Exception {
 
-        //Creates two users, one intended to have permission, the other not
-        createUser(usernameWithPermission, passwordWithPermission);
-        String tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
-        createUser(usernameWithoutPermission, passwordWithoutPermission);
-        String tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
+        if(!initialized)
+            initUser();
 
         //Adds template temporarily
         String id = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql3.ttl", tokenWithPermission);

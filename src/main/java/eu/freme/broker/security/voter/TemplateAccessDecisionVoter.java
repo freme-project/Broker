@@ -52,6 +52,7 @@ public class TemplateAccessDecisionVoter implements AccessDecisionVoter<Object> 
 			//System.out.println("Successfully casted from Object to Template");
 
 
+
 			if (authentication.getPrincipal().equals("anonymousUser")) {
 				return ACCESS_DENIED;
 			}
