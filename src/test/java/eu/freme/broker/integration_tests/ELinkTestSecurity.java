@@ -48,11 +48,11 @@ import static org.junit.Assert.*;
 public class ELinkTestSecurity extends IntegrationTest {
 
 
-    @Autowired
-    AbstractAccessDecisionManager decisionManager;
+    //@Autowired
+    //AbstractAccessDecisionManager decisionManager;
 
-    @Autowired
-    AccessLevelHelper accessLevelHelper;
+    //@Autowired
+    //AccessLevelHelper accessLevelHelper;
 
 
     private static final String usernameWithPermission = "userwithpermission";

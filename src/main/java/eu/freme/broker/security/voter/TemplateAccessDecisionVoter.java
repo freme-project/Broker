@@ -19,7 +19,9 @@ import eu.freme.broker.security.database.OwnedResource;
 import eu.freme.broker.security.database.model.Template;
 import eu.freme.broker.security.database.model.User;
 
+import eu.freme.broker.security.tools.AccessLevelHelper;
 import org.hibernate.metamodel.domain.Entity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
@@ -30,6 +32,9 @@ import java.util.Collection;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 public class TemplateAccessDecisionVoter implements AccessDecisionVoter<Object> {
+
+	@Autowired
+	AccessLevelHelper accessLevelHelper;
 
 	@Override
 	public boolean supports(ConfigAttribute attribute) {
@@ -60,7 +65,7 @@ public class TemplateAccessDecisionVoter implements AccessDecisionVoter<Object> 
 			User authenticatedUser = (User) authentication.getPrincipal();
 			if (authenticatedUser.getRole().equals(User.roleAdmin)) {
 				return ACCESS_GRANTED;
-			} else if (template.getAccessLevel().equals(OwnedResource.AccessLevel.PUBLIC)) {
+			} else if (template.getAccessLevel().equals(OwnedResource.AccessLevel.PUBLIC) && accessLevelHelper.hasRead(attributes)) {
 				return ACCESS_GRANTED;
 			} else if (authenticatedUser.getName().equals(template.getOwner().getName())) {
 				return ACCESS_GRANTED;
