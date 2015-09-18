@@ -47,10 +47,24 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
+
+import eu.freme.broker.exception.ExternalServiceFailedException;
+import eu.freme.broker.tools.NIFParameterSet;
+import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.eservices.eentity.api.EEntityService;
+import eu.freme.eservices.eentity.exceptions.BadRequestException;
+import eu.freme.eservices.elink.api.DataEnricher;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,6 +73,9 @@ public class FremeNER extends BaseRestController {
 
 	@Autowired
 	EEntityService entityAPI;
+        
+        @Autowired
+        DataEnricher dataEnricher;
 
     @Autowired
     AbstractAccessDecisionManager decisionManager;
@@ -91,6 +108,7 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "language", required = false) String language,
 			@RequestParam(value = "dataset", required = false) String dataset,
 			@RequestParam(value = "numLinks", required = false) String numLinksParam,
+			@RequestParam(value = "enrichement", required = false) String enrichementType,
                         @RequestBody(required = false) String postBody) {
             
             // Check the language parameter.
@@ -112,7 +130,7 @@ public class FremeNER extends BaseRestController {
             
             // Check the dataset parameter.
             if(dataset == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Dataset is not specified");
+                throw new eu.freme.broker.exception.BadRequestException("Dataset parameter is not specified");            
             } else {
                 // OK, dataset specified.
             }
@@ -136,6 +154,16 @@ public class FremeNER extends BaseRestController {
                     numLinks = 1;
                 }
             }
+            
+            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
+           
+            Model inModel = ModelFactory.createDefaultModel();
+            Model outModel = ModelFactory.createDefaultModel();
+            outModel.setNsPrefix("dbpedia", "http://dbpedia.org/resource/");
+            outModel.setNsPrefix("dbc", "http://dbpedia.org/resource/Category:");
+            outModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+            outModel.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
+            outModel.setNsPrefix("freme-onto", "http://freme-project.eu/ns#");
 
             // merge long and short parameters - long parameters override short parameters
             if( input == null ){
@@ -150,13 +178,7 @@ public class FremeNER extends BaseRestController {
             if( prefix == null ){
                 prefix = p;
             }
-
-            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
-           
-            Model inModel = ModelFactory.createDefaultModel();
-            Model outModel = ModelFactory.createDefaultModel();;
-
-
+            
             String textForProcessing = null;
             
             if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
@@ -204,9 +226,15 @@ public class FremeNER extends BaseRestController {
             }
             
             try {
-                String fremeNERRes = entityAPI.callFremeNER(textForProcessing,language,parameters.getPrefix(), dataset, numLinks);
+                String fremeNERRes = entityAPI.callFremeNER(textForProcessing, language, parameters.getPrefix(), dataset, numLinks);
                 outModel.read(new ByteArrayInputStream(fremeNERRes.getBytes()), null, "TTL");
                 outModel.add(inModel);
+                HashMap<String, String> templateParams = new HashMap();
+                if(enrichementType != null) {
+                    if(enrichementType.equals("dbpedia-categories")) {
+                        outModel = dataEnricher.enrichNIF(outModel, 300, templateParams);
+                    }
+                }
             } catch (BadRequestException e) {
                 logger.error("failed", e);
                 throw new eu.freme.broker.exception.BadRequestException(e.getMessage());
@@ -327,7 +355,7 @@ public class FremeNER extends BaseRestController {
             if(endpoint != null && sparql != null) {
                 try {
                     // fed via SPARQL endpoint
-                    result = callBackend("http://139.18.2.231:8080/api/datasets?format="+format
+                    return callBackend("http://139.18.2.231:8080/api/datasets?format="+format
                             + "&name="+name
                             + "&description="+URLEncoder.encode(description,"UTF-8")
                             + "&language="+language
@@ -488,7 +516,7 @@ public class FremeNER extends BaseRestController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> removeDataset(
 			@PathVariable(value = "name") String name) {
-
+            
             // Check the dataset name parameter.
             if(name == null) {
                 throw new eu.freme.broker.exception.BadRequestException("Unspecified dataset name.");            
