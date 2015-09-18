@@ -17,22 +17,17 @@ package eu.freme.broker.eservices;
 
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
-
 import eu.freme.broker.exception.ExternalServiceFailedException;
 import eu.freme.broker.security.database.dao.DatasetDAO;
-import eu.freme.broker.security.database.dao.TemplateSecurityDAO;
 import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.Dataset;
 import eu.freme.broker.security.database.model.OwnedResource;
-import eu.freme.broker.security.database.model.User;
-import eu.freme.broker.security.database.repository.DatasetRepository;
-import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
-
+import eu.freme.eservices.elink.api.DataEnricher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -41,25 +36,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
-
-import eu.freme.broker.exception.ExternalServiceFailedException;
-import eu.freme.broker.tools.NIFParameterSet;
-import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.eservices.eentity.api.EEntityService;
-import eu.freme.eservices.eentity.exceptions.BadRequestException;
-import eu.freme.eservices.elink.api.DataEnricher;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -154,16 +135,6 @@ public class FremeNER extends BaseRestController {
                     numLinks = 1;
                 }
             }
-            
-            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
-           
-            Model inModel = ModelFactory.createDefaultModel();
-            Model outModel = ModelFactory.createDefaultModel();
-            outModel.setNsPrefix("dbpedia", "http://dbpedia.org/resource/");
-            outModel.setNsPrefix("dbc", "http://dbpedia.org/resource/Category:");
-            outModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-            outModel.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
-            outModel.setNsPrefix("freme-onto", "http://freme-project.eu/ns#");
 
             // merge long and short parameters - long parameters override short parameters
             if( input == null ){
@@ -178,7 +149,17 @@ public class FremeNER extends BaseRestController {
             if( prefix == null ){
                 prefix = p;
             }
-            
+
+            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
+           
+            Model inModel = ModelFactory.createDefaultModel();
+            Model outModel = ModelFactory.createDefaultModel();
+            outModel.setNsPrefix("dbpedia", "http://dbpedia.org/resource/");
+            outModel.setNsPrefix("dbc", "http://dbpedia.org/resource/Category:");
+            outModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+            outModel.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
+            outModel.setNsPrefix("freme-onto", "http://freme-project.eu/ns#");
+
             String textForProcessing = null;
             
             if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
