@@ -114,6 +114,21 @@ public class ELink extends BaseRestController {
             try {
                 
                 int templateId = validateTemplateID(templateIdStr);
+
+                // Security
+                if (templateSecurityDAO.getRepository().findOneById(templateId+"") == null) {
+                    throw new BadRequestException("template metadata for templateId=\""+templateId+"\" does not exist");
+                }
+
+                Authentication authentication = SecurityContextHolder.getContext()
+                        .getAuthentication();
+                eu.freme.broker.security.database.model.Template templ = templateSecurityDAO.getRepository().findOneById(templateId+"");
+                try {
+                    decisionManager.decide(authentication, templ, accessLevelHelper.readAccess());
+                }catch (AccessDeniedException e){
+                    return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+                }
+                // Security END
                 
                 String informat  = null;
                 String f         = null;

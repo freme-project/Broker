@@ -57,23 +57,17 @@ public class TemplateAccessDecisionVoter implements AccessDecisionVoter<Object> 
 			}
 
 			User authenticatedUser = (User) authentication.getPrincipal();
-			//System.out.println(template.getAccessLevel()+ "NAnanananan");
 			if (authenticatedUser.getRole().equals(User.roleAdmin)) {
-				//System.out.println("ADMINnNn");
 				return ACCESS_GRANTED;
 			} else if (template.getAccessLevel().equals(OwnedResource.AccessLevel.PUBLIC)) {
-				//System.out.println("PuuuUuBlic");
 				return ACCESS_GRANTED;
 			} else if (authenticatedUser.getName().equals(template.getOwner().getName())) {
-				//System.out.println("OwwnNNeer");
 				return ACCESS_GRANTED;
 			} else {
-				//System.out.println("DeneieiEIIEd");
 				return ACCESS_DENIED;
 			}
 		} catch (ClassCastException e) {
 			//temporary
-			//System.out.println("Handled ClassCastException from some Object to Template");
 			return ACCESS_ABSTAIN;
 		}
 	}

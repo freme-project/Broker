@@ -50,9 +50,6 @@ public class ELinkTestSecurity extends IntegrationTest {
     AbstractAccessDecisionManager decisionManager;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
     AccessLevelHelper accessLevelHelper;
 
 
@@ -69,6 +66,32 @@ public class ELinkTestSecurity extends IntegrationTest {
     @Test
     public void testTemplateHandlingWithSecurity() throws Exception{
 
+        //Creates two users, one intended to have permission, the other not
+        createUser(usernameWithPermission, passwordWithPermission);
+        String tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
+        createUser(usernameWithoutPermission, passwordWithoutPermission);
+        String tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
+
+        // add a template for the first user
+        String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl", tokenWithPermission);
+        assertNotNull(templateid);
+
+        // User without permission should not be able to query, update or delete another user's template
+        // User with permission should
+        // check query template...
+        assertEquals(testELinkTemplatesId(templateid, tokenWithPermission), HttpStatus.OK.value());
+        assertEquals(testELinkTemplatesId(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+        // check update template...
+        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission),  HttpStatus.FORBIDDEN.value());
+        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission),  HttpStatus.OK.value());
+        // check delete template...
+        assertEquals(testELinkTemplatesDelete(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+        int responseCode = testELinkTemplatesDelete(templateid, tokenWithPermission);
+        assertTrue(responseCode== HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+    public void testELinkDocuments() throws Exception {
 
         //Creates two users, one intended to have permission, the other not
         createUser(usernameWithPermission, passwordWithPermission);
@@ -76,31 +99,32 @@ public class ELinkTestSecurity extends IntegrationTest {
         createUser(usernameWithoutPermission, passwordWithoutPermission);
         String tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
 
-        //Tests if users can add  and update Templates
-        String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl", tokenWithPermission);
-        assertNotNull(templateid);
+        //Adds template temporarily
+        String id = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql3.ttl", tokenWithPermission);
 
-        //Tests if template is successfully created and has right attributes
-        /*
-        Template fromDB = templateRepository.findOneById(templateid);
-        assertNotNull(fromDB);
-        assertTrue(fromDB.getOwner().getName().equals(usernameWithPermission));
-        */
+        String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
 
-        assertEquals(testELinkTemplatesId(templateid, tokenWithPermission), HttpStatus.OK.value());
-        assertEquals(testELinkTemplatesId(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+        // this shouldn't be granted...
+        HttpResponse<String> response = baseRequestPost("documents")
+                .header("X-Auth-Token", tokenWithOutPermission)
+                .queryString("templateid", id)
+                .queryString("informat", "turtle")
+                .queryString("outformat", "turtle")
+                .body(nifContent)
+                .asString();
+        assertEquals(response.getStatus(), HttpStatus.FORBIDDEN.value());
+        // but this...
+        response = baseRequestPost("documents")
+                .header("X-Auth-Token", tokenWithPermission)
+                .queryString("templateid", id)
+                .queryString("informat", "turtle")
+                .queryString("outformat", "turtle")
+                .body(nifContent)
+                .asString();
 
-        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission),  HttpStatus.FORBIDDEN.value());
-        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission),  HttpStatus.OK.value());
-
-
-        //User without permission should not be able to delete another user's template
-        assertEquals(testELinkTemplatesDelete(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
-
-        //User with permission should
-        int responseCode = testELinkTemplatesDelete(templateid, tokenWithPermission);
-        assertTrue(responseCode== HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
-
+        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        //Deletes temporary template
+        testELinkTemplatesDelete(id, tokenWithPermission);
     }
 
     //Tests GET e-link/templates/
@@ -117,8 +141,6 @@ public class ELinkTestSecurity extends IntegrationTest {
     //Tests POST e-link/templates/
     public String testELinkTemplatesAdd(String filename, String token) throws Exception {
         String query = readFile(filename);
-
-
 
         HttpResponse<String> response = baseRequestPost("templates")
                 .header("X-Auth-Token", token)
@@ -161,7 +183,7 @@ public class ELinkTestSecurity extends IntegrationTest {
                 .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description"))
                 .asString();
 
-        if(response.getStatus() == 200) {
+        if(response.getStatus() == HttpStatus.OK.value()) {
             validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
             JSONObject jsonObj = new JSONObject(response.getBody());
             String newid = jsonObj.getString("templateId");
