@@ -15,9 +15,13 @@
  */
 package eu.freme.broker.security.database.dao;
 
+import eu.freme.broker.security.tools.AccessLevelHelper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.security.access.vote.AbstractAccessDecisionManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -36,6 +40,7 @@ public class DAO<Repository  extends CrudRepository<Entity, Long>, Entity> {
 
     Logger logger = Logger.getLogger(DAO.class);
 
+
     public void delete(Entity entity){
         repository.delete(entity);
         try {
@@ -45,6 +50,7 @@ public class DAO<Repository  extends CrudRepository<Entity, Long>, Entity> {
             logger.warn("Tried to flush and clear the entity manager, but didn't work! ("+e.getMessage()+")");
         }
     }
+
 
     public void save(Entity entity){
         repository.save(entity);

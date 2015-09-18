@@ -19,6 +19,9 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import eu.freme.broker.exception.ExternalServiceFailedException;
+import eu.freme.broker.security.database.dao.DatasetDAO;
+import eu.freme.broker.security.database.dao.TemplateSecurityDAO;
+import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.Dataset;
 import eu.freme.broker.security.database.model.OwnedResource;
 import eu.freme.broker.security.database.model.User;
@@ -35,6 +38,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
@@ -60,10 +64,12 @@ public class FremeNER extends BaseRestController {
     AbstractAccessDecisionManager decisionManager;
 
     @Autowired
-    UserRepository userRepository;
+    UserDAO userDAO;
+    //UserRepository userRepository;
 
     @Autowired
-    DatasetRepository datasetRepository;
+    DatasetDAO datasetDAO;
+    //TemplateRepository templateRepository;
 
     @Autowired
     AccessLevelHelper accessLevelHelper;
@@ -106,10 +112,21 @@ public class FremeNER extends BaseRestController {
             
             // Check the dataset parameter.
             if(dataset == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Dataset language is not specified");            
+                throw new eu.freme.broker.exception.BadRequestException("Dataset is not specified");
             } else {
                 // OK, dataset specified.
             }
+
+            // security
+            try {
+                //check read access
+                if (datasetDAO.findOneById(dataset) == null) {
+                    throw new eu.freme.broker.exception.BadRequestException("template metadata for templateId=\""+dataset+"\" does not exist");
+                }
+            }catch (AccessDeniedException e){
+                return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+            }
+
             
             int numLinks = 1;
             // Check the dataset parameter.
@@ -119,11 +136,6 @@ public class FremeNER extends BaseRestController {
                     numLinks = 1;
                 }
             }
-            
-            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
-           
-            Model inModel = ModelFactory.createDefaultModel();
-            Model outModel = ModelFactory.createDefaultModel();;
 
             // merge long and short parameters - long parameters override short parameters
             if( input == null ){
@@ -138,7 +150,13 @@ public class FremeNER extends BaseRestController {
             if( prefix == null ){
                 prefix = p;
             }
-            
+
+            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
+           
+            Model inModel = ModelFactory.createDefaultModel();
+            Model outModel = ModelFactory.createDefaultModel();;
+
+
             String textForProcessing = null;
             
             if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
@@ -213,6 +231,7 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "f", required = false) String f,
 			@RequestParam(value = "endpoint", required = false) String endpoint,
 			@RequestParam(value = "sparql", required = false) String sparql,
+            @RequestParam(value = "visibility",        required=false) String visibility,
                         @RequestBody(required = false) String postBody) {
             
             // merge long and short parameters - long parameters override short parameters.
@@ -294,6 +313,16 @@ public class FremeNER extends BaseRestController {
                     break;
             }
 
+            // Security
+            Dataset dataset = new Dataset(name, OwnedResource.Visibility.getByString(visibility));
+            try {
+                // check write access
+                decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), dataset, accessLevelHelper.writeAccess());
+            }catch (AccessDeniedException e){
+                return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+            }
+            // Security END
+
             ResponseEntity<String> result = null;
             if(endpoint != null && sparql != null) {
                 try {
@@ -313,14 +342,12 @@ public class FremeNER extends BaseRestController {
                     + "&name="+name
                     + "&language="+language, HttpMethod.POST, postBody);
             }
-            if(result!= null && result.getStatusCode().is2xxSuccessful()) {
-                Authentication authentication = SecurityContextHolder.getContext()
-                        .getAuthentication();
-                User user = (User) authentication.getPrincipal();
 
-                Dataset dataset = new Dataset(name, user, OwnedResource.Visibility.PRIVATE);
-                datasetRepository.save(dataset);
+            // Security
+            if(result!= null && result.getStatusCode().is2xxSuccessful()) {
+                datasetDAO.save(dataset);
             }
+
             return result;
         }
         
@@ -335,6 +362,7 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "language", required = false) String language,
 			@RequestParam(value = "informat", required = false) String informat,
 			@RequestParam(value = "f", required = false) String f,
+            @RequestParam(value = "visibility",        required=false) String visibility,
                         @RequestBody(required = false) String postBody) {
             
             // Check the dataset name parameter.
@@ -397,8 +425,26 @@ public class FremeNER extends BaseRestController {
                     break;
             }
 
-            return callBackend("http://139.18.2.231:8080/api/datasets"+name+"?format="+format
-                    + "&language="+language, HttpMethod.PUT, postBody);
+            // Security
+            Dataset dataset;  //new Dataset(name, user, OwnedResource.Visibility.getByString(visibility));
+            try {
+                dataset = datasetDAO.findOneById(name); //checks just read access
+                decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), dataset, accessLevelHelper.writeAccess());
+            }catch (AccessDeniedException e){
+                return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+            }
+            // Security END
+
+            ResponseEntity<String> result = callBackend("http://139.18.2.231:8080/api/datasets"+name+"?format="+format
+                        + "&language="+language, HttpMethod.PUT, postBody);
+
+            // update visibility
+            if(result.getStatusCode().is2xxSuccessful()){
+                dataset.setVisibility(OwnedResource.Visibility.getByString(visibility));
+                // check write access
+                datasetDAO.save(dataset);
+            }
+            return result;
         }
         
         // Get info about a specific dataset.
@@ -411,6 +457,16 @@ public class FremeNER extends BaseRestController {
             // Check the dataset name parameter.
             if(name == null) {
                 throw new eu.freme.broker.exception.BadRequestException("Unspecified dataset name.");            
+            }
+
+            // security
+            try {
+                //check read access
+                if (datasetDAO.findOneById(name) == null) {
+                    throw new eu.freme.broker.exception.BadRequestException("template metadata for templateId=\""+name+"\" does not exist");
+                }
+            }catch (AccessDeniedException e){
+                return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
             }
 
             return callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.GET, null);
@@ -438,17 +494,21 @@ public class FremeNER extends BaseRestController {
                 throw new eu.freme.broker.exception.BadRequestException("Unspecified dataset name.");            
             }
 
-            Authentication authentication = SecurityContextHolder.getContext()
-                    .getAuthentication();
-
-            Dataset dataset = datasetRepository.findOneById(name);
-            decisionManager.decide(authentication, dataset, accessLevelHelper.writeAccess());
-
+            // security
+            Dataset dataset;
+            try {
+                dataset = datasetDAO.findOneById(name); //checks just read access
+                decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), dataset, accessLevelHelper.writeAccess());
+            }catch (AccessDeniedException e){
+                return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+            }
 
             ResponseEntity<String> result = callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.DELETE, null);
+
             if(result.getStatusCode().is2xxSuccessful()) {
-                datasetRepository.delete(dataset);
+                datasetDAO.delete(dataset);
             }
+
             return result;
         }
 

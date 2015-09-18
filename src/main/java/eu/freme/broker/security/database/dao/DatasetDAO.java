@@ -23,5 +23,5 @@ import org.springframework.stereotype.Component;
  * Created by Arne on 18.09.2015.
  */
 @Component
-public class DatasetDAO extends DAO<DatasetRepository, Dataset> {
+public class DatasetDAO extends OwnedResourceDAO<Dataset> {
 }

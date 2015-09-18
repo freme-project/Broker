@@ -23,5 +23,5 @@ import org.springframework.stereotype.Component;
  * Created by Arne on 18.09.2015.
  */
 @Component
-public class TemplateSecurityDAO extends DAO<TemplateRepository, Template> {
+public class TemplateSecurityDAO extends OwnedResourceDAO<Template> {
 }

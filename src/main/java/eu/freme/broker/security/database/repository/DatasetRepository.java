@@ -22,8 +22,6 @@ import eu.freme.broker.security.database.model.Dataset;
 /**
  * @author Jonathan Sauder jsauder@campus.tu-berlin.de
  */
-public interface DatasetRepository extends CrudRepository<Dataset, Long> {
-
-    Dataset findOneById(String name);
+public interface DatasetRepository extends OwnedResourceRepository<Dataset> {
     
 }

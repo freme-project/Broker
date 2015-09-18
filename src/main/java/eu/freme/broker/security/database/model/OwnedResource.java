@@ -17,6 +17,14 @@ package eu.freme.broker.security.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import eu.freme.broker.exception.BadRequestException;
+import eu.freme.broker.security.tools.AccessLevelHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.vote.AbstractAccessDecisionManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.persistence.*;
 
@@ -52,7 +60,15 @@ public class OwnedResource {
 
 	public OwnedResource(String id, User owner, Visibility visibility) {
 		this.id = id;
-		this.owner= owner;
+		this.owner = owner;
+		this.visibility = visibility;
+	}
+
+	public OwnedResource(String id, Visibility visibility) throws AccessDeniedException{
+		Authentication authentication = SecurityContextHolder.getContext()
+				.getAuthentication();
+		this.owner = (User) authentication.getPrincipal();
+		this.id = id;
 		this.visibility = visibility;
 	}
 

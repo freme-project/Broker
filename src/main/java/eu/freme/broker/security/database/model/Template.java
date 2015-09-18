@@ -26,5 +26,8 @@ public class Template extends OwnedResource {
     public Template(String id, User owner, Visibility visibility) {
         super(id, owner, visibility);
     }
+    public Template(String id, Visibility visibility) {
+        super(id, visibility);
+    }
     public Template(){super();}
 }
