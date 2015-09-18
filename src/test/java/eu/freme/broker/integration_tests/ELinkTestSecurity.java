@@ -37,9 +37,7 @@ import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 
 /**
@@ -56,10 +54,6 @@ public class ELinkTestSecurity extends IntegrationTest {
 
     @Autowired
     AccessLevelHelper accessLevelHelper;
-
-    @Autowired
-    TemplateRepository templateRepository;
-
 
 
     String usernameWithPermission = "userwithpermission";
@@ -92,22 +86,29 @@ public class ELinkTestSecurity extends IntegrationTest {
         assertNotNull(fromDB);
         assertTrue(fromDB.getOwner().getName().equals(usernameWithPermission));
         */
-        testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission);
+
+        assertEquals(testELinkTemplatesId(templateid, tokenWithPermission), HttpStatus.OK.value());
+        assertEquals(testELinkTemplatesId(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+
+        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission),  HttpStatus.FORBIDDEN.value());
+        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission),  HttpStatus.OK.value());
 
 
         //User without permission should not be able to delete another user's template
-        assertFalse(testELinkTemplatesDelete(templateid,tokenWithOutPermission));
+        assertEquals(testELinkTemplatesDelete(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
 
         //User with permission should
-        assertTrue(testELinkTemplatesDelete(templateid, tokenWithPermission));
+        int responseCode = testELinkTemplatesDelete(templateid, tokenWithPermission);
+        assertTrue(responseCode== HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
 
     }
 
     //Tests GET e-link/templates/
-    public void testELinkTemplates() throws UnirestException, IOException {
+    public void testELinkTemplates(String token) throws UnirestException, IOException {
         HttpResponse<String> response;
 
         response = baseRequestGet("templates")
+                .header("X-Auth-Token", token)
                 .queryString("outformat", "json-ld").asString();
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 
@@ -125,6 +126,7 @@ public class ELinkTestSecurity extends IntegrationTest {
                 .queryString("outformat", "json-ld")
                 .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description"))
         .asString();
+
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 
         JSONObject jsonObj = new JSONObject(response.getBody());
@@ -137,15 +139,19 @@ public class ELinkTestSecurity extends IntegrationTest {
     }
 
     //Tests GET e-link/templates/
-    public void testELinkTemplatesId(String id) throws UnirestException, IOException {
+    public int testELinkTemplatesId(String id, String token) throws UnirestException, IOException {
         HttpResponse<String> response = baseRequestGet("templates/"+id)
+                .header("X-Auth-Token", token)
                 .queryString("outformat", "turtle")
                 .asString();
-        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        if(response.getStatus()==HttpStatus.OK.value()) {
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        }
+        return response.getStatus();
     }
 
     //Tests PUT e-link/templates/
-    public void testELinkTemplatesUpdate(String filename, String id, String token) throws IOException, UnirestException{
+    public int testELinkTemplatesUpdate(String filename, String id, String token) throws IOException, UnirestException{
         String query = readFile(filename);
 
         HttpResponse<String> response = baseRequestPut("templates/" + id)
@@ -155,24 +161,25 @@ public class ELinkTestSecurity extends IntegrationTest {
                 .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description"))
                 .asString();
 
-        validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
+        if(response.getStatus() == 200) {
+            validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
+            JSONObject jsonObj = new JSONObject(response.getBody());
+            String newid = jsonObj.getString("templateId");
+            // check, if id is numerical
+            assertTrue(newid.matches("\\d+"));
+            assertTrue(id.equals(newid));
+        }
 
-        JSONObject jsonObj = new JSONObject(response.getBody());
-        String newid = jsonObj.getString("templateId");
-        // check, if id is numerical
-        assertTrue(newid.matches("\\d+"));
-        assertTrue(id.equals(newid));
-
-
+        return response.getStatus();
 
     }
 
     //Tests DELETE e-link/templates/
-    public boolean testELinkTemplatesDelete(String id, String token) throws UnirestException{
+    public int testELinkTemplatesDelete(String id, String token) throws UnirestException{
         HttpResponse<String> response = baseRequestDelete("templates/" + id)
                 .header("X-Auth-Token", token)
                 .asString();
-        return (response.getStatus() == 200 || response.getStatus() == 204);
+        return response.getStatus();
     }
 
 

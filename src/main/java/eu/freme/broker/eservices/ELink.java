@@ -24,6 +24,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import eu.freme.broker.security.database.OwnedResource;
+import eu.freme.broker.security.database.dao.TemplateSecurityDAO;
+import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.User;
 import eu.freme.broker.security.database.repository.TemplateRepository;
 import eu.freme.broker.security.database.repository.UserRepository;
@@ -35,6 +37,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
@@ -82,10 +85,12 @@ public class ELink extends BaseRestController {
         AbstractAccessDecisionManager decisionManager;
 
         @Autowired
-        UserRepository userRepository;
+        UserDAO userDAO;
+        //UserRepository userRepository;
 
         @Autowired
-        TemplateRepository templateRepository;
+        TemplateSecurityDAO templateSecurityDAO;
+        //TemplateRepository templateRepository;
 
         @Autowired
         AccessLevelHelper accessLevelHelper;
@@ -328,23 +333,26 @@ public class ELink extends BaseRestController {
                 
                 String templateId = t.getId();
 
-                if (templateRepository.findOneById(templateId) != null) {
+                if (templateSecurityDAO.getRepository().findOneById(templateId) != null) {
                     throw new BadRequestException("template metadata for templateId=\""+templateId+"\" already exists");
                 }
-
-
 
                 Authentication authentication = SecurityContextHolder.getContext()
                         .getAuthentication();
                 User user = (User) authentication.getPrincipal();
-                decisionManager.decide(authentication, user, accessLevelHelper.writeAccess());
 
                 eu.freme.broker.security.database.model.Template templ = new eu.freme.broker.security.database.model.Template(templateId, user, OwnedResource.AccessLevel.PRIVATE);
-                templateRepository.save(templ);
-                //System.out.println(templ.getAccessLevel());
-                //eu.freme.broker.security.database.Template templ2=templateRepository.findOneById(templateId);
-                //System.out.println(templ2.getId()+"   "+templateId);
-                //System.out.println(templ2.getAccessLevel()+ "kakakakakaka");
+                try {
+                    decisionManager.decide(authentication, templ, accessLevelHelper.writeAccess());
+                }catch (AccessDeniedException e){
+                    // TODO: not so cool...
+                    templateDAO.removeTemplateById(templateId);
+                    return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+                }
+
+                templateSecurityDAO.save(templ);
+
+
 
                 HttpHeaders responseHeaders = new HttpHeaders();
                 URI location = new URI("/e-link/templates/"+t.getId());
@@ -438,6 +446,21 @@ public class ELink extends BaseRestController {
                     thisOutformat = rdfELinkSerializationFormats.get(acceptHeader);
                 }
                 // END: Checking the outformat parameter
+
+                // Security
+                if (templateSecurityDAO.getRepository().findOneById(id+"") == null) {
+                    throw new BadRequestException("template metadata for templateId=\""+id+"\" does not exist");
+                }
+
+                Authentication authentication = SecurityContextHolder.getContext()
+                        .getAuthentication();
+                eu.freme.broker.security.database.model.Template templ = templateSecurityDAO.getRepository().findOneById(id+"");
+                try {
+                    decisionManager.decide(authentication, templ, accessLevelHelper.readAccess());
+                }catch (AccessDeniedException e){
+                    return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+                }
+                // Security END
 
                 Template t = templateDAO.getTemplateById(id+"");
                 
@@ -651,7 +674,22 @@ public class ELink extends BaseRestController {
                         break;
                 }
                
+
+                if (templateSecurityDAO.getRepository().findOneById(templateId) == null) {
+                    throw new BadRequestException("template metadata for templateId=\""+templateId+"\" does not exist");
+                }
+
+                Authentication authentication = SecurityContextHolder.getContext()
+                        .getAuthentication();
+                eu.freme.broker.security.database.model.Template templ = templateSecurityDAO.getRepository().findOneById(templateId);
+                try {
+                    decisionManager.decide(authentication, templ, accessLevelHelper.writeAccess());
+                }catch (AccessDeniedException e){
+                    return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+                }
+
                 templateDAO.updateTemplate(t);
+
                 
                 HttpHeaders responseHeaders = new HttpHeaders();
                 URI location = new URI("/e-link/templates/"+t.getId());
@@ -708,11 +746,16 @@ public class ELink extends BaseRestController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> removeTemplateById(@PathVariable("templateid") String id) {
 
+
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
-        eu.freme.broker.security.database.model.Template templ = templateRepository.findOneById(id);
-        decisionManager.decide(authentication, templ, accessLevelHelper.writeAccess());
-        templateRepository.delete(templ);
+        eu.freme.broker.security.database.model.Template templ = templateSecurityDAO.getRepository().findOneById(id);
+        try {
+            decisionManager.decide(authentication, templ, accessLevelHelper.writeAccess());
+        }catch (AccessDeniedException e){
+            return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+        }
+        templateSecurityDAO.delete(templ);
 
             if(templateDAO.removeTemplateById(id)) {
                 return new ResponseEntity<String>("The template was sucessfully removed.", HttpStatus.NO_CONTENT);

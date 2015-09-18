@@ -44,7 +44,7 @@ public class UserAccessDecisionVoter implements AccessDecisionVoter<Object> {
 			User user = (User) object;
 
 			//temporary
-			System.out.println("Successfully casted from Object to User");
+			//System.out.println("Successfully casted from Object to User");
 
 			if (authentication.getPrincipal().equals("anonymousUser")) {
 				return ACCESS_DENIED;
@@ -61,7 +61,7 @@ public class UserAccessDecisionVoter implements AccessDecisionVoter<Object> {
 			}
 		} catch (ClassCastException e) {
 			//temporary
-			System.out.println("Handled ClassCastException from some Object to User");
+			//System.out.println("Handled ClassCastException from some Object to User");
 			return ACCESS_ABSTAIN;
 		}
 	}
