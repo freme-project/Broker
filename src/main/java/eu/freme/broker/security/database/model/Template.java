@@ -15,8 +15,6 @@
  */
 package eu.freme.broker.security.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 
 /**
@@ -25,8 +23,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "template")
 public class Template extends OwnedResource {
-    public Template(String id, User owner, AccessLevel accessLevel) {
-        super(id, owner, accessLevel);
+    public Template(String id, User owner, Visibility visibility) {
+        super(id, owner, visibility);
     }
     public Template(){super();}
 }

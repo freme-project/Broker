@@ -16,6 +16,7 @@
 package eu.freme.broker.security.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import eu.freme.broker.exception.BadRequestException;
 
 import javax.persistence.*;
 
@@ -26,7 +27,17 @@ import javax.persistence.*;
 @MappedSuperclass
 public class OwnedResource {
 
-	public enum AccessLevel {PRIVATE,PUBLIC}
+	public enum Visibility {
+		PRIVATE,
+		PUBLIC;
+		public static Visibility getByString(String value){
+			if(value!=null && value.toLowerCase().equals("private"))
+				return PRIVATE;
+			if(value!=null && !value.toLowerCase().equals("public"))
+				throw new BadRequestException("Wrong value for visibility level: \""+value+"\". Has to be either \"private\" or \"public\".");
+			return PUBLIC;
+		}
+	}
 
 	@Id
 	public String id;
@@ -35,22 +46,22 @@ public class OwnedResource {
 	@ManyToOne(fetch = FetchType.EAGER) //(optional=false,targetEntity = User.class)
 	public User owner;
 
-	public AccessLevel accessLevel;
+	public Visibility visibility;
 
 	public OwnedResource(){}
 
-	public OwnedResource(String id, User owner, AccessLevel accessLevel) {
+	public OwnedResource(String id, User owner, Visibility visibility) {
 		this.id = id;
 		this.owner= owner;
-		this.accessLevel = accessLevel;
+		this.visibility = visibility;
 	}
 
-	public AccessLevel getAccessLevel() {
-		return accessLevel;
+	public Visibility getVisibility() {
+		return visibility;
 	}
 
-	public void setAccessLevel(AccessLevel accessLevel) {
-		this.accessLevel = accessLevel;
+	public void setVisibility(Visibility visibility) {
+		this.visibility = visibility;
 	}
 
 
@@ -71,6 +82,6 @@ public class OwnedResource {
 	}
 
 	public String toString(){
-		return "OwnedResource[id="+id+", owner="+owner.toString()+", accessLevel="+accessLevel.toString()+"]";
+		return "OwnedResource[id="+id+", owner="+owner.toString()+", visibility="+ visibility.toString()+"]";
 	}
 }

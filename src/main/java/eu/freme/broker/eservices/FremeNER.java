@@ -318,7 +318,7 @@ public class FremeNER extends BaseRestController {
                         .getAuthentication();
                 User user = (User) authentication.getPrincipal();
 
-                Dataset dataset = new Dataset(name, user, OwnedResource.AccessLevel.PRIVATE);
+                Dataset dataset = new Dataset(name, user, OwnedResource.Visibility.PRIVATE);
                 datasetRepository.save(dataset);
             }
             return result;

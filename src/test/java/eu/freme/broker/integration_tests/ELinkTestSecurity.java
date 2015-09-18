@@ -94,8 +94,12 @@ public class ELinkTestSecurity extends IntegrationTest {
         assertEquals(testELinkTemplatesId(templateid, tokenWithPermission), HttpStatus.OK.value());
         assertEquals(testELinkTemplatesId(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
         // check update template...
-        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission),  HttpStatus.FORBIDDEN.value());
-        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission),  HttpStatus.OK.value());
+        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"),  HttpStatus.FORBIDDEN.value());
+        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "public"),  HttpStatus.OK.value());
+        assertEquals(testELinkTemplatesId(templateid, tokenWithOutPermission), HttpStatus.OK.value());
+        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "private"),  HttpStatus.OK.value());
+        assertEquals(testELinkTemplatesId(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+
         // check delete template...
         assertEquals(testELinkTemplatesDelete(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
         int responseCode = testELinkTemplatesDelete(templateid, tokenWithPermission);
@@ -153,6 +157,7 @@ public class ELinkTestSecurity extends IntegrationTest {
 
         HttpResponse<String> response = baseRequestPost("templates")
                 .header("X-Auth-Token", token)
+                .queryString("visibility", "private")
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
                 .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description"))
@@ -182,13 +187,14 @@ public class ELinkTestSecurity extends IntegrationTest {
     }
 
     //Tests PUT e-link/templates/
-    public int testELinkTemplatesUpdate(String filename, String id, String token) throws IOException, UnirestException{
+    public int testELinkTemplatesUpdate(String filename, String id, String token, String visibility) throws IOException, UnirestException{
         String query = readFile(filename);
 
         HttpResponse<String> response = baseRequestPut("templates/" + id)
                 .header("X-Auth-Token",token)
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
+                .queryString("visibility", visibility)
                 .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description"))
                 .asString();
 

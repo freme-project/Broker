@@ -54,11 +54,11 @@ public class TemplateRepositoryTest {
 		userDAO.save(testuser);
 
 		logger.info("create template \"1\" and save it");
-		templateSecurityDAO.save(new Template("1", testuser, OwnedResource.AccessLevel.PUBLIC));
+		templateSecurityDAO.save(new Template("1", testuser, OwnedResource.Visibility.PUBLIC));
 		logger.info("create template \"2\" and save it");
-		templateSecurityDAO.save(new Template("2", testuser, OwnedResource.AccessLevel.PUBLIC));
+		templateSecurityDAO.save(new Template("2", testuser, OwnedResource.Visibility.PUBLIC));
 		logger.info("create template \"3\" and save it");
-		templateSecurityDAO.save(new Template("3", testuser, OwnedResource.AccessLevel.PUBLIC));
+		templateSecurityDAO.save(new Template("3", testuser, OwnedResource.Visibility.PUBLIC));
 
 		logger.info("fetch template \"2\"");
 		Template two = templateSecurityDAO.getRepository().findOneById("2");

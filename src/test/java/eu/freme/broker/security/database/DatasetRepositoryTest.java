@@ -54,13 +54,13 @@ public class DatasetRepositoryTest {
 
 		logger.info("create dataset \"1\" and save it");
 		datasetDAO.save(new Dataset("1", testuser,
-				OwnedResource.AccessLevel.PUBLIC));
+				OwnedResource.Visibility.PUBLIC));
 		logger.info("create dataset \"2\" and save it");
 		datasetDAO.save(new Dataset("2", testuser,
-				OwnedResource.AccessLevel.PUBLIC));
+				OwnedResource.Visibility.PUBLIC));
 		logger.info("create dataset \"3\" and save it");
 		datasetDAO.save(new Dataset("3", testuser,
-				OwnedResource.AccessLevel.PUBLIC));
+				OwnedResource.Visibility.PUBLIC));
 
 		logger.info("fetch dataset \"2\"");
 		Dataset two = datasetDAO.getRepository().findOneById("2");
@@ -92,7 +92,7 @@ public class DatasetRepositoryTest {
 		userDAO.save(user);
 		
 		Dataset dataset = new Dataset("t1", user,
-				OwnedResource.AccessLevel.PUBLIC);
+				OwnedResource.Visibility.PUBLIC);
 		datasetDAO.save(dataset);
 
 		assertTrue(datasetDAO.findAll().iterator().hasNext());
@@ -106,7 +106,7 @@ public class DatasetRepositoryTest {
 				+ Helper.count(datasetDAO.findAll()));
 		logger.info("create 2nd dataset and delete 1st");
 		Dataset dataset2 = new Dataset("t2", user,
-				OwnedResource.AccessLevel.PUBLIC);
+				OwnedResource.Visibility.PUBLIC);
 		datasetDAO.save(dataset2);
 		logger.info("dataset count (before delete): "
 				+ Helper.count(datasetDAO.findAll()));

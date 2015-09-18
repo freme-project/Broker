@@ -15,8 +15,6 @@
  */
 package eu.freme.broker.security.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 
 /**
@@ -25,8 +23,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "dataset")
 public class Dataset extends OwnedResource{
-    public Dataset(String id, User owner, AccessLevel accessLevel) {
-        super(id, owner, accessLevel);
+    public Dataset(String id, User owner, Visibility visibility) {
+        super(id, owner, visibility);
     }
 
     public Dataset(){super();}

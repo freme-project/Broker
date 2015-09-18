@@ -16,7 +16,6 @@
 package eu.freme.broker.security.voter;
 
 import eu.freme.broker.security.database.model.OwnedResource;
-import eu.freme.broker.security.database.model.Dataset;
 import eu.freme.broker.security.database.model.User;
 
 import eu.freme.broker.security.tools.AccessLevelHelper;
@@ -32,8 +31,10 @@ import java.util.Collection;
  */
 public class OwnedResourceAccessDecisionVoter implements AccessDecisionVoter<Object> {
 
-	@Autowired
-	AccessLevelHelper accessLevelHelper;
+	// TODO: Why does Autowire not work?
+	//@Autowired
+	//AccessLevelHelper accessLevelHelper;
+	static AccessLevelHelper accessLevelHelper = new AccessLevelHelper();
 
 	@Override
 	public boolean supports(ConfigAttribute attribute) {
@@ -58,7 +59,7 @@ public class OwnedResourceAccessDecisionVoter implements AccessDecisionVoter<Obj
 
 			if (authenticatedUser.getRole().equals(User.roleAdmin)) {
 				return ACCESS_GRANTED;
-			} else if (casted.getAccessLevel().equals(OwnedResource.AccessLevel.PUBLIC) && accessLevelHelper.hasRead(attributes)) {
+			} else if (casted.getVisibility().equals(OwnedResource.Visibility.PUBLIC) && accessLevelHelper.hasRead(attributes)) {
 				return ACCESS_GRANTED;
 			} else if (authenticatedUser.getName().equals(casted.getOwner().getName())) {
 				return ACCESS_GRANTED;
