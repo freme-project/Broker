@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>conversion</artifactId>
-			<version>0.3</version>
+			<version>0.4-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -77,12 +77,12 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-entity</artifactId>
-			<version>0.3</version>
+			<version>0.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-link</artifactId>
-			<version>0.3</version>
+			<version>0.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.freme</groupId>
@@ -156,6 +156,18 @@
 				</exclusion>
 			</exclusions>	
 		</dependency>
+                
+<!--                <dependency>
+                    <groupId>org.apache.jena</groupId>
+                    <artifactId>apache-jena-libs</artifactId>
+                    <version>2.13.0</version>
+                </dependency>
+                
+                <dependency>
+                    <groupId>com.hp.hpl.jena</groupId>
+                    <artifactId>jena</artifactId>
+                    <version>2.6.4</version>
+                </dependency>-->
 	</dependencies>
 
 	<build>
@@ -230,6 +242,7 @@
 						<exclude>changelog.txt</exclude>
 						<exclude>LICENSE</exclude>
 						<exclude>LICENSE-3RD-PARTY</exclude>
+						<exclude>nbactions.xml</exclude>
 					</excludes>
 				</configuration>
 				<executions>

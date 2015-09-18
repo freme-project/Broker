@@ -171,9 +171,9 @@ public class ELink extends BaseRestController {
             } catch (TemplateNotFoundException ex) {
                 logger.warn("The template with the specified ID has not been found.", ex);
                 throw new TemplateNotFoundException("The template with the specified ID has not been found.");
-            } catch (org.apache.jena.riot.RiotException ex) {
-                logger.error("Invalid NIF document.", ex);
-                throw new InvalidNIFException(ex.getMessage());                
+//            } catch (org.apache.jena.riot.RiotException ex) {
+//                logger.error("Invalid NIF document.", ex);
+//                throw new InvalidNIFException(ex.getMessage());                
             } catch (eu.freme.eservices.elink.exceptions.BadRequestException ex) {
                 logger.error(ex.getMessage(), ex);
                 throw ex;

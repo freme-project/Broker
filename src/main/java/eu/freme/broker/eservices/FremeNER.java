@@ -45,8 +45,10 @@ import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
+import eu.freme.eservices.elink.api.DataEnricher;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,6 +57,9 @@ public class FremeNER extends BaseRestController {
 
 	@Autowired
 	EEntityService entityAPI;
+        
+        @Autowired
+        DataEnricher dataEnricher;
 
         // Submitting document for processing.
 	@RequestMapping(value = "/e-entity/freme-ner/documents", method = {
@@ -73,6 +78,7 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "language", required = false) String language,
 			@RequestParam(value = "dataset", required = false) String dataset,
 			@RequestParam(value = "numLinks", required = false) String numLinksParam,
+			@RequestParam(value = "enrichement", required = false) String enrichementType,
                         @RequestBody(required = false) String postBody) {
             
             // Check the language parameter.
@@ -111,7 +117,12 @@ public class FremeNER extends BaseRestController {
             NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
            
             Model inModel = ModelFactory.createDefaultModel();
-            Model outModel = ModelFactory.createDefaultModel();;
+            Model outModel = ModelFactory.createDefaultModel();
+            outModel.setNsPrefix("dbpedia", "http://dbpedia.org/resource/");
+            outModel.setNsPrefix("dbc", "http://dbpedia.org/resource/Category:");
+            outModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+            outModel.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
+            outModel.setNsPrefix("freme-onto", "http://freme-project.eu/ns#");
 
             // merge long and short parameters - long parameters override short parameters
             if( input == null ){
@@ -177,6 +188,12 @@ public class FremeNER extends BaseRestController {
                 String fremeNERRes = entityAPI.callFremeNER(textForProcessing, language, parameters.getPrefix(), dataset, numLinks);
                 outModel.read(new ByteArrayInputStream(fremeNERRes.getBytes()), null, "TTL");
                 outModel.add(inModel);
+                HashMap<String, String> templateParams = new HashMap();
+                if(enrichementType != null) {
+                    if(enrichementType.equals("dbpedia-categories")) {
+                        outModel = dataEnricher.enrichNIF(outModel, 300, templateParams);
+                    }
+                }
             } catch (BadRequestException e) {
                 logger.error("failed", e);
                 throw new eu.freme.broker.exception.BadRequestException(e.getMessage());
