@@ -19,6 +19,7 @@ import eu.freme.broker.BrokerConfig;
 import eu.freme.broker.security.database.dao.DatasetDAO;
 import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.Dataset;
+import eu.freme.broker.security.database.model.OwnedResource;
 import eu.freme.broker.security.database.model.User;
 import org.apache.log4j.Logger;
 import org.junit.Test;

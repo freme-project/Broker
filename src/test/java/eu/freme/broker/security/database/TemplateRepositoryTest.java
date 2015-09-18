@@ -18,6 +18,7 @@ package eu.freme.broker.security.database;
 import eu.freme.broker.BrokerConfig;
 import eu.freme.broker.security.database.dao.TemplateSecurityDAO;
 import eu.freme.broker.security.database.dao.UserDAO;
+import eu.freme.broker.security.database.model.OwnedResource;
 import eu.freme.broker.security.database.model.Template;
 import eu.freme.broker.security.database.model.User;
 import org.apache.log4j.Logger;

@@ -19,8 +19,8 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import eu.freme.broker.exception.ExternalServiceFailedException;
-import eu.freme.broker.security.database.*;
 import eu.freme.broker.security.database.model.Dataset;
+import eu.freme.broker.security.database.model.OwnedResource;
 import eu.freme.broker.security.database.model.User;
 import eu.freme.broker.security.database.repository.DatasetRepository;
 import eu.freme.broker.security.database.repository.UserRepository;

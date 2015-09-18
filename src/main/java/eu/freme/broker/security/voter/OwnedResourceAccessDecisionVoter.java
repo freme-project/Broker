@@ -15,12 +15,11 @@
  */
 package eu.freme.broker.security.voter;
 
-import eu.freme.broker.security.database.OwnedResource;
-import eu.freme.broker.security.database.model.Template;
+import eu.freme.broker.security.database.model.OwnedResource;
+import eu.freme.broker.security.database.model.Dataset;
 import eu.freme.broker.security.database.model.User;
 
 import eu.freme.broker.security.tools.AccessLevelHelper;
-import org.hibernate.metamodel.domain.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
@@ -31,7 +30,7 @@ import java.util.Collection;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */
-public class TemplateAccessDecisionVoter implements AccessDecisionVoter<Object> {
+public class OwnedResourceAccessDecisionVoter implements AccessDecisionVoter<Object> {
 
 	@Autowired
 	AccessLevelHelper accessLevelHelper;
@@ -42,39 +41,32 @@ public class TemplateAccessDecisionVoter implements AccessDecisionVoter<Object> 
 	}
 
 	@Override
-	public boolean supports(Class clazz) {
-		return (clazz==Template.class);
+	public boolean supports(Class<?> clazz) {
+		return clazz == Object.class;
 	}
 
 	@Override
 	public int vote(Authentication authentication, Object object,
 			Collection<ConfigAttribute> attributes) {
-		//System.out.println("CAllal");
-		try {
-			Template template = (Template) object;
-
-			//temporary
-			//System.out.println("Successfully casted from Object to Template");
-
-
-
+		if (object instanceof OwnedResource) {
+			OwnedResource casted= (OwnedResource) object;
 			if (authentication.getPrincipal().equals("anonymousUser")) {
 				return ACCESS_DENIED;
 			}
 
 			User authenticatedUser = (User) authentication.getPrincipal();
+
 			if (authenticatedUser.getRole().equals(User.roleAdmin)) {
 				return ACCESS_GRANTED;
-			} else if (template.getAccessLevel().equals(OwnedResource.AccessLevel.PUBLIC) && accessLevelHelper.hasRead(attributes)) {
+			} else if (casted.getAccessLevel().equals(OwnedResource.AccessLevel.PUBLIC) && accessLevelHelper.hasRead(attributes)) {
 				return ACCESS_GRANTED;
-			} else if (authenticatedUser.getName().equals(template.getOwner().getName())) {
+			} else if (authenticatedUser.getName().equals(casted.getOwner().getName())) {
 				return ACCESS_GRANTED;
 			} else {
 				return ACCESS_DENIED;
 			}
-		} catch (ClassCastException e) {
-			//temporary
-			return ACCESS_ABSTAIN;
-		}
+
+		} else return ACCESS_ABSTAIN;
+
 	}
 }

@@ -23,12 +23,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import eu.freme.broker.security.database.OwnedResource;
+import eu.freme.broker.security.database.model.OwnedResource;
 import eu.freme.broker.security.database.dao.TemplateSecurityDAO;
 import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.User;
-import eu.freme.broker.security.database.repository.TemplateRepository;
-import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 
 import org.json.JSONObject;
@@ -39,7 +37,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -67,10 +64,6 @@ import eu.freme.eservices.elink.Exporter;
 import eu.freme.eservices.elink.Template;
 import eu.freme.eservices.elink.TemplateDAO;
 import eu.freme.eservices.elink.exceptions.TemplateNotFoundException;
-
-import org.apache.commons.validator.routines.UrlValidator;
-
-import javax.xml.bind.SchemaOutputResolver;
 
 @RestController
 public class ELink extends BaseRestController {

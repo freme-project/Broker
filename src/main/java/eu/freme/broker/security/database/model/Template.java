@@ -17,8 +17,6 @@ package eu.freme.broker.security.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import eu.freme.broker.security.database.OwnedResource;
-
 import javax.persistence.*;
 
 /**
@@ -27,52 +25,8 @@ import javax.persistence.*;
 @Entity
 @Table(name = "template")
 public class Template extends OwnedResource {
-
-    @Id
-    @Column(name = "id")
-    private String id;
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
-    private User owner;
-
-    private AccessLevel accessLevel;
-
-    Template(){ }
-
-
     public Template(String id, User owner, AccessLevel accessLevel) {
-        super();
-        this.id = id;
-        this.owner= owner;
-        this.accessLevel = accessLevel;
+        super(id, owner, accessLevel);
     }
-
-
-    public AccessLevel getAccessLevel() {
-        return accessLevel;
-    }
-
-    public void setAccessLevel(AccessLevel accessLevel) {
-        this.accessLevel = accessLevel;
-    }
-
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-
+    public Template(){super();}
 }

@@ -23,7 +23,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import eu.freme.broker.security.voter.DatasetAccessDecisionVoter;
+import eu.freme.broker.security.voter.OwnedResourceAccessDecisionVoter;
 import eu.freme.broker.security.voter.TemplateAccessDecisionVoter;
 
 import org.apache.log4j.Logger;
@@ -188,9 +188,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 	public AffirmativeBased defaultAccessDecisionManager() {
 		@SuppressWarnings("rawtypes")
 		ArrayList<AccessDecisionVoter> list = new ArrayList<AccessDecisionVoter>();
-		list.add(new TemplateAccessDecisionVoter());
+		//list.add(new TemplateAccessDecisionVoter());
 		list.add(new UserAccessDecisionVoter());
-		list.add(new DatasetAccessDecisionVoter());
+		list.add(new OwnedResourceAccessDecisionVoter());
 		AffirmativeBased ab = new AffirmativeBased(list);
 		return ab;
 	}
