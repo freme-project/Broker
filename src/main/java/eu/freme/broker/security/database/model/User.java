@@ -20,8 +20,6 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import org.hibernate.annotations.Cascade;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
@@ -47,6 +45,9 @@ public class User {
 
 	@OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
 	private List<Dataset> datasets;
+
+	@OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+	private List<Template> templates;
 
 	protected User() {
 	}
@@ -100,4 +101,8 @@ public class User {
 	public void setDatasets(List<Dataset> datasets) {
 		this.datasets = datasets;
 	}
+
+	public List<Template> getTemplates() { return templates; }
+
+	public void setTemplates(List<Template> templates) { this.templates = templates; }
 }

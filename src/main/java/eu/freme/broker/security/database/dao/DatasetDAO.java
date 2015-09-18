@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.freme.broker.security.database.repository;
-
-import org.springframework.data.repository.CrudRepository;
+package eu.freme.broker.security.database.dao;
 
 import eu.freme.broker.security.database.model.Dataset;
+import eu.freme.broker.security.database.repository.DatasetRepository;
+import org.springframework.stereotype.Component;
 
 /**
- * @author Jonathan Sauder jsauder@campus.tu-berlin.de
+ * Created by Arne on 18.09.2015.
  */
-public interface DatasetRepository extends CrudRepository<Dataset, Long> {
-
-    Dataset findOneById(String name);
-    
+@Component
+public class DatasetDAO extends DAO<DatasetRepository, Dataset> {
 }

@@ -15,58 +15,46 @@
  */
 package eu.freme.broker.security.database;
 
-import java.util.Iterator;
-
-import com.sun.xml.internal.bind.v2.runtime.output.SAXOutput;
-
-import org.junit.Ignore;
+import eu.freme.broker.BrokerConfig;
+import eu.freme.broker.security.database.dao.UserDAO;
+import eu.freme.broker.security.database.model.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.transaction.Transactional;
+
 import static org.junit.Assert.assertTrue;
-import eu.freme.broker.BrokerConfig;
-import eu.freme.broker.security.database.model.User;
-import eu.freme.broker.security.database.repository.UserRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BrokerConfig.class)
 public class UserRepositoryTest {
 
 	@Autowired
-	UserRepository userRepository;
-	
-	private int count(Iterable<User> itr){
-		Iterator<User> itr2 = itr.iterator();
-		int counter=0;
-		while(itr2.hasNext()){
-			counter++;
-			itr2.next();
-		}
-		return counter;
-	}
+	UserDAO userDAO;
 	
 	@Test
+	@Transactional
 	public void testUserRepository(){
 
 
-		int preexisting = count(userRepository.findAll());
-		userRepository.save(new User("Juergen", "bla", User.roleUser));
-		userRepository.save(new User("Peter", "bla", User.roleUser));
-		userRepository.save(new User("Madeleine", "bla", User.roleAdmin));
+		int preexisting = Helper.count(userDAO.findAll());
+		userDAO.save(new User("Juergen", "bla", User.roleUser));
+		userDAO.save(new User("Peter", "bla", User.roleUser));
+		userDAO.save(new User("Madeleine", "bla", User.roleAdmin));
 		
-		User juergen = userRepository.findOneByName("Juergen");
+		User juergen = userDAO.getRepository().findOneByName("Juergen");
 		assertTrue(juergen!=null);
 		
-		int counter = count(userRepository.findAll());
+		int counter = Helper.count(userDAO.findAll());
 		// admin user is one more
 
 		assertTrue(counter==(preexisting+3));
-		
-		userRepository.delete(juergen);
-		counter = count(userRepository.findAll());
+
+		userDAO.delete(juergen);
+		counter = Helper.count(userDAO.findAll());
 		assertTrue(counter==(preexisting+2));
 	}
 }

@@ -15,6 +15,11 @@
  */
 package eu.freme.broker.security.database;
 
+import eu.freme.broker.BrokerConfig;
+import eu.freme.broker.security.database.dao.TokenDAO;
+import eu.freme.broker.security.database.dao.UserDAO;
+import eu.freme.broker.security.database.model.Token;
+import eu.freme.broker.security.database.model.User;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,79 +27,63 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import eu.freme.broker.BrokerConfig;
-import eu.freme.broker.security.database.dao.UserDAO;
-import eu.freme.broker.security.database.model.Token;
-import eu.freme.broker.security.database.model.User;
-import eu.freme.broker.security.database.repository.TokenRepository;
-import eu.freme.broker.security.database.repository.UserRepository;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BrokerConfig.class)
 public class TokenRepositoryTest {
 
 	Logger logger = Logger.getLogger(TokenRepositoryTest.class);
-	
-	@Autowired
-	UserRepository userRepository;
-	
-	@Autowired
-	TokenRepository tokenRepository;
-	
+
 	@Autowired
 	UserDAO userDAO;
 
-	@PersistenceContext
-	EntityManager entityManager;
-	
+	@Autowired
+	TokenDAO tokenDAO;
+
 	@Test
 	@Transactional
 	public void testTokenRepository(){
-		entityManager.flush();
+		//entityManager.flush();
 		logger.info("create user and token");
 		User user = new User("hallo", "welt", User.roleUser);
-		userRepository.save(user);
+		userDAO.save(user);
 		
 		Token token = new Token("t1", user);
-		tokenRepository.save(token);
+		tokenDAO.save(token);
 		
-		assertTrue(tokenRepository.findAll().iterator().hasNext());
-		assertTrue(userRepository.findAll().iterator().hasNext());
+		assertTrue(tokenDAO.findAll().iterator().hasNext());
+		assertTrue(userDAO.findAll().iterator().hasNext());
 		
 		logger.info("load token, see if it has the right user attached");
-		Token fromDb = tokenRepository.findOneByToken(token.getToken());
+		Token fromDb = tokenDAO.getRepository().findOneByToken(token.getToken());
 		assertTrue(fromDb.getUser().getName().equals(user.getName()));
 
-		logger.info("token count: " + Helper.count(tokenRepository.findAll()));
+		logger.info("token count: " + Helper.count(tokenDAO.findAll()));
 		logger.info("create 2nd token and delete 1st");
 		Token token2 = new Token("t2", user);
-		tokenRepository.save(token2);
-		logger.info("token count (before delete): " + tokenRepository.count());
-		assertEquals((long)2, tokenRepository.count());
-		tokenRepository.delete(token);
-		logger.info("token count (after delete): " + tokenRepository.count());
+		tokenDAO.save(token2);
+		logger.info("token count (before delete): " + tokenDAO.count());
+		assertEquals((long) 2, tokenDAO.count());
+		tokenDAO.delete(token);
+		logger.info("token count (after delete): " + tokenDAO.count());
 
-		assertEquals((long)1, tokenRepository.count());
+		assertEquals((long) 1, tokenDAO.count());
 		// one user is automatically generated admin user
-		assertEquals((long)2, userRepository.count());
+		assertEquals((long) 2, userDAO.count());
 		
-		entityManager.flush();
-		entityManager.clear();
+		//entityManager.flush();
+		//entityManager.clear();
 
-		User userFromDb = userRepository.findOneByName(user.getName());
-		entityManager.flush();
+		User userFromDb = userDAO.getRepository().findOneByName(user.getName());
+		//entityManager.flush();
 		logger.info("delete user, should delete token also");
-		userDAO.deleteUser(userFromDb);
-		logger.info("token count (after user delete): " + tokenRepository.count());
-		entityManager.flush();
+		userDAO.delete(userFromDb);
+		logger.info("token count (after user delete): " + tokenDAO.count());
+		//entityManager.flush();
 
-		assertFalse(tokenRepository.findAll().iterator().hasNext());
+		assertFalse(tokenDAO.findAll().iterator().hasNext());
 	}
 }
