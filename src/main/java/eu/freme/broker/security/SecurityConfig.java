@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.freme.broker.security.voter.OwnedResourceAccessDecisionVoter;
-import eu.freme.broker.security.voter.TemplateAccessDecisionVoter;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 public class FremeNERTest extends IntegrationTest{
 
 
-    String[] availableLanguages = {"en","de","it","nl","fr","es"};
+    String[] availableLanguages = {"en"};//,"de","it","nl","fr","es"};
     String dataset = "dbpedia";
     String testinput= "Enrich this Content please";
 
@@ -61,36 +61,53 @@ public class FremeNERTest extends IntegrationTest{
 
         String testDatasetName = "integration-test-dataset";
 
+        createDataset(testDatasetName, testDataset);
+        getDataset(testDatasetName);
+        //TODO:Fix PUT e-entity/datasets/{dataset-name}
+        //updateDataset(testDatasetName,testUpdatedDataset);
+        deleteDataset(testDatasetName);
+    }
 
-        HttpResponse<String> response= baseRequestGet("datasets/"+testDatasetName).asString();
+    private void createDataset(String name, String dataset) throws UnirestException {
+        logger.info("check, if dataset with name \""+name+"\" exists...");
+        HttpResponse<String> response= baseRequestGet("datasets/" + name).asString();
         if (response.getStatus()!=200) {
+            logger.info("dataset with name \""+name+"\" does not exist. Create it...");
 
             response=baseRequestPost("datasets")
                     .queryString("informat", "n-triples")
                     .queryString("description","Test-Description")
                     .queryString("language","en")
-                    .queryString("name",testDatasetName)
-                    .body(testDataset)
+                    .queryString("name",name)
+                    .body(dataset)
                     .asString();
             assertTrue(response.getStatus()<=201);
         }
-        response= baseRequestGet("datasets/"+testDatasetName)
-                .queryString("outformat","turtle").asString();
-        assertTrue(response.getStatus()==200);
-        /*
-        TODO:Fix PUT e-entity/datasets/{dataset-name}
-        response=baseRequestPut("datasets/"+testDatasetName)
+    }
+
+    private void updateDataset(String name, String dataset) throws UnirestException {
+        logger.info("update dataset (\""+name+"\")...");
+        HttpResponse<String> response=baseRequestPut("datasets/"+name)
                 .queryString("informat","n-triples")
                 .queryString("language","en")
-                .body(testUpdatedDataset).asString();
-
-        System.out.println(response.getStatus());
+                .body(dataset).asString();
         System.out.println(response.getBody());
-        */
-        response=baseRequestDelete("datasets/" + testDatasetName).asString();
+        assertTrue(response.getStatus() <= 201);
+
+    }
+
+    private String getDataset(String name) throws UnirestException {
+        logger.info("query dataset (\"" + name + "\")...");
+        HttpResponse<String> response= baseRequestGet("datasets/"+name)
+                .queryString("outformat","turtle").asString();
+        assertTrue(response.getStatus() == 200);
+        return response.getBody();
+    }
+
+    private void deleteDataset(String name) throws UnirestException {
+        logger.info("delete dataset (\""+name+"\")...");
+        HttpResponse<String> response=baseRequestDelete("datasets/" + name).asString();
         assertTrue(response.getStatus()==200);
-
-
     }
 
     @Test
@@ -107,7 +124,7 @@ public class FremeNERTest extends IntegrationTest{
             //Tests POST
             //Plaintext Input in Query String
             response = baseRequestPost("documents")
-                    .queryString("input", testinput)
+                    .queryString("input", testinputEncoded)
                     .queryString("language", lang)
                     .queryString("informat", "text")
                     .queryString("dataset", dataset)
@@ -145,7 +162,7 @@ public class FremeNERTest extends IntegrationTest{
             //assertTrue(response.getString() contains prefix)
 
             //Tests GET
-            response = Unirest.get(getUrl() + "documents?informat=text&input=" + testinputEncoded + "&language=" + lang + "&dataset=" + dataset).asString();
+            //response = Unirest.get(getUrl() + "documents?informat=text&input=" + testinputEncoded + "&language=" + lang + "&dataset=" + dataset).asString();
             response = baseRequestGet("documents")
                     .queryString("informat", "text")
                     .queryString("dataset", dataset)

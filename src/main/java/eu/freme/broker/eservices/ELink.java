@@ -101,6 +101,7 @@ public class ELink extends BaseRestController {
         // POST /e-link/enrich/
         // Example: curl -X POST -d @data.ttl "http://localhost:8080/e-link/enrich/documents/?outformat=turtle&templateid=3&limit-val=4" -H "Content-Type: text/turtle"
 	@RequestMapping(value = "/e-link/documents", method = RequestMethod.POST)
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> enrich(
 			@RequestParam(value = "templateid",    required=true)  String templateIdStr,
 			@RequestHeader(value = "Accept",       required=false) String acceptHeader,
@@ -412,6 +413,7 @@ public class ELink extends BaseRestController {
         // GET /e-link/templates/{template-id}
         // curl -v http://api-dev.freme-project.eu/current/e-link/templates/1
 	@RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.GET)
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> getTemplateById(
                 @RequestHeader(value = "Accept",       required=false) String acceptHeader,
                 @PathVariable("templateid") String idStr,

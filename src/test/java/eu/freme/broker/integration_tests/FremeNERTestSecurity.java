@@ -22,15 +22,18 @@ import eu.freme.broker.security.database.repository.DatasetRepository;
 import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 
+import eu.freme.conversion.rdf.RDFConstants;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 03.09.15.
@@ -38,81 +41,201 @@ import static org.junit.Assert.assertTrue;
 public class FremeNERTestSecurity extends IntegrationTest {
 
 
-    @Autowired
-    AbstractAccessDecisionManager decisionManager;
+    String[] availableLanguages = {"en"};//,"de","it","nl","fr","es"};
+    String dataset = "dbpedia";
+    String testinput= "Enrich this Content please";
 
-    @Autowired
-    UserRepository userRepository;
+    private static final String usernameWithPermission = "userwithpermission";
+    private static final String passwordWithPermission  = "testpassword";
+    private static final String usernameWithoutPermission = "userwithoutpermission";
+    private static final String passwordWithoutPermission  = "testpassword";
+    private static String tokenWithPermission;
+    private static String tokenWithOutPermission;
+    private static boolean initialized = false;
 
-    @Autowired
-    AccessLevelHelper accessLevelHelper;
-
-    @Autowired
-    DatasetRepository datasetRepository;
-
-    String usernameWithPermission = "userwithpermission";
-    String passwordWithPermission  = "testpassword";
-    String usernameWithoutPermission = "userwithoutpermission";
-    String passwordWithoutPermission  = "testpassword";
+    public void initUser() throws UnirestException {
+        //Creates two users, one intended to have permission, the other not
+        createUser(usernameWithPermission, passwordWithPermission);
+        tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
+        createUser(usernameWithoutPermission, passwordWithoutPermission);
+        tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
+        initialized = true;
+    }
 
 
     public FremeNERTestSecurity() throws UnirestException {
         super("/e-entity/");
     }
 
+
+
     @Test
-    public void testDatasetHandlingWithSecurity() throws Exception{
+    public void testDatasetManagement() throws UnirestException , IOException {
 
-        //Creates two users, one intended to have permission, the other not
-        createUser(usernameWithPermission, passwordWithPermission);
-        String tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
-        createUser(usernameWithoutPermission, passwordWithoutPermission);
-        String tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
-
+        if(!initialized)
+            initUser();
 
         String testDataset=readFile("src/test/resources/e-entity/small-dataset-rdfs.nt");
         String testUpdatedDataset=readFile("src/test/resources/e-entity/small-dataset.nt");
 
-        String testDatasetName = "integration-test-dataset";
+        String privateDatasetName = "integration-test-dataset-private2";
+        String publicDatasetName = "integration-test-dataset-public2";
 
+        assertEquals(HttpStatus.OK.value(), createDataset(privateDatasetName, testDataset, tokenWithPermission, "private"));
+        assertEquals(HttpStatus.OK.value(), createDataset(publicDatasetName, testDataset, tokenWithPermission, "public"));
 
-        HttpResponse<String> response= baseRequestGet("datasets/"+testDatasetName).asString();
+        // User without permission should not be able to query, update or delete another user's template
+        // User with permission should
+        // check query template...
+        assertEquals(HttpStatus.OK.value(), getDataset(privateDatasetName, tokenWithPermission));
+        assertEquals(HttpStatus.FORBIDDEN.value(), getDataset(privateDatasetName, tokenWithOutPermission));
+
+        assertEquals(HttpStatus.OK.value(), getDataset(publicDatasetName, tokenWithOutPermission));
+
+        // check update template...
+        /*assertEquals(updateDataset(privateDatasetName,testUpdatedDataset, tokenWithOutPermission, "private"),  HttpStatus.FORBIDDEN.value());
+        assertEquals(updateDataset(privateDatasetName,testUpdatedDataset, tokenWithPermission, "public"),  HttpStatus.OK.value());
+        assertEquals(getDataset(privateDatasetName, tokenWithOutPermission), HttpStatus.OK.value());
+        assertEquals(updateDataset(privateDatasetName,testUpdatedDataset, tokenWithPermission, "private"), HttpStatus.OK.value());
+        assertEquals(getDataset(privateDatasetName, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+        */
+
+        // check delete template...
+        assertEquals(HttpStatus.FORBIDDEN.value(), deleteDataset(privateDatasetName, tokenWithOutPermission));
+        assertEquals(HttpStatus.FORBIDDEN.value(), deleteDataset(publicDatasetName, tokenWithOutPermission));
+        //int responseCode = deleteDataset(privateDatasetName, tokenWithPermission);
+        //assertTrue(responseCode == HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
+        assertTrue(deleteDataset(privateDatasetName, tokenWithPermission) <= 204);
+        assertTrue(deleteDataset(publicDatasetName, tokenWithPermission) <= 204);
+    }
+
+    private int createDataset(String name, String dataset, String token, String visibility) throws UnirestException {
+        logger.info("check, if dataset with name \"" + name + "\" exists...");
+        HttpResponse<String> response= baseRequestGet("datasets/" + name)
+                .header("X-Auth-Token", token)
+                .asString();
+        if(response.getStatus()==HttpStatus.FORBIDDEN.value())
+            return response.getStatus();
         if (response.getStatus()!=200) {
+            logger.info("dataset with name \""+name+"\" does not exist. Create it...");
 
-            response=baseRequestPost("datasets")
-                    .header("X-Auth-Token",tokenWithPermission)
+            /*response=baseRequestPost("datasets")
                     .queryString("informat", "n-triples")
                     .queryString("description","Test-Description")
                     .queryString("language","en")
-                    .queryString("name",testDatasetName)
-                    .body(testDataset)
+                    .queryString("name",name)
+                    .body(dataset)
                     .asString();
-            assertTrue(response.getStatus()<=201);
+            */
+            response=baseRequestPost("datasets")
+                    .header("X-Auth-Token", token)
+                    .queryString("informat", "n-triples")
+                    .queryString("description","Test-Description")
+                    .queryString("language","en")
+                    .queryString("name",name)
+                    .queryString("visibility",visibility)
+                    .body(dataset)
+                    .asString();
+            //assertTrue(response.getStatus()<=201);
         }
-        response= baseRequestGet("datasets/"+testDatasetName)
-                .queryString("outformat","turtle").asString();
-        assertTrue(response.getStatus()==200);
-        /*
-        TODO:Fix PUT e-entity/datasets/{dataset-name}
-        response=baseRequestPut("datasets/"+testDatasetName)
+        return response.getStatus();
+    }
 
-                    .header("X-Auth-Token",tokenWithPermission)
-                .queryString("informat","n-triples")
+    private int updateDataset(String name, String dataset, String token, String visibility) throws UnirestException {
+        logger.info("update dataset (\"" + name + "\")...");
+        HttpResponse<String> response=baseRequestPut("datasets/"+name)
+                .header("X-Auth-Token", token)
+                .queryString("informat", "n-triples")
                 .queryString("language","en")
-                .body(testUpdatedDataset).asString();
-
-        System.out.println(response.getStatus());
+                .queryString("visibility", visibility)
+                .body(dataset).asString();
         System.out.println(response.getBody());
-        */
+        //assertTrue(response.getStatus() <= 201);
+        return response.getStatus();
+    }
 
-        response=baseRequestDelete("datasets/" + testDatasetName)
-                .header("X-Auth-Token", tokenWithOutPermission).asString();
-        assertTrue(response.getStatus() != 200);
-
-        response=baseRequestDelete("datasets/" + testDatasetName)
-                .header("X-Auth-Token",tokenWithPermission).asString();
+    private int getDataset(String name, String token) throws UnirestException {
+        logger.info("query dataset (\"" + name + "\")...");
+        HttpResponse<String> response= baseRequestGet("datasets/"+name)
+                .header("X-Auth-Token", token)
+                .queryString("outformat", "turtle").asString();
         assertTrue(response.getStatus() == 200);
+        return response.getStatus();
+    }
 
+    private int deleteDataset(String name, String token) throws UnirestException {
+        logger.info("delete dataset (\""+name+"\")...");
+        HttpResponse<String> response=baseRequestDelete("datasets/" + name)
+                .header("X-Auth-Token", token)
+                .asString();
+        //assertTrue(response.getStatus() == 200);
+        return response.getStatus();
+    }
+
+    @Test
+    public void TestFremeNER() throws UnirestException, IOException, UnsupportedEncodingException {
+
+        if(!initialized)
+            initUser();
+
+        HttpResponse<String> response;
+
+        String testinputEncoded= URLEncoder.encode(testinput, "UTF-8");
+        String data = readFile("src/test/resources/rdftest/e-entity/data.ttl");
+
+        //Tests every language
+        for (String lang : availableLanguages) {
+
+            //Tests POST
+            //Plaintext Input in Query String
+            response = baseRequestPost("documents")
+                    .queryString("input", testinputEncoded)
+                    .queryString("language", lang)
+                    .queryString("informat", "text")
+                    .queryString("dataset", dataset)
+                    .asString();
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+
+            //Tests POST
+            //Plaintext Input in Body
+            response = baseRequestPost("documents")
+                    .queryString("language", lang)
+                    .queryString("dataset", dataset)
+                    .header("Content-Type", "text/plain")
+                    .body(testinput)
+                    .asString();
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+            //Tests POST
+            //NIF Input in Body (Turtle)
+            response = baseRequestPost("documents").header("Content-Type", "text/turtle")
+                    .queryString("language", lang)
+                    .queryString("dataset", dataset)
+                    .body(data).asString();
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+
+
+            //Tests POST
+            //Test Prefix
+            response = baseRequestPost("documents")
+                    .queryString("input", testinput)
+                    .queryString("language", lang)
+                    .queryString("dataset", dataset)
+                    .queryString("informat", "text")
+                    .queryString("prefix", "http://test-prefix.com")
+                    .asString();
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+            //assertTrue(response.getString() contains prefix)
+
+            //Tests GET
+            //response = Unirest.get(getUrl() + "documents?informat=text&input=" + testinputEncoded + "&language=" + lang + "&dataset=" + dataset).asString();
+            response = baseRequestGet("documents")
+                    .queryString("informat", "text")
+                    .queryString("dataset", dataset)
+                    .queryString("input", testinputEncoded)
+                    .queryString("language", lang)
+                    .asString();
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        }
     }
 
 

@@ -16,26 +16,13 @@
 package eu.freme.broker.integration_tests;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequestWithBody;
 
-import eu.freme.broker.eservices.BaseRestController;
-import eu.freme.broker.security.database.model.Template;
-import eu.freme.broker.security.database.model.User;
-import eu.freme.broker.security.database.repository.TemplateRepository;
-import eu.freme.broker.security.database.repository.UserRepository;
-import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.conversion.rdf.RDFConstants;
 
-import eu.freme.conversion.rdf.RDFConversionService;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 
 import java.io.IOException;
 
@@ -85,24 +72,24 @@ public class ELinkTestSecurity extends IntegrationTest {
             initUser();
 
         // add a template for the first user
-        String templateid = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql1.ttl", tokenWithPermission);
+        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", tokenWithPermission);
         assertNotNull(templateid);
 
         // User without permission should not be able to query, update or delete another user's template
         // User with permission should
         // check query template...
-        assertEquals(testELinkTemplatesId(templateid, tokenWithPermission), HttpStatus.OK.value());
-        assertEquals(testELinkTemplatesId(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+        assertEquals(getTemplate(templateid, tokenWithPermission), HttpStatus.OK.value());
+        assertEquals(getTemplate(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
         // check update template...
-        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"),  HttpStatus.FORBIDDEN.value());
-        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "public"),  HttpStatus.OK.value());
-        assertEquals(testELinkTemplatesId(templateid, tokenWithOutPermission), HttpStatus.OK.value());
-        assertEquals(testELinkTemplatesUpdate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "private"),  HttpStatus.OK.value());
-        assertEquals(testELinkTemplatesId(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+        assertEquals(updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"),  HttpStatus.FORBIDDEN.value());
+        assertEquals(updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "public"),  HttpStatus.OK.value());
+        assertEquals(getTemplate(templateid, tokenWithOutPermission), HttpStatus.OK.value());
+        assertEquals(updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "private"),  HttpStatus.OK.value());
+        assertEquals(getTemplate(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
 
         // check delete template...
-        assertEquals(testELinkTemplatesDelete(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
-        int responseCode = testELinkTemplatesDelete(templateid, tokenWithPermission);
+        assertEquals(deleteTemplate(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+        int responseCode = deleteTemplate(templateid, tokenWithPermission);
         assertTrue(responseCode== HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
     }
 
@@ -113,7 +100,7 @@ public class ELinkTestSecurity extends IntegrationTest {
             initUser();
 
         //Adds template temporarily
-        String id = testELinkTemplatesAdd("src/test/resources/rdftest/e-link/sparql3.ttl", tokenWithPermission);
+        String id = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", tokenWithPermission);
 
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
 
@@ -137,7 +124,7 @@ public class ELinkTestSecurity extends IntegrationTest {
 
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
         //Deletes temporary template
-        testELinkTemplatesDelete(id, tokenWithPermission);
+        deleteTemplate(id, tokenWithPermission);
     }
 
     //Tests GET e-link/templates/
@@ -152,7 +139,7 @@ public class ELinkTestSecurity extends IntegrationTest {
     }
 
     //Tests POST e-link/templates/
-    public String testELinkTemplatesAdd(String filename, String token) throws Exception {
+    public String createTemplate(String filename, String token) throws Exception {
         String query = readFile(filename);
 
         HttpResponse<String> response = baseRequestPost("templates")
@@ -175,7 +162,7 @@ public class ELinkTestSecurity extends IntegrationTest {
     }
 
     //Tests GET e-link/templates/
-    public int testELinkTemplatesId(String id, String token) throws UnirestException, IOException {
+    public int getTemplate(String id, String token) throws UnirestException, IOException {
         HttpResponse<String> response = baseRequestGet("templates/"+id)
                 .header("X-Auth-Token", token)
                 .queryString("outformat", "turtle")
@@ -187,7 +174,7 @@ public class ELinkTestSecurity extends IntegrationTest {
     }
 
     //Tests PUT e-link/templates/
-    public int testELinkTemplatesUpdate(String filename, String id, String token, String visibility) throws IOException, UnirestException{
+    public int updateTemplate(String filename, String id, String token, String visibility) throws IOException, UnirestException{
         String query = readFile(filename);
 
         HttpResponse<String> response = baseRequestPut("templates/" + id)
@@ -212,7 +199,7 @@ public class ELinkTestSecurity extends IntegrationTest {
     }
 
     //Tests DELETE e-link/templates/
-    public int testELinkTemplatesDelete(String id, String token) throws UnirestException{
+    public int deleteTemplate(String id, String token) throws UnirestException{
         HttpResponse<String> response = baseRequestDelete("templates/" + id)
                 .header("X-Auth-Token", token)
                 .asString();

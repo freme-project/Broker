@@ -75,6 +75,7 @@ public class FremeNER extends BaseRestController {
         // Submitting document for processing.
 	@RequestMapping(value = "/e-entity/freme-ner/documents", method = {
             RequestMethod.POST, RequestMethod.GET })
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> execute(
 			@RequestParam(value = "input", required = false) String input,
 			@RequestParam(value = "i", required = false) String i,
@@ -231,6 +232,7 @@ public class FremeNER extends BaseRestController {
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/?name=test&language=en" -X POST
 	@RequestMapping(value = "/e-entity/freme-ner/datasets", method = {
             RequestMethod.POST })
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> createDataset(
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
 			@RequestParam(value = "name", required = false) String name,
@@ -460,6 +462,7 @@ public class FremeNER extends BaseRestController {
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test
 	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}", method = {
             RequestMethod.GET })
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> getDataset(
                 @PathVariable(value = "name") String name) {
             
