@@ -807,7 +807,7 @@ public class ELink extends BaseRestController {
                 owner = template.getOwner();
 
             }else{
-                return new ResponseEntity<String>("Metadate for the dataset \"" + name + "\" does not exist. Please provide an owner to create this data.", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<String>("Metadate for the template \"" + name + "\" does not exist. Please provide an owner to create this data.", HttpStatus.BAD_REQUEST);
             }
         }
         if(template==null){
