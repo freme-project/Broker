@@ -22,6 +22,7 @@ import eu.freme.broker.security.database.dao.DatasetDAO;
 import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.Dataset;
 import eu.freme.broker.security.database.model.OwnedResource;
+import eu.freme.broker.security.database.model.User;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.conversion.rdf.RDFConstants;
@@ -523,6 +524,44 @@ public class FremeNER extends BaseRestController {
 
             return result;
         }
+
+    // Updating dataset metadata
+    @RequestMapping(value = "/e-entity/freme-ner/datasets/admin/{name}", method = {
+            RequestMethod.PUT })
+    @Secured({"ROLE_ADMIN"})
+    public ResponseEntity<String> updateDatasetMetadata(
+            @PathVariable(value = "name") String name,
+            @RequestParam(value = "owner",        required=false) String ownerName,
+            @RequestParam(value = "visibility",        required=false) String visibility) {
+
+        Dataset dataset = datasetDAO.findOneById(name);
+        User owner;
+        if(ownerName !=null) {
+            owner = userDAO.getRepository().findOneByName(ownerName);
+            if (owner == null) {
+                return new ResponseEntity<String>("User \"" + ownerName + "\" does not exist.", HttpStatus.BAD_REQUEST);
+            }
+        }else{
+            if(dataset!=null){
+                owner = dataset.getOwner();
+            }else{
+                return new ResponseEntity<String>("Metadate for the dataset \"" + name + "\" does not exist. Please provide an owner to create this data.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        if(dataset==null){
+            dataset = new Dataset(name, owner, OwnedResource.Visibility.PUBLIC);
+        }
+
+        dataset.setOwner(owner);
+        if(visibility!=null && !visibility.equals("")) {
+            dataset.setVisibility(OwnedResource.Visibility.getByString(visibility));
+        }
+
+        // insert without permission check (via getRepository)
+        datasetDAO.getRepository().save(dataset);
+
+        return new ResponseEntity<String>("Update successful.", HttpStatus.OK);
+    }
 
 
     private ResponseEntity<String> callBackend(String uri, HttpMethod method, String body) {

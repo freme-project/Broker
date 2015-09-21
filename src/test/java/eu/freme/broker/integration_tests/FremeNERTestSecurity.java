@@ -18,6 +18,11 @@ package eu.freme.broker.integration_tests;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import eu.freme.broker.security.database.dao.DatasetDAO;
+import eu.freme.broker.security.database.dao.UserDAO;
+import eu.freme.broker.security.database.model.Dataset;
+import eu.freme.broker.security.database.model.OwnedResource;
+import eu.freme.broker.security.database.model.User;
 import eu.freme.broker.security.database.repository.DatasetRepository;
 import eu.freme.broker.security.database.repository.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
@@ -40,9 +45,14 @@ import static org.junit.Assert.assertEquals;
  */
 public class FremeNERTestSecurity extends IntegrationTest {
 
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    DatasetDAO datasetDAO;
 
     String[] availableLanguages = {"en"};//,"de","it","nl","fr","es"};
-    String dataset = "dbpedia";
+    String datasetName = "dbpedia";
     String testinput= "Enrich this Content please";
 
     private static final String usernameWithPermission = "userwithpermission";
@@ -52,6 +62,8 @@ public class FremeNERTestSecurity extends IntegrationTest {
     private static String tokenWithPermission;
     private static String tokenWithOutPermission;
     private static boolean initialized = false;
+
+    public FremeNERTestSecurity(){super("/e-entity/freme-ner/");}
 
     public void initUser() throws UnirestException {
         //Creates two users, one intended to have permission, the other not
@@ -63,9 +75,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
     }
 
 
-    public FremeNERTestSecurity() throws UnirestException {
-        super("/e-entity/");
-    }
+
 
 
 
@@ -78,11 +88,11 @@ public class FremeNERTestSecurity extends IntegrationTest {
         String testDataset=readFile("src/test/resources/e-entity/small-dataset-rdfs.nt");
         String testUpdatedDataset=readFile("src/test/resources/e-entity/small-dataset.nt");
 
-        String privateDatasetName = "integration-test-dataset-private2";
-        String publicDatasetName = "integration-test-dataset-public2";
+        String privateDatasetName = "integration-test-dataset-private";
+        String publicDatasetName = "integration-test-dataset-public";
 
-        assertEquals(HttpStatus.OK.value(), createDataset(privateDatasetName, testDataset, tokenWithPermission, "private"));
-        assertEquals(HttpStatus.OK.value(), createDataset(publicDatasetName, testDataset, tokenWithPermission, "public"));
+        assertEquals(HttpStatus.CREATED.value(), createDataset(privateDatasetName, testDataset, tokenWithPermission, "private"));
+        assertEquals(HttpStatus.CREATED.value(), createDataset(publicDatasetName, testDataset, tokenWithPermission, "public"));
 
         // User without permission should not be able to query, update or delete another user's template
         // User with permission should
@@ -116,17 +126,8 @@ public class FremeNERTestSecurity extends IntegrationTest {
                 .asString();
         if(response.getStatus()==HttpStatus.FORBIDDEN.value())
             return response.getStatus();
-        if (response.getStatus()!=200) {
+        if (response.getStatus()!=HttpStatus.OK.value()) {
             logger.info("dataset with name \""+name+"\" does not exist. Create it...");
-
-            /*response=baseRequestPost("datasets")
-                    .queryString("informat", "n-triples")
-                    .queryString("description","Test-Description")
-                    .queryString("language","en")
-                    .queryString("name",name)
-                    .body(dataset)
-                    .asString();
-            */
             response=baseRequestPost("datasets")
                     .header("X-Auth-Token", token)
                     .queryString("informat", "n-triples")
@@ -156,10 +157,9 @@ public class FremeNERTestSecurity extends IntegrationTest {
 
     private int getDataset(String name, String token) throws UnirestException {
         logger.info("query dataset (\"" + name + "\")...");
-        HttpResponse<String> response= baseRequestGet("datasets/"+name)
+        HttpResponse<String> response= baseRequestGet("datasets/" + name)
                 .header("X-Auth-Token", token)
                 .queryString("outformat", "turtle").asString();
-        assertTrue(response.getStatus() == 200);
         return response.getStatus();
     }
 
@@ -168,7 +168,18 @@ public class FremeNERTestSecurity extends IntegrationTest {
         HttpResponse<String> response=baseRequestDelete("datasets/" + name)
                 .header("X-Auth-Token", token)
                 .asString();
-        //assertTrue(response.getStatus() == 200);
+        return response.getStatus();
+    }
+
+    private int updateDatasetMetadata(String name, String newOwner, String visibility, String token) throws UnirestException {
+        logger.info("update dataset metadata (datasetName: " + name + ", newOwner: "+newOwner+", visibility: "+visibility+")...");
+        HttpResponse<String> response=baseRequestPut("datasets/admin/" + name)
+                .header("X-Auth-Token", token)
+                .queryString("owner", newOwner)
+                .queryString("visibility", visibility)
+                .asString();
+        //System.out.println(response.getBody());
+        //assertTrue(response.getStatus() <= 201);
         return response.getStatus();
     }
 
@@ -177,6 +188,15 @@ public class FremeNERTestSecurity extends IntegrationTest {
 
         if(!initialized)
             initUser();
+
+        /*
+        String testDataset=readFile("src/test/resources/e-entity/small-dataset-rdfs.nt");
+        assertEquals(updateDataset("dbpedia",testDataset, tokenWithPermission, "private"), HttpStatus.OK.value());
+*/
+
+        assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithoutPermission, null, tokenWithPermission));
+
+        assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithPermission, null, tokenWithPermission));
 
         HttpResponse<String> response;
 
@@ -193,7 +213,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
                     .queryString("input", testinputEncoded)
                     .queryString("language", lang)
                     .queryString("informat", "text")
-                    .queryString("dataset", dataset)
+                    .queryString("dataset", datasetName)
                     .asString();
             validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
@@ -202,7 +222,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
             response = baseRequestPost("documents")
                     .header("X-Auth-Token", tokenWithPermission)
                     .queryString("language", lang)
-                    .queryString("dataset", dataset)
+                    .queryString("dataset", datasetName)
                     .header("Content-Type", "text/plain")
                     .body(testinput)
                     .asString();
@@ -212,7 +232,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
             response = baseRequestPost("documents").header("Content-Type", "text/turtle")
                     .header("X-Auth-Token", tokenWithPermission)
                     .queryString("language", lang)
-                    .queryString("dataset", dataset)
+                    .queryString("dataset", datasetName)
                     .body(data).asString();
             validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
@@ -223,7 +243,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
                     .header("X-Auth-Token", tokenWithPermission)
                     .queryString("input", testinput)
                     .queryString("language", lang)
-                    .queryString("dataset", dataset)
+                    .queryString("dataset", datasetName)
                     .queryString("informat", "text")
                     .queryString("prefix", "http://test-prefix.com")
                     .asString();
@@ -235,7 +255,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
             response = baseRequestGet("documents")
                     .header("X-Auth-Token", tokenWithPermission)
                     .queryString("informat", "text")
-                    .queryString("dataset", dataset)
+                    .queryString("dataset", datasetName)
                     .queryString("input", testinputEncoded)
                     .queryString("language", lang)
                     .asString();
