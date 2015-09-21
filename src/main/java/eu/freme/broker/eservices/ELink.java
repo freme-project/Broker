@@ -786,7 +786,7 @@ public class ELink extends BaseRestController {
             RequestMethod.PUT })
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> updateTemplateMetadata(
-            @PathVariable(value = "name") String name,
+            @PathVariable(value = "templateid") String name,
             @RequestParam(value = "owner",        required=false) String ownerName,
             @RequestParam(value = "visibility",        required=false) String visibility) {
 

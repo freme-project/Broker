@@ -22,6 +22,7 @@ import eu.freme.conversion.rdf.RDFConstants;
 
 import org.json.JSONObject;
 import org.junit.Test;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
@@ -48,6 +49,7 @@ public class ELinkTestSecurity extends IntegrationTest {
     private static final String passwordWithoutPermission  = "testpassword";
     private static String tokenWithPermission;
     private static String tokenWithOutPermission;
+    private static String tokenAdmin;
     private static boolean initialized = false;
 
 
@@ -62,6 +64,8 @@ public class ELinkTestSecurity extends IntegrationTest {
         tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
         createUser(usernameWithoutPermission, passwordWithoutPermission);
         tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
+        ConfigurableApplicationContext context = IntegrationTestSetup.getApplicationContext();
+        tokenAdmin = authenticateUser(context.getEnvironment().getProperty("admin.username"), context.getEnvironment().getProperty("admin.password"));
         initialized = true;
     }
 
@@ -86,6 +90,20 @@ public class ELinkTestSecurity extends IntegrationTest {
         assertEquals(getTemplate(templateid, tokenWithOutPermission), HttpStatus.OK.value());
         assertEquals(updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "private"),  HttpStatus.OK.value());
         assertEquals(getTemplate(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+
+        // only admin can change the metadata. should fail
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplateMetadata(templateid, usernameWithoutPermission, "private", tokenWithPermission));
+        // change user
+        assertEquals(HttpStatus.OK.value(), updateTemplateMetadata(templateid, usernameWithoutPermission, "private",tokenAdmin));
+        assertEquals(getTemplate(templateid, tokenWithOutPermission), HttpStatus.OK.value());
+        assertEquals(getTemplate(templateid, tokenWithPermission), HttpStatus.FORBIDDEN.value());
+
+        assertEquals(HttpStatus.OK.value(), updateTemplateMetadata(templateid, usernameWithoutPermission, "public", tokenAdmin));
+        assertEquals(getTemplate(templateid, tokenWithPermission), HttpStatus.OK.value());
+        assertEquals(deleteTemplate(templateid, tokenWithPermission), HttpStatus.FORBIDDEN.value());
+
+
+        assertEquals(HttpStatus.OK.value(), updateTemplateMetadata(templateid, usernameWithPermission, "private", tokenAdmin));
 
         // check delete template...
         assertEquals(deleteTemplate(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
@@ -196,6 +214,15 @@ public class ELinkTestSecurity extends IntegrationTest {
 
         return response.getStatus();
 
+    }
+
+    public int updateTemplateMetadata(String id, String ownerName, String visibility, String token) throws UnirestException {
+        HttpResponse<String> response = baseRequestPut("templates/admin/" + id)
+                .header("X-Auth-Token",token)
+                .queryString("owner", ownerName)
+                .queryString("visibility", visibility)
+                .asString();
+        return response.getStatus();
     }
 
     //Tests DELETE e-link/templates/
