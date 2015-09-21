@@ -2,6 +2,7 @@ package eu.freme.broker.security.database.dao;
 
 import eu.freme.broker.security.database.model.Dataset;
 import eu.freme.broker.security.database.model.OwnedResource;
+import eu.freme.broker.security.database.model.User;
 import eu.freme.broker.security.database.repository.DatasetRepository;
 import eu.freme.broker.security.database.repository.OwnedResourceRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
@@ -27,7 +28,9 @@ public class OwnedResourceDAO<Entity extends OwnedResource>  extends DAO<OwnedRe
     public void delete(Entity entity){
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
-        decisionManager.decide(authentication, entity, accessLevelHelper.writeAccess());
+        User authUser = (User) authentication.getPrincipal();
+        if(!authUser.getRole().equals(User.roleAdmin))
+            decisionManager.decide(authentication, entity, accessLevelHelper.writeAccess());
         super.delete(entity);
     }
 
@@ -35,7 +38,9 @@ public class OwnedResourceDAO<Entity extends OwnedResource>  extends DAO<OwnedRe
     public void save(Entity entity){
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
-        decisionManager.decide(authentication, entity, accessLevelHelper.writeAccess());
+        User authUser = (User) authentication.getPrincipal();
+        if(!authUser.getRole().equals(User.roleAdmin))
+            decisionManager.decide(authentication, entity, accessLevelHelper.writeAccess());
         super.save(entity);
     }
 
@@ -45,7 +50,9 @@ public class OwnedResourceDAO<Entity extends OwnedResource>  extends DAO<OwnedRe
             return null;
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
-        decisionManager.decide(authentication, result, accessLevelHelper.readAccess());
+        User authUser = (User) authentication.getPrincipal();
+        if(!authUser.getRole().equals(User.roleAdmin))
+            decisionManager.decide(authentication, result, accessLevelHelper.readAccess());
         return result;
     }
 

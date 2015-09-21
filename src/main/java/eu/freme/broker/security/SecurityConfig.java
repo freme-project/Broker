@@ -59,7 +59,7 @@ import eu.freme.broker.security.voter.UserAccessDecisionVoter;
 @Configuration
 @EnableWebMvcSecurity
 @EnableScheduling
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 		ApplicationContextAware {
 

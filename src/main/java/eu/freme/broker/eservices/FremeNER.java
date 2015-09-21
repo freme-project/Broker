@@ -36,6 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -528,7 +529,7 @@ public class FremeNER extends BaseRestController {
     // Updating dataset metadata
     @RequestMapping(value = "/e-entity/freme-ner/datasets/admin/{name}", method = {
             RequestMethod.PUT })
-    @Secured({"ROLE_ADMIN"})
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> updateDatasetMetadata(
             @PathVariable(value = "name") String name,
             @RequestParam(value = "owner",        required=false) String ownerName,
@@ -558,7 +559,7 @@ public class FremeNER extends BaseRestController {
         }
 
         // insert without permission check (via getRepository)
-        datasetDAO.getRepository().save(dataset);
+        datasetDAO.save(dataset);
 
         return new ResponseEntity<String>("Update successful.", HttpStatus.OK);
     }

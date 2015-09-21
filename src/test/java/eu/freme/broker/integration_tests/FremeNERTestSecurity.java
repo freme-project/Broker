@@ -30,6 +30,7 @@ import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.conversion.rdf.RDFConstants;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 
@@ -61,6 +62,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
     private static final String passwordWithoutPermission  = "testpassword";
     private static String tokenWithPermission;
     private static String tokenWithOutPermission;
+    private static String tokenAdmin;
     private static boolean initialized = false;
 
     public FremeNERTestSecurity(){super("/e-entity/freme-ner/");}
@@ -71,6 +73,9 @@ public class FremeNERTestSecurity extends IntegrationTest {
         tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
         createUser(usernameWithoutPermission, passwordWithoutPermission);
         tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
+
+        ConfigurableApplicationContext context = IntegrationTestSetup.getApplicationContext();
+        tokenAdmin = authenticateUser(context.getEnvironment().getProperty("admin.username"), context.getEnvironment().getProperty("admin.password"));
         initialized = true;
     }
 
@@ -194,14 +199,36 @@ public class FremeNERTestSecurity extends IntegrationTest {
         assertEquals(updateDataset("dbpedia",testDataset, tokenWithPermission, "private"), HttpStatus.OK.value());
 */
 
-        assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithoutPermission, null, tokenWithPermission));
-
-        assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithPermission, null, tokenWithPermission));
+        String testinputEncoded= URLEncoder.encode(testinput, "UTF-8");
+        String data = readFile("src/test/resources/rdftest/e-entity/data.ttl");
 
         HttpResponse<String> response;
 
-        String testinputEncoded= URLEncoder.encode(testinput, "UTF-8");
-        String data = readFile("src/test/resources/rdftest/e-entity/data.ttl");
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), updateDatasetMetadata(datasetName, usernameWithPermission, null, tokenWithPermission));
+
+
+        assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithPermission, "private", tokenAdmin));
+        response = baseRequestPost("documents")
+                .header("X-Auth-Token", tokenWithOutPermission)
+                .queryString("input", testinputEncoded)
+                .queryString("language", availableLanguages[0])
+                .queryString("informat", "text")
+                .queryString("dataset", datasetName)
+                .asString();
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+
+        // visibility == null defaults tp "PUBLIC"
+        assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithPermission, null, tokenAdmin));
+        response = baseRequestPost("documents")
+                .header("X-Auth-Token", tokenWithOutPermission)
+                .queryString("input", testinputEncoded)
+                .queryString("language", availableLanguages[0])
+                .queryString("informat", "text")
+                .queryString("dataset", datasetName)
+                .asString();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+
 
         //Tests every language
         for (String lang : availableLanguages) {
