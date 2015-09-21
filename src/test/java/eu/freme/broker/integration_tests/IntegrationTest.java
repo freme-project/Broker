@@ -110,7 +110,7 @@ public abstract class IntegrationTest {
         // We wait for https://github.com/freme-project/technical-discussion/issues/40
         if (contentType.equals("application/ld+json") && nifformat.contentType().equals("application/json+ld")) {
         } else {
-            assertTrue(contentType.equals(nifformat.contentType()));
+            assertEquals(contentType, nifformat.contentType());
         }
 
         // validate RDF

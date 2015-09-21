@@ -294,7 +294,7 @@ public class ELink extends BaseRestController {
                 
                 Template t = null;
                 Model model = ModelFactory.createDefaultModel();
-                
+
                 switch(thisInformat) {
                     case JSON:
                         JSONObject jsonObj = new JSONObject(postBody);
@@ -342,6 +342,7 @@ public class ELink extends BaseRestController {
                 templateDAO.addTemplate(t);
                 
                 String templateId = t.getId();
+                eu.freme.broker.security.database.model.Template templateMetadata;
 
                 // security
                 try {
@@ -349,7 +350,9 @@ public class ELink extends BaseRestController {
                     if (templateSecurityDAO.findOneById(templateId) != null) {
                         throw new BadRequestException("template metadata for templateId=\""+templateId+"\" already exists");
                     }
-                    templateSecurityDAO.save(new eu.freme.broker.security.database.model.Template(templateId, OwnedResource.Visibility.getByString(visibility)));
+                    templateMetadata = new eu.freme.broker.security.database.model.Template(templateId, OwnedResource.Visibility.getByString(visibility));
+                    decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), templateMetadata, accessLevelHelper.writeAccess());
+
                 } catch (AccessDeniedException e){
                     // TODO: not so cool...
                     templateDAO.removeTemplateById(templateId);
@@ -359,40 +362,46 @@ public class ELink extends BaseRestController {
                 HttpHeaders responseHeaders = new HttpHeaders();
                 URI location = new URI("/e-link/templates/"+t.getId());
                 responseHeaders.setLocation(location);
-                
-                Model outModel;
-                String serialization;
+
+                Model outModel = templateDAO.getTemplateInRDFById(t.getId());
+                String serialization = null;
                 
                 switch(thisOutformat) {
                     case JSON:
+                        serialization = Exporter.getInstance().convertOneTemplate2JSON(t).toString();
                         responseHeaders.set("Content-Type", "application/json");
-                        return new ResponseEntity<String>(Exporter.getInstance().convertOneTemplate2JSON(t).toString(), responseHeaders, HttpStatus.OK);
+                        break;
                     case TURTLE:
-                        outModel = templateDAO.getTemplateInRDFById(t.getId());
+
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.TURTLE);
                         responseHeaders.set("Content-Type", "text/turtle");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);                
+                        break;
                     case JSON_LD:
-                        outModel = templateDAO.getTemplateInRDFById(t.getId());
+                        //outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.JSON_LD);
                         responseHeaders.set("Content-Type", "application/ld+json");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);                        
+                        break;
                     case RDF_XML:
-                        outModel = templateDAO.getTemplateInRDFById(t.getId());
+                        //outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.RDF_XML);
                         responseHeaders.set("Content-Type", "application/rdf+xml");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                        break;
                     case N_TRIPLES:
-                        outModel = templateDAO.getTemplateInRDFById(t.getId());
+                        //outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.N_TRIPLES);
                         responseHeaders.set("Content-Type", "application/n-triples");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                        break;
                     case N3:
-                        outModel = templateDAO.getTemplateInRDFById(t.getId());
+                        //outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.N3);
                         responseHeaders.set("Content-Type", "text/n3");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
-                }                
+                        break;
+                }
+
+                templateMetadata.setContent(rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.TURTLE));
+                templateMetadata.setSerializationtype(RDFSerialization.TURTLE);
+                templateSecurityDAO.save(templateMetadata);
+                return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
             } catch (URISyntaxException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
                 throw new BadRequestException(ex.getMessage());
@@ -406,8 +415,7 @@ public class ELink extends BaseRestController {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
                 throw new InternalServerErrorException(ex.getMessage());
             }
-            
-            throw new InternalServerErrorException("Unknown problem. Please contact us.");
+
 	}
         
         // Get one template.
@@ -450,20 +458,40 @@ public class ELink extends BaseRestController {
                 }
                 // END: Checking the outformat parameter
 
+                HttpHeaders responseHeaders = new HttpHeaders();
+
                 // Security
                 try {
+                    eu.freme.broker.security.database.model.Template templateMetadata;
                     // check read access
-                    if (templateSecurityDAO.findOneById(id+"") == null) {
+                    templateMetadata = templateSecurityDAO.findOneById(id+"");
+                    if (templateMetadata == null) {
                         throw new BadRequestException("template metadata for templateId=\""+id+"\" does not exist");
                     }
+
+                    Model model;
+                    if(thisOutformat.equals(RDFSerialization.JSON)){
+                        /*JSONObject jsonObj = new JSONObject(templateMetadata.getContent());
+
+                        Template t = new Template(jsonObj.getString("templateId"),jsonObj.getString("query"),jsonObj.getString("label"),jsonObj.getString("description") );
+
+                        return new ResponseEntity<String>(templateMetadata.getContent(), responseHeaders, HttpStatus.OK);
+                        */
+                        throw new BadRequestException("JSON is not implemented as outFormat");
+                    }
+                    model = rdfConversionService.unserializeRDF(templateMetadata.getContent(), templateMetadata.getSerializationtype());
+                    String serialization = rdfConversionService.serializeRDF(model, thisOutformat);
+                    responseHeaders.set("Content-Type", getMimeTypeByRDFSerialization(thisOutformat));
+                    return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                    //return new ResponseEntity<String>(serialization, HttpStatus.OK);
                 }catch (AccessDeniedException e){
                     return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
                 }
                 // Security END
-
+/*
                 Template t = templateDAO.getTemplateById(id+"");
                 
-                HttpHeaders responseHeaders = new HttpHeaders();
+
                 Model model = ModelFactory.createDefaultModel();
                 String serialization;
                 
@@ -497,7 +525,7 @@ public class ELink extends BaseRestController {
                         responseHeaders.set("Content-Type", "text/n3");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                 }
-                
+                */
             } catch (TemplateNotFoundException e){
                 throw new TemplateNotFoundException("Template not found.");
             } catch (BadRequestException ex) {
@@ -508,6 +536,7 @@ public class ELink extends BaseRestController {
             }
             
             throw new InternalServerErrorException("Unknown problem. Please contact us.");
+
         }
 
         // Retrieve all templates.
@@ -528,9 +557,27 @@ public class ELink extends BaseRestController {
                 RDFSerialization thisOutformat = null;
                 thisOutformat = checkOutFormat(outformat, acceptHeader);
                 // END: Checking the outformat parameter
-                
-                
+
                 HttpHeaders responseHeaders = new HttpHeaders();
+
+
+
+                // TODO: set correct Content-Type...
+                Authentication authentication = SecurityContextHolder.getContext()
+                        .getAuthentication();
+                User authUser = (User) authentication.getPrincipal();
+                String result = "";
+                for (eu.freme.broker.security.database.model.Template templateMetadata : templateSecurityDAO.findAll()) {
+                    if(templateMetadata.getVisibility().equals(OwnedResource.Visibility.PUBLIC) || templateMetadata.getOwner().equals(authUser)) {
+                        Model model = rdfConversionService.unserializeRDF(templateMetadata.getContent(), templateMetadata.getSerializationtype());
+                        result += rdfConversionService.serializeRDF(model, thisOutformat)+"\n\n";
+                    }
+                }
+                responseHeaders.set("Content-Type", "text/plain");
+                return new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);
+
+
+/*
                 responseHeaders.setContentType(MediaType.APPLICATION_JSON);
                 String serialization;
                 Model model = ModelFactory.createDefaultModel();
@@ -565,6 +612,7 @@ public class ELink extends BaseRestController {
                         responseHeaders.set("Content-Type", "text/n3");
                         return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
                 }
+                */
             } catch (BadRequestException ex) {
                 throw new BadRequestException(ex.getMessage());
             } catch (Exception ex) {
@@ -586,6 +634,7 @@ public class ELink extends BaseRestController {
             @RequestParam(value = "outformat",     required=false) String outformat,
             @RequestParam(value = "o",             required=false) String o,
             @RequestParam(value = "visibility",    required=false) String visibility,
+            @RequestParam(value = "owner",    required=false) String ownerName,
             @PathVariable("templateid") String templateId,
             @RequestBody String postBody) {
             try {
@@ -673,63 +722,82 @@ public class ELink extends BaseRestController {
                         t = Exporter.getInstance().model2OneTemplate(model);
                         break;
                 }
-               
 
+
+                Model outModel;
                 // Security
+                eu.freme.broker.security.database.model.Template templateMetadata;
                 try {
                     // check read access
-                    eu.freme.broker.security.database.model.Template templ = templateSecurityDAO.findOneById(templateId);
-                    if (templ == null) {
+                    templateMetadata = templateSecurityDAO.findOneById(templateId);
+                    if (templateMetadata == null) {
                         throw new BadRequestException("template metadata for templateId=\""+templateId+"\" does not exist");
                     }
+                    decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), templateMetadata, accessLevelHelper.writeAccess());
+
+                    templateDAO.updateTemplate(t);
+
                     if(visibility!=null) {
-                        templ.setVisibility(OwnedResource.Visibility.getByString(visibility));
+                        templateMetadata.setVisibility(OwnedResource.Visibility.getByString(visibility));
                     }
-                    templateSecurityDAO.save(templ);
+                    if(ownerName!=null && !ownerName.trim().equals("")) {
+                        User owner = userDAO.getRepository().findOneByName(ownerName);
+                        if(owner==null)
+                            throw new BadRequestException("Can not change owner of the dataset. User \""+ownerName+"\" does not exist.");
+                        templateMetadata.setOwner(owner);
+                    }
+                    templateMetadata.setSerializationtype(RDFConstants.RDFSerialization.TURTLE);
+                    outModel = templateDAO.getTemplateInRDFById(t.getId());
+                    templateMetadata.setContent(rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.TURTLE));
+                    templateSecurityDAO.save(templateMetadata);
                 }catch (AccessDeniedException e){
                     return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
                 }
                 // Security END
 
-                templateDAO.updateTemplate(t);
+
                 
                 HttpHeaders responseHeaders = new HttpHeaders();
                 URI location = new URI("/e-link/templates/"+t.getId());
                 responseHeaders.setLocation(location);
                
-                Model outModel;
-                String serialization;
+
+                String serialization = null;
                 
                 switch(thisOutformat) {
                     case JSON:
+                        serialization = Exporter.getInstance().convertOneTemplate2JSON(t).toString();
                         responseHeaders.set("Content-Type", "application/json");
-                        return new ResponseEntity<String>(Exporter.getInstance().convertOneTemplate2JSON(t).toString(), responseHeaders, HttpStatus.OK);
+                        break;
                     case TURTLE:
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.TURTLE);
                         responseHeaders.set("Content-Type", "text/turtle");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);                
+                        break;
                     case JSON_LD:
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.JSON_LD);
                         responseHeaders.set("Content-Type", "application/ld+json");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);                        
+                        break;
                     case RDF_XML:
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.RDF_XML);
                         responseHeaders.set("Content-Type", "application/rdf+xml");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                        break;
                     case N_TRIPLES:
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.N_TRIPLES);
                         responseHeaders.set("Content-Type", "application/n-triples");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                        break;
                     case N3:
                         outModel = templateDAO.getTemplateInRDFById(t.getId());
                         serialization = rdfConversionService.serializeRDF(outModel, RDFConstants.RDFSerialization.N3);
                         responseHeaders.set("Content-Type", "text/n3");
-                        return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                        break;
                 }
+
+
+                return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
             } catch (URISyntaxException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             } catch (org.json.JSONException ex) {

@@ -15,17 +15,23 @@
  */
 package eu.freme.broker.integration_tests;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 import eu.freme.conversion.rdf.RDFConstants;
 
+import eu.freme.conversion.rdf.RDFConversionService;
 import org.json.JSONObject;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 

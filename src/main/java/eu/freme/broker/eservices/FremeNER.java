@@ -340,7 +340,7 @@ public class FremeNER extends BaseRestController {
             if(endpoint != null && sparql != null) {
                 try {
                     // fed via SPARQL endpoint
-                    return callBackend("http://139.18.2.231:8080/api/datasets?format="+format
+                    result = callBackend("http://139.18.2.231:8080/api/datasets?format="+format
                             + "&name="+name
                             + "&description="+URLEncoder.encode(description,"UTF-8")
                             + "&language="+language
@@ -376,6 +376,7 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "informat", required = false) String informat,
 			@RequestParam(value = "f", required = false) String f,
             @RequestParam(value = "visibility",        required=false) String visibility,
+            @RequestParam(value = "owner",        required=false) String ownerName,
                         @RequestBody(required = false) String postBody) {
             
             // Check the dataset name parameter.
@@ -453,7 +454,15 @@ public class FremeNER extends BaseRestController {
 
             // update visibility
             if(result.getStatusCode().is2xxSuccessful()){
-                dataset.setVisibility(OwnedResource.Visibility.getByString(visibility));
+                if(visibility!=null && !visibility.trim().equals("")) {
+                    dataset.setVisibility(OwnedResource.Visibility.getByString(visibility));
+                }
+                if(ownerName!=null && !ownerName.trim().equals("")) {
+                    User owner = userDAO.getRepository().findOneByName(ownerName);
+                    if(owner==null)
+                        throw new eu.freme.broker.exception.BadRequestException("Can not change owner of the dataset. User \""+ownerName+"\" does not exist.");
+                    dataset.setOwner(owner);
+                }
                 // check write access
                 datasetDAO.save(dataset);
             }

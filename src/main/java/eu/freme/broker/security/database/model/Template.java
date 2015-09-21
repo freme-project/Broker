@@ -15,6 +15,8 @@
  */
 package eu.freme.broker.security.database.model;
 
+import eu.freme.conversion.rdf.RDFConstants;
+
 import javax.persistence.*;
 
 /**
@@ -30,4 +32,14 @@ public class Template extends OwnedResource {
         super(id, visibility);
     }
     public Template(){super();}
+
+    private RDFConstants.RDFSerialization serializationtype;
+
+    public RDFConstants.RDFSerialization getSerializationtype() {
+        return serializationtype;
+    }
+
+    public void setSerializationtype(RDFConstants.RDFSerialization serializationtype) {
+        this.serializationtype = serializationtype;
+    }
 }

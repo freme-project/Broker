@@ -105,4 +105,17 @@ public class User {
 	public List<Template> getTemplates() { return templates; }
 
 	public void setTemplates(List<Template> templates) { this.templates = templates; }
+
+	@Override
+	public boolean equals(Object o){
+		if(!(o instanceof User))
+			return false;
+		User casted = (User) o;
+		return casted.getName().equals(this.getName());
+	}
+
+	@Override
+	public int hashCode(){
+		return this.getName().hashCode();
+	}
 }

@@ -17,6 +17,7 @@ package eu.freme.broker.eservices;
 
 import java.lang.annotation.Annotation;
 import java.util.Date;
+import java.util.UnknownFormatConversionException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.InternalServerErrorException;
@@ -187,4 +188,22 @@ public abstract class BaseRestController {
 		return new ResponseEntity<>(rdfString, responseHeaders, HttpStatus.OK);
 	}
 
+
+	public String getMimeTypeByRDFSerialization(RDFConstants.RDFSerialization rdfSerialization){
+		switch(rdfSerialization) {
+			case JSON:
+				return "application/json";
+			case TURTLE:
+				return  "text/turtle";
+			case JSON_LD:
+				return  "application/ld+json";
+			case RDF_XML:
+				return  "application/rdf+xml";
+			case N_TRIPLES:
+				return  "application/n-triples";
+			case N3:
+				return  "text/n3";
+		}
+		throw new UnknownFormatConversionException("unkown RDFSerialization: "+rdfSerialization);
+	}
 }
