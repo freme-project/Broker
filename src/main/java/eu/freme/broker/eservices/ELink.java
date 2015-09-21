@@ -40,6 +40,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -778,6 +779,52 @@ public class ELink extends BaseRestController {
             }
             return rdfELinkSerializationFormats.get(acceptHeader);
         }
+    }
+
+    // Updating dataset metadata
+    @RequestMapping(value = "/e-link/templates/admin/{templateid}", method = {
+            RequestMethod.PUT })
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<String> updateTemplateMetadata(
+            @PathVariable(value = "name") String name,
+            @RequestParam(value = "owner",        required=false) String ownerName,
+            @RequestParam(value = "visibility",        required=false) String visibility) {
+
+        OwnedResource.Visibility newVisibility = OwnedResource.Visibility.PUBLIC;
+        if(visibility!=null && !visibility.equals("")){
+            newVisibility = OwnedResource.Visibility.getByString(visibility);
+        }
+
+        eu.freme.broker.security.database.model.Template template = templateSecurityDAO.findOneById(name);
+        User owner;
+        if(ownerName !=null) {
+            owner = userDAO.getRepository().findOneByName(ownerName);
+            if (owner == null) {
+                return new ResponseEntity<String>("User \"" + ownerName + "\" does not exist.", HttpStatus.BAD_REQUEST);
+            }
+        }else{
+            if(template!=null){
+                owner = template.getOwner();
+
+            }else{
+                return new ResponseEntity<String>("Metadate for the dataset \"" + name + "\" does not exist. Please provide an owner to create this data.", HttpStatus.BAD_REQUEST);
+            }
+        }
+        if(template==null){
+            template = new eu.freme.broker.security.database.model.Template(name, owner, newVisibility);
+        }else{
+            template.setOwner(owner);
+            // set visibility, if changed
+            if(visibility!=null && !visibility.equals("")){
+                template.setVisibility(newVisibility);
+            }
+        }
+
+
+        // insert without permission check (via getRepository)
+        templateSecurityDAO.save(template);
+
+        return new ResponseEntity<String>("Update successful.", HttpStatus.OK);
     }
 
     private int validateTemplateID(String templateId) {
