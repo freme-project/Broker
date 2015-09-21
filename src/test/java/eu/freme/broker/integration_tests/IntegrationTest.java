@@ -15,6 +15,7 @@
  */
 package eu.freme.broker.integration_tests;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -98,7 +99,7 @@ public abstract class IntegrationTest {
     public void validateNIFResponse(HttpResponse<String> response, RDFConstants.RDFSerialization nifformat) throws IOException {
 
         //basic tests on response
-        assertTrue(response.getStatus() == 200);
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertTrue(response.getBody().length() > 0);
         assertTrue(!response.getHeaders().isEmpty());
         assertNotNull(response.getHeaders().get("content-type"));

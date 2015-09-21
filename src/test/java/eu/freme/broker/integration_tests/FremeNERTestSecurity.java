@@ -189,6 +189,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
             //Tests POST
             //Plaintext Input in Query String
             response = baseRequestPost("documents")
+                    .header("X-Auth-Token", tokenWithPermission)
                     .queryString("input", testinputEncoded)
                     .queryString("language", lang)
                     .queryString("informat", "text")
@@ -199,6 +200,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
             //Tests POST
             //Plaintext Input in Body
             response = baseRequestPost("documents")
+                    .header("X-Auth-Token", tokenWithPermission)
                     .queryString("language", lang)
                     .queryString("dataset", dataset)
                     .header("Content-Type", "text/plain")
@@ -208,6 +210,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
             //Tests POST
             //NIF Input in Body (Turtle)
             response = baseRequestPost("documents").header("Content-Type", "text/turtle")
+                    .header("X-Auth-Token", tokenWithPermission)
                     .queryString("language", lang)
                     .queryString("dataset", dataset)
                     .body(data).asString();
@@ -217,6 +220,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
             //Tests POST
             //Test Prefix
             response = baseRequestPost("documents")
+                    .header("X-Auth-Token", tokenWithPermission)
                     .queryString("input", testinput)
                     .queryString("language", lang)
                     .queryString("dataset", dataset)
@@ -229,6 +233,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
             //Tests GET
             //response = Unirest.get(getUrl() + "documents?informat=text&input=" + testinputEncoded + "&language=" + lang + "&dataset=" + dataset).asString();
             response = baseRequestGet("documents")
+                    .header("X-Auth-Token", tokenWithPermission)
                     .queryString("informat", "text")
                     .queryString("dataset", dataset)
                     .queryString("input", testinputEncoded)
