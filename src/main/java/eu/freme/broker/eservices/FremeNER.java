@@ -535,6 +535,11 @@ public class FremeNER extends BaseRestController {
             @RequestParam(value = "owner",        required=false) String ownerName,
             @RequestParam(value = "visibility",        required=false) String visibility) {
 
+        OwnedResource.Visibility newVisibility = OwnedResource.Visibility.PUBLIC;
+        if(visibility!=null && !visibility.equals("")){
+            newVisibility = OwnedResource.Visibility.getByString(visibility);
+        }
+
         Dataset dataset = datasetDAO.findOneById(name);
         User owner;
         if(ownerName !=null) {
@@ -545,18 +550,21 @@ public class FremeNER extends BaseRestController {
         }else{
             if(dataset!=null){
                 owner = dataset.getOwner();
+
             }else{
                 return new ResponseEntity<String>("Metadate for the dataset \"" + name + "\" does not exist. Please provide an owner to create this data.", HttpStatus.BAD_REQUEST);
             }
         }
         if(dataset==null){
-            dataset = new Dataset(name, owner, OwnedResource.Visibility.PUBLIC);
+            dataset = new Dataset(name, owner, newVisibility);
+        }else{
+            dataset.setOwner(owner);
+            // set visibility, if changed
+            if(visibility!=null && !visibility.equals("")){
+                dataset.setVisibility(newVisibility);
+            }
         }
 
-        dataset.setOwner(owner);
-        if(visibility!=null && !visibility.equals("")) {
-            dataset.setVisibility(OwnedResource.Visibility.getByString(visibility));
-        }
 
         // insert without permission check (via getRepository)
         datasetDAO.save(dataset);

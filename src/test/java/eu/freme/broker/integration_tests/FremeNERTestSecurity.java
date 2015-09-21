@@ -52,7 +52,7 @@ public class FremeNERTestSecurity extends IntegrationTest {
     @Autowired
     DatasetDAO datasetDAO;
 
-    String[] availableLanguages = {"en"};//,"de","it","nl","fr","es"};
+    String[] availableLanguages = {"en","de","it","nl","fr","es"};
     String datasetName = "dbpedia";
     String testinput= "Enrich this Content please";
 
@@ -80,10 +80,6 @@ public class FremeNERTestSecurity extends IntegrationTest {
     }
 
 
-
-
-
-
     @Test
     public void testDatasetManagement() throws UnirestException , IOException {
 
@@ -108,7 +104,9 @@ public class FremeNERTestSecurity extends IntegrationTest {
         assertEquals(HttpStatus.OK.value(), getDataset(publicDatasetName, tokenWithOutPermission));
 
         // check update template...
-        /*assertEquals(updateDataset(privateDatasetName,testUpdatedDataset, tokenWithOutPermission, "private"),  HttpStatus.FORBIDDEN.value());
+        /*
+        TODO: enable this!
+        assertEquals(updateDataset(privateDatasetName,testUpdatedDataset, tokenWithOutPermission, "private"),  HttpStatus.FORBIDDEN.value());
         assertEquals(updateDataset(privateDatasetName,testUpdatedDataset, tokenWithPermission, "public"),  HttpStatus.OK.value());
         assertEquals(getDataset(privateDatasetName, tokenWithOutPermission), HttpStatus.OK.value());
         assertEquals(updateDataset(privateDatasetName,testUpdatedDataset, tokenWithPermission, "private"), HttpStatus.OK.value());
@@ -194,19 +192,17 @@ public class FremeNERTestSecurity extends IntegrationTest {
         if(!initialized)
             initUser();
 
-        /*
-        String testDataset=readFile("src/test/resources/e-entity/small-dataset-rdfs.nt");
-        assertEquals(updateDataset("dbpedia",testDataset, tokenWithPermission, "private"), HttpStatus.OK.value());
-*/
 
         String testinputEncoded= URLEncoder.encode(testinput, "UTF-8");
         String data = readFile("src/test/resources/rdftest/e-entity/data.ttl");
 
         HttpResponse<String> response;
 
+        logger.info("try to update dataset metadata not as admin... has to fail");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), updateDatasetMetadata(datasetName, usernameWithPermission, null, tokenWithPermission));
 
 
+        logger.info("try to update dataset metadata as admin... should work");
         assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithPermission, "private", tokenAdmin));
         response = baseRequestPost("documents")
                 .header("X-Auth-Token", tokenWithOutPermission)
@@ -215,9 +211,22 @@ public class FremeNERTestSecurity extends IntegrationTest {
                 .queryString("informat", "text")
                 .queryString("dataset", datasetName)
                 .asString();
+        logger.info("the private dataset should not be accessible as user without permission (not the owner)...");
         assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
 
-        // visibility == null defaults tp "PUBLIC"
+        logger.info("update metadata: switch visbility private -> public");
+        assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithPermission, "public", tokenAdmin));
+        response = baseRequestPost("documents")
+                .header("X-Auth-Token", tokenWithOutPermission)
+                .queryString("input", testinputEncoded)
+                .queryString("language", availableLanguages[0])
+                .queryString("informat", "text")
+                .queryString("dataset", datasetName)
+                .asString();
+        logger.info("the public dataset should be accessible by any user (not the owner)...");
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+        logger.info("update metadata: no changes, especially keep visibility state");
         assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithPermission, null, tokenAdmin));
         response = baseRequestPost("documents")
                 .header("X-Auth-Token", tokenWithOutPermission)
@@ -226,8 +235,32 @@ public class FremeNERTestSecurity extends IntegrationTest {
                 .queryString("informat", "text")
                 .queryString("dataset", datasetName)
                 .asString();
+        logger.info("the public dataset should be accessible by any user (not the owner)...");
         assertEquals(HttpStatus.OK.value(), response.getStatus());
 
+        logger.info("update metadata: switch visbility public -> private");
+        assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithPermission, "private", tokenAdmin));
+        response = baseRequestPost("documents")
+                .header("X-Auth-Token", tokenWithOutPermission)
+                .queryString("input", testinputEncoded)
+                .queryString("language", availableLanguages[0])
+                .queryString("informat", "text")
+                .queryString("dataset", datasetName)
+                .asString();
+        logger.info("the private dataset should not be accessible as user without permission (not the owner)...");
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+
+        logger.info("update metadata: no changes, especially keep visibility state");
+        assertEquals(HttpStatus.OK.value(), updateDatasetMetadata(datasetName, usernameWithPermission, null, tokenAdmin));
+        response = baseRequestPost("documents")
+                .header("X-Auth-Token", tokenWithOutPermission)
+                .queryString("input", testinputEncoded)
+                .queryString("language", availableLanguages[0])
+                .queryString("informat", "text")
+                .queryString("dataset", datasetName)
+                .asString();
+        logger.info("the private dataset should not be accessible as user without permission (not the owner)...");
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
 
 
         //Tests every language

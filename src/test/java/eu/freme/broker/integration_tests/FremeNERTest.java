@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -55,6 +56,7 @@ public class FremeNERTest extends IntegrationTest{
     }
 
     @Test
+    @Ignore // is depricated. replaced by FremeNERTestSecurity.testDatasetManagement
     public void testDatasetManagement() throws UnirestException , IOException {
         String testDataset=readFile("src/test/resources/e-entity/small-dataset-rdfs.nt");
         String testUpdatedDataset=readFile("src/test/resources/e-entity/small-dataset.nt");
@@ -111,6 +113,7 @@ public class FremeNERTest extends IntegrationTest{
     }
 
     @Test
+    @Ignore // is depricated. replaced by FremeNERTestSecurity.TestFremeNER
     public void TestFremeNER() throws UnirestException, IOException, UnsupportedEncodingException {
 
         HttpResponse<String> response;
