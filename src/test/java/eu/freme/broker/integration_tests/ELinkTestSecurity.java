@@ -83,6 +83,11 @@ public class ELinkTestSecurity extends IntegrationTest {
         // add a template for the first user
         String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", tokenWithPermission);
         assertNotNull(templateid);
+
+        String templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", tokenWithPermission);
+        assertNotNull(templateid2);
+
+        assertEquals(HttpStatus.OK.value(),getAllTemplates(tokenWithPermission));
     }
 
     @Test
@@ -126,7 +131,7 @@ public class ELinkTestSecurity extends IntegrationTest {
         // check delete template...
         assertEquals(deleteTemplate(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
         int responseCode = deleteTemplate(templateid, tokenWithPermission);
-        assertTrue(responseCode== HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
+        assertTrue(responseCode == HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -164,14 +169,18 @@ public class ELinkTestSecurity extends IntegrationTest {
     }
 
     //Tests GET e-link/templates/
-    public void testELinkTemplates(String token) throws UnirestException, IOException {
+    public int getAllTemplates(String token) throws UnirestException, IOException {
         HttpResponse<String> response;
 
         response = baseRequestGet("templates")
                 .header("X-Auth-Token", token)
-                .queryString("outformat", "json-ld").asString();
-        validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
+                .queryString("outformat", "json").asString();
 
+
+        if(response.getStatus()==HttpStatus.OK.value()){
+            validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
+        }
+        return response.getStatus();
     }
 
     //Tests POST e-link/templates/
