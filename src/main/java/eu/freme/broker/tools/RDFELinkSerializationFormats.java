@@ -28,16 +28,16 @@ public class RDFELinkSerializationFormats extends HashMap<String, RDFConstants.R
 		put("application/x-turtle", RDFConstants.RDFSerialization.TURTLE);
 		put("turtle", RDFConstants.RDFSerialization.TURTLE);
 
-                put("application/json+ld",RDFConstants.RDFSerialization.JSON_LD);
+		put("application/json+ld",RDFConstants.RDFSerialization.JSON_LD);
 		put("json-ld", RDFConstants.RDFSerialization.JSON_LD);
 		
-                put("application/n-triples",RDFConstants.RDFSerialization.N_TRIPLES);
+        put("application/n-triples",RDFConstants.RDFSerialization.N_TRIPLES);
 		put("ntriples", RDFConstants.RDFSerialization.N_TRIPLES);
 
 		put("application/rdf+xml", RDFConstants.RDFSerialization.RDF_XML);
 		put("rdf-xml", RDFConstants.RDFSerialization.RDF_XML);
                 
-                put("text/n3",RDFConstants.RDFSerialization.N3);
+        put("text/n3",RDFConstants.RDFSerialization.N3);
 		put("n3",RDFConstants.RDFSerialization.N3);
                 
 		put("application/json", RDFConstants.RDFSerialization.JSON);

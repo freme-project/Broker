@@ -16,10 +16,15 @@
 package eu.freme.broker.tools;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Helper class to create a NIFParameterSet according to the specification of NIF.
@@ -32,6 +37,10 @@ public class NIFParameterFactory {
 	RDFSerializationFormats rdfSerializationFormats;
 
 	String defaultPrefix = "http://freme-project.eu/";
+
+	public final Set<String> NIF_PARAMETERS = new HashSet<>(Arrays.asList(new String[] {
+			"input", "i", "informat", "f", "outformat", "o", "prefix", "p"
+	}));
 
 	public NIFParameterSet constructFromHttp(String input, String informat,
 			String outformat, String postBody, String acceptHeader,
@@ -102,4 +111,9 @@ public class NIFParameterFactory {
 
 		return new NIFParameterSet(thisInput, thisInformat, thisOutformat, thisPrefix);
 	}
+
+	public boolean isNIFParameter(String parameter){
+		return NIF_PARAMETERS.contains(parameter);
+	}
+
 }
