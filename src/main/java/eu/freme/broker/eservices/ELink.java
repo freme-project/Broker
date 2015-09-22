@@ -70,8 +70,8 @@ public class ELink extends BaseRestController {
         @Autowired
         DataEnricher dataEnricher;
 
-        @Autowired
-        TemplateDAO templateDAO;
+        //@Autowired
+        //TemplateDAO templateDAO;
         
         @Autowired
         AbstractAccessDecisionManager decisionManager;

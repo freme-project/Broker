@@ -15,6 +15,10 @@
  */
 package eu.freme.broker.security.database.model;
 
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.DCTerms;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import eu.freme.conversion.rdf.RDFConstants;
 
 import javax.persistence.*;
@@ -25,13 +29,102 @@ import javax.persistence.*;
 @Entity
 @Table(name = "template")
 public class Template extends OwnedResource {
-    public Template(String id, User owner, Visibility visibility) {
+
+    private String endpoint;
+    private String query;
+    private String label;
+    private String description;
+
+    // NOTE: constructor without was implemented before...
+
+    public Template(String id, User owner, Visibility visibility, String endpoint, String query, String label, String description) {
         super(id, owner, visibility);
+
+        this.endpoint = endpoint;
+        this.query = query;
+        this.label = label;
+        this.description = description;
     }
-    public Template(String id, Visibility visibility) {
+    public Template(String id, Visibility visibility, String endpoint, String query, String label, String description) {
         super(id, visibility);
+        this.endpoint = endpoint;
+        this.query = query;
+        this.label = label;
+        this.description = description;
     }
+
+    public Template(String id, User owner, Visibility visibility, Model model){
+        super(id, owner, visibility);
+
+    }
+
+    public Template(String id,Visibility visibility, Model model){
+        super(id, visibility);
+
+
+    }
+
     public Template(){super();}
+
+
+    private void getTemplateByModel(Model model){
+        try {
+            int currentId = 0;
+            StmtIterator iter = model.listStatements((Resource)null, RDF.type, model.getResource("http://www.freme-project.eu/ns#Template"));
+
+            if(iter.hasNext()){
+                Statement templateRes = iter.nextStatement();
+                Resource templRes = templateRes.getSubject();
+                String endpoint = templRes.getProperty(model.getProperty("http://www.freme-project.eu/ns#endpoint")).getObject().asLiteral().toString();
+                String query = templRes.getProperty(model.getProperty("http://www.freme-project.eu/ns#query")).getObject().asLiteral().toString();
+               // String label = templRes.getProperty(model.getProperty("http://www.freme-project.eu/ns#label")).getObject().asLiteral().toString();
+               //String description = templRes.getProperty(model.getProperty("http://www.freme-project.eu/ns#endpoint")).getObject().asLiteral().toString();
+            }
+
+            while(true) {
+                if(!iter.hasNext()) {
+                    ++currentId;
+                    t.setId(currentId + "");
+                    Resource var10 = this.templatesModel.createResource("http://www.freme-project.eu/data/templates/" + t.getId());
+                    this.templatesModel.add(var10, RDF.type, this.templatesModel.getResource("http://www.freme-project.eu/ns#Template"));
+                    this.templatesModel.add(var10, this.templatesModel.getProperty("http://www.freme-project.eu/ns#templateId"), t.getId() + "");
+                    this.templatesModel.add(var10, this.templatesModel.getProperty("http://www.freme-project.eu/ns#query"), t.getQuery());
+                    this.templatesModel.add(var10, this.templatesModel.getProperty("http://www.freme-project.eu/ns#endpoint"), t.getEndpoint());
+                    this.templatesModel.add(var10, RDFS.label, t.getLabel());
+                    this.templatesModel.add(var10, DCTerms.description, t.getDescription());
+                    break;
+                }
+
+                Statement templateRes = iter.nextStatement();
+                Resource templRes = templateRes.getSubject();
+                int id = Integer.parseInt(templRes.getProperty(this.templatesModel.getProperty("http://www.freme-project.eu/ns#templateId")).getObject().asLiteral().toString());
+                if(id > currentId) {
+                    currentId = id;
+                }
+            }
+        } finally {
+            this.templatesModel.leaveCriticalSection();
+        }
+    }
+
+    public Model getRDF(){
+        Model result = ModelFactory.createDefaultModel();
+        result.enterCriticalSection(false);
+
+        try {
+            Resource resource = result.createResource("http://www.freme-project.eu/data/templates/" + this.getId());
+            result.add(resource, RDF.type, result.getResource("http://www.freme-project.eu/ns#Template"));
+            result.add(resource, result.getProperty("http://www.freme-project.eu/ns#templateId"), this.getId());
+            result.add(resource, result.getProperty("http://www.freme-project.eu/ns#query"), this.getQuery());
+            result.add(resource, result.getProperty("http://www.freme-project.eu/ns#endpoint"), this.getEndpoint());
+            result.add(resource, RDFS.label, this.getLabel());
+            result.add(resource, DCTerms.description, this.getDescription());
+        } finally {
+            result.leaveCriticalSection();
+        }
+
+        return result;
+    }
 
     private RDFConstants.RDFSerialization serializationtype;
 
@@ -41,5 +134,37 @@ public class Template extends OwnedResource {
 
     public void setSerializationtype(RDFConstants.RDFSerialization serializationtype) {
         this.serializationtype = serializationtype;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -15,8 +15,13 @@
  */
 package eu.freme.broker.security.database.dao;
 
+import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.DCTerms;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import eu.freme.broker.security.database.model.Template;
 import eu.freme.broker.security.database.repository.TemplateRepository;
+import eu.freme.eservices.elink.exceptions.TemplateNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,4 +29,29 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class TemplateSecurityDAO extends OwnedResourceDAO<Template> {
+
+    private int maxId = 0;
+
+    public TemplateSecurityDAO(){
+        super();
+        for(Template template: repository.findAll()){
+            int currentId = Integer.parseInt(template.getId());
+            if(currentId > maxId)
+                maxId = currentId;
+        }
+    }
+
+    public String getMaxId(){
+        return maxId+"";
+    }
+
+    public void save(Template template){
+        // is it a new one?
+        if(template.getId()== null){
+            maxId++;
+            template.setId(maxId+"");
+        }
+        super.save(template);
+    }
+
 }
