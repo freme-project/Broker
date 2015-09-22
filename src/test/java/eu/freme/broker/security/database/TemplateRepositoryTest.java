@@ -22,6 +22,7 @@ import eu.freme.broker.security.database.model.OwnedResource;
 import eu.freme.broker.security.database.model.Template;
 import eu.freme.broker.security.database.model.User;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,29 +47,37 @@ public class TemplateRepositoryTest {
 	TemplateSecurityDAO templateSecurityDAO;
 
 	@Test
+	@Ignore // doesnt work because user is not authenticated
 	@Transactional
 	public void testTemplateRepository(){
-/*
+
 		logger.info("create user and save it");
 		User testuser = new User("Juergen", "bla", User.roleUser);
 		userDAO.save(testuser);
 
 		logger.info("create template \"1\" and save it");
-		templateSecurityDAO.save(new Template("1", testuser, OwnedResource.Visibility.PUBLIC));
+		Template templ1 = new Template(testuser, OwnedResource.Visibility.PUBLIC, null, null, null, null);
+		templateSecurityDAO.save(templ1);
+		String templ1id = templ1.getId();
+		logger.info("generated id: "+templ1id);
 		logger.info("create template \"2\" and save it");
-		templateSecurityDAO.save(new Template("2", testuser, OwnedResource.Visibility.PUBLIC));
+		Template templ2 = new Template(testuser, OwnedResource.Visibility.PUBLIC, null, null, null, null);
+		String templ2id = templ2.getId();
+		logger.info("generated id: "+templ2id);
 		logger.info("create template \"3\" and save it");
-		templateSecurityDAO.save(new Template("3", testuser, OwnedResource.Visibility.PUBLIC));
+		Template templ3 = new Template(testuser, OwnedResource.Visibility.PUBLIC, null, null, null, null);
+		String templ3id = templ2.getId();
+		logger.info("generated id: "+templ3id);
 
-		logger.info("fetch template \"2\"");
-		Template two = templateSecurityDAO.getRepository().findOneById("2");
+		logger.info("fetch template \""+templ2id+"\"");
+		Template two = templateSecurityDAO.getRepository().findOneById(templ2id);
 		assertTrue(two != null);
 
 		logger.info("count templates");
 		// admin user is one more
 		assertTrue(templateSecurityDAO.count() == 3L);
 
-		logger.info("delete template \"2\"");
+		logger.info("delete template \""+templ2id+"\"");
 
 		templateSecurityDAO.delete(two);
 
@@ -80,6 +89,6 @@ public class TemplateRepositoryTest {
 		userDAO.delete(userFromDb);
 		logger.info("remaining templates: "+templateSecurityDAO.count());
 		assertFalse(templateSecurityDAO.findAll().iterator().hasNext());
-		*/
+
 	}
 }

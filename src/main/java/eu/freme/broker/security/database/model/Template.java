@@ -39,31 +39,28 @@ public class Template extends OwnedResource {
     @Lob
     private String description;
 
-    // NOTE: constructor without was implemented before...
-
-    public Template(String id, User owner, Visibility visibility, String endpoint, String query, String label, String description) {
-        super(id, owner, visibility);
-
+    public Template(User owner, Visibility visibility, String endpoint, String query, String label, String description) {
+        super(null, owner, visibility);
         this.endpoint = endpoint;
         this.query = query;
         this.label = label;
         this.description = description;
     }
-    public Template(String id, Visibility visibility, String endpoint, String query, String label, String description) {
-        super(id, visibility);
+    public Template(Visibility visibility, String endpoint, String query, String label, String description) {
+        super(null, visibility);
         this.endpoint = endpoint;
         this.query = query;
         this.label = label;
         this.description = description;
     }
 
-    public Template(String id, User owner, Visibility visibility, Model model){
-        super(id, owner, visibility);
+    public Template(User owner, Visibility visibility, Model model){
+        super(null, owner, visibility);
         setTemplateWithModel(model);
     }
 
-    public Template(String id,Visibility visibility, Model model){
-        super(id, visibility);
+    public Template(Visibility visibility, Model model){
+        super(null, visibility);
         setTemplateWithModel(model);
     }
 
