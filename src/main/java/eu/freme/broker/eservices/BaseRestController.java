@@ -99,6 +99,7 @@ public abstract class BaseRestController {
 	 * @param acceptHeader
 	 * @param contentTypeHeader,
 	 * @param parameters
+	 * @param allowEmptyInput
 	 */
 	protected NIFParameterSet normalizeNif(String postBody, String acceptHeader, String contentTypeHeader, Map<String,String> parameters, boolean allowEmptyInput)
 			throws BadRequestException {
