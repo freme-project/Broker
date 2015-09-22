@@ -30,9 +30,13 @@ import javax.persistence.*;
 @Table(name = "template")
 public class Template extends OwnedResource {
 
+    @Lob
     private String endpoint;
+    @Lob
     private String query;
+    @Lob
     private String label;
+    @Lob
     private String description;
 
     // NOTE: constructor without was implemented before...
@@ -55,55 +59,34 @@ public class Template extends OwnedResource {
 
     public Template(String id, User owner, Visibility visibility, Model model){
         super(id, owner, visibility);
-
+        setTemplateWithModel(model);
     }
 
     public Template(String id,Visibility visibility, Model model){
         super(id, visibility);
-
-
+        setTemplateWithModel(model);
     }
 
     public Template(){super();}
 
 
-    private void getTemplateByModel(Model model){
+    public void setTemplateWithModel(Model model){
+        model.enterCriticalSection(false);
         try {
-            int currentId = 0;
             StmtIterator iter = model.listStatements((Resource)null, RDF.type, model.getResource("http://www.freme-project.eu/ns#Template"));
 
+            // take first instance
             if(iter.hasNext()){
                 Statement templateRes = iter.nextStatement();
                 Resource templRes = templateRes.getSubject();
-                String endpoint = templRes.getProperty(model.getProperty("http://www.freme-project.eu/ns#endpoint")).getObject().asLiteral().toString();
-                String query = templRes.getProperty(model.getProperty("http://www.freme-project.eu/ns#query")).getObject().asLiteral().toString();
-               // String label = templRes.getProperty(model.getProperty("http://www.freme-project.eu/ns#label")).getObject().asLiteral().toString();
-               //String description = templRes.getProperty(model.getProperty("http://www.freme-project.eu/ns#endpoint")).getObject().asLiteral().toString();
+                endpoint = templRes.getProperty(model.getProperty("http://www.freme-project.eu/ns#endpoint")).getObject().asLiteral().toString();
+                query = templRes.getProperty(model.getProperty("http://www.freme-project.eu/ns#query")).getObject().asLiteral().toString();
+                label = templRes.getProperty(RDFS.label).getObject().asLiteral().toString();
+                description = templRes.getProperty(DCTerms.description).getObject().asLiteral().toString();
             }
 
-            while(true) {
-                if(!iter.hasNext()) {
-                    ++currentId;
-                    t.setId(currentId + "");
-                    Resource var10 = this.templatesModel.createResource("http://www.freme-project.eu/data/templates/" + t.getId());
-                    this.templatesModel.add(var10, RDF.type, this.templatesModel.getResource("http://www.freme-project.eu/ns#Template"));
-                    this.templatesModel.add(var10, this.templatesModel.getProperty("http://www.freme-project.eu/ns#templateId"), t.getId() + "");
-                    this.templatesModel.add(var10, this.templatesModel.getProperty("http://www.freme-project.eu/ns#query"), t.getQuery());
-                    this.templatesModel.add(var10, this.templatesModel.getProperty("http://www.freme-project.eu/ns#endpoint"), t.getEndpoint());
-                    this.templatesModel.add(var10, RDFS.label, t.getLabel());
-                    this.templatesModel.add(var10, DCTerms.description, t.getDescription());
-                    break;
-                }
-
-                Statement templateRes = iter.nextStatement();
-                Resource templRes = templateRes.getSubject();
-                int id = Integer.parseInt(templRes.getProperty(this.templatesModel.getProperty("http://www.freme-project.eu/ns#templateId")).getObject().asLiteral().toString());
-                if(id > currentId) {
-                    currentId = id;
-                }
-            }
         } finally {
-            this.templatesModel.leaveCriticalSection();
+            model.leaveCriticalSection();
         }
     }
 

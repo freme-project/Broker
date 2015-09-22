@@ -56,9 +56,6 @@ public class OwnedResource {
 
 	public Visibility visibility;
 
-	@Lob
-	public String content;
-
 	public OwnedResource(){}
 
 	public OwnedResource(String id, User owner, Visibility visibility) {
@@ -98,14 +95,6 @@ public class OwnedResource {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
 	}
 
 	public String toString(){

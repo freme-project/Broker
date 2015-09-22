@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.google.gson.Gson;
 import eu.freme.broker.security.database.model.OwnedResource;
 import eu.freme.broker.security.database.dao.TemplateSecurityDAO;
 import eu.freme.broker.security.database.dao.UserDAO;
@@ -183,56 +184,52 @@ public class ELink extends BaseRestController {
                 // NOTE: informat was defaulted to JSON before! Now it is TURTLE.
                 // NOTE: outformat was defaulted to turtle, if acceptHeader=="*/*" and informat==null, otherwise to JSON. Now it is TURTLE.
                 
-                Template t;
+                //Template t;
+
+                eu.freme.broker.security.database.model.Template template;
 
                 if(nifParameters.getInformat().equals(RDFSerialization.JSON)){
                     JSONObject jsonObj = new JSONObject(postBody);
                     templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
-                    t = new Template(
-//                                templateDAO.generateTemplateId(),
+                    template = new eu.freme.broker.security.database.model.Template(
+                            null,
+                            OwnedResource.Visibility.getByString(visibility),
                             jsonObj.getString("endpoint"),
                             jsonObj.getString("query"),
                             jsonObj.getString("label"),
                             jsonObj.getString("description")
-                    );
+                            );
                 }else{
                     Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
-                    t = Exporter.getInstance().model2OneTemplate(model);
-                    templateValidator.validateTemplateEndpoint(t.getEndpoint());
-                    t.setId(templateDAO.generateTemplateId());
+                    template = new eu.freme.broker.security.database.model.Template(null, OwnedResource.Visibility.getByString(visibility), model);
+                    //t = Exporter.getInstance().model2OneTemplate(model);
+                    templateValidator.validateTemplateEndpoint(template.getEndpoint());
+                    //t.setId(templateDAO.generateTemplateId());
                 }
 
-                templateDAO.addTemplate(t);
-                
-                String templateId = t.getId();
-                eu.freme.broker.security.database.model.Template templateMetadata;
-
-                // security
-                try {
-                    // check read access
-                    if (templateSecurityDAO.findOneById(templateId) != null) {
-                        throw new BadRequestException("template metadata for templateId=\""+templateId+"\" already exists");
-                    }
-                    templateMetadata = new eu.freme.broker.security.database.model.Template(templateId, OwnedResource.Visibility.getByString(visibility));
-                    decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), templateMetadata, accessLevelHelper.writeAccess());
-
+                try{
+                    templateSecurityDAO.save(template);
                 } catch (AccessDeniedException e){
-                    // TODO: not so cool...
-                    templateDAO.removeTemplateById(templateId);
+                    // hardly possible, but checked ether
                     return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
                 }
 
+                //templateDAO.addTemplate(t);
+                
+                //String templateId = template.getId();
+
+
                 HttpHeaders responseHeaders = new HttpHeaders();
-                URI location = new URI("/e-link/templates/"+t.getId());
+                URI location = new URI("/e-link/templates/"+template.getId());
                 responseHeaders.setLocation(location);
                 responseHeaders.set("Content-Type", this.getMimeTypeByRDFType(nifParameters.getOutformat()));
 
-                Model outModel = templateDAO.getTemplateInRDFById(t.getId());
+                //Model outModel = templateDAO.getTemplateInRDFById(t.getId());
 
-                String serialization = rdfConversionService.serializeRDF(outModel, nifParameters.getOutformat());
-                templateMetadata.setContent(serialization);
-                templateMetadata.setSerializationtype(nifParameters.getOutformat());
-                templateSecurityDAO.save(templateMetadata);
+                String serialization = rdfConversionService.serializeRDF(template.getRDF(), nifParameters.getOutformat());
+                //templateMetadata.setContent(serialization);
+                //templateMetadata.setSerializationtype(nifParameters.getOutformat());
+                //templateSecurityDAO.save(templateMetadata);
                 return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
             } catch (URISyntaxException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
@@ -279,30 +276,32 @@ public class ELink extends BaseRestController {
 
                 HttpHeaders responseHeaders = new HttpHeaders();
 
+                eu.freme.broker.security.database.model.Template templateMetadata;
                 // Security
                 try {
-                    eu.freme.broker.security.database.model.Template templateMetadata;
+
                     // check read access
                     templateMetadata = templateSecurityDAO.findOneById(templateId+"");
                     if (templateMetadata == null) {
                         throw new BadRequestException("template metadata for templateId=\""+templateId+"\" does not exist");
                     }
                 }catch (AccessDeniedException e){
-                    return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+                    return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
                 }
                 // Security END
 
-                Template t = templateDAO.getTemplateById(templateId+"");
+                //Template t = templateDAO.getTemplateById(templateId+"");
                 String serialization;
-                Model model;
+                //Model model;
                 if(nifParameters.getOutformat().equals(RDFSerialization.JSON)){
-                    serialization = Exporter.getInstance().convertOneTemplate2JSON(t).toString(4);
+                    Gson gson = new Gson();
+                    serialization = gson.toJson(templateMetadata); //Exporter.getInstance().convertOneTemplate2JSON(t).toString(4);
                 }else {
-                    model = templateDAO.getTemplateInRDFById(t.getId());
-                    serialization = rdfConversionService.serializeRDF(model, nifParameters.getOutformat());
+                    //model = templateDAO.getTemplateInRDFById(t.getId());
+                    serialization = rdfConversionService.serializeRDF(templateMetadata.getRDF(), nifParameters.getOutformat());
                 }
                 responseHeaders.set("Content-Type", getMimeTypeByRDFType(nifParameters.getOutformat()));
-                return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
 
             } catch (TemplateNotFoundException e){
                 throw new TemplateNotFoundException("Template not found.");
@@ -344,12 +343,12 @@ public class ELink extends BaseRestController {
                         .getAuthentication();
                 User authUser = (User) authentication.getPrincipal();
                 String result = "";
-                for (eu.freme.broker.security.database.model.Template templateMetadata : templateSecurityDAO.findAll()) {
+                /*for (eu.freme.broker.security.database.model.Template templateMetadata : templateSecurityDAO.findAll()) {
                     if(templateMetadata.getVisibility().equals(OwnedResource.Visibility.PUBLIC) || templateMetadata.getOwner().equals(authUser)) {
                         Model model = rdfConversionService.unserializeRDF(templateMetadata.getContent(), templateMetadata.getSerializationtype());
                         result += rdfConversionService.serializeRDF(model, thisOutformat)+"\n\n";
                     }
-                }
+                }*/
                 responseHeaders.set("Content-Type", "text/plain");
                 return new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);
 
@@ -426,25 +425,9 @@ public class ELink extends BaseRestController {
                     return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
                 }
 
-                Template t;
+                //Template t;
+                //eu.freme.broker.security.database.model.Template template;
 
-                if(nifParameters.getInformat().equals(RDFSerialization.JSON)){
-                    JSONObject jsonObj = new JSONObject(postBody);
-                    t = new Template(
-                            templateId,
-                            jsonObj.getString("endpoint"),
-                            jsonObj.getString("query"),
-                            jsonObj.getString("label"),
-                            jsonObj.getString("description")
-                    );
-                }else{
-                    Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
-                    t = Exporter.getInstance().model2OneTemplate(model);
-                }
-
-
-                Model outModel;
-                // Security
                 eu.freme.broker.security.database.model.Template templateMetadata;
                 try {
                     // check read access
@@ -456,9 +439,17 @@ public class ELink extends BaseRestController {
                 }catch (AccessDeniedException e){
                     return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
                 }
-                // Security END
 
-                templateDAO.updateTemplate(t);
+                if(nifParameters.getInformat().equals(RDFSerialization.JSON)){
+                    JSONObject jsonObj = new JSONObject(nifParameters.getInput());
+                    templateMetadata.setEndpoint(jsonObj.getString("endpoint"));
+                    templateMetadata.setEndpoint(jsonObj.getString("endpoint"));
+                    templateMetadata.setLabel(jsonObj.getString("label"));
+                    templateMetadata.setDescription(jsonObj.getString("description"));
+                }else{
+                    Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
+                    templateMetadata.setTemplateWithModel(model);
+                }
 
                 if(visibility!=null) {
                     templateMetadata.setVisibility(OwnedResource.Visibility.getByString(visibility));
@@ -469,18 +460,34 @@ public class ELink extends BaseRestController {
                         throw new BadRequestException("Can not change owner of the dataset. User \""+ownerName+"\" does not exist.");
                     templateMetadata.setOwner(owner);
                 }
-                templateMetadata.setSerializationtype(nifParameters.getOutformat());
-                outModel = templateDAO.getTemplateInRDFById(t.getId());
-                String serialization = rdfConversionService.serializeRDF(outModel, nifParameters.getOutformat());
-                templateMetadata.setContent(serialization);
-                templateSecurityDAO.save(templateMetadata);
+
+                try {
+                   templateSecurityDAO.save(templateMetadata);
+                }catch (AccessDeniedException e){
+                    return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+                }
+
+
+                //Model outModel;
+                // Security
+
+                // Security END
+
+                //templateDAO.updateTemplate(t);
+
+
+                //templateMetadata.setSerializationtype(nifParameters.getOutformat());
+                //outModel = templateDAO.getTemplateInRDFById(t.getId());
+                String serialization = rdfConversionService.serializeRDF(templateMetadata.getRDF(), nifParameters.getOutformat());
+                //templateMetadata.setContent(serialization);
+                //templateSecurityDAO.save(templateMetadata);
 
                 HttpHeaders responseHeaders = new HttpHeaders();
-                URI location = new URI("/e-link/templates/"+t.getId());
+                URI location = new URI("/e-link/templates/"+templateMetadata.getId());
                 responseHeaders.setLocation(location);
                 responseHeaders.set("Content-Type", this.getMimeTypeByRDFType(nifParameters.getOutformat()));
 
-                return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+                return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
             } catch (URISyntaxException ex) {
                 Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
             } catch (org.json.JSONException ex) {
@@ -501,15 +508,17 @@ public class ELink extends BaseRestController {
             try {
                 // check read and write access
                 templateSecurityDAO.delete(templateSecurityDAO.getRepository().findOneById(id));
+                return new ResponseEntity<String>("The template was sucessfully removed.", HttpStatus.NO_CONTENT);
             }catch (AccessDeniedException e){
                 return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
             }
 
+        /*
             if(templateDAO.removeTemplateById(id)) {
                 return new ResponseEntity<String>("The template was sucessfully removed.", HttpStatus.NO_CONTENT);
             } else {
                 throw new TemplateNotFoundException("A template with such id was not found.");
-            }
+            }*/
         }
 
     private RDFSerialization checkOutFormat(String outformat, String acceptHeader) {
@@ -531,6 +540,7 @@ public class ELink extends BaseRestController {
         }
     }
 
+    /*
     // Updating dataset metadata
     @RequestMapping(value = "/e-link/templates/admin/{templateid}", method = {
             RequestMethod.PUT })
@@ -576,6 +586,7 @@ public class ELink extends BaseRestController {
 
         return new ResponseEntity<String>("Update successful.", HttpStatus.OK);
     }
+    */
 
     private int validateTemplateID(String templateId) throws BadRequestException{
         if(templateId.isEmpty()){

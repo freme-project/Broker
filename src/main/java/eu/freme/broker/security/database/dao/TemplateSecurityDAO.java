@@ -32,8 +32,7 @@ public class TemplateSecurityDAO extends OwnedResourceDAO<Template> {
 
     private int maxId = 0;
 
-    public TemplateSecurityDAO(){
-        super();
+    public void refreshMaxId(){
         for(Template template: repository.findAll()){
             int currentId = Integer.parseInt(template.getId());
             if(currentId > maxId)
@@ -48,6 +47,7 @@ public class TemplateSecurityDAO extends OwnedResourceDAO<Template> {
     public void save(Template template){
         // is it a new one?
         if(template.getId()== null){
+            refreshMaxId();
             maxId++;
             template.setId(maxId+"");
         }
