@@ -17,8 +17,6 @@ package eu.freme.broker.eservices;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.gson.Gson;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import eu.freme.broker.exception.BadRequestException;
@@ -27,6 +25,7 @@ import eu.freme.broker.exception.InvalidTemplateEndpointException;
 import eu.freme.broker.security.database.dao.TemplateSecurityDAO;
 import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.OwnedResource;
+import eu.freme.broker.security.database.model.Template;
 import eu.freme.broker.security.database.model.User;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.tools.NIFParameterSet;
@@ -58,26 +57,20 @@ public class ELink extends BaseRestController {
     
         @Autowired
         DataEnricher dataEnricher;
-
-        //@Autowired
-        //TemplateDAO templateDAO;
         
         @Autowired
         AbstractAccessDecisionManager decisionManager;
 
         @Autowired
         UserDAO userDAO;
-        //UserRepository userRepository;
 
         @Autowired
         TemplateSecurityDAO templateDAO;
-        //TemplateRepository templateRepository;
 
         @Autowired
         AccessLevelHelper accessLevelHelper;
 
         // Enriching using a template.
-
 
         @Autowired
         TemplateValidator templateValidator;
@@ -173,12 +166,12 @@ public class ELink extends BaseRestController {
                 // NOTE: informat was defaulted to JSON before! Now it is TURTLE.
                 // NOTE: outformat was defaulted to turtle, if acceptHeader=="*/*" and informat==null, otherwise to JSON. Now it is TURTLE.
                 
-                eu.freme.broker.security.database.model.Template template;
+                Template template;
 
                 if(nifParameters.getInformat().equals(RDFSerialization.JSON)){
                     JSONObject jsonObj = new JSONObject(postBody);
                     templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
-                    template = new eu.freme.broker.security.database.model.Template(
+                    template = new Template(
                             OwnedResource.Visibility.getByString(visibility),
                             jsonObj.getString("endpoint"),
                             jsonObj.getString("query"),
@@ -187,7 +180,7 @@ public class ELink extends BaseRestController {
                             );
                 }else{
                     Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
-                    template = new eu.freme.broker.security.database.model.Template(OwnedResource.Visibility.getByString(visibility), model);
+                    template = new Template(OwnedResource.Visibility.getByString(visibility), model);
                     templateValidator.validateTemplateEndpoint(template.getEndpoint());
                 }
 
@@ -245,7 +238,7 @@ public class ELink extends BaseRestController {
 
                 HttpHeaders responseHeaders = new HttpHeaders();
 
-                eu.freme.broker.security.database.model.Template template;
+                Template template;
                 try {
                     // check read access
                     template = templateDAO.findOneById(templateId+"");
@@ -296,14 +289,14 @@ public class ELink extends BaseRestController {
                 HttpHeaders responseHeaders = new HttpHeaders();
                 responseHeaders.set("Content-Type", getMimeTypeByRDFType(nifParameters.getOutformat()));
 
-                List<eu.freme.broker.security.database.model.Template> templates = templateDAO.findAllReadAccessible();
+                List<Template> templates = templateDAO.findAllReadAccessible();
                 if(nifParameters.getOutformat().equals(RDFSerialization.JSON)){
                     ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
                     String serialization = ow.writeValueAsString(templates);
                     return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
                 }else {
                     Model mergedModel = ModelFactory.createDefaultModel();
-                    for (eu.freme.broker.security.database.model.Template template : templates) {
+                    for (Template template : templates) {
                         mergedModel.add(template.getRDF());
                     }
                     return new ResponseEntity<>(rdfConversionService.serializeRDF(mergedModel,nifParameters.getOutformat()), responseHeaders, HttpStatus.OK);
@@ -344,7 +337,7 @@ public class ELink extends BaseRestController {
                     return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
                 }
 
-                eu.freme.broker.security.database.model.Template template;
+                Template template;
                 try {
                     // check read access
                     template = templateDAO.findOneById(templateId);
