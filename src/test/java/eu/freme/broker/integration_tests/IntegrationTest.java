@@ -113,11 +113,13 @@ public abstract class IntegrationTest {
             assertEquals(contentType, nifformat.contentType());
         }
 
-        // validate RDF
-        try {
-            assertNotNull(converter.unserializeRDF(response.getBody(), nifformat));
-        } catch (Exception e) {
-            throw new AssertionFailureException("RDF validation failed");
+        if(nifformat!= RDFConstants.RDFSerialization.JSON) {
+            // validate RDF
+            try {
+                assertNotNull(converter.unserializeRDF(response.getBody(), nifformat));
+            } catch (Exception e) {
+                throw new AssertionFailureException("RDF validation failed");
+            }
         }
 
 

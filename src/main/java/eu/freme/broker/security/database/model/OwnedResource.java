@@ -16,24 +16,28 @@
 package eu.freme.broker.security.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializable;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import eu.freme.broker.exception.BadRequestException;
-import eu.freme.broker.security.tools.AccessLevelHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.persistence.*;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import java.io.IOException;
 
 /**
  * @author Jonathan Sauder jsauder@campus.tu-berlin.de
  */
 
 @MappedSuperclass
-public class OwnedResource {
+public class OwnedResource implements JsonSerializable {
 
 	public enum Visibility {
 		PRIVATE,
@@ -99,5 +103,18 @@ public class OwnedResource {
 
 	public String toString(){
 		return "OwnedResource[id="+id+", owner="+owner.toString()+", visibility="+ visibility.toString()+"]";
+	}
+
+	@Override
+	public void serialize(com.fasterxml.jackson.core.JsonGenerator jsonGenerator, com.fasterxml.jackson.databind.SerializerProvider serializerProvider) throws IOException, com.fasterxml.jackson.core.JsonProcessingException {
+		jsonGenerator.writeStartObject();
+		jsonGenerator.writeStringField("id", this.getId());
+		jsonGenerator.writeStringField("visibility", this.getVisibility().name());
+		jsonGenerator.writeEndObject();
+	}
+
+	@Override
+	public void serializeWithType(JsonGenerator jsonGenerator, SerializerProvider serializerProvider, TypeSerializer typeSerializer) throws IOException, JsonProcessingException {
+
 	}
 }

@@ -15,6 +15,9 @@
  */
 package eu.freme.broker.eservices;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.Gson;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -255,15 +258,16 @@ public class ELink extends BaseRestController {
 
                 String serialization;
                 if(nifParameters.getOutformat().equals(RDFSerialization.JSON)){
-                    Gson gson = new Gson();
-                    serialization = gson.toJson(template); //Exporter.getInstance().convertOneTemplate2JSON(t).toString(4);
+                    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+                    //JSONObject jsonObject = new JSONObject(ow.writeValueAsString(template));
+                    serialization = ow.writeValueAsString(template);//jsonObject.toString();//json;//gson.toJson(template); //Exporter.getInstance().convertOneTemplate2JSON(t).toString(4);
                 }else {
                     serialization = rdfConversionService.serializeRDF(template.getRDF(), nifParameters.getOutformat());
                 }
                 responseHeaders.set("Content-Type", getMimeTypeByRDFType(nifParameters.getOutformat()));
                 return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
 
-            } catch (TemplateNotFoundException e){
+            } catch (TemplateNotFoundException e) {
                 throw new TemplateNotFoundException("Template not found.");
             } catch (BadRequestException ex) {
                 logger.error(ex.getMessage(), ex);
@@ -285,8 +289,8 @@ public class ELink extends BaseRestController {
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
             //@RequestParam(value = "outformat",     required=false) String outformat,
             //@RequestParam(value = "o",             required=false) String o,
-            @RequestParam Map<String,String> allParams) {
-            try {
+            @RequestParam Map<String, String> allParams) {
+        try {
                 NIFParameterSet nifParameters = this.normalizeNif(null, acceptHeader, contentTypeHeader,allParams,true);
 
                 HttpHeaders responseHeaders = new HttpHeaders();
@@ -294,8 +298,8 @@ public class ELink extends BaseRestController {
 
                 List<eu.freme.broker.security.database.model.Template> templates = templateDAO.findAllReadAccessible();
                 if(nifParameters.getOutformat().equals(RDFSerialization.JSON)){
-                    Gson gson = new Gson();
-                    String serialization = gson.toJson(templates);
+                    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+                    String serialization = ow.writeValueAsString(templates);
                     return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
                 }else {
                     Model mergedModel = ModelFactory.createDefaultModel();

@@ -15,20 +15,28 @@
  */
 package eu.freme.broker.security.database.model;
 
+import com.fasterxml.jackson.databind.JsonSerializable;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.DCTerms;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import eu.freme.conversion.rdf.RDFConstants;
+import com.google.gson.*;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.SerializerProvider;
+import org.codehaus.jackson.map.TypeSerializer;
 
 import javax.persistence.*;
+import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 13.08.15.
  */
 @Entity
 @Table(name = "template")
-public class Template extends OwnedResource {
+public class Template extends OwnedResource implements JsonSerializable {
 
     @Lob
     private String endpoint;
@@ -70,7 +78,7 @@ public class Template extends OwnedResource {
     public void setTemplateWithModel(Model model){
         model.enterCriticalSection(false);
         try {
-            StmtIterator iter = model.listStatements((Resource)null, RDF.type, model.getResource("http://www.freme-project.eu/ns#Template"));
+            StmtIterator iter = model.listStatements((Resource) null, RDF.type, model.getResource("http://www.freme-project.eu/ns#Template"));
 
             // take first instance
             if(iter.hasNext()){
@@ -106,15 +114,6 @@ public class Template extends OwnedResource {
         return result;
     }
 
-    private RDFConstants.RDFSerialization serializationtype;
-
-    public RDFConstants.RDFSerialization getSerializationtype() {
-        return serializationtype;
-    }
-
-    public void setSerializationtype(RDFConstants.RDFSerialization serializationtype) {
-        this.serializationtype = serializationtype;
-    }
 
     public String getEndpoint() {
         return endpoint;
@@ -146,5 +145,25 @@ public class Template extends OwnedResource {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public void serialize(com.fasterxml.jackson.core.JsonGenerator jsonGenerator, com.fasterxml.jackson.databind.SerializerProvider serializerProvider) throws IOException, com.fasterxml.jackson.core.JsonProcessingException {
+        jsonGenerator.writeStartObject();
+        jsonGenerator.writeStringField("id", this.getId());
+        jsonGenerator.writeStringField("visibility", this.getVisibility().name());
+        jsonGenerator.writeStringField("endpoint", this.getEndpoint());
+        jsonGenerator.writeStringField("query", this.getQuery());
+        jsonGenerator.writeStringField("label", this.getLabel());
+        jsonGenerator.writeStringField("description", this.getDescription());
+        jsonGenerator.writeEndObject();
+    }
+
+    @Override
+    public void serializeWithType(com.fasterxml.jackson.core.JsonGenerator jsonGenerator, com.fasterxml.jackson.databind.SerializerProvider serializerProvider, com.fasterxml.jackson.databind.jsontype.TypeSerializer typeSerializer) throws IOException, com.fasterxml.jackson.core.JsonProcessingException {
+        /*typeSerializer.writeTypePrefixForScalar(this, jsonGenerator, Template.class);
+        serialize(value, jsonGenerator, serializerProvider);
+        typeSerializer.writeTypeSuffixForScalar(this, jsonGenerator);
+        */
     }
 }

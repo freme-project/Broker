@@ -87,7 +87,8 @@ public class ELinkTestSecurity extends IntegrationTest {
         String templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", tokenWithPermission);
         assertNotNull(templateid2);
 
-        assertEquals(HttpStatus.OK.value(),getAllTemplates(tokenWithPermission));
+        //assertEquals(HttpStatus.OK.value(),getAllTemplates(tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(),getTemplate(templateid,tokenWithPermission));
     }
 
     @Test
@@ -178,7 +179,7 @@ public class ELinkTestSecurity extends IntegrationTest {
 
 
         if(response.getStatus()==HttpStatus.OK.value()){
-            validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
+            validateNIFResponse(response, RDFConstants.RDFSerialization.JSON);
         }
         return response.getStatus();
     }
@@ -210,10 +211,10 @@ public class ELinkTestSecurity extends IntegrationTest {
     public int getTemplate(String id, String token) throws UnirestException, IOException {
         HttpResponse<String> response = baseRequestGet("templates/"+id)
                 .header("X-Auth-Token", token)
-                .queryString("outformat", "turtle")
+                .queryString("outformat", "json")
                 .asString();
         if(response.getStatus()==HttpStatus.OK.value()) {
-            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+            validateNIFResponse(response, RDFConstants.RDFSerialization.JSON);
         }
         return response.getStatus();
     }
