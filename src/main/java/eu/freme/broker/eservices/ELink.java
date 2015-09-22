@@ -17,8 +17,9 @@ package eu.freme.broker.eservices;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.rdf.model.*;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.exception.InvalidTemplateEndpointException;
@@ -31,7 +32,6 @@ import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.TemplateValidator;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
-import eu.freme.eservices.elink.api.DataEnricher;
 import eu.freme.eservices.elink.exceptions.TemplateNotFoundException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -55,9 +56,6 @@ import java.util.logging.Logger;
 @RestController
 public class ELink extends BaseRestController {
     
-        @Autowired
-        DataEnricher dataEnricher;
-        
         @Autowired
         AbstractAccessDecisionManager decisionManager;
 
@@ -115,8 +113,8 @@ public class ELink extends BaseRestController {
                 }
 
                 Model inModel =  rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
-                // TODO: FIX THIS!
-                inModel = dataEnricher.enrichNIF(inModel, templateId, templateParams);
+
+                inModel = this.enrichNIF(inModel, templateId, templateParams);
                 
                 HttpHeaders responseHeaders = new HttpHeaders();
                 String serialization = rdfConversionService.serializeRDF(inModel, nifParameters.getOutformat());
@@ -425,5 +423,36 @@ public class ELink extends BaseRestController {
             }
         }
         return Integer.parseInt(templateId);
+    }
+
+    public Model enrichNIF(Model model, int templateId, HashMap<String, String> templateParams) {
+        try {
+            StmtIterator ex = model.listStatements((Resource)null, model.getProperty("http://www.w3.org/2005/11/its/rdf#taIdentRef"), (RDFNode)null);
+
+            while(ex.hasNext()) {
+                Statement stm = ex.nextStatement();
+                String entityURI = stm.getObject().asResource().getURI();
+                Template t = this.templateDAO.findOneById(templateId + "");
+                if(t == null) {
+                    return null;
+                }
+
+                String query = t.getQuery().replaceAll("@@@entity_uri@@@", entityURI);
+
+                Map.Entry resModel;
+                for(Iterator e = templateParams.entrySet().iterator(); e.hasNext(); query = query.replaceAll("@@@" + (String)resModel.getKey() + "@@@", (String)resModel.getValue())) {
+                    resModel = (Map.Entry)e.next();
+                }
+
+                QueryExecution e1 = QueryExecutionFactory.sparqlService(t.getEndpoint(), query);
+                Model resModel1 = e1.execConstruct();
+                model.add(resModel1);
+                e1.close();
+            }
+
+            return model;
+        } catch (Exception var11) {
+            throw new eu.freme.eservices.elink.exceptions.BadRequestException("It seems your SPARQL template is not correctly defined.");
+        }
     }
 }
