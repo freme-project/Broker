@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -30,6 +31,7 @@ import eu.freme.conversion.rdf.RDFConstants;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */
+@Ignore
 public class TildeETranslationTest extends IntegrationTest{
 
 	String sourceLang = "en";
