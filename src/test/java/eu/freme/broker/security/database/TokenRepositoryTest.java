@@ -16,6 +16,7 @@
 package eu.freme.broker.security.database;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import eu.freme.broker.BrokerConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BrokerConfig.class)
+@Ignore
 public class TokenRepositoryTest {
 
 	Logger logger = Logger.getLogger(TokenRepositoryTest.class);
