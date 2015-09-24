@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>conversion</artifactId>
-			<version>0.4-SNAPSHOT</version>
+			<version>0.3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
