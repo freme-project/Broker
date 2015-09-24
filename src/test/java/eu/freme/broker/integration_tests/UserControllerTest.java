@@ -181,6 +181,12 @@ public class UserControllerTest {
 				.header("X-Auth-Token", token).asString();
 		assertTrue(response.getStatus() == HttpStatus.OK.value());		
 		
+		logger.info("access user through access token passed via query string");
+		response = Unirest
+				.get(baseUrl + "/user")
+				.queryString("token", token).asString();
+		assertTrue(response.getStatus() == HttpStatus.OK.value());		
+		
 		logger.info("admin can delete carlos");
 		response = Unirest
 				.delete(baseUrl + "/user/" + username)
