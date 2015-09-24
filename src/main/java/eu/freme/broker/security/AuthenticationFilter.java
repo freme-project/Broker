@@ -67,6 +67,10 @@ public class AuthenticationFilter extends GenericFilterBean {
         Optional<String> password = Optional.fromNullable(httpRequest.getHeader("X-Auth-Password"));
         Optional<String> token = Optional.fromNullable(httpRequest.getHeader("X-Auth-Token"));
 
+        if( httpRequest.getParameter("token") != null ){
+        	token = Optional.fromNullable(httpRequest.getParameter("token"));
+        }
+        
         String resourcePath = new UrlPathHelper().getPathWithinApplication(httpRequest);
 
         try {
