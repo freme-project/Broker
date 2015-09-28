@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,9 +54,11 @@ import eu.freme.eservices.elink.Exporter;
 import eu.freme.eservices.elink.Template;
 import eu.freme.eservices.elink.TemplateDAO;
 import eu.freme.eservices.elink.exceptions.TemplateNotFoundException;
+
 import org.apache.commons.validator.routines.UrlValidator;
 
 @RestController
+@Profile("broker")
 public class ELink extends BaseRestController {
     
         @Autowired

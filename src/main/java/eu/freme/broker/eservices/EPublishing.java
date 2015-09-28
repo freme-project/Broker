@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,7 @@ import eu.freme.eservices.epublishing.webservice.Metadata;
  * @author Pieter Heyvaert <pheyvaer.heyvaert@ugent.be>
  */
 @RestController
+@Profile("broker")
 public class EPublishing {
 
     private static final Logger logger = Logger.getLogger(EPublishing.class.getName());

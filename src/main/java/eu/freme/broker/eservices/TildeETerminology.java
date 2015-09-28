@@ -15,6 +15,7 @@
  */
 package eu.freme.broker.eservices;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,6 +42,7 @@ import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @RestController
+@Profile("broker")
 public class TildeETerminology extends BaseRestController {
 
 	private String endpoint = "https://services.tilde.com/Terminology/";

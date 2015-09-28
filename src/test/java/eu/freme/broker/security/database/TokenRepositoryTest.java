@@ -21,14 +21,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import eu.freme.broker.BrokerConfig;
+import eu.freme.broker.FremeCommonConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = BrokerConfig.class)
+@SpringApplicationConfiguration(classes = FremeCommonConfig.class)
+@ActiveProfiles("broker")
 @Ignore
 public class TokenRepositoryTest {
 

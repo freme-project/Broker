@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,7 @@ import eu.freme.conversion.rdf.RDFConstants;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 import eu.freme.eservices.elink.api.DataEnricher;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -53,6 +55,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
+@Profile("broker")
 public class FremeNER extends BaseRestController {
 
 	@Autowired

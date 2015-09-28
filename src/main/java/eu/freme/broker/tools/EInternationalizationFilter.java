@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import eu.freme.broker.exception.InternalServerErrorException;
@@ -48,6 +49,7 @@ import eu.freme.i18n.okapi.nif.converter.ConversionException;
  */
 
 @Component
+@Profile("broker")
 public class EInternationalizationFilter implements Filter {
 
 	private HashSet<String> contentTypes;

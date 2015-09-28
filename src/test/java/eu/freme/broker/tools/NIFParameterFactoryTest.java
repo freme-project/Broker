@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import eu.freme.broker.BrokerConfig;
+import eu.freme.broker.FremeCommonConfig;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
 
@@ -33,7 +33,7 @@ import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = BrokerConfig.class)
+@SpringApplicationConfiguration(classes = FremeCommonConfig.class)
 public class NIFParameterFactoryTest {
 
 	@Autowired

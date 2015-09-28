@@ -18,6 +18,7 @@ package eu.freme.broker.eservices;
 import java.io.ByteArrayInputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -43,6 +44,7 @@ import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 
 @RestController
+@Profile("broker")
 public class DBpediaSpotlight extends BaseRestController {
 
 	@Autowired
