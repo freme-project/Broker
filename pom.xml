@@ -213,7 +213,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 			</plugin>
 
-			<plugin>
+<!-- 		<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<version>2.3</version>
@@ -246,15 +246,15 @@
 				<groupId>org.jasig.maven</groupId>
 				<artifactId>maven-notice-plugin</artifactId>
 				<version>1.0.6</version>
-				<configuration>
+				<configuration>-->
 					<!--<noticeTemplate>NOTICE.template</noticeTemplate>-->
-					<licenseMapping>
+<!-- 					<licenseMapping>
 						<param>https://source.jasig.org/licenses/license-mappings.xml</param>
 						<param>src/main/resources/license-mappings.xml</param>
 					</licenseMapping>
 				</configuration>
 			</plugin>
-
+ -->
 		</plugins>
 	</build>
 
