@@ -39,9 +39,12 @@ public class TemplateSecurityDAO extends OwnedResourceDAO<Template> {
         }
         newId++;
         logger.debug("template newId: "+newId);
-
-        //maxId = query.getFirstResult();
         return newId+"";
+    }
+
+    @Override
+    public String className() {
+        return Template.class.getSimpleName();
     }
 
     public void save(Template template){

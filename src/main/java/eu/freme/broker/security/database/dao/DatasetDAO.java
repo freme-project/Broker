@@ -16,7 +16,6 @@
 package eu.freme.broker.security.database.dao;
 
 import eu.freme.broker.security.database.model.Dataset;
-import eu.freme.broker.security.database.repository.DatasetRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,4 +23,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DatasetDAO extends OwnedResourceDAO<Dataset> {
+    @Override
+    public String className() {
+        return Dataset.class.getSimpleName();
+    }
 }

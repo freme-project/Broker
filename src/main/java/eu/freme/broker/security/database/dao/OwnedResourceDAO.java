@@ -1,32 +1,29 @@
 package eu.freme.broker.security.database.dao;
 
-import eu.freme.broker.security.database.model.Dataset;
 import eu.freme.broker.security.database.model.OwnedResource;
 import eu.freme.broker.security.database.model.User;
-import eu.freme.broker.security.database.repository.DatasetRepository;
 import eu.freme.broker.security.database.repository.OwnedResourceRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.management.Query;
-import javax.persistence.TransactionRequiredException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Arne on 18.09.2015.
  */
-public class OwnedResourceDAO<Entity extends OwnedResource>  extends DAO<OwnedResourceRepository<Entity>, Entity>{
+public abstract class OwnedResourceDAO<Entity extends OwnedResource>  extends DAO<OwnedResourceRepository<Entity>, Entity>{
 
     @Autowired
     AbstractAccessDecisionManager decisionManager;
 
     @Autowired
     AccessLevelHelper accessLevelHelper;
+
+    public abstract String className();
 
     public void delete(Entity entity){
         Authentication authentication = SecurityContextHolder.getContext()
@@ -60,20 +57,18 @@ public class OwnedResourceDAO<Entity extends OwnedResource>  extends DAO<OwnedRe
     }
 
     public List<Entity> findAllReadAccessible(){
+        if(repository.count()==0)
+            return new ArrayList<>(0);
+
         Authentication authentication = SecurityContextHolder.getContext()
                 .getAuthentication();
         User authUser = (User) authentication.getPrincipal();
-        List<Entity> result = new ArrayList<>();
-        for(Entity entity: repository.findAll()){
-            if(entity.getVisibility().equals(OwnedResource.Visibility.PUBLIC) || entity.getOwner().equals(authUser))
-                result.add(entity);
-        }
-        /*
-        String hql = "FROM Employee E WHERE E.id = 10";
-        Query query = session.createQuery(hql);
-        List results = query.list();
-        */
-        return result;
+
+        String entityName = className();
+        String entity = entityName.toLowerCase();
+        String queryString = "select "+entity+" from "+entityName +" "+entity+" where "+entity+".owner.name = '"+authUser.getName()+"' or "+entity+".visibility = "+ OwnedResource.Visibility.PUBLIC.ordinal(); //
+
+        return (List<Entity>)entityManager.createQuery(queryString).getResultList();
     }
 
 }
