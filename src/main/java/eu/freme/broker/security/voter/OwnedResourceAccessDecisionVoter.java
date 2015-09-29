@@ -43,7 +43,7 @@ public class OwnedResourceAccessDecisionVoter implements AccessDecisionVoter<Obj
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return clazz == Object.class;
+		return clazz == OwnedResource.class;
 	}
 
 	@Override
