@@ -2,8 +2,8 @@
 <!--
 
     Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
-    					Institut für Angewandte Informatik e. V. an der Universität Leipzig,
-    					Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
+    Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+    Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -223,10 +223,10 @@
 					<header>https://raw.githubusercontent.com/mycila/license-maven-plugin/master/license-maven-plugin/src/main/resources/com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
 					<properties>
 						<owner>
-					<!-- IMPORTANT: keep this indentation! So the copyright information will be well formatted in all header files. -->
-					Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
-					Institut für Angewandte Informatik e. V. an der Universität Leipzig,
-					Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL
+<!-- IMPORTANT: keep this indentation! So the copyright information will be well formatted in all header files. -->
+Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL
 						</owner>
 						<email>http://freme-project.eu</email>
 					</properties>
@@ -241,26 +241,21 @@
 						<exclude>nbactions.xml</exclude>
 					</excludes>
 				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
+			<!--
 			<plugin>
 				<groupId>org.jasig.maven</groupId>
 				<artifactId>maven-notice-plugin</artifactId>
 				<version>1.0.6</version>
 				<configuration>
-					<!--<noticeTemplate>NOTICE.template</noticeTemplate>-->
+
  					<licenseMapping>
 						<param>https://source.jasig.org/licenses/license-mappings.xml</param>
 						<param>src/main/resources/license-mappings.xml</param>
 					</licenseMapping>
 				</configuration>
 			</plugin>
+			-->
 		</plugins>
 	</build>
 
