@@ -25,7 +25,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.voter.OwnedResourceAccessDecisionVoter;
+import eu.freme.broker.security.database.dao.*;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

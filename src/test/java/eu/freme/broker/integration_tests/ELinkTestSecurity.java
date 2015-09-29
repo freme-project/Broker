@@ -20,14 +20,19 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import eu.freme.broker.FremeCommonConfig;
 import eu.freme.conversion.rdf.RDFConstants;
 
 import eu.freme.conversion.rdf.RDFConversionService;
 import org.json.JSONObject;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -39,6 +44,9 @@ import static org.junit.Assert.*;
 /**
  * Created by Jonathan Sauder - jsauder@campus.tu-berlin.de on 28.07.15.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringApplicationConfiguration(classes = FremeCommonConfig.class)
+@ActiveProfiles("broker")
 public class ELinkTestSecurity extends IntegrationTest {
 
 
@@ -100,6 +108,11 @@ public class ELinkTestSecurity extends IntegrationTest {
         // add a template for the first user
         String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", tokenWithPermission);
         assertNotNull(templateid);
+
+        String templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", tokenWithPermission);
+        assertNotNull(templateid2);
+
+        assertEquals(getTemplate(templateid2, tokenWithPermission), HttpStatus.OK.value());
 
         // User without permission should not be able to query, update or delete another user's template
         // User with permission should
