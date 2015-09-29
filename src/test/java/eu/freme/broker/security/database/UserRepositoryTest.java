@@ -1,5 +1,7 @@
 /**
- * Copyright (C) 2015 Deutsches Forschungszentrum für Künstliche Intelligenz (http://freme-project.eu)
+ * Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+ * 					Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+ * 					Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +17,8 @@
  */
 package eu.freme.broker.security.database;
 
+import java.util.Iterator;
+
 import eu.freme.broker.BrokerConfig;
 import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.User;
@@ -22,14 +26,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.transaction.Transactional;
 
 import static org.junit.Assert.assertTrue;
+import eu.freme.broker.Broker;
+import eu.freme.broker.security.database.User;
+import eu.freme.broker.security.database.UserRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = BrokerConfig.class)
+@SpringApplicationConfiguration(classes = Broker.class)
+@ActiveProfiles("broker")
 public class UserRepositoryTest {
 
 	@Autowired

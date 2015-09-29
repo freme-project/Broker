@@ -1,5 +1,7 @@
 /**
- * Copyright (C) 2015 Deutsches Forschungszentrum für Künstliche Intelligenz (http://freme-project.eu)
+ * Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+ * 					Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+ * 					Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +24,26 @@ import eu.freme.broker.security.database.model.Token;
 import eu.freme.broker.security.database.model.User;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import eu.freme.broker.FremeCommonConfig;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = BrokerConfig.class)
+@SpringApplicationConfiguration(classes = FremeCommonConfig.class)
+@ActiveProfiles("broker")
+@Ignore
 public class TokenRepositoryTest {
 
 	Logger logger = Logger.getLogger(TokenRepositoryTest.class);
@@ -45,13 +54,10 @@ public class TokenRepositoryTest {
 	@Autowired
 	TokenDAO tokenDAO;
 	
-	@Autowired
-	EntityManager entityManager;
-
 	@Test
 	@Transactional
 	public void testTokenRepository(){
-		//entityManager.flush();
+		
 		logger.info("create user and token");
 		User user = new User("hallo", "welt", User.roleUser);
 		userDAO.save(user);

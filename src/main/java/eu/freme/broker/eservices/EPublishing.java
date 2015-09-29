@@ -1,5 +1,7 @@
 /**
- * Copyright (C) 2015 Deutsches Forschungszentrum für Künstliche Intelligenz (http://freme-project.eu)
+ * Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+ * 					Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+ * 					Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +46,7 @@ import eu.freme.eservices.epublishing.webservice.Metadata;
  * @author Pieter Heyvaert <pheyvaer.heyvaert@ugent.be>
  */
 @RestController
+@Profile("broker")
 public class EPublishing {
 
     private static final Logger logger = Logger.getLogger(EPublishing.class.getName());

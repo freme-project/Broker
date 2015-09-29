@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2015 Deutsches Forschungszentrum für Künstliche Intelligenz (http://freme-project.eu)
+    Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+    					Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+    					Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -52,7 +54,7 @@
 		<dependency>
 			<groupId>com.mashape.unirest</groupId>
 			<artifactId>unirest-java</artifactId>
-			<version>1.4.5</version>
+			<version>1.4.6</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -61,7 +63,7 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>conversion</artifactId>
-			<version>0.4-SNAPSHOT</version>
+			<version>0.3</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -179,22 +181,11 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -230,14 +221,19 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 			</plugin>
 
-			<plugin>
+ 		<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<version>2.3</version>
 				<configuration>
 					<header>https://raw.githubusercontent.com/mycila/license-maven-plugin/master/license-maven-plugin/src/main/resources/com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
 					<properties>
-						<owner>Deutsches Forschungszentrum für Künstliche Intelligenz</owner>
+						<owner>
+					<!-- IMPORTANT: keep this indentation! So the copyright information will be well formatted in all header files. -->
+					Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+					Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+					Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL
+						</owner>
 						<email>http://freme-project.eu</email>
 					</properties>
 					<excludes>
@@ -265,13 +261,12 @@
 				<version>1.0.6</version>
 				<configuration>
 					<!--<noticeTemplate>NOTICE.template</noticeTemplate>-->
-					<licenseMapping>
+ 					<licenseMapping>
 						<param>https://source.jasig.org/licenses/license-mappings.xml</param>
 						<param>src/main/resources/license-mappings.xml</param>
 					</licenseMapping>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
 

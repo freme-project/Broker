@@ -1,5 +1,7 @@
 /**
- * Copyright (C) 2015 Deutsches Forschungszentrum für Künstliche Intelligenz (http://freme-project.eu)
+ * Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+ * 					Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+ * 					Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +32,7 @@ import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 import eu.freme.eservices.elink.api.DataEnricher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -43,6 +46,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
+
+import eu.freme.broker.exception.ExternalServiceFailedException;
+import eu.freme.broker.tools.NIFParameterSet;
+import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.eservices.eentity.api.EEntityService;
+import eu.freme.eservices.eentity.exceptions.BadRequestException;
+import eu.freme.eservices.elink.api.DataEnricher;
+
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -52,6 +69,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
+@Profile("broker")
 public class FremeNER extends BaseRestController {
 
 	@Autowired
