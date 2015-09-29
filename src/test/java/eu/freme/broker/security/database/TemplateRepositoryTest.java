@@ -15,7 +15,7 @@
  */
 package eu.freme.broker.security.database;
 
-import eu.freme.broker.BrokerConfig;
+import eu.freme.broker.FremeCommonConfig;
 import eu.freme.broker.security.database.dao.TemplateSecurityDAO;
 import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.OwnedResource;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = BrokerConfig.class)
+@SpringApplicationConfiguration(classes = FremeCommonConfig.class)
 public class TemplateRepositoryTest {
 
 	Logger logger = Logger.getLogger(TokenRepositoryTest.class);

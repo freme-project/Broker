@@ -15,7 +15,7 @@
  */
 package eu.freme.broker.security.database;
 
-import eu.freme.broker.BrokerConfig;
+import eu.freme.broker.FremeCommonConfig;
 import eu.freme.broker.security.database.dao.DatasetDAO;
 import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.Dataset;
@@ -34,7 +34,7 @@ import javax.transaction.Transactional;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = BrokerConfig.class)
+@SpringApplicationConfiguration(classes = FremeCommonConfig.class)
 public class DatasetRepositoryTest {
 
 	Logger logger = Logger.getLogger(TokenRepositoryTest.class);

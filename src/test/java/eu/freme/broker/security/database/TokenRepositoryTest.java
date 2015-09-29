@@ -17,12 +17,11 @@
  */
 package eu.freme.broker.security.database;
 
-import eu.freme.broker.BrokerConfig;
+import eu.freme.broker.FremeCommonConfig;
 import eu.freme.broker.security.database.dao.TokenDAO;
 import eu.freme.broker.security.database.dao.UserDAO;
 import eu.freme.broker.security.database.model.Token;
 import eu.freme.broker.security.database.model.User;
-
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -32,18 +31,14 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import eu.freme.broker.FremeCommonConfig;
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = FremeCommonConfig.class)
 @ActiveProfiles("broker")
-@Ignore
 public class TokenRepositoryTest {
 
 	Logger logger = Logger.getLogger(TokenRepositoryTest.class);
@@ -84,17 +79,12 @@ public class TokenRepositoryTest {
 		assertEquals((long) 1, tokenDAO.count());
 		// one user is automatically generated admin user
 		assertEquals((long) 2, userDAO.count());
-		
-		entityManager.flush();
-		entityManager.clear();
 
 		User userFromDb = userDAO.getRepository().findOneByName(user.getName());
 		//entityManager.flush();
 		logger.info("delete user, should delete token also");
 		userDAO.delete(userFromDb);
 		logger.info("token count (after user delete): " + tokenDAO.count());
-		
-		entityManager.flush();
 
 		assertEquals((long) 0, tokenDAO.count());
 	}
