@@ -43,15 +43,7 @@ public class ELinkTest extends IntegrationTest {
     public ELinkTest(){
         super("/e-link/");
     }
-    private String constructTemplate(String label, String query, String endpoint, String description) {
-        query = query.replaceAll("\n","\\\\n");
-        return  " {\n" +
-                "\"label\":\""+ label + "\",\n"+
-                " \"query\":\""+query+"\",\n" +
-                " \"endpoint\":\""+endpoint+"\",\n" +
-                "\"description\":\""+ description + "\"\n"+
-                " }";
-    }
+
 
 
     //Tests Creation, fetching, modification and deletion of a template and fetching of all templates

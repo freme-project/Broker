@@ -17,8 +17,7 @@
  */
 package eu.freme.broker.integration_tests;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +28,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.broker.eservices.BaseRestController;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.apache.log4j.Logger;
 
 import com.hp.hpl.jena.shared.AssertionFailureException;
 import com.mashape.unirest.http.HttpResponse;
@@ -43,20 +43,24 @@ import org.springframework.http.HttpStatus;
 /**
  * Created by Arne on 29.07.2015.
  */
+
 public abstract class IntegrationTest {
 
     private String url = null;
+    private String baseUrl = null;
     private String service;
     public RDFConversionService converter;
-    
+    public Logger logger = Logger.getLogger(IntegrationTest.class);
+
+
     public IntegrationTest(String service){
         this.service = service;
     }
 
     @Before
     public void setup(){
-
-        url = IntegrationTestSetup.getURLEndpoint() + service;
+        baseUrl = IntegrationTestSetup.getURLEndpoint();
+        url=baseUrl+service;
         converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
     }
 
@@ -78,13 +82,16 @@ public abstract class IntegrationTest {
     public String getUrl() {
         return url;
     }
+    public String getBaseUrl() {
+        return baseUrl;
+    }
 
 
     //Reads a text file line by line. Use this when testing API with examples from /test/resources/
     public static String readFile(String file) throws IOException {
         StringBuilder bldr = new StringBuilder();
         for (String line: Files.readAllLines(Paths.get(file), StandardCharsets.UTF_8)) {
-                bldr.append(line).append('\n');
+            bldr.append(line).append('\n');
         }
         return bldr.toString();
     }
@@ -93,7 +100,7 @@ public abstract class IntegrationTest {
     public void validateNIFResponse(HttpResponse<String> response, RDFConstants.RDFSerialization nifformat) throws IOException {
 
         //basic tests on response
-        assertTrue(response.getStatus() == 200);
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertTrue(response.getBody().length() > 0);
         assertTrue(!response.getHeaders().isEmpty());
         assertNotNull(response.getHeaders().get("content-type"));
@@ -104,14 +111,16 @@ public abstract class IntegrationTest {
         // We wait for https://github.com/freme-project/technical-discussion/issues/40
         if (contentType.equals("application/ld+json") && nifformat.contentType().equals("application/json+ld")) {
         } else {
-            assertTrue(contentType.equals(nifformat.contentType()));
+            assertEquals(contentType, nifformat.contentType());
         }
 
-        // validate RDF
-        try {
-            assertNotNull(converter.unserializeRDF(response.getBody(), nifformat));
-        } catch (Exception e) {
-            throw new AssertionFailureException("RDF validation failed");
+        if(nifformat!= RDFConstants.RDFSerialization.JSON) {
+            // validate RDF
+            try {
+                assertNotNull(converter.unserializeRDF(response.getBody(), nifformat));
+            } catch (Exception e) {
+                throw new AssertionFailureException("RDF validation failed");
+            }
         }
 
 

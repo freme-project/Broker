@@ -51,5 +51,8 @@ public class RDFSerializationFormats extends
 
 		put("text/n3", RDFConstants.RDFSerialization.N3);
 		put("n3", RDFConstants.RDFSerialization.N3);
+
+		put("json", RDFConstants.RDFSerialization.JSON);
+		put("application/json", RDFConstants.RDFSerialization.JSON);
 	}
 }
