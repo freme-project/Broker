@@ -26,6 +26,7 @@ import eu.freme.broker.exception.InvalidTemplateEndpointException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.TemplateValidator;
 import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.exception.OwnedResourceNotFoundException;
 import eu.freme.common.persistence.dao.TemplateDAO;
 import eu.freme.common.persistence.dao.UserDAO;
 import eu.freme.common.persistence.model.OwnedResource;
@@ -107,7 +108,9 @@ public class ELink extends BaseRestController {
                     throw new BadRequestException("template metadata for templateId=\""+templateId+"\" does not exist");
                 }
             }catch (AccessDeniedException e){
-                return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
+                return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
+            }catch (OwnedResourceNotFoundException e){
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
             }
 
             HashMap<String, String> templateParams = new HashMap<>();
@@ -251,6 +254,8 @@ public class ELink extends BaseRestController {
                 }
             }catch (AccessDeniedException e){
                 return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
+            }catch (OwnedResourceNotFoundException e){
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
             }
 
             String serialization;
@@ -351,6 +356,8 @@ public class ELink extends BaseRestController {
                 decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), template, accessLevelHelper.writeAccess());
             }catch (AccessDeniedException e){
                 return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
+            }catch (OwnedResourceNotFoundException e){
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
             }
 
             if(nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)){
@@ -404,10 +411,12 @@ public class ELink extends BaseRestController {
     public ResponseEntity<String> removeTemplateById(@PathVariable("templateid") String id) {
         try {
             // check read and write access
-            templateDAO.delete(templateDAO.getRepository().findOneById(id));
+            templateDAO.delete(templateDAO.findOneById(id));
             return new ResponseEntity<>("The template was sucessfully removed.", HttpStatus.NO_CONTENT);
         }catch (AccessDeniedException e){
             return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
+        }catch (OwnedResourceNotFoundException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 

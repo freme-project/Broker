@@ -67,6 +67,25 @@ public class ELinkSecurityTest extends IntegrationTest {
     }
 
     @Test
+    public void invalidTemplateId() throws Exception{
+        if (!initialized)
+            initUser();
+
+        // add a template for the first user
+        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        assertNotNull(templateid);
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), deleteTemplate("999", tokenWithPermission));
+        assertEquals(HttpStatus.NOT_FOUND.value(), getTemplate("999", tokenWithPermission));
+        assertEquals(HttpStatus.NOT_FOUND.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "999", tokenWithPermission, "public"));
+        String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
+        assertEquals(HttpStatus.NOT_FOUND.value(), doELink(nifContent, "999", tokenWithOutPermission));
+
+        int responseCode = deleteTemplate(templateid, tokenWithPermission);
+        assertTrue(responseCode == HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
     public void testTemplateHandlingWithSecuritySimple() throws Exception {
         if (!initialized)
             initUser();
@@ -149,26 +168,26 @@ public class ELinkSecurityTest extends IntegrationTest {
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
 
         // this shouldn't be granted...
-        HttpResponse<String> response = baseRequestPost("documents")
-                .header("X-Auth-Token", tokenWithOutPermission)
-                .queryString("templateid", id)
-                .queryString("informat", "turtle")
-                .queryString("outformat", "turtle")
-                .body(nifContent)
-                .asString();
-        assertEquals(response.getStatus(), HttpStatus.FORBIDDEN.value());
+        assertEquals(HttpStatus.FORBIDDEN.value(), doELink(nifContent, id, tokenWithOutPermission));
         // but this...
-        response = baseRequestPost("documents")
-                .header("X-Auth-Token", tokenWithPermission)
-                .queryString("templateid", id)
-                .queryString("informat", "turtle")
-                .queryString("outformat", "turtle")
-                .body(nifContent)
-                .asString();
+        assertEquals(HttpStatus.OK.value(), doELink(nifContent, id, tokenWithPermission));
 
-        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
         //Deletes temporary template
         deleteTemplate(id, tokenWithPermission);
+    }
+
+    private int doELink(String nifContent, String templateId, String token) throws UnirestException, IOException {
+        HttpResponse<String> response = baseRequestPost("documents")
+                .header("X-Auth-Token", token)
+                .queryString("templateid", templateId)
+                .queryString("informat", "turtle")
+                .queryString("outformat", "turtle")
+                .body(nifContent)
+                .asString();
+        if(response.getStatus()==HttpStatus.OK.value()) {
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        }
+        return response.getStatus();
     }
 
     //Tests GET e-link/templates/
