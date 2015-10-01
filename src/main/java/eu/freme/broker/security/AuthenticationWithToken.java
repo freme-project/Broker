@@ -22,7 +22,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
-import eu.freme.common.persistence.Token;
+import eu.freme.common.persistence.model.Token;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

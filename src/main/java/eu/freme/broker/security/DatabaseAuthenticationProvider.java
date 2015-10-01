@@ -28,9 +28,9 @@ import org.springframework.security.core.authority.AuthorityUtils;
 
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.security.tools.PasswordHasher;
-import eu.freme.common.persistence.Token;
-import eu.freme.common.persistence.User;
-import eu.freme.common.persistence.UserRepository;
+import eu.freme.common.persistence.model.Token;
+import eu.freme.common.persistence.model.User;
+import eu.freme.common.persistence.repository.UserRepository;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

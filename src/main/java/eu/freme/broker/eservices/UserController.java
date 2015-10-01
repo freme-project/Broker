@@ -36,8 +36,8 @@ import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.security.tools.PasswordHasher;
-import eu.freme.common.persistence.User;
-import eu.freme.common.persistence.UserRepository;
+import eu.freme.common.persistence.model.User;
+import eu.freme.common.persistence.repository.UserRepository;
 
 @RestController
 @Profile("broker")
