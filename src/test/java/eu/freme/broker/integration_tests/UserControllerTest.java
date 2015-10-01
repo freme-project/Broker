@@ -143,13 +143,13 @@ public class UserControllerTest {
 		responseUsername = new JSONObject(response.getBody()).getString("name");
 		assertTrue(responseUsername.equals(username));
 
-		/*
+
 		logger.info("delete own user - should work");
 		response = Unirest
 				.delete(baseUrl + "/user/" + username)
 				.header("X-Auth-Token", token).asString();
 		assertTrue(response.getStatus() == HttpStatus.NO_CONTENT.value());
-		*/
+
 	}
 
 	@Test
@@ -193,7 +193,7 @@ public class UserControllerTest {
 				.queryString("token", token).asString();
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
 
-		/*
+
 		logger.info("admin can delete carlos");
 		response = Unirest
 				.delete(baseUrl + "/user/" + username)
@@ -201,7 +201,7 @@ public class UserControllerTest {
 
 
 		assertTrue(response.getStatus() == HttpStatus.NO_CONTENT.value());
-*/
+
 		response = Unirest
 				.get(baseUrl + "/user")
 				.header("X-Auth-Token", token).asString();
