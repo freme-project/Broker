@@ -26,7 +26,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ TildeETranslationTest.class, // TildeETerminologyTest.class,
-		TildeETranslationTest.class, FremeNERTest.class, ELinkTest.class })
+		TildeETranslationTest.class, FremeNERTest.class, ELinkSecurityTest.class })
 public class TestRunner {
 
 	public static void main(String[] args) {
