@@ -23,7 +23,7 @@ import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
 
-import eu.freme.common.persistence.User;
+import eu.freme.common.persistence.model.User;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

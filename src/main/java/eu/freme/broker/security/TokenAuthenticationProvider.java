@@ -26,8 +26,8 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 
 import com.google.common.base.Optional;
 
-import eu.freme.common.persistence.Token;
-import eu.freme.common.persistence.User;
+import eu.freme.common.persistence.model.Token;
+import eu.freme.common.persistence.model.User;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */
