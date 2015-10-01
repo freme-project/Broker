@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import eu.freme.common.persistence.tools.AccessLevelHelper;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +48,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.security.tools.PasswordHasher;
 import eu.freme.broker.security.voter.UserAccessDecisionVoter;
 import eu.freme.common.persistence.model.User;

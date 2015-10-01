@@ -17,6 +17,7 @@
  */
 package eu.freme.broker.eservices;
 
+import eu.freme.common.persistence.tools.AccessLevelHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.security.tools.PasswordHasher;
 import eu.freme.common.persistence.model.User;
 import eu.freme.common.persistence.repository.UserRepository;

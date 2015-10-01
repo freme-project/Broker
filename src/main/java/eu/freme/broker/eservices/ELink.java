@@ -23,9 +23,16 @@ import com.hp.hpl.jena.rdf.model.*;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.exception.InvalidTemplateEndpointException;
-import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.tools.NIFParameterSet;
-import eu.freme.broker.tools.TemplateValidator;import eu.freme.eservices.elink.api.DataEnricher;
+import eu.freme.broker.tools.TemplateValidator;
+import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.persistence.dao.TemplateDAO;
+import eu.freme.common.persistence.dao.UserDAO;
+import eu.freme.common.persistence.model.OwnedResource;
+import eu.freme.common.persistence.model.Template;
+import eu.freme.common.persistence.model.User;
+import eu.freme.common.persistence.tools.AccessLevelHelper;
+import eu.freme.eservices.elink.api.DataEnricher;
 import eu.freme.eservices.elink.exceptions.TemplateNotFoundException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +49,11 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 @RestController
 @Profile("broker")
@@ -165,7 +172,7 @@ public class ELink extends BaseRestController {
 
             Template template;
 
-            if(nifParameters.getInformat().equals(RDFSerialization.JSON)){
+            if(nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)){
                 JSONObject jsonObj = new JSONObject(postBody);
                 templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
                 template = new Template(
@@ -247,14 +254,14 @@ public class ELink extends BaseRestController {
             }
 
             String serialization;
-            if(nifParameters.getOutformat().equals(RDFSerialization.JSON)){
+            if(nifParameters.getOutformat().equals(RDFConstants.RDFSerialization.JSON)){
                 ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
                 //JSONObject jsonObject = new JSONObject(ow.writeValueAsString(template));
                 serialization = ow.writeValueAsString(template);//jsonObject.toString();//json;//gson.toJson(template); //Exporter.getInstance().convertOneTemplate2JSON(t).toString(4);
             }else {
                 serialization = rdfConversionService.serializeRDF(template.getRDF(), nifParameters.getOutformat());
             }
-            responseHeaders.set("Content-Type", nifParameters.getOutformat());
+            responseHeaders.set("Content-Type", nifParameters.getOutformat().getMimeType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
 
         } catch (TemplateNotFoundException e) {
@@ -284,10 +291,10 @@ public class ELink extends BaseRestController {
             NIFParameterSet nifParameters = this.normalizeNif(null, acceptHeader, contentTypeHeader,allParams,true);
 
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("Content-Type", nifParameters.getOutformat());
+            responseHeaders.set("Content-Type", nifParameters.getOutformat().getMimeType());
 
             List<Template> templates = templateDAO.findAllReadAccessible();
-            if(nifParameters.getOutformat().equals(RDFSerialization.JSON)){
+            if(nifParameters.getOutformat().equals(RDFConstants.RDFSerialization.JSON)){
                 ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
                 String serialization = ow.writeValueAsString(templates);
                 return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
@@ -346,7 +353,7 @@ public class ELink extends BaseRestController {
                 return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
             }
 
-            if(nifParameters.getInformat().equals(RDFSerialization.JSON)){
+            if(nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)){
                 JSONObject jsonObj = new JSONObject(nifParameters.getInput());
                 template.setEndpoint(jsonObj.getString("endpoint"));
                 template.setEndpoint(jsonObj.getString("endpoint"));

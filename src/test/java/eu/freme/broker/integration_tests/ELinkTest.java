@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -33,6 +34,7 @@ import eu.freme.common.conversion.rdf.RDFConstants;
 /**
  * Created by Jonathan Sauder (jsauder@campus-tu-berlin.de) on 28.07.15.
  */
+@Ignore //depricated. replaced by ELinkTestSecurity
 public class ELinkTest extends IntegrationTest {
     String label = "My Label";
     String endpoint = "http://dbpedia.org/sparql/";
