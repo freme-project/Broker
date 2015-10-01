@@ -27,6 +27,7 @@ import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.TemplateValidator;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.exception.OwnedResourceNotFoundException;
+import eu.freme.common.exception.TemplateNotFoundException;
 import eu.freme.common.persistence.dao.TemplateDAO;
 import eu.freme.common.persistence.dao.UserDAO;
 import eu.freme.common.persistence.model.OwnedResource;
@@ -34,7 +35,6 @@ import eu.freme.common.persistence.model.Template;
 import eu.freme.common.persistence.model.User;
 import eu.freme.common.persistence.tools.AccessLevelHelper;
 import eu.freme.eservices.elink.api.DataEnricher;
-import eu.freme.eservices.elink.exceptions.TemplateNotFoundException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -136,7 +136,7 @@ public class ELink extends BaseRestController {
 //                logger.error("Invalid NIF document.", ex);
 //                throw new InvalidNIFException(ex.getMessage());                
         //}
-        catch (eu.freme.eservices.elink.exceptions.BadRequestException ex) {
+        catch (BadRequestException ex) {
             logger.error(ex.getMessage(), ex);
             throw ex;
         } catch (Exception ex) {
