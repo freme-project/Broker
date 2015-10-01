@@ -45,7 +45,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 import eu.freme.broker.eservices.BaseRestController;
-import eu.freme.broker.security.database.Token;
+import eu.freme.common.persistence.Token;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

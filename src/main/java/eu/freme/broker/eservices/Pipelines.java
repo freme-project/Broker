@@ -17,17 +17,7 @@
  */
 package eu.freme.broker.eservices;
 
-import com.google.gson.JsonSyntaxException;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
-import eu.freme.broker.exception.BadRequestException;
-import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.broker.exception.NotAcceptableException;
-import eu.freme.eservices.pipelines.core.PipelineService;
-import eu.freme.eservices.pipelines.core.ServiceException;
-import eu.freme.eservices.pipelines.requests.RequestBuilder;
-import eu.freme.eservices.pipelines.requests.RequestFactory;
-import eu.freme.eservices.pipelines.requests.SerializedRequest;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -35,11 +25,23 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.JsonSyntaxException;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+import eu.freme.broker.exception.BadRequestException;
+import eu.freme.broker.exception.InternalServerErrorException;
+import eu.freme.broker.exception.NotAcceptableException;
 import eu.freme.eservices.pipelines.core.PipelineResponse;
-
-import java.util.List;
+import eu.freme.eservices.pipelines.core.PipelineService;
+import eu.freme.eservices.pipelines.core.ServiceException;
+import eu.freme.eservices.pipelines.requests.RequestBuilder;
+import eu.freme.eservices.pipelines.requests.RequestFactory;
+import eu.freme.eservices.pipelines.requests.SerializedRequest;
 
 /**
  * @author Gerald Haesendonck

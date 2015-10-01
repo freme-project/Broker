@@ -47,11 +47,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import eu.freme.broker.security.database.User;
-import eu.freme.broker.security.database.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.security.tools.PasswordHasher;
 import eu.freme.broker.security.voter.UserAccessDecisionVoter;
+import eu.freme.common.persistence.User;
+import eu.freme.common.persistence.UserRepository;
 
 /**
  * @author Jan Nehring - jan.nehring@dfki.de

@@ -25,7 +25,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
-import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.common.conversion.rdf.RDFConstants;
 
 /**
  * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 06.08.15.

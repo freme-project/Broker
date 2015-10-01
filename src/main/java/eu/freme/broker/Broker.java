@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Profile;
 
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.StarterHelper;
-import eu.freme.conversion.ConversionApplicationConfig;
+import eu.freme.common.FREMECommonConfig;
 import eu.freme.eservices.eentity.EEntityConfig;
 import eu.freme.eservices.elink.ELinkConfig;
 import eu.freme.eservices.epublishing.EPublishingConfig;
@@ -46,7 +46,7 @@ import eu.freme.i18n.api.EInternationalizationConfig;
 
 @SpringBootApplication
 @Import({ FremeCommonConfig.class, EEntityConfig.class, ELinkConfig.class,
-		EPublishingConfig.class, ConversionApplicationConfig.class,
+		EPublishingConfig.class, FREMECommonConfig.class,
 		PipelineConfig.class, EInternationalizationConfig.class })
 @Profile("broker")
 public class Broker {

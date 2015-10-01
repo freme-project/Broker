@@ -34,10 +34,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.broker.security.database.User;
-import eu.freme.broker.security.database.UserRepository;
 import eu.freme.broker.security.tools.AccessLevelHelper;
 import eu.freme.broker.security.tools.PasswordHasher;
+import eu.freme.common.persistence.User;
+import eu.freme.common.persistence.UserRepository;
 
 @RestController
 @Profile("broker")

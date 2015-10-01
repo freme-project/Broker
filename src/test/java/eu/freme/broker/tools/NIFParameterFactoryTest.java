@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.freme.broker.FremeCommonConfig;
 import eu.freme.broker.exception.BadRequestException;
-import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
+import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 
 /**
  * @author Jan Nehring - jan.nehring@dfki.de

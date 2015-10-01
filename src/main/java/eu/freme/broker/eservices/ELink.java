@@ -45,19 +45,16 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.broker.exception.InvalidNIFException;
 import eu.freme.broker.exception.InvalidTemplateEndpointException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.TemplateValidator;
-import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
-import eu.freme.eservices.elink.api.DataEnricher;
+import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 import eu.freme.eservices.elink.Exporter;
 import eu.freme.eservices.elink.Template;
 import eu.freme.eservices.elink.TemplateDAO;
+import eu.freme.eservices.elink.api.DataEnricher;
 import eu.freme.eservices.elink.exceptions.TemplateNotFoundException;
-
-import org.apache.commons.validator.routines.UrlValidator;
 
 @RestController
 @Profile("broker")
