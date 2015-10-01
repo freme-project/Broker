@@ -126,7 +126,7 @@ public class ELink extends BaseRestController {
 
             HttpHeaders responseHeaders = new HttpHeaders();
             String serialization = rdfConversionService.serializeRDF(inModel, nifParameters.getOutformat());
-            responseHeaders.add("Content-Type", getMimeTypeByRDFType(nifParameters.getOutformat()));
+            responseHeaders.add("Content-Type", nifParameters.getOutformat().getMimeType());
             return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
         } //catch (TemplateNotFoundException ex) {
         //  logger.warn("The template with the specified ID has not been found.", ex);
@@ -200,7 +200,7 @@ public class ELink extends BaseRestController {
             HttpHeaders responseHeaders = new HttpHeaders();
             URI location = new URI("/e-link/templates/"+template.getId());
             responseHeaders.setLocation(location);
-            responseHeaders.set("Content-Type", this.getMimeTypeByRDFType(nifParameters.getOutformat()));
+            responseHeaders.set("Content-Type", nifParameters.getOutformat().getMimeType());
             String serialization = rdfConversionService.serializeRDF(template.getRDF(), nifParameters.getOutformat());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         } catch (URISyntaxException ex) {
@@ -263,7 +263,7 @@ public class ELink extends BaseRestController {
             }else {
                 serialization = rdfConversionService.serializeRDF(template.getRDF(), nifParameters.getOutformat());
             }
-            responseHeaders.set("Content-Type", getMimeTypeByRDFType(nifParameters.getOutformat()));
+            responseHeaders.set("Content-Type", nifParameters.getOutformat());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
 
         } catch (TemplateNotFoundException e) {
@@ -293,7 +293,7 @@ public class ELink extends BaseRestController {
             NIFParameterSet nifParameters = this.normalizeNif(null, acceptHeader, contentTypeHeader,allParams,true);
 
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("Content-Type", getMimeTypeByRDFType(nifParameters.getOutformat()));
+            responseHeaders.set("Content-Type", nifParameters.getOutformat());
 
             List<Template> templates = templateDAO.findAllReadAccessible();
             if(nifParameters.getOutformat().equals(RDFSerialization.JSON)){
@@ -386,7 +386,7 @@ public class ELink extends BaseRestController {
             HttpHeaders responseHeaders = new HttpHeaders();
             URI location = new URI("/e-link/templates/"+template.getId());
             responseHeaders.setLocation(location);
-            responseHeaders.set("Content-Type", this.getMimeTypeByRDFType(nifParameters.getOutformat()));
+            responseHeaders.set("Content-Type", nifParameters.getOutformat().getMimeType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         } catch (URISyntaxException ex) {
             Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
