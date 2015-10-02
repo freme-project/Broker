@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
@@ -39,12 +40,12 @@ import eu.freme.eservices.pipelines.api.PipelineConfig;
 import eu.freme.i18n.api.EInternationalizationConfig;
 
 /**
- * configures broker without api endpoints and e-Services
+ * Start broker as standalone application without the FREME cloud.
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 
-@SpringBootApplication
+@SpringCloudApplication
 @Import({ FremeCommonConfig.class, EEntityConfig.class, ELinkConfig.class,
 		EPublishingConfig.class, FREMECommonConfig.class,
 		PipelineConfig.class, EInternationalizationConfig.class })
