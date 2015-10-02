@@ -2,6 +2,7 @@ package eu.freme.broker;
 
 import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,10 +13,13 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 
 import eu.freme.broker.tools.StarterHelper;
 
-@SpringBootApplication
+
 @ComponentScan(basePackages = "eu.freme.broker", excludeFilters = @Filter(type = FilterType.REGEX, pattern = { "eu.freme.broker.security.*" }))
 @Profile("cloud-freme-ner")
 @EnableDiscoveryClient
+@EnableAutoConfiguration(exclude = {
+        org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class,
+})
 @Import(FremeNERStarter.class)
 /**
  * Start FREME ner as part of FREME cloud

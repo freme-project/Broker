@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
@@ -13,6 +14,8 @@ import eu.freme.broker.tools.StarterHelper;
 @Profile("broker")
 @EnableDiscoveryClient
 @Import(Broker.class)
+@EnableFeignClients
+
 /**
  * Start broker as part of FREME cloud
  * 

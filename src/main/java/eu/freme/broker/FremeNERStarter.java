@@ -19,6 +19,7 @@ package eu.freme.broker;
 
 import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -33,8 +34,10 @@ import eu.freme.broker.tools.StarterHelper;
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
-@SpringBootApplication
 @ComponentScan(basePackages = "eu.freme.broker", excludeFilters = @Filter(type = FilterType.REGEX, pattern = { "eu.freme.broker.security.*" }))
+@EnableAutoConfiguration(exclude = {
+        org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class,
+})
 @Import({FremeCommonConfig.class})
 @Profile("fremener")
 public class FremeNERStarter {
