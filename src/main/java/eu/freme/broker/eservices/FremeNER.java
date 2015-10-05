@@ -54,6 +54,7 @@ import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 import eu.freme.eservices.elink.api.DataEnricher;
+import java.util.ArrayList;
 
 @RestController
 @Profile("broker")
@@ -83,6 +84,7 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "dataset", required = false) String dataset,
 			@RequestParam(value = "numLinks", required = false) String numLinksParam,
 			@RequestParam(value = "enrichement", required = false) String enrichementType,
+			@RequestParam(value = "mode", required = false) String mode,
                         @RequestBody(required = false) String postBody) {
             
             // Check the language parameter.
@@ -94,7 +96,8 @@ public class FremeNER extends BaseRestController {
                         || language.equals("nl")
                         || language.equals("it")
                         || language.equals("fr")
-                        || language.equals("es")) {
+                        || language.equals("es")
+                        || language.equals("ru")) {
                     // OK, the language is supported.
                 } else {
                     // The language specified with the langauge parameter is not supported.
@@ -107,6 +110,38 @@ public class FremeNER extends BaseRestController {
                 throw new eu.freme.broker.exception.BadRequestException("Dataset parameter is not specified");            
             } else {
                 // OK, dataset specified.
+            }
+            
+            ArrayList rMode = new ArrayList();
+            
+            // Check the MODE parameter.
+            if(mode != null) {
+                String[] modes = mode.split(",");
+                for(String m : modes) {
+                    if(m.equals("spot") 
+                            || m.equals("classify") 
+                            || m.equals("link")
+                            || m.equals("all")) {
+                        // OK, the mode is supported.
+                        rMode.add(m);
+                    } else {
+                        // The mode specified is not supported.
+                        throw new eu.freme.broker.exception.BadRequestException("Unsupported mode: " + m);
+                    }
+                }
+                
+                if(rMode.contains("classify") && !rMode.contains("spot")) {
+                    throw new eu.freme.broker.exception.BadRequestException("Unsupported mode combination: classification must be performed in combination with spotting.");
+                }
+                
+                if(rMode.contains("all")) {
+                    rMode.clear();
+                    rMode.add("all");
+                }
+                
+            } else {
+                // OK, perform all.
+                rMode.add("all");
             }
             
             int numLinks = 1;
@@ -123,6 +158,12 @@ public class FremeNER extends BaseRestController {
             Model inModel = ModelFactory.createDefaultModel();
             Model outModel = ModelFactory.createDefaultModel();
             outModel.setNsPrefix("dbpedia", "http://dbpedia.org/resource/");
+            outModel.setNsPrefix("dbpedia-de", "http://de.dbpedia.org/resource/");
+            outModel.setNsPrefix("dbpedia-nl", "http://nl.dbpedia.org/resource/");
+            outModel.setNsPrefix("dbpedia-es", "http://es.dbpedia.org/resource/");
+            outModel.setNsPrefix("dbpedia-it", "http://it.dbpedia.org/resource/");
+            outModel.setNsPrefix("dbpedia-fr", "http://fr.dbpedia.org/resource/");
+            outModel.setNsPrefix("dbpedia-ru", "http://ru.dbpedia.org/resource/");
             outModel.setNsPrefix("dbc", "http://dbpedia.org/resource/Category:");
             outModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
             outModel.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
@@ -142,54 +183,64 @@ public class FremeNER extends BaseRestController {
                 prefix = p;
             }
             
-            String textForProcessing = null;
+            String docForProcessing = null;
             
             if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
                 // input is sent as value of the input parameter
-                textForProcessing = parameters.getInput();
+                docForProcessing = parameters.getInput();
+                
+                if(rMode.size() == 1 && rMode.contains("link")) {
+                    throw new eu.freme.broker.exception.BadRequestException("Unsupported mode combination: you must provide NIF in order to perform only linking.");
+                }
+                
             } else {
                 // input is sent as body of the request
-                switch(parameters.getInformat()) {
-                    case TURTLE:
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
-                        break;
-                    case JSON_LD:
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "JSON-LD");
-                        break;
-                    case RDF_XML:
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "RDF/XML");
-                        break;
-                    case N_TRIPLES:
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N-TRIPLE");
-                        break;
-                    case N3:
-                        inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N3");
-                        break;                        
+
+                if(rMode.size() == 1 && rMode.contains("link")) {
+                    docForProcessing = postBody;
+                } else {
+                    switch(parameters.getInformat()) {
+                        case TURTLE:
+                            inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
+                            break;
+                        case JSON_LD:
+                            inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "JSON-LD");
+                            break;
+                        case RDF_XML:
+                            inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "RDF/XML");
+                            break;
+                        case N_TRIPLES:
+                            inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N-TRIPLE");
+                            break;
+                        case N3:
+                            inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N3");
+                            break;                        
+                    }
+
+                    StmtIterator iter = inModel.listStatements(null, RDF.type, inModel.getResource("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#Context"));
+
+                    boolean textFound = false;
+                    String tmpPrefix = "http://freme-project.eu/#";
+                    // The first nif:Context with assigned nif:isString will be processed.
+                    while(!textFound) {
+                        Resource contextRes = iter.nextStatement().getSubject();
+                        tmpPrefix = contextRes.getURI().split("#")[0];
+                        parameters.setPrefix(tmpPrefix);
+                        Statement isStringStm = contextRes.getProperty(inModel.getProperty("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#isString"));
+                        if(isStringStm != null) {
+                            docForProcessing = isStringStm.getObject().asLiteral().getString();
+                            textFound = true;
+                        }                    
+                    }
                 }
                 
-                StmtIterator iter = inModel.listStatements(null, RDF.type, inModel.getResource("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#Context"));
-                
-                boolean textFound = false;
-                String tmpPrefix = "http://freme-project.eu/#";
-                // The first nif:Context with assigned nif:isString will be processed.
-                while(!textFound) {
-                    Resource contextRes = iter.nextStatement().getSubject();
-                    tmpPrefix = contextRes.getURI().split("#")[0];
-                    parameters.setPrefix(tmpPrefix);
-                    Statement isStringStm = contextRes.getProperty(inModel.getProperty("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#isString"));
-                    if(isStringStm != null) {
-                        textForProcessing = isStringStm.getObject().asLiteral().getString();
-                        textFound = true;
-                    }                    
-                }
-                
-                if(textForProcessing == null) {
-                    throw new eu.freme.broker.exception.BadRequestException("No text to process.");
+                if(docForProcessing == null) {
+                    throw new eu.freme.broker.exception.BadRequestException("No content to process.");
                 }
             }
             
             try {
-                String fremeNERRes = entityAPI.callFremeNER(textForProcessing, language, parameters.getPrefix(), dataset, numLinks);
+                String fremeNERRes = entityAPI.callFremeNER(docForProcessing, language, parameters.getPrefix(), dataset, numLinks, rMode, parameters.getInformat().getMimeType());
                 outModel.read(new ByteArrayInputStream(fremeNERRes.getBytes()), null, "TTL");
                 outModel.add(inModel);
                 HashMap<String, String> templateParams = new HashMap();
