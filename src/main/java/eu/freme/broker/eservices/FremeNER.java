@@ -171,7 +171,7 @@ public class FremeNER extends BaseRestController {
                 while(!textFound) {
                     Resource contextRes = iter.nextStatement().getSubject();
                     tmpPrefix = contextRes.getURI().split("#")[0];
-                    parameters.setPrefix(tmpPrefix+"#");
+                    parameters.setPrefix(tmpPrefix);
                     Statement isStringStm = contextRes.getProperty(inModel.getProperty("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#isString"));
                     if(isStringStm != null) {
                         textForProcessing = isStringStm.getObject().asLiteral().getString();
