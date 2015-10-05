@@ -28,6 +28,7 @@ import eu.freme.broker.tools.TemplateValidator;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.exception.OwnedResourceNotFoundException;
 import eu.freme.common.exception.TemplateNotFoundException;
+import eu.freme.common.exception.UnsupportedEndpointType;
 import eu.freme.common.persistence.dao.TemplateDAO;
 import eu.freme.common.persistence.dao.UserDAO;
 import eu.freme.common.persistence.model.OwnedResource;
@@ -145,6 +146,49 @@ public class ELink extends BaseRestController {
         }
     }
 
+    // Enriching using a template.
+    // POST /e-link/explore/
+    // Example: curl -v -X POST "http://localhost:8080/e-link/explore?resource=http%3A%2F%2Fdbpedia.org%2Fresource%2FBerlin&endpoint=http%3A%2F%2Fdbpedia.org%2Fsparql&outformat=n-triples" -H "Content-Type:"
+    @RequestMapping(value = "/e-link/explore", method = RequestMethod.POST)
+    @Secured({"ROLE_USER", "ROLE_ADMIN"})
+    public ResponseEntity<String> exploreResource(
+            @RequestHeader(value = "Accept",        required=false) String acceptHeader,
+            @RequestHeader(value = "Content-Type",  required=false) String contentTypeHeader,
+            @RequestParam Map<String,String>        allParams,
+            @RequestParam(value = "resource",       required=true)  String resource,
+            @RequestParam(value = "endpoint",      required=true)  String endpoint,
+            @RequestParam(value = "endpoint-type", required=false) String endpointType) {
+        try {
+
+            System.out.println(resource);
+            System.out.println(endpoint);
+            System.out.println(endpointType);
+//            int templateId;
+            NIFParameterSet nifParameters;
+            try {
+                nifParameters = this.normalizeNif("", acceptHeader, contentTypeHeader, allParams, false);
+            }catch(BadRequestException e){
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+            
+            Model inModel = dataEnricher.exploreResource(resource, endpoint, endpointType);
+
+            HttpHeaders responseHeaders = new HttpHeaders();
+            String serialization = rdfConversionService.serializeRDF(inModel, nifParameters.getOutformat());
+            responseHeaders.add("Content-Type", nifParameters.getOutformat().getMimeType());
+            return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
+        } catch (UnsupportedEndpointType ex) {
+            logger.error(ex.getMessage(), ex);
+            throw ex;
+        } catch (UnsupportedOperationException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Internal service problem. Please contact the service provider.", ex);
+            throw new InternalServerErrorException("Unknown problem. Please contact us.");
+        }
+    }
+    
     // Creating a template.
     // POST /e-link/templates/
     // Example: curl -X POST -d @template.json "http://localhost:8080/e-link/templates/" -H "Content-Type: application/json" -H "Accept: application/json" -v
