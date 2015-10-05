@@ -1,5 +1,7 @@
 /**
- * Copyright (C) 2015 Deutsches Forschungszentrum für Künstliche Intelligenz (http://freme-project.eu)
+ * Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+ * Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+ * Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +21,11 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.freme.broker.exception.BadRequestException;
-import eu.freme.conversion.rdf.RDFConstants.RDFSerialization;
+import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Helper class to create a NIFParameterSet according to the specification of NIF.
@@ -32,6 +38,10 @@ public class NIFParameterFactory {
 	RDFSerializationFormats rdfSerializationFormats;
 
 	String defaultPrefix = "http://freme-project.eu/";
+
+	public final Set<String> NIF_PARAMETERS = new HashSet<>(Arrays.asList(new String[]{
+			"input", "i", "informat", "f", "outformat", "o", "prefix", "p"
+	}));
 
 	public NIFParameterSet constructFromHttp(String input, String informat,
 			String outformat, String postBody, String acceptHeader,
@@ -101,5 +111,9 @@ public class NIFParameterFactory {
 		}
 
 		return new NIFParameterSet(thisInput, thisInformat, thisOutformat, thisPrefix);
+	}
+
+	public boolean isNIFParameter(String parameter){
+		return NIF_PARAMETERS.contains(parameter);
 	}
 }
