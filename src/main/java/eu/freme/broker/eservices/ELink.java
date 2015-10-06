@@ -222,13 +222,19 @@ public class ELink extends BaseRestController {
             if(nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)){
                 JSONObject jsonObj = new JSONObject(postBody);
                 templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
-                template = new Template(
-                        OwnedResource.Visibility.getByString(visibility),
-                        jsonObj.getString("endpoint"),
-                        jsonObj.getString("query"),
-                        jsonObj.getString("label"),
-                        jsonObj.getString("description")
-                );
+
+                //AccessDeniedException can be thrown, if current authentication is the anonymousUser
+                try {
+                    template = new Template(
+                            OwnedResource.Visibility.getByString(visibility),
+                            jsonObj.getString("endpoint"),
+                            jsonObj.getString("query"),
+                            jsonObj.getString("label"),
+                            jsonObj.getString("description")
+                    );
+                }catch(AccessDeniedException e){
+                    return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+                }
             }else{
                 Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
                 template = new Template(OwnedResource.Visibility.getByString(visibility), model);

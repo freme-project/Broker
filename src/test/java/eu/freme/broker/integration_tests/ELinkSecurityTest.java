@@ -2,6 +2,8 @@ package eu.freme.broker.integration_tests;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.broker.FremeCommonConfig;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import org.json.JSONArray;
@@ -12,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -31,7 +34,6 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = FremeCommonConfig.class)
 @ActiveProfiles("broker")
-@Ignore
 public class ELinkSecurityTest extends IntegrationTest {
 
 
@@ -95,46 +97,25 @@ public class ELinkSecurityTest extends IntegrationTest {
         String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
         assertNotNull(templateid);
 
-        HttpResponse<String> response;
+        //try {
+            createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", null);
+        //}catch(AccessDeniedException e){
 
-        response = baseRequestGet("templates")
-                .queryString("outformat", "json").asString();
-
-
-        if (response.getStatus() == HttpStatus.OK.value()) {
-            validateNIFResponse(response, RDFConstants.RDFSerialization.JSON);
-        }
-
-
-
-       response = baseRequestGet("templates/" + templateid)
-                .queryString("outformat", "json")
-                .asString();
-        if (response.getStatus() == HttpStatus.OK.value()) {
-            validateNIFResponse(response, RDFConstants.RDFSerialization.JSON);
-        }
-
+        //}
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), null));
+        assertEquals(HttpStatus.OK.value(), getTemplate(templateid, null));
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
-        response = baseRequestPost("documents")
-                .queryString("templateid", templateid)
-                .queryString("informat", "turtle")
-                .queryString("outformat", "turtle")
-                .body(nifContent)
-                .asString();
-        if(response.getStatus()==HttpStatus.OK.value()) {
-            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
-        }
+        assertEquals(HttpStatus.OK.value(), doELink(nifContent, templateid, null));
+        assertEquals(HttpStatus.FORBIDDEN.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, null, "private"));
+        assertEquals(HttpStatus.FORBIDDEN.value(), deleteTemplate(templateid, null));
 
-        //JSONArray jsonArray = new JSONArray(response.getBody());
-        //assertEquals(expectedIDs.size(), jsonArray.length());
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(), doELink(nifContent, templateid, tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "private"));
+        assertEquals(204, deleteTemplate(templateid, tokenWithPermission));
 
 
-        /*ArrayList<String> tempIDs = new ArrayList<>(expectedIDs);
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String id = jsonObject.getString("id");
-            assertTrue(tempIDs.remove(id));
-        }*/
 
     }
 
@@ -230,8 +211,7 @@ public class ELinkSecurityTest extends IntegrationTest {
     }
 
     private int doELink(String nifContent, String templateId, String token) throws UnirestException, IOException {
-        HttpResponse<String> response = baseRequestPost("documents")
-                .header("X-Auth-Token", token)
+        HttpResponse<String> response = baseRequestPost("documents", token)
                 .queryString("templateid", templateId)
                 .queryString("informat", "turtle")
                 .queryString("outformat", "turtle")
@@ -247,8 +227,7 @@ public class ELinkSecurityTest extends IntegrationTest {
     public int getAllTemplates(List<String> expectedIDs, String token) throws UnirestException, IOException {
         HttpResponse<String> response;
 
-        response = baseRequestGet("templates")
-                .header("X-Auth-Token", token)
+        response = baseRequestGet("templates", token)
                 .queryString("outformat", "json").asString();
 
 
@@ -271,14 +250,15 @@ public class ELinkSecurityTest extends IntegrationTest {
     public String createTemplate(String filename, String visibility, String token) throws Exception {
         String query = readFile(filename);
 
-        HttpResponse<String> response = baseRequestPost("templates")
-                .header("X-Auth-Token", token)
+        HttpResponse<String> response = baseRequestPost("templates", token)
                 .queryString("visibility", visibility)
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
                 .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description"))
                 .asString();
 
+        if(response.getStatus() == HttpStatus.FORBIDDEN.value())
+            throw new AccessDeniedException("Creation of template denied.");
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 
         JSONObject jsonObj = new JSONObject(response.getBody());
@@ -292,10 +272,9 @@ public class ELinkSecurityTest extends IntegrationTest {
 
     //Tests GET e-link/templates/
     public int getTemplate(String id, String token) throws UnirestException, IOException {
-        HttpResponse<String> response = baseRequestGet("templates/" + id)
-                .header("X-Auth-Token", token)
-                .queryString("outformat", "json")
-                .asString();
+
+        HttpResponse<String> response = baseRequestGet("templates/" + id, token)
+                .queryString("outformat", "json").asString();
         if (response.getStatus() == HttpStatus.OK.value()) {
             validateNIFResponse(response, RDFConstants.RDFSerialization.JSON);
         }
@@ -306,8 +285,7 @@ public class ELinkSecurityTest extends IntegrationTest {
     public int updateTemplate(String filename, String id, String token, String visibility) throws IOException, UnirestException {
         String query = readFile(filename);
 
-        HttpResponse<String> response = baseRequestPut("templates/" + id)
-                .header("X-Auth-Token", token)
+        HttpResponse<String> response = baseRequestPut("templates/" + id, token)
                 .queryString("informat", "json")
                 .queryString("outformat", "json-ld")
                 .queryString("visibility", visibility)
@@ -328,8 +306,7 @@ public class ELinkSecurityTest extends IntegrationTest {
     }
 
     public int updateTemplateMetadata(String id, String ownerName, String visibility, String token) throws UnirestException {
-        HttpResponse<String> response = baseRequestPut("templates/admin/" + id)
-                .header("X-Auth-Token", token)
+        HttpResponse<String> response = baseRequestPut("templates/admin/" + id, token)
                 .queryString("owner", ownerName)
                 .queryString("visibility", visibility)
                 .asString();
@@ -338,8 +315,7 @@ public class ELinkSecurityTest extends IntegrationTest {
 
     //Tests DELETE e-link/templates/
     public int deleteTemplate(String id, String token) throws UnirestException {
-        HttpResponse<String> response = baseRequestDelete("templates/" + id)
-                .header("X-Auth-Token", token)
+        HttpResponse<String> response = baseRequestDelete("templates/" + id, token)
                 .asString();
         return response.getStatus();
     }

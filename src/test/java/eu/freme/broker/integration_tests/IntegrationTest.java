@@ -68,13 +68,32 @@ public abstract class IntegrationTest {
     protected HttpRequestWithBody baseRequestPost(String function) {
         return Unirest.post(url + function);
     }
-    protected HttpRequest baseRequestGet( String function) {
-        return Unirest.get(url + function);
-    }
+    protected HttpRequest baseRequestGet( String function) {return Unirest.get(url + function);}
     protected HttpRequestWithBody baseRequestDelete( String function) {
         return Unirest.delete(url + function);
     }
     protected HttpRequestWithBody baseRequestPut( String function) {
+        return Unirest.put(url + function);
+    }
+
+    protected HttpRequestWithBody baseRequestPost(String function, String token) {
+        if(token!=null)
+            return Unirest.post(url + function).header("X-Auth-Token", token);
+        return Unirest.post(url + function);
+    }
+    protected HttpRequest baseRequestGet( String function, String token) {
+        if(token!=null)
+            return Unirest.get(url + function).header("X-Auth-Token", token);
+        return Unirest.get(url + function);
+    }
+    protected HttpRequestWithBody baseRequestDelete( String function, String token) {
+        if(token!=null)
+            return Unirest.delete(url + function).header("X-Auth-Token", token);
+        return Unirest.delete(url + function);
+    }
+    protected HttpRequestWithBody baseRequestPut( String function, String token) {
+        if(token!=null)
+            return Unirest.put(url + function).header("X-Auth-Token", token);
         return Unirest.put(url + function);
     }
 
