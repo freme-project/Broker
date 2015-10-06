@@ -37,14 +37,6 @@ import static org.junit.Assert.assertTrue;
 @ActiveProfiles("broker")
 public class ELinkSecurityTest extends IntegrationTest {
 
-
-    //@Autowired
-    //AbstractAccessDecisionManager decisionManager;
-
-    //@Autowired
-    //AccessLevelHelper accessLevelHelper;
-
-
     private static final String usernameWithPermission = "userwithpermission";
     private static final String passwordWithPermission = "testpassword";
     private static final String usernameWithoutPermission = "userwithoutpermission";
