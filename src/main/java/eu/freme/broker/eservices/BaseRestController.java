@@ -70,6 +70,8 @@ public abstract class BaseRestController {
 	
 	public static final String authenticationEndpoint = "/authenticate";
 
+	public static final String inputDummy = "inputDummy";
+
 	/**
 	 * Create a NIFParameterSet to make dealing with NIF API specifications
 	 * easier. It handles informat overwrites Content-Type header, input
@@ -115,9 +117,7 @@ public abstract class BaseRestController {
 			if(input.length()==0)
 				input=null;
 		}
-		if(input==null && allowEmptyInput){
-			input = "dummy";
-		}
+
 		String informat = parameters.get("informat");
 		if(informat == null){
 			informat = parameters.get("f");
@@ -131,7 +131,7 @@ public abstract class BaseRestController {
 			prefix = parameters.get("p");
 		}
 		return nifParameterFactory.constructFromHttp(input, informat,
-				outformat, postBody, acceptHeader, contentTypeHeader, prefix);
+				outformat, postBody, acceptHeader, contentTypeHeader, prefix, allowEmptyInput);
 	}
 
 	/**

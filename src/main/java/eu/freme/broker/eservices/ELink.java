@@ -391,7 +391,7 @@ public class ELink extends BaseRestController {
             try {
                 // NOTE: informat was defaulted to JSON before! Now it is TURTLE.
                 // NOTE: outformat was defaulted to turtle, if acceptHeader=="*/*" and informat==null, otherwise to JSON. Now it is TURTLE.
-                nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, false);
+                nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, true);
             }catch(BadRequestException e){
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
@@ -410,15 +410,18 @@ public class ELink extends BaseRestController {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
             }
 
-            if(nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)){
-                JSONObject jsonObj = new JSONObject(nifParameters.getInput());
-                template.setEndpoint(jsonObj.getString("endpoint"));
-                template.setEndpoint(jsonObj.getString("endpoint"));
-                template.setLabel(jsonObj.getString("label"));
-                template.setDescription(jsonObj.getString("description"));
-            }else{
-                Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
-                template.setTemplateWithModel(model);
+            // Was the nif-input empty?
+            if(nifParameters.getInput()!=null) {
+                if (nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)) {
+                    JSONObject jsonObj = new JSONObject(nifParameters.getInput());
+                    template.setEndpoint(jsonObj.getString("endpoint"));
+                    template.setEndpoint(jsonObj.getString("endpoint"));
+                    template.setLabel(jsonObj.getString("label"));
+                    template.setDescription(jsonObj.getString("description"));
+                } else {
+                    Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
+                    template.setTemplateWithModel(model);
+                }
             }
 
             if(visibility!=null) {

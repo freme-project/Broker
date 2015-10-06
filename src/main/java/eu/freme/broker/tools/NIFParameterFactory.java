@@ -43,12 +43,20 @@ public class NIFParameterFactory {
 			"input", "i", "informat", "f", "outformat", "o", "prefix", "p"
 	}));
 
+
+	public NIFParameterSet constructFromHttp(String input, String informat,
+											 String outformat, String postBody, String acceptHeader,
+											 String contentTypeHeader, String prefix) throws BadRequestException {
+		return constructFromHttp(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix, false);
+	}
+
+
 	public NIFParameterSet constructFromHttp(String input, String informat,
 			String outformat, String postBody, String acceptHeader,
-			String contentTypeHeader, String prefix) throws BadRequestException {
+			String contentTypeHeader, String prefix, boolean allowEmptyInput) throws BadRequestException {
 
 		String thisInput;
-		if (input == null && postBody == null) {
+		if (!allowEmptyInput && input == null && postBody == null) {
 			throw new BadRequestException("no input found in request");
 		} else if (input != null) {
 			thisInput = input;
