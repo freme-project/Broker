@@ -92,7 +92,8 @@ public class ELinkSecurityTest extends IntegrationTest {
 
     @Test
 
-    public void anonymousUserTest() throws Exception {
+    public void testAnonymousUser() throws Exception {
+        logger.info("testAnonymousUser");
         if (!initialized)
             initUser();
 
@@ -139,71 +140,86 @@ public class ELinkSecurityTest extends IntegrationTest {
 
     @Test
     public void testTemplateHandlingWithSecurity() throws Exception {
-
+        logger.info("testTemplateHandlingWithSecurity");
         if (!initialized)
             initUser();
 
         // add a template for the first user
+        logger.info("create private template for user 1");
         String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        logger.info("private template for user 1 has id: " + templateid);
         assertNotNull(templateid);
 
-        String templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
-        assertNotNull(templateid2);
-
-        assertEquals(getTemplate(templateid2, tokenWithPermission), HttpStatus.OK.value());
-
-        // User without permission should not be able to query, update or delete another user's template
+        // User without permission should not be able to query, update or delete another user's private template
         // User with permission should
-        // check query template...
-        assertEquals(getTemplate(templateid, tokenWithPermission), HttpStatus.OK.value());
-        assertEquals(getTemplate(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
-        // check update template...
-        assertEquals(updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"), HttpStatus.FORBIDDEN.value());
-        assertEquals(updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "public"), HttpStatus.OK.value());
-        assertEquals(getTemplate(templateid, tokenWithOutPermission), HttpStatus.OK.value());
-        assertEquals(updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "private"), HttpStatus.OK.value());
-        assertEquals(getTemplate(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+        // Public templates can be queried, but not updated or deleted by another user.
+        logger.info("try to fetch private template as other user... should not work");
+        assertEquals(HttpStatus.FORBIDDEN.value(), getTemplate(templateid, tokenWithOutPermission));
+        logger.info("try to fetch private template as owner... should work");
+        assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithPermission));
+        logger.info("fetch all templates as other user... should return an empty list");
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(), tokenWithOutPermission));
+        logger.info("fetch all templates as owner... should return template: "+templateid);
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), tokenWithPermission));
+        logger.info("try to update private template as other user... should not work");
+        assertEquals(HttpStatus.FORBIDDEN.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"));
+        logger.info("try to delete private template as other user... should not work");
+        assertEquals(HttpStatus.FORBIDDEN.value(), deleteTemplate(templateid, tokenWithOutPermission));
 
-        // only admin can change the metadata. should fail
-        /*assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplateMetadata(templateid, usernameWithoutPermission, "private", tokenWithPermission));
-        // change user
-        assertEquals(HttpStatus.OK.value(), updateTemplateMetadata(templateid, usernameWithoutPermission, "private",tokenAdmin));
-        assertEquals(getTemplate(templateid, tokenWithOutPermission), HttpStatus.OK.value());
-        assertEquals(getTemplate(templateid, tokenWithPermission), HttpStatus.FORBIDDEN.value());
+        logger.info("try to update private template as owner. Set visibility to public... should work");
+        assertEquals(HttpStatus.OK.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "public"));
 
-        assertEquals(HttpStatus.OK.value(), updateTemplateMetadata(templateid, usernameWithoutPermission, "public", tokenAdmin));
-        assertEquals(getTemplate(templateid, tokenWithPermission), HttpStatus.OK.value());
-        assertEquals(deleteTemplate(templateid, tokenWithPermission), HttpStatus.FORBIDDEN.value());
+        logger.info("try to fetch public template as other user... should work");
+        assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithOutPermission));
+        logger.info("try to fetch public template as owner... should work");
+        assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithPermission));
+        logger.info("fetch all templates as other user... should return template: " + templateid);
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), tokenWithOutPermission));
+        logger.info("fetch all templates as owner... should return template: "+templateid);
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), tokenWithPermission));
+        logger.info("try to update public template as other user... should not work");
+        assertEquals(HttpStatus.FORBIDDEN.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"));
+        logger.info("try to delete public template as other user... should not work");
+        assertEquals(HttpStatus.FORBIDDEN.value(), deleteTemplate(templateid, tokenWithOutPermission));
 
+        logger.info("try to set public template to private as owner. Set visibility to private... should work");
+        assertEquals(HttpStatus.OK.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "private"));
+        logger.info("re-try to fetch private template as other user... should not work");
+        assertEquals(HttpStatus.FORBIDDEN.value(), getTemplate(templateid, tokenWithOutPermission));
 
-        assertEquals(HttpStatus.OK.value(), updateTemplateMetadata(templateid, usernameWithPermission, "private", tokenAdmin));
-*/
-
-
-        // check delete template...
-        assertEquals(deleteTemplate(templateid, tokenWithOutPermission), HttpStatus.FORBIDDEN.value());
+        logger.info("try to delete private template as owner... should work");
         int responseCode = deleteTemplate(templateid, tokenWithPermission);
         assertTrue(responseCode == HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
     }
 
     @Test
     public void testELinkDocuments() throws Exception {
-
+        logger.info("testELinkDocuments");
         if (!initialized)
             initUser();
 
-        //Adds template temporarily
+        logger.info("create private template");
         String id = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission);
 
+        logger.info("create public template");
+        String idPublic = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "public", tokenWithPermission);
+
+        logger.info("read nif to enrich");
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
 
-        // this shouldn't be granted...
+        logger.info("try to enrich via private template as other user... should not work");
         assertEquals(HttpStatus.FORBIDDEN.value(), doELink(nifContent, id, tokenWithOutPermission));
-        // but this...
+        logger.info("try to enrich via private template as template owner... should work");
         assertEquals(HttpStatus.OK.value(), doELink(nifContent, id, tokenWithPermission));
+        logger.info("try to enrich via public template as other user... should work");
+        assertEquals(HttpStatus.OK.value(), doELink(nifContent, idPublic, tokenWithOutPermission));
+        logger.info("try to enrich via public template as template owner... should work");
+        assertEquals(HttpStatus.OK.value(), doELink(nifContent, idPublic, tokenWithPermission));
 
-        //Deletes temporary template
+        logger.info("delete private template");
         deleteTemplate(id, tokenWithPermission);
+        logger.info("delete public template");
+        deleteTemplate(idPublic, tokenWithPermission);
     }
 
     private int doELink(String nifContent, String templateId, String token) throws UnirestException, IOException {
