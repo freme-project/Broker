@@ -465,7 +465,7 @@ public class ELink extends BaseRestController {
         try {
             // check read and write access
             templateDAO.delete(templateDAO.findOneById(id));
-            return new ResponseEntity<>("The template was sucessfully removed.", HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>("The template was sucessfully removed.", HttpStatus.OK);
         }catch (AccessDeniedException e){
             return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
         }catch (OwnedResourceNotFoundException e){

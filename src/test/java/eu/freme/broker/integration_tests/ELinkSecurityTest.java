@@ -2,13 +2,10 @@ package eu.freme.broker.integration_tests;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.broker.FremeCommonConfig;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -37,36 +34,15 @@ import static org.junit.Assert.assertTrue;
 @ActiveProfiles("broker")
 public class ELinkSecurityTest extends IntegrationTest {
 
-    private static final String usernameWithPermission = "userwithpermission";
-    private static final String passwordWithPermission = "testpassword";
-    private static final String usernameWithoutPermission = "userwithoutpermission";
-    private static final String passwordWithoutPermission = "testpassword";
-    private static String tokenWithPermission;
-    private static String tokenWithOutPermission;
-    private static String tokenAdmin;
-    private static boolean initialized = false;
-
-
     public ELinkSecurityTest() throws UnirestException {
         super("/e-link/");
+        enableAuthenticate();
     }
 
-
-    public void initUser() throws UnirestException {
-        //Creates two users, one intended to have permission, the other not
-        createUser(usernameWithPermission, passwordWithPermission);
-        tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
-        createUser(usernameWithoutPermission, passwordWithoutPermission);
-        tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
-        ConfigurableApplicationContext context = IntegrationTestSetup.getApplicationContext();
-        tokenAdmin = authenticateUser(context.getEnvironment().getProperty("admin.username"), context.getEnvironment().getProperty("admin.password"));
-        initialized = true;
-    }
 
     @Test
     public void invalidTemplateId() throws Exception{
-        if (!initialized)
-            initUser();
+
 
         // add a template for the first user
         String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
@@ -78,16 +54,15 @@ public class ELinkSecurityTest extends IntegrationTest {
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
         assertEquals(HttpStatus.NOT_FOUND.value(), doELink(nifContent, "999", tokenWithOutPermission));
 
-        int responseCode = deleteTemplate(templateid, tokenWithPermission);
-        assertTrue(responseCode == HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
+
+        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
 
     @Test
 
     public void testAnonymousUser() throws Exception {
         logger.info("testAnonymousUser");
-        if (!initialized)
-            initUser();
+
 
         String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
         assertNotNull(templateid);
@@ -102,17 +77,18 @@ public class ELinkSecurityTest extends IntegrationTest {
         logger.info("try to use e-link with public template as anonymous user... should work");
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
         assertEquals(HttpStatus.OK.value(), doELink(nifContent, templateid, null));
-        logger.info("try to update a public template as anonymous user... should work");
+        logger.info("try to update a public template as anonymous user... should not work");
         assertEquals(HttpStatus.FORBIDDEN.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, null, "private"));
-        logger.info("try to delete public template as anonymous user... should work");
+        logger.info("try to delete public template as anonymous user... should not work");
         assertEquals(HttpStatus.FORBIDDEN.value(), deleteTemplate(templateid, null));
+
+        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
 
     @Test
     public void testGetAllTemplates() throws Exception {
         logger.info("testGetAllTemplates");
-        if (!initialized)
-            initUser();
+
 
         // add a template for the first user
         logger.info("create private template for user 1");
@@ -125,18 +101,21 @@ public class ELinkSecurityTest extends IntegrationTest {
         assertNotNull(templateid1);
         logger.info("create private template for user 2");
         String templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithOutPermission);
-        logger.info("created template with id: "+templateid2);
+        logger.info("created template with id: " + templateid2);
         assertNotNull(templateid2);
 
         logger.info("getAllTemplates called by user 2 should return template " + templateid1 + " and " + templateid2);
         assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid1, templateid2), tokenWithOutPermission));
+
+        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid1, tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid2, tokenWithOutPermission));
     }
 
     @Test
     public void testTemplateHandlingWithSecurity() throws Exception {
         logger.info("testTemplateHandlingWithSecurity");
-        if (!initialized)
-            initUser();
+
 
         // add a template for the first user
         logger.info("create private template for user 1");
@@ -182,15 +161,13 @@ public class ELinkSecurityTest extends IntegrationTest {
         assertEquals(HttpStatus.FORBIDDEN.value(), getTemplate(templateid, tokenWithOutPermission));
 
         logger.info("try to delete private template as owner... should work");
-        int responseCode = deleteTemplate(templateid, tokenWithPermission);
-        assertTrue(responseCode == HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
+        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
 
     @Test
     public void testELinkDocuments() throws Exception {
         logger.info("testELinkDocuments");
-        if (!initialized)
-            initUser();
+
 
         logger.info("create private template");
         String id = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission);
