@@ -6,6 +6,7 @@ import eu.freme.broker.FremeCommonConfig;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -30,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = FremeCommonConfig.class)
 @ActiveProfiles("broker")
+@Ignore
 public class ELinkSecurityTest extends IntegrationTest {
 
 
@@ -83,6 +85,57 @@ public class ELinkSecurityTest extends IntegrationTest {
 
         int responseCode = deleteTemplate(templateid, tokenWithPermission);
         assertTrue(responseCode == HttpStatus.OK.value() || responseCode == HttpStatus.NO_CONTENT.value());
+    }
+
+    @Test
+
+    public void noAuthentication() throws Exception {
+        if (!initialized)
+            initUser();
+        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
+        assertNotNull(templateid);
+
+        HttpResponse<String> response;
+
+        response = baseRequestGet("templates")
+                .queryString("outformat", "json").asString();
+
+
+        if (response.getStatus() == HttpStatus.OK.value()) {
+            validateNIFResponse(response, RDFConstants.RDFSerialization.JSON);
+        }
+
+
+
+       response = baseRequestGet("templates/" + templateid)
+                .queryString("outformat", "json")
+                .asString();
+        if (response.getStatus() == HttpStatus.OK.value()) {
+            validateNIFResponse(response, RDFConstants.RDFSerialization.JSON);
+        }
+
+        String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
+        response = baseRequestPost("documents")
+                .queryString("templateid", templateid)
+                .queryString("informat", "turtle")
+                .queryString("outformat", "turtle")
+                .body(nifContent)
+                .asString();
+        if(response.getStatus()==HttpStatus.OK.value()) {
+            validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        }
+
+        //JSONArray jsonArray = new JSONArray(response.getBody());
+        //assertEquals(expectedIDs.size(), jsonArray.length());
+
+
+        /*ArrayList<String> tempIDs = new ArrayList<>(expectedIDs);
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            String id = jsonObject.getString("id");
+            assertTrue(tempIDs.remove(id));
+        }*/
+
     }
 
     @Test
