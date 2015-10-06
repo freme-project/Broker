@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.stefanbirkner.fishbowl.Fishbowl.exceptionThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -91,32 +92,27 @@ public class ELinkSecurityTest extends IntegrationTest {
 
     @Test
 
-    public void noAuthentication() throws Exception {
+    public void anonymousUserTest() throws Exception {
         if (!initialized)
             initUser();
+
         String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
         assertNotNull(templateid);
 
-        //try {
-            createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", null);
-        //}catch(AccessDeniedException e){
-
-        //}
+        logger.info("try to create template as anonymous user... should not work");
+        Throwable exception = exceptionThrownBy(() -> createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", null));
+        assertEquals(AccessDeniedException.class, exception.getClass());
+        logger.info("try to fetch all templates as anonymous user... should work");
         assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), null));
+        logger.info("try to get public template as anonymous user... should work");
         assertEquals(HttpStatus.OK.value(), getTemplate(templateid, null));
+        logger.info("try to use e-link with public template as anonymous user... should work");
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
         assertEquals(HttpStatus.OK.value(), doELink(nifContent, templateid, null));
+        logger.info("try to update a public template as anonymous user... should work");
         assertEquals(HttpStatus.FORBIDDEN.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, null, "private"));
+        logger.info("try to delete public template as anonymous user... should work");
         assertEquals(HttpStatus.FORBIDDEN.value(), deleteTemplate(templateid, null));
-
-        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), tokenWithPermission));
-        assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithPermission));
-        assertEquals(HttpStatus.OK.value(), doELink(nifContent, templateid, tokenWithPermission));
-        assertEquals(HttpStatus.OK.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "private"));
-        assertEquals(204, deleteTemplate(templateid, tokenWithPermission));
-
-
-
     }
 
     @Test
