@@ -109,25 +109,27 @@ public class ELinkSecurityTest extends IntegrationTest {
     }
 
     @Test
-    public void testTemplateHandlingWithSecuritySimple() throws Exception {
+    public void testGetAllTemplates() throws Exception {
+        logger.info("testGetAllTemplates");
         if (!initialized)
             initUser();
 
         // add a template for the first user
+        logger.info("create private template for user 1");
         String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        logger.info("created template with id: " + templateid);
         assertNotNull(templateid);
-
+        logger.info("create public template for user 1");
         String templateid1 = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
+        logger.info("created template with id: " + templateid1);
         assertNotNull(templateid1);
-
+        logger.info("create private template for user 2");
         String templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithOutPermission);
+        logger.info("created template with id: "+templateid2);
         assertNotNull(templateid2);
 
-        //should return two templates
+        logger.info("getAllTemplates called by user 2 should return template " + templateid1 + " and " + templateid2);
         assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid1, templateid2), tokenWithOutPermission));
-
-        //assertEquals(HttpStatus.OK.value(),getAllTemplates(tokenWithPermission));
-        assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithPermission));
     }
 
     @Test
