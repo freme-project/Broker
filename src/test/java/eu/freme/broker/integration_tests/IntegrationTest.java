@@ -58,6 +58,11 @@ public abstract class IntegrationTest {
     public static String tokenWithOutPermission;
     public static String tokenAdmin;
 
+    final String usernameWithPermission = "userwithpermission";
+    final String passwordWithPermission = "testpassword";
+    final String usernameWithoutPermission = "userwithoutpermission";
+    final String passwordWithoutPermission = "testpassword";
+
     private boolean authenticate = false;
     private static boolean authenticated = false;
 
@@ -75,10 +80,6 @@ public abstract class IntegrationTest {
     }
 
     public void authenticateUsers() throws UnirestException {
-        final String usernameWithPermission = "userwithpermission";
-        final String passwordWithPermission = "testpassword";
-        final String usernameWithoutPermission = "userwithoutpermission";
-        final String passwordWithoutPermission = "testpassword";
 
         //Creates two users, one intended to have permission, the other not
         createUser(usernameWithPermission, passwordWithPermission);
