@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.github.stefanbirkner.fishbowl.Fishbowl.exceptionThrownBy;
@@ -71,7 +71,7 @@ public class ELinkSecurityTest extends IntegrationTest {
         Throwable exception = exceptionThrownBy(() -> createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", null));
         assertEquals(AccessDeniedException.class, exception.getClass());
         logger.info("try to fetch all templates as anonymous user... should work");
-        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), null));
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.singletonList(templateid), null));
         logger.info("try to get public template as anonymous user... should work");
         assertEquals(HttpStatus.OK.value(), getTemplate(templateid, null));
         logger.info("try to use e-link with public template as anonymous user... should work");
@@ -131,9 +131,9 @@ public class ELinkSecurityTest extends IntegrationTest {
         logger.info("try to fetch private template as owner... should work");
         assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithPermission));
         logger.info("fetch all templates as other user... should return an empty list");
-        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(), tokenWithOutPermission));
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.emptyList(), tokenWithOutPermission));
         logger.info("fetch all templates as owner... should return template: "+templateid);
-        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.singletonList(templateid), tokenWithPermission));
         logger.info("try to update private template as other user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"));
         logger.info("try to delete private template as other user... should not work");
@@ -147,9 +147,9 @@ public class ELinkSecurityTest extends IntegrationTest {
         logger.info("try to fetch public template as owner... should work");
         assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithPermission));
         logger.info("fetch all templates as other user... should return template: " + templateid);
-        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), tokenWithOutPermission));
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.singletonList(templateid), tokenWithOutPermission));
         logger.info("fetch all templates as owner... should return template: "+templateid);
-        assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.singletonList(templateid), tokenWithPermission));
         logger.info("try to update public template as other user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"));
         logger.info("try to delete public template as other user... should not work");
