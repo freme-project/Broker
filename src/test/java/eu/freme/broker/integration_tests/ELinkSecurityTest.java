@@ -78,9 +78,9 @@ public class ELinkSecurityTest extends IntegrationTest {
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
         assertEquals(HttpStatus.OK.value(), doELink(nifContent, templateid, null));
         logger.info("try to update a public template as anonymous user... should not work");
-        assertEquals(HttpStatus.FORBIDDEN.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, null, "private"));
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, null, "private"));
         logger.info("try to delete public template as anonymous user... should not work");
-        assertEquals(HttpStatus.FORBIDDEN.value(), deleteTemplate(templateid, null));
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteTemplate(templateid, null));
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
@@ -127,7 +127,7 @@ public class ELinkSecurityTest extends IntegrationTest {
         // User with permission should
         // Public templates can be queried, but not updated or deleted by another user.
         logger.info("try to fetch private template as other user... should not work");
-        assertEquals(HttpStatus.FORBIDDEN.value(), getTemplate(templateid, tokenWithOutPermission));
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), getTemplate(templateid, tokenWithOutPermission));
         logger.info("try to fetch private template as owner... should work");
         assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithPermission));
         logger.info("fetch all templates as other user... should return an empty list");
@@ -135,9 +135,9 @@ public class ELinkSecurityTest extends IntegrationTest {
         logger.info("fetch all templates as owner... should return template: "+templateid);
         assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), tokenWithPermission));
         logger.info("try to update private template as other user... should not work");
-        assertEquals(HttpStatus.FORBIDDEN.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"));
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"));
         logger.info("try to delete private template as other user... should not work");
-        assertEquals(HttpStatus.FORBIDDEN.value(), deleteTemplate(templateid, tokenWithOutPermission));
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteTemplate(templateid, tokenWithOutPermission));
 
         logger.info("try to update private template as owner. Set visibility to public... should work");
         assertEquals(HttpStatus.OK.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "public"));
@@ -151,14 +151,14 @@ public class ELinkSecurityTest extends IntegrationTest {
         logger.info("fetch all templates as owner... should return template: "+templateid);
         assertEquals(HttpStatus.OK.value(), getAllTemplates(Arrays.asList(templateid), tokenWithPermission));
         logger.info("try to update public template as other user... should not work");
-        assertEquals(HttpStatus.FORBIDDEN.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"));
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithOutPermission, "private"));
         logger.info("try to delete public template as other user... should not work");
-        assertEquals(HttpStatus.FORBIDDEN.value(), deleteTemplate(templateid, tokenWithOutPermission));
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteTemplate(templateid, tokenWithOutPermission));
 
         logger.info("try to set public template to private as owner. Set visibility to private... should work");
         assertEquals(HttpStatus.OK.value(), updateTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", templateid, tokenWithPermission, "private"));
         logger.info("re-try to fetch private template as other user... should not work");
-        assertEquals(HttpStatus.FORBIDDEN.value(), getTemplate(templateid, tokenWithOutPermission));
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), getTemplate(templateid, tokenWithOutPermission));
 
         logger.info("try to delete private template as owner... should work");
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
@@ -179,7 +179,7 @@ public class ELinkSecurityTest extends IntegrationTest {
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
 
         logger.info("try to enrich via private template as other user... should not work");
-        assertEquals(HttpStatus.FORBIDDEN.value(), doELink(nifContent, id, tokenWithOutPermission));
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), doELink(nifContent, id, tokenWithOutPermission));
         logger.info("try to enrich via private template as template owner... should work");
         assertEquals(HttpStatus.OK.value(), doELink(nifContent, id, tokenWithPermission));
         logger.info("try to enrich via public template as other user... should work");
@@ -240,7 +240,7 @@ public class ELinkSecurityTest extends IntegrationTest {
                 .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description"))
                 .asString();
 
-        if(response.getStatus() == HttpStatus.FORBIDDEN.value())
+        if(response.getStatus() == HttpStatus.UNAUTHORIZED.value())
             throw new AccessDeniedException("Creation of template denied.");
         validateNIFResponse(response, RDFConstants.RDFSerialization.JSON_LD);
 
