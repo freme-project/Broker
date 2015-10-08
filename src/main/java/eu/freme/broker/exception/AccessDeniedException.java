@@ -26,5 +26,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @SuppressWarnings("serial")
 @ResponseStatus(value=HttpStatus.UNAUTHORIZED, reason="")
 public class AccessDeniedException extends FREMEHttpException{
-
+    public AccessDeniedException(){super();}
+    public AccessDeniedException(String msg){super(msg);}
 }

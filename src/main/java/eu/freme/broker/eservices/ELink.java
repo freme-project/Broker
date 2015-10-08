@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.hp.hpl.jena.rdf.model.*;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
+import eu.freme.broker.exception.InvalidNIFException;
 import eu.freme.broker.exception.InvalidTemplateEndpointException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.TemplateValidator;
@@ -94,25 +95,11 @@ public class ELink extends BaseRestController {
             @RequestParam Map<String,String> allParams) {
         try {
 
-            int templateId;
-            NIFParameterSet nifParameters;
-            try {
-                templateId = validateTemplateID(templateIdStr);
-                nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, false);
-            }catch(BadRequestException e){
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-            }
+            int templateId = validateTemplateID(templateIdStr);
+            NIFParameterSet nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, false);
 
-            try {
-                // check read access
-                if (templateDAO.findOneById(templateId + "") == null) {
-                    throw new BadRequestException("template metadata for templateId=\""+templateId+"\" does not exist");
-                }
-            }catch (AccessDeniedException e){
-                return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
-            }catch (OwnedResourceNotFoundException e){
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-            }
+            // check read access
+            templateDAO.findOneById(templateIdStr);
 
             HashMap<String, String> templateParams = new HashMap<>();
 
@@ -123,23 +110,24 @@ public class ELink extends BaseRestController {
             }
 
             Model inModel =  rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
-
             inModel = dataEnricher.enrichNIF(inModel, templateId, templateParams);
 
             HttpHeaders responseHeaders = new HttpHeaders();
             String serialization = rdfConversionService.serializeRDF(inModel, nifParameters.getOutformat());
             responseHeaders.add("Content-Type", nifParameters.getOutformat().getMimeType());
-            return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
-        } //catch (TemplateNotFoundException ex) {
-        //  logger.warn("The template with the specified ID has not been found.", ex);
-        //  throw new TemplateNotFoundException("The template with the specified ID has not been found.");
-//            } catch (org.apache.jena.riot.RiotException ex) {
-//                logger.error("Invalid NIF document.", ex);
-//                throw new InvalidNIFException(ex.getMessage());                
-        //}
-        catch (BadRequestException ex) {
+            return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (AccessDeniedException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new eu.freme.broker.exception.AccessDeniedException();
+        }catch (BadRequestException ex) {
             logger.error(ex.getMessage(), ex);
             throw ex;
+        }catch (OwnedResourceNotFoundException ex){
+            logger.error(ex.getMessage());
+            throw new TemplateNotFoundException(ex.getMessage());
+        } catch (org.apache.jena.riot.RiotException ex) {
+            logger.error("Invalid NIF document. "+ex.getMessage(), ex);
+            throw new InvalidNIFException(ex.getMessage());
         } catch (Exception ex) {
             logger.error("Internal service problem. Please contact the service provider.", ex);
             throw new InternalServerErrorException("Unknown problem. Please contact us.");
@@ -163,24 +151,16 @@ public class ELink extends BaseRestController {
             System.out.println(resource);
             System.out.println(endpoint);
             System.out.println(endpointType);
-//            int templateId;
-            NIFParameterSet nifParameters;
-            try {
-                nifParameters = this.normalizeNif("", acceptHeader, contentTypeHeader, allParams, false);
-            }catch(BadRequestException e){
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-            }
-            
+
+            NIFParameterSet nifParameters = this.normalizeNif("", acceptHeader, contentTypeHeader, allParams, false);
+
             Model inModel = dataEnricher.exploreResource(resource, endpoint, endpointType);
 
             HttpHeaders responseHeaders = new HttpHeaders();
             String serialization = rdfConversionService.serializeRDF(inModel, nifParameters.getOutformat());
             responseHeaders.add("Content-Type", nifParameters.getOutformat().getMimeType());
-            return new ResponseEntity<String>(serialization, responseHeaders, HttpStatus.OK);
-        } catch (UnsupportedEndpointType ex) {
-            logger.error(ex.getMessage(), ex);
-            throw ex;
-        } catch (UnsupportedOperationException ex) {
+            return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        } catch (UnsupportedEndpointType | BadRequestException | UnsupportedOperationException ex) {
             logger.error(ex.getMessage(), ex);
             throw ex;
         } catch (Exception ex) {
@@ -207,21 +187,17 @@ public class ELink extends BaseRestController {
 
         try {
 
-            NIFParameterSet nifParameters;
-            try {
-                nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, false);
-            }catch(BadRequestException e){
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-            }
+            NIFParameterSet nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, false);
 
             // NOTE: informat was defaulted to JSON before! Now it is TURTLE.
             // NOTE: outformat was defaulted to turtle, if acceptHeader=="*/*" and informat==null, otherwise to JSON. Now it is TURTLE.
 
             Template template;
-
             if(nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)){
                 JSONObject jsonObj = new JSONObject(postBody);
                 templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
+
+                //AccessDeniedException can be thrown, if current authentication is the anonymousUser
                 template = new Template(
                         OwnedResource.Visibility.getByString(visibility),
                         jsonObj.getString("endpoint"),
@@ -235,33 +211,29 @@ public class ELink extends BaseRestController {
                 templateValidator.validateTemplateEndpoint(template.getEndpoint());
             }
 
-            try{
-                templateDAO.save(template);
-            } catch (AccessDeniedException e){
-                // hardly possible, but checked ether
-                return new ResponseEntity<String>("Access denied.", HttpStatus.FORBIDDEN);
-            }
-
+            templateDAO.save(template);
             HttpHeaders responseHeaders = new HttpHeaders();
             URI location = new URI("/e-link/templates/"+template.getId());
             responseHeaders.setLocation(location);
             responseHeaders.set("Content-Type", nifParameters.getOutformat().getMimeType());
             String serialization = rdfConversionService.serializeRDF(template.getRDF(), nifParameters.getOutformat());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
-            throw new BadRequestException(ex.getMessage());
-        } catch (org.json.JSONException ex) {
-            Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (AccessDeniedException ex){
+            logger.error(ex.getMessage(), ex);
+            throw new eu.freme.broker.exception.AccessDeniedException(ex.getMessage());
+        }catch(BadRequestException ex){
+            logger.error(ex.getMessage(), ex);
+            throw ex;
+        } catch (URISyntaxException | org.json.JSONException ex) {
+            logger.error(ex.getMessage(), ex);
             throw new BadRequestException(ex.getMessage());
         } catch (InvalidTemplateEndpointException ex) {
-            Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(), ex);
             throw new InvalidTemplateEndpointException(ex.getMessage());
         } catch (Exception ex) {
-            Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(), ex);
             throw new InternalServerErrorException(ex.getMessage());
         }
-
     }
 
     // Get one template.
@@ -277,52 +249,36 @@ public class ELink extends BaseRestController {
             @RequestParam Map<String,String> allParams) {
 
         try {
-            int templateId;
-            NIFParameterSet nifParameters;
-            try {
-                templateId = validateTemplateID(templateIdStr);
-                // NOTE: outformat was defaulted to JSON before! Now it is TURTLE.
-                nifParameters = this.normalizeNif(null, acceptHeader, null, allParams, true);
-            }catch(BadRequestException e){
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-            }
-
+            validateTemplateID(templateIdStr);
+            // NOTE: outformat was defaulted to JSON before! Now it is TURTLE.
+            NIFParameterSet nifParameters = this.normalizeNif(null, acceptHeader, null, allParams, true);
             HttpHeaders responseHeaders = new HttpHeaders();
-
-            Template template;
-            try {
-                // check read access
-                template = templateDAO.findOneById(templateId+"");
-                if (template == null) {
-                    throw new BadRequestException("template metadata for templateId=\""+templateId+"\" does not exist");
-                }
-            }catch (AccessDeniedException e){
-                return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
-            }catch (OwnedResourceNotFoundException e){
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-            }
+            // check read access
+            Template template = templateDAO.findOneById(templateIdStr);
 
             String serialization;
             if(nifParameters.getOutformat().equals(RDFConstants.RDFSerialization.JSON)){
                 ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-                //JSONObject jsonObject = new JSONObject(ow.writeValueAsString(template));
-                serialization = ow.writeValueAsString(template);//jsonObject.toString();//json;//gson.toJson(template); //Exporter.getInstance().convertOneTemplate2JSON(t).toString(4);
+                serialization = ow.writeValueAsString(template);
             }else {
                 serialization = rdfConversionService.serializeRDF(template.getRDF(), nifParameters.getOutformat());
             }
             responseHeaders.set("Content-Type", nifParameters.getOutformat().getMimeType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
 
-        } catch (TemplateNotFoundException e) {
-            throw new TemplateNotFoundException("Template not found.");
-        } catch (BadRequestException ex) {
+        }catch (AccessDeniedException ex){
+            logger.error(ex.getMessage(), ex);
+            throw new eu.freme.broker.exception.AccessDeniedException();
+        }catch(BadRequestException ex){
             logger.error(ex.getMessage(), ex);
             throw ex;
+        } catch (OwnedResourceNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new TemplateNotFoundException("Template not found. "+ex.getMessage());
         } catch (Exception ex) {
-            Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(), ex);
             throw new InternalServerErrorException("Unknown problem. Please contact us.");
         }
-
     }
 
     // Retrieve all templates.
@@ -337,7 +293,7 @@ public class ELink extends BaseRestController {
             //@RequestParam(value = "o",             required=false) String o,
             @RequestParam Map<String, String> allParams) {
         try {
-            NIFParameterSet nifParameters = this.normalizeNif(null, acceptHeader, contentTypeHeader,allParams,true);
+            NIFParameterSet nifParameters = this.normalizeNif(null, acceptHeader, contentTypeHeader, allParams, true);
 
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.set("Content-Type", nifParameters.getOutformat().getMimeType());
@@ -360,7 +316,6 @@ public class ELink extends BaseRestController {
             Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
         }
         throw new InternalServerErrorException("Unknown problem. Please contact us.");
-//            return new ResponseEntity<String>("Unknown problem. Please contact us.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     // Update one template.
@@ -380,39 +335,27 @@ public class ELink extends BaseRestController {
             @RequestParam Map<String,String> allParams,
             @RequestBody String postBody) {
         try {
+            // NOTE: informat was defaulted to JSON before! Now it is TURTLE.
+            // NOTE: outformat was defaulted to turtle, if acceptHeader=="*/*" and informat==null, otherwise to JSON. Now it is TURTLE.
+            NIFParameterSet nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, true);
 
-            NIFParameterSet nifParameters;
-            try {
-                // NOTE: informat was defaulted to JSON before! Now it is TURTLE.
-                // NOTE: outformat was defaulted to turtle, if acceptHeader=="*/*" and informat==null, otherwise to JSON. Now it is TURTLE.
-                nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, false);
-            }catch(BadRequestException e){
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-            }
+            validateTemplateID(templateId);
+            // check read access
+            Template template = templateDAO.findOneById(templateId);
+            decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), template, accessLevelHelper.writeAccess());
 
-            Template template;
-            try {
-                // check read access
-                template = templateDAO.findOneById(templateId);
-                if (template == null) {
-                    throw new BadRequestException("template metadata for templateId=\""+templateId+"\" does not exist");
+            // Was the nif-input empty?
+            if(nifParameters.getInput()!=null) {
+                if (nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)) {
+                    JSONObject jsonObj = new JSONObject(nifParameters.getInput());
+                    template.setEndpoint(jsonObj.getString("endpoint"));
+                    template.setEndpoint(jsonObj.getString("endpoint"));
+                    template.setLabel(jsonObj.getString("label"));
+                    template.setDescription(jsonObj.getString("description"));
+                } else {
+                    Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
+                    template.setTemplateWithModel(model);
                 }
-                decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), template, accessLevelHelper.writeAccess());
-            }catch (AccessDeniedException e){
-                return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
-            }catch (OwnedResourceNotFoundException e){
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-            }
-
-            if(nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)){
-                JSONObject jsonObj = new JSONObject(nifParameters.getInput());
-                template.setEndpoint(jsonObj.getString("endpoint"));
-                template.setEndpoint(jsonObj.getString("endpoint"));
-                template.setLabel(jsonObj.getString("label"));
-                template.setDescription(jsonObj.getString("description"));
-            }else{
-                Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
-                template.setTemplateWithModel(model);
             }
 
             if(visibility!=null) {
@@ -424,12 +367,7 @@ public class ELink extends BaseRestController {
                     throw new BadRequestException("Can not change owner of the dataset. User \""+ownerName+"\" does not exist.");
                 template.setOwner(owner);
             }
-
-            try {
-                templateDAO.save(template);
-            }catch (AccessDeniedException e){
-                return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
-            }
+            templateDAO.save(template);
 
             String serialization = rdfConversionService.serializeRDF(template.getRDF(), nifParameters.getOutformat());
             HttpHeaders responseHeaders = new HttpHeaders();
@@ -438,12 +376,22 @@ public class ELink extends BaseRestController {
             responseHeaders.set("Content-Type", nifParameters.getOutformat().getMimeType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         } catch (URISyntaxException ex) {
-            Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (org.json.JSONException ex) {
-            Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(), ex);
+            throw new BadRequestException(ex.getMessage());
+        }catch (AccessDeniedException ex){
+            logger.error(ex.getMessage(), ex);
+            throw new eu.freme.broker.exception.AccessDeniedException();
+        }catch(BadRequestException ex){
+            logger.error(ex.getMessage(), ex);
+            throw ex;
+        } catch (OwnedResourceNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new TemplateNotFoundException("Template not found. "+ex.getMessage());
+        }catch (org.json.JSONException ex) {
+            logger.error(ex.getMessage(), ex);
             throw new BadRequestException("The JSON object is incorrectly formatted. Problem description: " + ex.getMessage());
         } catch (Exception ex) {
-            Logger.getLogger(ELink.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(), ex);
         }
         throw new InternalServerErrorException("Unknown problem. Please contact us.");
     }
@@ -454,13 +402,19 @@ public class ELink extends BaseRestController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<String> removeTemplateById(@PathVariable("templateid") String id) {
         try {
+            validateTemplateID(id);
             // check read and write access
             templateDAO.delete(templateDAO.findOneById(id));
-            return new ResponseEntity<>("The template was sucessfully removed.", HttpStatus.NO_CONTENT);
-        }catch (AccessDeniedException e){
-            return new ResponseEntity<>("Access denied.", HttpStatus.FORBIDDEN);
-        }catch (OwnedResourceNotFoundException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("The template was sucessfully removed.", HttpStatus.OK);
+        }catch (AccessDeniedException ex){
+            logger.error(ex.getMessage(), ex);
+            throw new eu.freme.broker.exception.AccessDeniedException();
+        }catch(BadRequestException ex){
+            logger.error(ex.getMessage(), ex);
+            throw ex;
+        } catch (OwnedResourceNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new TemplateNotFoundException("Template not found. "+ex.getMessage());
         }
     }
 

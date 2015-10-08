@@ -38,6 +38,7 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConversionService;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -53,28 +54,72 @@ public abstract class IntegrationTest {
     public Logger logger = Logger.getLogger(IntegrationTest.class);
 
 
+    public static String tokenWithPermission;
+    public static String tokenWithOutPermission;
+    public static String tokenAdmin;
+
+    private boolean authenticate = false;
+    private static boolean authenticated = false;
+
     public IntegrationTest(String service){
         this.service = service;
     }
 
     @Before
-    public void setup(){
+    public void setup() throws UnirestException {
         baseUrl = IntegrationTestSetup.getURLEndpoint();
         url=baseUrl+service;
         converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
+        if(!authenticated && authenticate)
+            authenticateUsers();
+    }
+
+    public void authenticateUsers() throws UnirestException {
+        final String usernameWithPermission = "userwithpermission";
+        final String passwordWithPermission = "testpassword";
+        final String usernameWithoutPermission = "userwithoutpermission";
+        final String passwordWithoutPermission = "testpassword";
+
+        //Creates two users, one intended to have permission, the other not
+        createUser(usernameWithPermission, passwordWithPermission);
+        tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
+        createUser(usernameWithoutPermission, passwordWithoutPermission);
+        tokenWithOutPermission = authenticateUser(usernameWithoutPermission, passwordWithoutPermission);
+        ConfigurableApplicationContext context = IntegrationTestSetup.getApplicationContext();
+        tokenAdmin = authenticateUser(context.getEnvironment().getProperty("admin.username"), context.getEnvironment().getProperty("admin.password"));
+        authenticated = true;
     }
 
     //All HTTP Methods used in FREME are defined.
     protected HttpRequestWithBody baseRequestPost(String function) {
         return Unirest.post(url + function);
     }
-    protected HttpRequest baseRequestGet( String function) {
-        return Unirest.get(url + function);
-    }
+    protected HttpRequest baseRequestGet( String function) {return Unirest.get(url + function);}
     protected HttpRequestWithBody baseRequestDelete( String function) {
         return Unirest.delete(url + function);
     }
     protected HttpRequestWithBody baseRequestPut( String function) {
+        return Unirest.put(url + function);
+    }
+
+    protected HttpRequestWithBody baseRequestPost(String function, String token) {
+        if(token!=null)
+            return Unirest.post(url + function).header("X-Auth-Token", token);
+        return Unirest.post(url + function);
+    }
+    protected HttpRequest baseRequestGet( String function, String token) {
+        if(token!=null)
+            return Unirest.get(url + function).header("X-Auth-Token", token);
+        return Unirest.get(url + function);
+    }
+    protected HttpRequestWithBody baseRequestDelete( String function, String token) {
+        if(token!=null)
+            return Unirest.delete(url + function).header("X-Auth-Token", token);
+        return Unirest.delete(url + function);
+    }
+    protected HttpRequestWithBody baseRequestPut( String function, String token) {
+        if(token!=null)
+            return Unirest.put(url + function).header("X-Auth-Token", token);
         return Unirest.put(url + function);
     }
 
@@ -150,6 +195,9 @@ public abstract class IntegrationTest {
                 " }";
     }
 
+    public void enableAuthenticate() {
+        authenticate = true;
+    }
 
     public void createUser(String username, String password) throws UnirestException {
 
