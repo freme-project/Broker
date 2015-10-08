@@ -220,7 +220,7 @@ public class ELink extends BaseRestController {
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         }catch (AccessDeniedException ex){
             logger.error(ex.getMessage(), ex);
-            throw new eu.freme.broker.exception.AccessDeniedException();
+            throw new eu.freme.broker.exception.AccessDeniedException(ex.getMessage());
         }catch(BadRequestException ex){
             logger.error(ex.getMessage(), ex);
             throw ex;
