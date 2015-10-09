@@ -17,11 +17,15 @@
  */
 package eu.freme.broker.integration_tests.pipelines;
 
+import com.hp.hpl.jena.util.FileUtils;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
 import org.apache.http.HttpStatus;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.IOException;
 
 /**
  * @author Gerald Haesendonck
@@ -76,5 +80,14 @@ public class EntityLinkTest extends PipelinesCommon {
 		SerializedRequest linkRequest = RequestFactory.createLink("3");	// Geo pos
 
 		sendRequest(HttpStatus.SC_BAD_REQUEST, entityRequest, linkRequest);
+	}
+
+	@Test
+	public void testLongArticle() throws IOException, UnirestException {
+		String data = readFile("src/test/resources/pipelines/DuitslandGriekenland.txt");
+		SerializedRequest entityRequest = RequestFactory.createEntityFremeNER(data, "nl", "dbpedia");
+		SerializedRequest linkRequest = RequestFactory.createLink("3");	// Geo pos
+
+		sendRequest(HttpStatus.SC_OK, entityRequest, linkRequest);
 	}
 }
