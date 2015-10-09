@@ -28,10 +28,6 @@ import org.junit.Test;
  */
 public class EntityLinkTest extends PipelinesCommon {
 
-	public EntityLinkTest() {
-		super("/pipelining/");
-	}
-
 	/**
 	 * e-Entity using the Spotlight NER and e-Link using template 3 (Geo pos). All should go well.
 	 * @throws UnirestException

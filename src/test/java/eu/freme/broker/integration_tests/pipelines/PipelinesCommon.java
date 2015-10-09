@@ -38,8 +38,8 @@ import static org.junit.Assert.assertEquals;
  * @author Gerald Haesendonck
  */
 public abstract class PipelinesCommon extends IntegrationTest {
-	protected PipelinesCommon(String service) {
-		super(service);
+	protected PipelinesCommon() {
+		super("/pipelining/");
 	}
 
 	/**
@@ -54,7 +54,7 @@ public abstract class PipelinesCommon extends IntegrationTest {
 	protected HttpResponse<String> sendRequest(int expectedResponseCode, SerializedRequest... requests) throws UnirestException {
 		List<SerializedRequest> serializedRequests = Arrays.asList(requests);
 		String body = RequestFactory.toJson(requests);
-		System.out.println("request.body = " + body);
+		//System.out.println("request.body = " + body);
 
 		HttpResponse<String> response = baseRequestPost("chain")
 				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
