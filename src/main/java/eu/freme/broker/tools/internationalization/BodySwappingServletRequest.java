@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.freme.broker.tools;
+package eu.freme.broker.tools.internationalization;
 
 import java.io.BufferedReader;
 import java.io.IOException;

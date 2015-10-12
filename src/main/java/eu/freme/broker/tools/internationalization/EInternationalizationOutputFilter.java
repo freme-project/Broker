@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.freme.broker.tools;
+package eu.freme.broker.tools.internationalization;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,72 +52,31 @@ import eu.freme.i18n.okapi.nif.converter.ConversionException;
 
 @Component
 @Profile("broker")
-public class EInternationalizationFilter implements Filter {
+public class EInternationalizationOutputFilter implements Filter {
 
-	private HashSet<String> contentTypes;
-	private Logger logger = Logger.getLogger(EInternationalizationFilter.class);
+	private Logger logger = Logger.getLogger(EInternationalizationOutputFilter.class);
 
 	@Autowired
 	EInternationalizationAPI eInternationalizationApi;
 
-	public EInternationalizationFilter() {
-		contentTypes = new HashSet<String>();
-		contentTypes.add(EInternationalizationAPI.MIME_TYPE_HTML.toLowerCase());
-		contentTypes.add(EInternationalizationAPI.MIME_TYPE_XLIFF_1_2
-				.toLowerCase());
+	public EInternationalizationOutputFilter() {
 	}
 
 	public void doFilter(ServletRequest req, ServletResponse res,
 			FilterChain chain) throws IOException, ServletException {
+//
+//		String informat = req.getParameter("informat");
+//		if (informat == null && req.getContentType() != null) {
+//			informat = req.getContentType();
+//			String[] parts = informat.split(";");
+//			if (parts.length > 1) {
+//				informat = parts[0].trim();
+//			}
+//		}
 
-		String informat = req.getParameter("informat");
-		if (informat == null && req.getContentType() != null) {
-			informat = req.getContentType();
-			String[] parts = informat.split(";");
-			if (parts.length > 1) {
-				informat = parts[0].trim();
-			}
-		}
+		res.getOutputStream().write(new String("xxxxxxxxxxx").getBytes());
 
-		if (informat == null) {
-			chain.doFilter(req, res);
-			return;
-		}
-
-		if (!contentTypes.contains(informat.toLowerCase())) {
-			chain.doFilter(req, res);
-			return;
-		}
-
-		if (!(req instanceof HttpServletRequest)) {
-			chain.doFilter(req, res);
-			return;
-		}
-
-		logger.debug("convert input from " + informat + " to nif");
-
-		InputStream is = null;
-
-		String inputQueryString = req.getParameter("input");
-		if (inputQueryString == null) {
-			// read data from request body
-			is = req.getInputStream();
-		} else {
-			// read data from query string input parameter
-			is = new ReaderInputStream(new StringReader(inputQueryString), "UTF-8");
-		}
-
-		Reader nif;
-		try {
-			nif = eInternationalizationApi.convertToTurtle(is,
-					informat.toLowerCase());
-		} catch (ConversionException e) {
-			logger.error("Error", e);
-			throw new InternalServerErrorException();
-		}
-		BodySwappingServletRequest bssr = new BodySwappingServletRequest(
-				(HttpServletRequest) req, nif);
-		chain.doFilter(bssr, res);
+		chain.doFilter(req, res);
 	}
 
 	public void init(FilterConfig filterConfig) {
