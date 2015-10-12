@@ -23,6 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Helper class to create a NIFParameterSet according to the specification of NIF.
  * 
@@ -35,12 +39,24 @@ public class NIFParameterFactory {
 
 	String defaultPrefix = "http://freme-project.eu/";
 
+	public final Set<String> NIF_PARAMETERS = new HashSet<>(Arrays.asList(new String[]{
+			"input", "i", "informat", "f", "outformat", "o", "prefix", "p"
+	}));
+
+
+	public NIFParameterSet constructFromHttp(String input, String informat,
+											 String outformat, String postBody, String acceptHeader,
+											 String contentTypeHeader, String prefix) throws BadRequestException {
+		return constructFromHttp(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix, false);
+	}
+
+
 	public NIFParameterSet constructFromHttp(String input, String informat,
 			String outformat, String postBody, String acceptHeader,
-			String contentTypeHeader, String prefix) throws BadRequestException {
+			String contentTypeHeader, String prefix, boolean allowEmptyInput) throws BadRequestException {
 
 		String thisInput;
-		if (input == null && postBody == null) {
+		if (!allowEmptyInput && input == null && postBody == null) {
 			throw new BadRequestException("no input found in request");
 		} else if (input != null) {
 			thisInput = input;
@@ -103,5 +119,9 @@ public class NIFParameterFactory {
 		}
 
 		return new NIFParameterSet(thisInput, thisInformat, thisOutformat, thisPrefix);
+	}
+
+	public boolean isNIFParameter(String parameter){
+		return NIF_PARAMETERS.contains(parameter);
 	}
 }

@@ -19,10 +19,12 @@ package eu.freme.broker.eservices;
 
 import java.lang.annotation.Annotation;
 import java.util.Date;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.InternalServerErrorException;
 
+import eu.freme.broker.exception.BadRequestException;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +70,8 @@ public abstract class BaseRestController {
 	
 	public static final String authenticationEndpoint = "/authenticate";
 
+	public static final String inputDummy = "inputDummy";
+
 	/**
 	 * Create a NIFParameterSet to make dealing with NIF API specifications
 	 * easier. It handles informat overwrites Content-Type header, input
@@ -87,6 +91,47 @@ public abstract class BaseRestController {
 			String contentTypeHeader, String prefix) {
 		return nifParameterFactory.constructFromHttp(input, informat,
 				outformat, postBody, acceptHeader, contentTypeHeader, prefix);
+	}
+
+	/**
+	 * Create a NIFParameterSet to make dealing with NIF API specifications
+	 * easier. It handles informat overwrites Content-Type header, input
+	 * overwrites post body, and more.
+	 *
+	 * @param postBody
+	 * @param acceptHeader
+	 * @param contentTypeHeader,
+	 * @param parameters
+	 * @param allowEmptyInput
+	 */
+	protected NIFParameterSet normalizeNif(String postBody, String acceptHeader, String contentTypeHeader, Map<String,String> parameters, boolean allowEmptyInput)
+			throws BadRequestException {
+		// merge long and short parameters - long parameters override short parameters
+		String input = parameters.get("input");
+		if(input == null){
+			input = parameters.get("i");
+		}
+		// trim input and set it to null, if empty
+		if(input!=null){
+			input = input.trim();
+			if(input.length()==0)
+				input=null;
+		}
+
+		String informat = parameters.get("informat");
+		if(informat == null){
+			informat = parameters.get("f");
+		}
+		String outformat = parameters.get("outformat");
+		if(outformat == null){
+			outformat = parameters.get("o");
+		}
+		String prefix = parameters.get("prefix");
+		if(prefix == null){
+			prefix = parameters.get("p");
+		}
+		return nifParameterFactory.constructFromHttp(input, informat,
+				outformat, postBody, acceptHeader, contentTypeHeader, prefix, allowEmptyInput);
 	}
 
 	/**
