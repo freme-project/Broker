@@ -45,13 +45,13 @@ import org.springframework.http.HttpStatus;
  * Created by Arne on 29.07.2015.
  */
 
-public abstract class IntegrationTest {
+public abstract class EServiceTest {
 
     private String url = null;
     private String baseUrl = null;
     private String service;
     public RDFConversionService converter;
-    public Logger logger = Logger.getLogger(IntegrationTest.class);
+    public Logger logger = Logger.getLogger(EServiceTest.class);
 
 
     public static String tokenWithPermission;
@@ -66,7 +66,7 @@ public abstract class IntegrationTest {
     private boolean authenticate = false;
     private static boolean authenticated = false;
 
-    public IntegrationTest(String service){
+    public EServiceTest(String service){
         this.service = service;
     }
 

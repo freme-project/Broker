@@ -21,8 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,14 +63,19 @@ public class FremeNER extends BaseRestController {
 	@Autowired
 	EEntityService entityAPI;
         
-        @Autowired
-        DataEnricher dataEnricher;
+    @Autowired
+    DataEnricher dataEnricher;
+
+    public final Set<String> SUPPORTED_LANGUAGES = new HashSet<>(Arrays.asList(new String[]{
+            "en", "de", "nl", "it", "fr", "es", "ru"
+    }));
+
 
         // Submitting document for processing.
 	@RequestMapping(value = "/e-entity/freme-ner/documents", method = {
             RequestMethod.POST, RequestMethod.GET })
 	public ResponseEntity<String> execute(
-			@RequestParam(value = "input", required = false) String input,
+			/*@RequestParam(value = "input", required = false) String input,
 			@RequestParam(value = "i", required = false) String i,
 			@RequestParam(value = "informat", required = false) String informat,
 			@RequestParam(value = "f", required = false) String f,
@@ -79,41 +83,25 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "o", required = false) String o,
 			@RequestParam(value = "prefix", required = false) String prefix,
 			@RequestParam(value = "p", required = false) String p,
-			@RequestHeader(value = "Accept", required = false) String acceptHeader,
+			*/
+            @RequestHeader(value = "Accept", required = false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
-			@RequestParam(value = "language", required = false) String language,
-			@RequestParam(value = "dataset", required = false) String dataset,
+			@RequestParam(value = "language", required = true) String language,
+			@RequestParam(value = "dataset", required = true) String dataset,
 			@RequestParam(value = "numLinks", required = false) String numLinksParam,
 			@RequestParam(value = "enrichement", required = false) String enrichementType,
 			@RequestParam(value = "mode", required = false) String mode,
-                        @RequestBody(required = false) String postBody) {
-            
+            @RequestParam Map<String,String> allParams,
+            @RequestBody(required = false) String postBody) {
+        try {
             // Check the language parameter.
-            if(language == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Parameter language is not specified");            
-            } else {
-                if(language.equals("en") 
-                        || language.equals("de") 
-                        || language.equals("nl")
-                        || language.equals("it")
-                        || language.equals("fr")
-                        || language.equals("es")
-                        || language.equals("ru")) {
-                    // OK, the language is supported.
-                } else {
+           if(!SUPPORTED_LANGUAGES.contains(language)){
                     // The language specified with the langauge parameter is not supported.
                     throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
-                }
             }
-            
-            // Check the dataset parameter.
-            if(dataset == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Dataset parameter is not specified");            
-            } else {
-                // OK, dataset specified.
-            }
-            
-            ArrayList rMode = new ArrayList();
+
+
+            ArrayList<String> rMode = new ArrayList<>();
             
             // Check the MODE parameter.
             if(mode != null) {
@@ -154,8 +142,9 @@ public class FremeNER extends BaseRestController {
                 }
             }
             
-            NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
-           
+            //NIFParameterSet parameters = this.normalizeNif(input, informat, outformat, postBody, acceptHeader, contentTypeHeader, prefix);
+            NIFParameterSet nifParameters = this.normalizeNif(postBody,acceptHeader,contentTypeHeader,allParams,false);
+
             Model inModel = ModelFactory.createDefaultModel();
             Model outModel = ModelFactory.createDefaultModel();
             outModel.setNsPrefix("dbpedia", "http://dbpedia.org/resource/");
@@ -170,25 +159,11 @@ public class FremeNER extends BaseRestController {
             outModel.setNsPrefix("dcterms", "http://purl.org/dc/terms/");
             outModel.setNsPrefix("freme-onto", "http://freme-project.eu/ns#");
 
-            // merge long and short parameters - long parameters override short parameters
-            if( input == null ){
-                input = i;
-            }
-            if( informat == null ){
-                informat = f;
-            }
-            if( outformat == null ){
-                outformat = o;
-            }
-            if( prefix == null ){
-                prefix = p;
-            }
-            
             String docForProcessing = null;
             
-            if (parameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
+            if (nifParameters.getInformat().equals(RDFConstants.RDFSerialization.PLAINTEXT)) {
                 // input is sent as value of the input parameter
-                docForProcessing = parameters.getInput();
+                docForProcessing = nifParameters.getInput();
                 
                 if(rMode.size() == 1 && rMode.contains("link")) {
                     throw new eu.freme.broker.exception.BadRequestException("Unsupported mode combination: you must provide NIF in order to perform only linking.");
@@ -200,23 +175,7 @@ public class FremeNER extends BaseRestController {
                 if(rMode.size() == 1 && rMode.contains("link")) {
                     docForProcessing = postBody;
                 } else {
-                    switch(parameters.getInformat()) {
-                        case TURTLE:
-                            inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "TTL");
-                            break;
-                        case JSON_LD:
-                            inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "JSON-LD");
-                            break;
-                        case RDF_XML:
-                            inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "RDF/XML");
-                            break;
-                        case N_TRIPLES:
-                            inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N-TRIPLE");
-                            break;
-                        case N3:
-                            inModel.read(new ByteArrayInputStream(postBody.getBytes()), null, "N3");
-                            break;                        
-                    }
+                    inModel = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
 
                     StmtIterator iter = inModel.listStatements(null, RDF.type, inModel.getResource("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#Context"));
 
@@ -226,7 +185,7 @@ public class FremeNER extends BaseRestController {
                     while(!textFound) {
                         Resource contextRes = iter.nextStatement().getSubject();
                         tmpPrefix = contextRes.getURI().split("#")[0];
-                        parameters.setPrefix(tmpPrefix);
+                        nifParameters.setPrefix(tmpPrefix);
                         Statement isStringStm = contextRes.getProperty(inModel.getProperty("http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#isString"));
                         if(isStringStm != null) {
                             docForProcessing = isStringStm.getObject().asLiteral().getString();
@@ -240,25 +199,28 @@ public class FremeNER extends BaseRestController {
                 }
             }
             
-            try {
-                String fremeNERRes = entityAPI.callFremeNER(docForProcessing, language, parameters.getPrefix(), dataset, numLinks, rMode, parameters.getInformat().getMimeType());
+
+                String fremeNERRes = entityAPI.callFremeNER(docForProcessing, language, nifParameters.getPrefix(), dataset, numLinks, rMode, nifParameters.getInformat().getMimeType());
                 outModel.read(new ByteArrayInputStream(fremeNERRes.getBytes()), null, "TTL");
                 outModel.add(inModel);
-                HashMap<String, String> templateParams = new HashMap();
+                HashMap<String, String> templateParams = new HashMap<>();
                 if(enrichementType != null) {
                     if(enrichementType.equals("dbpedia-categories")) {
                         outModel = dataEnricher.enrichNIF(outModel, 300, templateParams);
                     }
                 }
+
+            return createSuccessResponse(outModel,  nifParameters.getOutformat());
             } catch (BadRequestException e) {
-                logger.error("failed", e);
+                logger.error(e.getMessage(), e);
                 throw new eu.freme.broker.exception.BadRequestException(e.getMessage());
             } catch (eu.freme.eservices.eentity.exceptions.ExternalServiceFailedException e) {
-                logger.error("failed", e);
+                logger.error(e.getMessage(), e);
                 throw new ExternalServiceFailedException();
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                throw new eu.freme.broker.exception.BadRequestException(e.getMessage());
             }
-            
-            return createSuccessResponse(outModel,  parameters.getOutformat());
         }
 
         // Submitting dataset for use in the e-Entity service.
@@ -266,78 +228,34 @@ public class FremeNER extends BaseRestController {
 	@RequestMapping(value = "/e-entity/freme-ner/datasets", method = {
             RequestMethod.POST })
 	public ResponseEntity<String> createDataset(
-			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
-			@RequestParam(value = "name", required = false) String name,
-			@RequestParam(value = "description", required = false) String description,
-			@RequestParam(value = "language", required = false) String language,
-			@RequestParam(value = "informat", required = false) String informat,
-			@RequestParam(value = "f", required = false) String f,
+            @RequestHeader(value = "Accept", required = false) String acceptHeader,
+            @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+			@RequestParam(value = "name", required = true) String name,
+			@RequestParam(value = "description", required = true) String description,
+			@RequestParam(value = "language", required = true) String language,
+			//@RequestParam(value = "informat", required = false) String informat,
+			//@RequestParam(value = "f", required = false) String f,
 			@RequestParam(value = "endpoint", required = false) String endpoint,
 			@RequestParam(value = "sparql", required = false) String sparql,
-                        @RequestBody(required = false) String postBody) {
-            
-            // merge long and short parameters - long parameters override short parameters.
-            if( informat == null ){
-                informat = f;
+            @RequestParam Map<String,String> allParams,
+            @RequestBody(required = false) String postBody) {
+
+        try {
+            if (!SUPPORTED_LANGUAGES.contains(language)) {
+                // The language specified with the langauge parameter is not supported.
+                throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
             }
-            // Check the dataset name parameter.
-            if(name == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Parameter name is not specified");            
-            }
-            // Check the dataset name parameter.
-            if(description == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Parameter description is not specified");            
-            }
-            // Check the language parameter.
-            if(language == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Parameter language is not specified");            
-            } else {
-                if(language.equals("en") 
-                        || language.equals("de") 
-                        || language.equals("nl")
-                        || language.equals("it")
-                        || language.equals("fr")
-                        || language.equals("es")) {
-                    // OK, the language is supported.
-                } else {
-                    // The language specified with the langauge parameter is not supported.
-                    throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
-                }
-            }
+
             // first check if user wants to submit data via SPARQL
-            if(endpoint != null) {
-                if(sparql != null) {
-                    
-                } else {
-                    // endpoint specified, but not sparql => throw exception
-                    throw new eu.freme.broker.exception.BadRequestException("SPARQL endpoint was specified but not a SPARQL query.");
-                }
+            if (endpoint != null && sparql == null) {
+                // endpoint specified, but not sparql => throw exception
+                throw new eu.freme.broker.exception.BadRequestException("SPARQL endpoint was specified but not a SPARQL query.");
             }
-            // if not, then check the body of the request
-            else if( postBody == null || postBody.trim().length() == 0 ){
-                // Check if data was sent.
-                throw new eu.freme.broker.exception.BadRequestException("No data to process could be found in the input.");
-            }
-            
-            // Checking the informat parameter
-            RDFConstants.RDFSerialization thisInformat;
-            if (informat == null && contentTypeHeader == null) {
-                thisInformat = RDFConstants.RDFSerialization.TURTLE;
-            } else if (informat != null) {
-                if (!rdfSerializationFormats.containsKey(informat)) {
-                    throw new eu.freme.broker.exception.BadRequestException( "The parameter informat has invalid value \"" + informat + "\"");
-                }
-                thisInformat = rdfSerializationFormats.get(informat);
-            } else {
-                if (!rdfSerializationFormats.containsKey(contentTypeHeader)) {
-                    throw new eu.freme.broker.exception.BadRequestException("Content-Type header has invalid value \"" + contentTypeHeader + "\"");
-                }
-                thisInformat = rdfSerializationFormats.get(contentTypeHeader);
-            }
-            // END: Checking the informat parameter
-            
+
+            NIFParameterSet nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, true);
+
             String format = null;
-            switch(thisInformat) {
+            switch (nifParameters.getInformat()) {
                 case TURTLE:
                     format = "TTL";
                     break;
@@ -354,27 +272,26 @@ public class FremeNER extends BaseRestController {
                     format = "N3";
                     break;
             }
-            
-            if(endpoint != null && sparql != null) {
-                try {
-                    // fed via SPARQL endpoint
-                    return callBackend("http://139.18.2.231:8080/api/datasets?format="+format
-                            + "&name="+name
-                            + "&description="+URLEncoder.encode(description,"UTF-8")
-                            + "&language="+language
-                            + "&endpoint="+endpoint
-                            + "&sparql="+URLEncoder.encode(sparql,"UTF-8"), HttpMethod.POST, null);
-                } catch (UnsupportedEncodingException ex) {
-                    Logger.getLogger(FremeNER.class.getName()).log(Level.SEVERE, null, ex);
-                }
+
+            if (endpoint != null) {
+                // fed via SPARQL endpoint
+                return callBackend("http://139.18.2.231:8080/api/datasets?format=" + format
+                        + "&name=" + name
+                        + "&description=" + URLEncoder.encode(description, "UTF-8")
+                        + "&language=" + language
+                        + "&endpoint=" + endpoint
+                        + "&sparql=" + URLEncoder.encode(sparql, "UTF-8"), HttpMethod.POST, null);
             } else {
                 // datasets is sent
-                return callBackend("http://139.18.2.231:8080/api/datasets?format="+format
-                    + "&name="+name
-                    + "&language="+language, HttpMethod.POST, postBody);
+                return callBackend("http://139.18.2.231:8080/api/datasets?format=" + format
+                        + "&name=" + name
+                        + "&language=" + language, HttpMethod.POST, nifParameters.getInput());
             }
-            return null;
+        } catch(Exception e){
+            logger.error(e.getMessage(), e);
+            throw new eu.freme.broker.exception.BadRequestException(e.getMessage());
         }
+    }
         
         // Updating dataset for use in the e-Entity service.
         // curl -v "http://localhost:8080/e-entity/freme-ner/datasets/test?language=en" -X PUT
@@ -383,73 +300,46 @@ public class FremeNER extends BaseRestController {
 	public ResponseEntity<String> updateDataset(
 			@RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
 			@PathVariable(value = "name") String name,
-			@RequestParam(value = "language", required = false) String language,
-			@RequestParam(value = "informat", required = false) String informat,
-			@RequestParam(value = "f", required = false) String f,
-                        @RequestBody(required = false) String postBody) {
-            
-            // Check the dataset name parameter.
-            if(name == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Unspecified dataset name.");            
-            }
-            // Check the language parameter.
-            if(language == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Unspecified dataset language.");            
-            } else {
-                if(language.equals("en") 
-                        || language.equals("de") 
-                        || language.equals("nl")
-                        || language.equals("it")
-                        || language.equals("fr")
-                        || language.equals("es")) {
-                    // OK, the language is supported.
-                } else {
+			@RequestParam(value = "language") String language,
+			//@RequestParam(value = "informat", required = false) String informat,
+			//@RequestParam(value = "f", required = false) String f,
+            @RequestParam Map<String,String> allParams,
+            @RequestBody(required = false) String postBody) {
+
+            try {
+
+                if (!SUPPORTED_LANGUAGES.contains(language)) {
                     // The language specified with the langauge parameter is not supported.
                     throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
                 }
-            }
-            // Check if data was sent.
-            if( postBody == null || postBody.trim().length() == 0 ){
-                throw new eu.freme.broker.exception.BadRequestException("No data to process could be found in the input.");
-            }
-            // Checking the informat parameter
-            RDFConstants.RDFSerialization thisInformat;
-            if (informat == null && contentTypeHeader == null) {
-                thisInformat = RDFConstants.RDFSerialization.TURTLE;
-            } else if (informat != null) {
-                if (!rdfSerializationFormats.containsKey(informat)) {
-                    throw new eu.freme.broker.exception.BadRequestException( "The parameter informat has invalid value \"" + informat + "\"");
-                }
-                thisInformat = rdfSerializationFormats.get(informat);
-            } else {
-                if (!rdfSerializationFormats.containsKey(contentTypeHeader)) {
-                    throw new eu.freme.broker.exception.BadRequestException("Content-Type header has invalid value \"" + contentTypeHeader + "\"");
-                }
-                thisInformat = rdfSerializationFormats.get(contentTypeHeader);
-            }
-            // END: Checking the informat parameter
-            
-            String format = null;
-            switch(thisInformat) {
-                case TURTLE:
-                    format = "TTL";
-                    break;
-                case JSON_LD:
-                    format = "JSON-LD";
-                    break;
-                case RDF_XML:
-                    format = "RDF/XML";
-                    break;
-                case N_TRIPLES:
-                    format = "N-TRIPLES";
-                    break;
-                case N3:
-                    format = "N3";
-                    break;
-            }
 
-            return callBackend("http://139.18.2.231:8080/api/datasets"+name+"?format="+format
-                    + "&language="+language, HttpMethod.PUT, postBody);
+                NIFParameterSet nifParameters = this.normalizeNif(postBody, null, contentTypeHeader, allParams, false);
+
+                String format = null;
+                switch (nifParameters.getInformat()) {
+                    case TURTLE:
+                        format = "TTL";
+                        break;
+                    case JSON_LD:
+                        format = "JSON-LD";
+                        break;
+                    case RDF_XML:
+                        format = "RDF/XML";
+                        break;
+                    case N_TRIPLES:
+                        format = "N-TRIPLES";
+                        break;
+                    case N3:
+                        format = "N3";
+                        break;
+                }
+
+                return callBackend("http://139.18.2.231:8080/api/datasets" + name + "?format=" + format
+                    + "&language=" + language, HttpMethod.PUT, nifParameters.getInput());
+            }catch(Exception e){
+                logger.error(e.getMessage(), e);
+                throw new eu.freme.broker.exception.BadRequestException(e.getMessage());
+            }
         }
         
         // Get info about a specific dataset.
@@ -457,13 +347,7 @@ public class FremeNER extends BaseRestController {
 	@RequestMapping(value = "/e-entity/freme-ner/datasets/{name}", method = {
             RequestMethod.GET })
 	public ResponseEntity<String> getDataset(
-                @PathVariable(value = "name") String name) {
-            
-            // Check the dataset name parameter.
-            if(name == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Unspecified dataset name.");            
-            }
-
+            @PathVariable(value = "name") String name) {
             return callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.GET, null);
         }
 
@@ -472,7 +356,6 @@ public class FremeNER extends BaseRestController {
 	@RequestMapping(value = "/e-entity/freme-ner/datasets", method = {
             RequestMethod.GET })
 	public ResponseEntity<String> getAllDatasets() {
-
             return callBackend("http://139.18.2.231:8080/api/datasets", HttpMethod.GET, null);
         }
         
@@ -482,12 +365,6 @@ public class FremeNER extends BaseRestController {
             RequestMethod.DELETE })
 	public ResponseEntity<String> removeDataset(
 			@PathVariable(value = "name") String name) {
-            
-            // Check the dataset name parameter.
-            if(name == null) {
-                throw new eu.freme.broker.exception.BadRequestException("Unspecified dataset name.");            
-            }
-
             return callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.DELETE, null);
         }
 

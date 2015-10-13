@@ -3,7 +3,6 @@ package eu.freme.broker.integration_tests;
 import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.broker.FremeCommonConfig;
 import eu.freme.common.conversion.rdf.RDFConstants;
@@ -35,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = FremeCommonConfig.class)
 @ActiveProfiles("broker")
-public class ELinkSecurityTest extends IntegrationTest {
+public class ELinkSecurityTest extends EServiceTest {
 
     public ELinkSecurityTest() throws UnirestException {
         super("/e-link/");
@@ -129,9 +128,9 @@ public class ELinkSecurityTest extends IntegrationTest {
         );
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, "public", null, null));
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, null, "ldf", null));
-        assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, null, null, usernameWithPermission));
+        assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, null, null, usernameWithoutPermission));
 
-        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithOutPermission));
     }
 
     @Test
@@ -326,7 +325,10 @@ public class ELinkSecurityTest extends IntegrationTest {
                 String newType = jsonObj.getString("type");
                 assertEquals(type.toLowerCase(), newType.toLowerCase());
             }
-            //String newOwner = jsonObj.getString("owner");
+            if(!Strings.isNullOrEmpty(owner)) {
+                String newOwner = jsonObj.getString("owner");
+                assertEquals(owner, newOwner);
+            }
         }
 
         return response.getStatus();

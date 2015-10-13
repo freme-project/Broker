@@ -196,7 +196,7 @@ public class ELink extends BaseRestController {
 
             Template template;
             if(nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)){
-                JSONObject jsonObj = new JSONObject(postBody);
+                JSONObject jsonObj = new JSONObject(nifParameters.getInput());
                 templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
 
                 //AccessDeniedException can be thrown, if current authentication is the anonymousUser
@@ -299,13 +299,16 @@ public class ELink extends BaseRestController {
             if(!Strings.isNullOrEmpty(type)) {
                 template.setType(Template.Type.getByString(type));
             }
+
+            templateDAO.save(template);
+
             if(!Strings.isNullOrEmpty(ownerName)) {
                 User owner = userDAO.getRepository().findOneByName(ownerName);
                 if(owner==null)
                     throw new BadRequestException("Can not change owner of the dataset. User \""+ownerName+"\" does not exist.");
-                template.setOwner(owner);
+                templateDAO.updateOwner(template,owner);
             }
-            templateDAO.save(template);
+
 
             String serialization;
             if (nifParameters.getOutformat().equals(RDFConstants.RDFSerialization.JSON)) {

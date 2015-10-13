@@ -37,7 +37,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
  *
  * @author Pieter Heyvaert <pheyvaer.heyvaert@ugent.be>
  */
-public class EPublishingTest extends IntegrationTest{
+public class EPublishingTest extends EServiceTest {
 
     public EPublishingTest() {
         super("/e-publishing/");
