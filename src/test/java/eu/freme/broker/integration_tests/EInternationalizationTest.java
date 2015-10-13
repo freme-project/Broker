@@ -19,6 +19,7 @@ package eu.freme.broker.integration_tests;
 
 import java.io.IOException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -30,6 +31,7 @@ import eu.freme.common.conversion.rdf.RDFConstants;
 /**
  * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 06.08.15.
  */
+@Ignore
 public class EInternationalizationTest extends IntegrationTest {
 
     //Tests E-Internationalization Service used for converting html and xliff to nif format

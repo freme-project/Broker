@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -35,6 +36,7 @@ import eu.freme.common.conversion.rdf.RDFConstants;
 /**
  * Created by jonathan on 28.07.15.
  */
+@Ignore
 public class FremeNERTest extends IntegrationTest{
 
 
