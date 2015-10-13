@@ -31,27 +31,27 @@ import eu.freme.broker.tools.RDFSerializationFormats;
 
 @Configuration
 public class CommonConfig {
-	
-    @Bean
-    public RDFSerializationFormats rdfFormats(){
-    	return new RDFSerializationFormats();
-    }
-    @Bean
-    public NIFParameterFactory getNifParameterFactory(){
-    	return new NIFParameterFactory();
-    }
-    
+
+	@Bean
+	public RDFSerializationFormats rdfFormats() {
+		return new RDFSerializationFormats();
+	}
+
+	@Bean
+	public NIFParameterFactory getNifParameterFactory() {
+		return new NIFParameterFactory();
+	}
 
 	/**
 	 * Create a filter that logs all requests input and output
 	 */
-    @Bean
-    public FilterRegistrationBean loggingFilter() {
-    	FilterRegistrationBean filter = new FilterRegistrationBean();
-    	filter.setFilter(new LoggingFilter());
-        List<String> urlPatterns = new ArrayList<String>();
-        urlPatterns.add("/*");
-    	filter.setUrlPatterns(urlPatterns);
-        return filter;
-    }
+	@Bean
+	public FilterRegistrationBean loggingFilter() {
+		FilterRegistrationBean filter = new FilterRegistrationBean();
+		filter.setFilter(new LoggingFilter());
+		List<String> urlPatterns = new ArrayList<String>();
+		urlPatterns.add("/*");
+		filter.setUrlPatterns(urlPatterns);
+		return filter;
+	}
 }

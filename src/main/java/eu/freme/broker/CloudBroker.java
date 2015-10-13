@@ -24,7 +24,7 @@ import eu.freme.broker.tools.StarterHelper;
 public class CloudBroker {
 	static Logger logger = Logger.getLogger(Broker.class);
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		logger.info("Starting FREME in cloud broker mode");
 		String[] newArgs = StarterHelper.addProfile(args, "broker,cloudbroker");
 		SpringApplication.run(CloudBroker.class, newArgs);

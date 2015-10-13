@@ -39,18 +39,16 @@ import eu.freme.fremener.FremeNer;
  */
 @SpringBootApplication
 @ComponentScan(basePackages = "eu.freme.broker", excludeFilters = @Filter(type = FilterType.REGEX, pattern = { "eu.freme.broker.security.*" }))
-@EnableAutoConfiguration(exclude = {
-        org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class,
-})
+@EnableAutoConfiguration(exclude = { org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class, })
 @Configuration
-@Import({CommonConfig.class})
+@Import({ CommonConfig.class })
 @Profile("fremener")
 public class FremeNERStarter {
 
 	private static Logger logger = Logger.getLogger(FremeNERStarter.class);
-	
+
 	@Bean
-	public FremeNer getFremeNer(){
+	public FremeNer getFremeNer() {
 		return new FremeNer();
 	}
 

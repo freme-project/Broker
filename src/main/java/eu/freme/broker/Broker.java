@@ -46,21 +46,21 @@ import eu.freme.i18n.api.EInternationalizationConfig;
 
 @SpringBootApplication
 @Import({ CommonConfig.class, EEntityConfig.class, ELinkConfig.class,
-		EPublishingConfig.class, FREMECommonConfig.class,
-		PipelineConfig.class, EInternationalizationConfig.class })
+		EPublishingConfig.class, FREMECommonConfig.class, PipelineConfig.class,
+		EInternationalizationConfig.class })
 @Profile("broker")
 public class Broker {
-	
+
 	static Logger logger = Logger.getLogger(Broker.class);
 
 	@Value("${workspace.location}")
 	String workspaceLocation;
-	
-    @Bean
-    public RDFELinkSerializationFormats eLinkRdfFormats(){
-    	return new RDFELinkSerializationFormats();
-    }
-    
+
+	@Bean
+	public RDFELinkSerializationFormats eLinkRdfFormats() {
+		return new RDFELinkSerializationFormats();
+	}
+
 	@PostConstruct
 	public void init() {
 		// create workspace folder
@@ -73,8 +73,8 @@ public class Broker {
 	public void setWorkspaceLocation(String workspaceLocation) {
 		this.workspaceLocation = workspaceLocation;
 	}
-	
-	public static void main(String[] args){
+
+	public static void main(String[] args) {
 		logger.info("Starting FREME in Broker mode");
 		String[] newArgs = StarterHelper.addProfile(args, "broker");
 		SpringApplication.run(Broker.class, newArgs);
