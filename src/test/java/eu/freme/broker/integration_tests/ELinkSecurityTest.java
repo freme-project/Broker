@@ -128,9 +128,9 @@ public class ELinkSecurityTest extends EServiceTest {
         );
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, "public", null, null));
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, null, "ldf", null));
-        assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, null, null, usernameWithPermission));
+        assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, null, null, usernameWithoutPermission));
 
-        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithOutPermission));
     }
 
     @Test
@@ -325,7 +325,10 @@ public class ELinkSecurityTest extends EServiceTest {
                 String newType = jsonObj.getString("type");
                 assertEquals(type.toLowerCase(), newType.toLowerCase());
             }
-            //String newOwner = jsonObj.getString("owner");
+            if(!Strings.isNullOrEmpty(owner)) {
+                String newOwner = jsonObj.getString("owner");
+                assertEquals(owner, newOwner);
+            }
         }
 
         return response.getStatus();

@@ -299,13 +299,16 @@ public class ELink extends BaseRestController {
             if(!Strings.isNullOrEmpty(type)) {
                 template.setType(Template.Type.getByString(type));
             }
+
+            templateDAO.save(template);
+
             if(!Strings.isNullOrEmpty(ownerName)) {
                 User owner = userDAO.getRepository().findOneByName(ownerName);
                 if(owner==null)
                     throw new BadRequestException("Can not change owner of the dataset. User \""+ownerName+"\" does not exist.");
-                template.setOwner(owner);
+                templateDAO.updateOwner(template,owner);
             }
-            templateDAO.save(template);
+
 
             String serialization;
             if (nifParameters.getOutformat().equals(RDFConstants.RDFSerialization.JSON)) {
