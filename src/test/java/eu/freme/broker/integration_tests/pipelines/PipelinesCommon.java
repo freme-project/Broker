@@ -20,7 +20,7 @@ package eu.freme.broker.integration_tests.pipelines;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.freme.broker.integration_tests.IntegrationTest;
+import eu.freme.broker.integration_tests.EServiceTest;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
@@ -37,7 +37,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Gerald Haesendonck
  */
-public abstract class PipelinesCommon extends IntegrationTest {
+public abstract class PipelinesCommon extends EServiceTest {
 	protected PipelinesCommon() {
 		super("/pipelining/");
 	}

@@ -35,7 +35,7 @@ import eu.freme.common.conversion.rdf.RDFConstants;
 /**
  * Created by jonathan on 28.07.15.
  */
-public class FremeNERTest extends IntegrationTest{
+public class FremeNERTest extends EServiceTest {
 
 
     String[] availableLanguages = {"en","de","it","nl","fr","es"};
