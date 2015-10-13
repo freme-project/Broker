@@ -89,14 +89,14 @@ public class ELink extends BaseRestController {
     @RequestMapping(value = "/e-link/documents", method = RequestMethod.POST)
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<String> enrich(
-            @RequestParam(value = "templateid",    required=true)  String templateIdStr,
+            @RequestParam(value = "templateid",    required=true)  long templateIdStr,
             @RequestHeader(value = "Accept",       required=false) String acceptHeader,
             @RequestHeader(value = "Content-Type", required=false) String contentTypeHeader,
             @RequestBody String postBody,
             @RequestParam Map<String,String> allParams) {
         try {
 
-            int templateId = validateTemplateID(templateIdStr);
+            //int templateId = validateTemplateID(templateIdStr);
             NIFParameterSet nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, false);
 
             // check read access
@@ -111,7 +111,7 @@ public class ELink extends BaseRestController {
             }
 
             Model inModel =  rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
-            inModel = dataEnricher.enrichNIF(inModel, templateId, templateParams);
+            inModel = dataEnricher.enrichNIF(inModel, templateIdStr, templateParams);
 
             HttpHeaders responseHeaders = new HttpHeaders();
             String serialization = rdfConversionService.serializeRDF(inModel, nifParameters.getOutformat());
@@ -265,7 +265,7 @@ public class ELink extends BaseRestController {
             @RequestParam(value = "visibility",    required=false) String visibility,
             @RequestParam(value = "type",        required=false) String type,
             @RequestParam(value = "owner",    required=false) String ownerName,
-            @PathVariable("templateid") String templateId,
+            @PathVariable("templateid") long templateId,
             @RequestParam Map<String,String> allParams,
             @RequestBody String postBody) {
 
@@ -274,7 +274,7 @@ public class ELink extends BaseRestController {
             // NOTE: outformat was defaulted to turtle, if acceptHeader=="*/*" and informat==null, otherwise to JSON. Now it is TURTLE.
             NIFParameterSet nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, true);
 
-            validateTemplateID(templateId);
+            //validateTemplateID(templateId);
             // check read access
             Template template = templateDAO.findOneById(templateId);
             decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), template, accessLevelHelper.writeAccess());
@@ -351,13 +351,13 @@ public class ELink extends BaseRestController {
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<String> getTemplateById(
             @RequestHeader(value = "Accept",       required=false) String acceptHeader,
-            @PathVariable("templateid") String templateIdStr,
+            @PathVariable("templateid") long templateIdStr,
             //@RequestParam(value = "outformat",     required=false) String outformat,
             //@RequestParam(value = "o",             required=false) String o
             @RequestParam Map<String,String> allParams) {
 
         try {
-            validateTemplateID(templateIdStr);
+            //validateTemplateID(templateIdStr);
             // NOTE: outformat was defaulted to JSON before! Now it is TURTLE.
             NIFParameterSet nifParameters = this.normalizeNif(null, acceptHeader, null, allParams, true);
             HttpHeaders responseHeaders = new HttpHeaders();
@@ -432,9 +432,9 @@ public class ELink extends BaseRestController {
     // DELETE /e-link/templates/{template-id}
     @RequestMapping(value = "/e-link/templates/{templateid}", method = RequestMethod.DELETE)
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
-    public ResponseEntity<String> removeTemplateById(@PathVariable("templateid") String id) {
+    public ResponseEntity<String> removeTemplateById(@PathVariable("templateid") long id) {
         try {
-            validateTemplateID(id);
+            //validateTemplateID(id);
             // check read and write access
             templateDAO.delete(templateDAO.findOneById(id));
             return new ResponseEntity<>("The template was sucessfully removed.", HttpStatus.OK);
@@ -451,7 +451,7 @@ public class ELink extends BaseRestController {
     }
 
 
-
+/*
     private int validateTemplateID(String templateId) throws BadRequestException{
         if(templateId.isEmpty()){
             throw new BadRequestException("Empty templateid parameter.");
@@ -469,4 +469,6 @@ public class ELink extends BaseRestController {
         }
         return Integer.parseInt(templateId);
     }
+
+    */
 }

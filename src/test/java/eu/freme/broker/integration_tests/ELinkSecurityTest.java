@@ -47,14 +47,14 @@ public class ELinkSecurityTest extends EServiceTest {
 
 
         // add a template for the first user
-        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
         assertNotNull(templateid);
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), deleteTemplate("999", tokenWithPermission));
-        assertEquals(HttpStatus.NOT_FOUND.value(), getTemplate("999", tokenWithPermission));
-        assertEquals(HttpStatus.NOT_FOUND.value(), updateTemplate("999", tokenWithPermission, constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), "http://dbpedia.org/sparql/", "Some description"), "public", null, null));
+        assertEquals(HttpStatus.NOT_FOUND.value(), deleteTemplate(999, tokenWithPermission));
+        assertEquals(HttpStatus.NOT_FOUND.value(), getTemplate(999, tokenWithPermission));
+        assertEquals(HttpStatus.NOT_FOUND.value(), updateTemplate(999, tokenWithPermission, constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), "http://dbpedia.org/sparql/", "Some description"), "public", null, null));
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
-        assertEquals(HttpStatus.NOT_FOUND.value(), doELink(nifContent, "999", tokenWithOutPermission));
+        assertEquals(HttpStatus.NOT_FOUND.value(), doELink(nifContent, 999, tokenWithOutPermission));
 
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
@@ -66,7 +66,7 @@ public class ELinkSecurityTest extends EServiceTest {
         logger.info("testAnonymousUser");
 
 
-        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
         assertNotNull(templateid);
 
         logger.info("try to create template as anonymous user... should not work");
@@ -94,15 +94,15 @@ public class ELinkSecurityTest extends EServiceTest {
 
         // add a template for the first user
         logger.info("create private template for user 1");
-        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
         logger.info("created template with id: " + templateid);
         assertNotNull(templateid);
         logger.info("create public template for user 1");
-        String templateid1 = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
+        long templateid1 = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
         logger.info("created template with id: " + templateid1);
         assertNotNull(templateid1);
         logger.info("create private template for user 2");
-        String templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithOutPermission);
+        long templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithOutPermission);
         logger.info("created template with id: " + templateid2);
         assertNotNull(templateid2);
 
@@ -119,7 +119,7 @@ public class ELinkSecurityTest extends EServiceTest {
         logger.info("testUpdateTemplate");
         // add a template for the first user
         logger.info("create private template for user 1");
-        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
         String template = constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"), "http://dbpedia.org/sparql/", "Some description");
 
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission,
@@ -140,7 +140,7 @@ public class ELinkSecurityTest extends EServiceTest {
 
         // add a template for the first user
         logger.info("create private template for user 1");
-        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
         logger.info("private template for user 1 has id: " + templateid);
         assertNotNull(templateid);
 
@@ -198,10 +198,10 @@ public class ELinkSecurityTest extends EServiceTest {
 
 
         logger.info("create private template");
-        String id = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission);
+        long id = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission);
 
         logger.info("create public template");
-        String idPublic = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "public", tokenWithPermission);
+        long idPublic = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "public", tokenWithPermission);
 
         logger.info("read nif to enrich");
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
@@ -221,7 +221,7 @@ public class ELinkSecurityTest extends EServiceTest {
         deleteTemplate(idPublic, tokenWithPermission);
     }
 
-    private int doELink(String nifContent, String templateId, String token) throws UnirestException, IOException {
+    private int doELink(String nifContent, long templateId, String token) throws UnirestException, IOException {
         HttpResponse<String> response = baseRequestPost("documents", token)
                 .queryString("templateid", templateId)
                 .queryString("informat", "turtle")
@@ -235,7 +235,7 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
     //Tests GET e-link/templates/
-    public int getAllTemplates(List<String> expectedIDs, String token) throws UnirestException, IOException {
+    public int getAllTemplates(List<Long> expectedIDs, String token) throws UnirestException, IOException {
         HttpResponse<String> response;
 
         response = baseRequestGet("templates", token)
@@ -248,17 +248,17 @@ public class ELinkSecurityTest extends EServiceTest {
         JSONArray jsonArray = new JSONArray(response.getBody());
         assertEquals(expectedIDs.size(), jsonArray.length());
 
-        ArrayList<String> tempIDs = new ArrayList<>(expectedIDs);
+        ArrayList<Long> tempIDs = new ArrayList<>(expectedIDs);
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String id = jsonObject.getString("id");
+            long id = jsonObject.getLong("id");
             assertTrue(tempIDs.remove(id));
         }
         return response.getStatus();
     }
 
     //Tests POST e-link/templates/
-    public String createTemplate(String filename, String visibility, String token) throws Exception {
+    public long createTemplate(String filename, String visibility, String token) throws Exception {
         String query = readFile(filename);
 
         HttpResponse<String> response = baseRequestPost("templates", token)
@@ -274,15 +274,15 @@ public class ELinkSecurityTest extends EServiceTest {
 
         JSONObject jsonObj = new JSONObject(response.getBody());
 
-        String id = jsonObj.getString("id");
+        long id = jsonObj.getLong("id");
         // check, if id is numerical
-        assertTrue(id.matches("\\d+"));
+        //assertTrue(id.matches("\\d+"));
 
         return id;
     }
 
     //Tests GET e-link/templates/
-    public int getTemplate(String id, String token) throws UnirestException, IOException {
+    public int getTemplate(long id, String token) throws UnirestException, IOException {
 
         HttpResponse<String> response = baseRequestGet("templates/" + id, token)
                 .queryString("outformat", "json").asString();
@@ -294,7 +294,7 @@ public class ELinkSecurityTest extends EServiceTest {
 
 
     //Tests PUT e-link/templates/
-    public int updateTemplate(String id, String token, String template, String visibility, String type, String owner) throws IOException, UnirestException {
+    public int updateTemplate(long id, String token, String template, String visibility, String type, String owner) throws IOException, UnirestException {
         //String query = readFile(filename);
 
         HttpRequestWithBody request = baseRequestPut("templates/" + id, token)
@@ -313,9 +313,9 @@ public class ELinkSecurityTest extends EServiceTest {
         if (response.getStatus() == HttpStatus.OK.value()) {
             validateNIFResponse(response, RDFConstants.RDFSerialization.JSON);
             JSONObject jsonObj = new JSONObject(response.getBody());
-            String newid = jsonObj.getString("id");
+            long newid = jsonObj.getLong("id");
             // check, if id is numerical
-            assertTrue(newid.matches("\\d+"));
+
             assertEquals(id, newid);
             if(!Strings.isNullOrEmpty(visibility)) {
                 String newVisibility = jsonObj.getString("visibility");
@@ -336,7 +336,7 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
     //Tests DELETE e-link/templates/
-    public int deleteTemplate(String id, String token) throws UnirestException {
+    public int deleteTemplate(long id, String token) throws UnirestException {
         HttpResponse<String> response = baseRequestDelete("templates/" + id, token)
                 .asString();
         return response.getStatus();
