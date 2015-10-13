@@ -79,7 +79,7 @@ public abstract class IntegrationTest {
             authenticateUsers();
     }
 
-    public void authenticateUsers() throws UnirestException {
+    private void authenticateUsers() throws UnirestException {
 
         //Creates two users, one intended to have permission, the other not
         createUser(usernameWithPermission, passwordWithPermission);

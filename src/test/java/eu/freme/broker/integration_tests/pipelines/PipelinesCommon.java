@@ -40,6 +40,7 @@ import static org.junit.Assert.assertEquals;
 public abstract class PipelinesCommon extends IntegrationTest {
 	protected PipelinesCommon() {
 		super("/pipelining/");
+		enableAuthenticate();
 	}
 
 	/**
@@ -51,7 +52,7 @@ public abstract class PipelinesCommon extends IntegrationTest {
 	 *                      error response with some explanation what went wrong in the body.
 	 * @throws UnirestException
 	 */
-	protected HttpResponse<String> sendRequest(int expectedResponseCode, SerializedRequest... requests) throws UnirestException {
+	protected HttpResponse<String> sendRequest(int expectedResponseCode, final SerializedRequest... requests) throws UnirestException {
 		List<SerializedRequest> serializedRequests = Arrays.asList(requests);
 		String body = RequestFactory.toJson(requests);
 		//System.out.println("request.body = " + body);

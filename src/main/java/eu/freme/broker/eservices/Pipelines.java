@@ -19,16 +19,17 @@ package eu.freme.broker.eservices;
 
 import java.util.List;
 
+import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.persistence.dao.PipelineDAO;
+import eu.freme.common.persistence.model.OwnedResource;
+import eu.freme.common.persistence.model.Pipeline;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.google.gson.JsonSyntaxException;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -54,6 +55,9 @@ public class Pipelines extends BaseRestController {
 	@Autowired
 	PipelineService pipelineAPI;
 
+	@Autowired
+	PipelineDAO pipelineDAO;
+
 	/**
 	 * <p>Calls the pipelining service.</p>
 	 * <p>Some predefined Requests can be formed using the class {@link RequestFactory}. It also converts request objects
@@ -77,15 +81,57 @@ public class Pipelines extends BaseRestController {
 			headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getContentType());
 			return new ResponseEntity<>(pipelineResult.getBody(), headers, HttpStatus.OK);
 		} catch (ServiceException serviceError) {
+			logger.error(serviceError.getMessage(), serviceError);
 			MultiValueMap<String, String> headers = new HttpHeaders();
 			headers.add(HttpHeaders.CONTENT_TYPE, serviceError.getResponse().getContentType());
 			return new ResponseEntity<>(serviceError.getMessage(), headers, serviceError.getStatus());
 		} catch (JsonSyntaxException jsonException) {
+			logger.error(jsonException.getMessage(), jsonException);
 			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
 			throw new NotAcceptableException("Error detected in the JSON body contents: " + errormsg);
 		} catch (UnirestException unirestException) {
+			logger.error(unirestException.getMessage(), unirestException);
 			throw new BadRequestException(unirestException.getMessage());
 		} catch (Throwable t) {
+			logger.error(t.getMessage(), t);
+			// throw a FREME exception if anything goes really wrong...
+			throw new InternalServerErrorException(t.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "/pipelining/templates",
+					method = RequestMethod.POST,
+					consumes = "application/json",
+					produces = "application/json")
+	public ResponseEntity<String> create(
+			@RequestBody String requests,
+			@RequestParam(value = "visibility", required = false) String visibility,
+			@RequestParam (value = "persist", defaultValue = "false", required = false) String persist) {
+
+		try {
+			// just to perform a first validation of the pipeline...
+			List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
+
+			boolean toPersist = Boolean.parseBoolean(persist);
+			Pipeline pipeline = new Pipeline(OwnedResource.Visibility.getByString(visibility), requests, toPersist);
+			pipelineDAO.save(pipeline);
+
+			// now get the id of the pipeline.
+			String response = "{\"id\": \"" + pipeline.getId() + "\", \"persist\": " + pipeline.isPersistent() + '}';
+
+			MultiValueMap<String, String> headers = new HttpHeaders();
+			headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.getMimeType());
+			return new ResponseEntity<>(response, headers, HttpStatus.OK);
+
+		} catch (JsonSyntaxException jsonException) {
+			logger.error(jsonException.getMessage(), jsonException);
+			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
+			throw new NotAcceptableException("Error detected in the JSON body contents: " + errormsg);
+		} catch (eu.freme.common.exception.BadRequestException e) {
+			logger.error(e.getMessage(), e);
+			throw new BadRequestException(e.getMessage());
+		} catch (Throwable t) {
+			logger.error(t.getMessage(), t);
 			// throw a FREME exception if anything goes really wrong...
 			throw new InternalServerErrorException(t.getMessage());
 		}
