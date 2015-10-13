@@ -326,7 +326,7 @@ public class ELinkSecurityTest extends EServiceTest {
                 assertEquals(type.toLowerCase(), newType.toLowerCase());
             }
             if(!Strings.isNullOrEmpty(owner)) {
-                String newOwner = jsonObj.getString("owner");
+                String newOwner = jsonObj.getJSONObject("owner").getString("name");
                 assertEquals(owner, newOwner);
             }
         }
