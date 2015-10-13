@@ -5,7 +5,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
-import eu.freme.broker.FremeCommonConfig;
+import eu.freme.broker.CommonConfig;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = FremeCommonConfig.class)
+@SpringApplicationConfiguration(classes = CommonConfig.class)
 @ActiveProfiles("broker")
 public class ELinkSecurityTest extends IntegrationTest {
 

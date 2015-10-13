@@ -21,28 +21,38 @@ import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Profile;
 
 import eu.freme.broker.tools.StarterHelper;
+import eu.freme.fremener.FremeNer;
 
 /**
  * Start only FREME NER
  * 
  * @author Jan Nehring - jan.nehring@dfki.de
  */
+@SpringBootApplication
 @ComponentScan(basePackages = "eu.freme.broker", excludeFilters = @Filter(type = FilterType.REGEX, pattern = { "eu.freme.broker.security.*" }))
 @EnableAutoConfiguration(exclude = {
         org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class,
 })
-@Import({FremeCommonConfig.class})
+@Configuration
+@Import({CommonConfig.class})
 @Profile("fremener")
 public class FremeNERStarter {
 
 	private static Logger logger = Logger.getLogger(FremeNERStarter.class);
+	
+	@Bean
+	public FremeNer getFremeNer(){
+		return new FremeNer();
+	}
 
 	public static void main(String[] args) {
 		logger.info("Starting FREME in FREME NER mode");

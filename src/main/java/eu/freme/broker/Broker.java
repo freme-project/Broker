@@ -45,8 +45,8 @@ import eu.freme.i18n.api.EInternationalizationConfig;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 
-@SpringCloudApplication
-@Import({ FremeCommonConfig.class, EEntityConfig.class, ELinkConfig.class,
+@SpringBootApplication
+@Import({ CommonConfig.class, EEntityConfig.class, ELinkConfig.class,
 		EPublishingConfig.class, FREMECommonConfig.class,
 		PipelineConfig.class, EInternationalizationConfig.class })
 @Profile("broker")

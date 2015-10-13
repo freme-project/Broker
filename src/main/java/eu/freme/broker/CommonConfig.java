@@ -30,7 +30,7 @@ import eu.freme.broker.tools.NIFParameterFactory;
 import eu.freme.broker.tools.RDFSerializationFormats;
 
 @Configuration
-public class FremeCommonConfig {
+public class CommonConfig {
 	
     @Bean
     public RDFSerializationFormats rdfFormats(){

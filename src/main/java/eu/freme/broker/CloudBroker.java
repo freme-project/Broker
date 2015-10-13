@@ -3,6 +3,7 @@ package eu.freme.broker;
 import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Import;
@@ -10,8 +11,8 @@ import org.springframework.context.annotation.Profile;
 
 import eu.freme.broker.tools.StarterHelper;
 
-@SpringBootApplication
-@Profile("broker")
+@SpringCloudApplication
+@Profile("cloudbroker")
 @EnableDiscoveryClient
 @Import(Broker.class)
 @EnableFeignClients
