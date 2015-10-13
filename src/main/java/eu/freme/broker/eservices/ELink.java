@@ -196,7 +196,7 @@ public class ELink extends BaseRestController {
 
             Template template;
             if(nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)){
-                JSONObject jsonObj = new JSONObject(postBody);
+                JSONObject jsonObj = new JSONObject(nifParameters.getInput());
                 templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
 
                 //AccessDeniedException can be thrown, if current authentication is the anonymousUser
