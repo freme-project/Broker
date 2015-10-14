@@ -30,7 +30,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Gerald Haesendonck
@@ -49,11 +49,14 @@ public class CRUDTest extends PipelinesCommon {
 				.body(new JsonNode(body))
 				.asString();
 		// print some response info
-		System.out.println("response.getStatus() = " + response.getStatus());
-		System.out.println("response.getStatusText() = " + response.getStatusText());
-		System.out.println("response.contentType = " + response.getHeaders().getFirst("content-type"));
-		System.out.println("response.body = " + response.getBody());
+		logger.info("response.getStatus() = " + response.getStatus());
+		logger.info("response.getStatusText() = " + response.getStatusText());
+		logger.info("response.contentType = " + response.getHeaders().getFirst("content-type"));
+		logger.debug("response.body = " + response.getBody());
 		assertEquals(HttpStatus.SC_OK, response.getStatus());
+		Pipeline pipelineInfo = RequestFactory.templateFromJson(response.getBody());
+		assertFalse(pipelineInfo.isPersist());
+		assertTrue(pipelineInfo.getId() > 0);
 	}
 
 	@Test
