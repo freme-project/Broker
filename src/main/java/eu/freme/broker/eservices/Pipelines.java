@@ -123,11 +123,7 @@ public class Pipelines extends BaseRestController {
 
 			// now get the id of the pipeline.
 			String response = "{\"id\": " + pipeline.getId() + ", \"persist\": " + pipeline.isPersistent() + '}';
-
-			MultiValueMap<String, String> headers = new HttpHeaders();
-			headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.getMimeType());
-			return new ResponseEntity<>(response, headers, HttpStatus.OK);
-
+			return createOKJSONResponse(response);
 		} catch (JsonSyntaxException jsonException) {
 			logger.error(jsonException.getMessage(), jsonException);
 			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
@@ -142,13 +138,26 @@ public class Pipelines extends BaseRestController {
 		}
 	}
 
-//	@RequestMapping(
-//			value = "pipelining/templates/{id}",
-//			method = RequestMethod.GET,
-//			produces = "application/json"
-//	)
-//	public ResponseEntity<String> read(@PathVariable(value = "id") String id) {
-//
-//		return null;
-//	}
+	@RequestMapping(
+			value = "pipelining/templates/{id}",
+			method = RequestMethod.GET,
+			produces = "application/json"
+	)
+	public ResponseEntity<String> read(@PathVariable(value = "id") String id) {
+		try {
+			long idNr = Long.parseLong(id);
+			Pipeline pipeline = pipelineDAO.findOneById(idNr);
+			String serializedPipeline = RequestFactory.toJson(pipeline);
+			return createOKJSONResponse(serializedPipeline);
+		} catch (NumberFormatException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new BadRequestException("The id has to be an integer number. " + ex.getMessage());
+		}
+	}
+
+	private ResponseEntity<String> createOKJSONResponse(final String contents) {
+		MultiValueMap<String, String> headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.getMimeType());
+		return new ResponseEntity<>(contents, headers, HttpStatus.OK);
+	}
 }
