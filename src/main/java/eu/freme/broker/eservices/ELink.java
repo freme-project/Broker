@@ -28,6 +28,7 @@ import eu.freme.broker.exception.InvalidTemplateEndpointException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.TemplateValidator;
 import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 import eu.freme.common.exception.OwnedResourceNotFoundException;
 import eu.freme.common.exception.TemplateNotFoundException;
 import eu.freme.common.exception.UnsupportedEndpointType;
@@ -78,8 +79,6 @@ public class ELink extends BaseRestController {
     @Autowired
     AccessLevelHelper accessLevelHelper;
 
-    // Enriching using a template.
-
     @Autowired
     TemplateValidator templateValidator;
 
@@ -99,9 +98,10 @@ public class ELink extends BaseRestController {
             //int templateId = validateTemplateID(templateIdStr);
             NIFParameterSet nifParameters = this.normalizeNif(postBody, acceptHeader, contentTypeHeader, allParams, false);
 
-            // check read access
-            templateDAO.findOneById(templateIdStr);
-
+//            templateDAO.findOneById(templateIdStr);
+            // Check read access and retrieve the template
+            Template template = templateDAO.findOneById(templateIdStr);
+            
             HashMap<String, String> templateParams = new HashMap<>();
 
             for (Map.Entry<String, String> entry : allParams.entrySet()) {
@@ -111,7 +111,7 @@ public class ELink extends BaseRestController {
             }
 
             Model inModel =  rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
-            inModel = dataEnricher.enrichNIF(inModel, templateIdStr, templateParams);
+            inModel = dataEnricher.enrichWithTemplate(inModel, template, templateParams);
 
             HttpHeaders responseHeaders = new HttpHeaders();
             String serialization = rdfConversionService.serializeRDF(inModel, nifParameters.getOutformat());
@@ -149,10 +149,6 @@ public class ELink extends BaseRestController {
             @RequestParam(value = "endpoint-type", required=false) String endpointType) {
         try {
 
-            System.out.println(resource);
-            System.out.println(endpoint);
-            System.out.println(endpointType);
-
             NIFParameterSet nifParameters = this.normalizeNif("", acceptHeader, contentTypeHeader, allParams, false);
 
             Model inModel = dataEnricher.exploreResource(resource, endpoint, endpointType);
@@ -182,8 +178,9 @@ public class ELink extends BaseRestController {
             //@RequestParam(value = "f",             required=false) String f,
             //@RequestParam(value = "outformat",     required=false) String outformat,
             //@RequestParam(value = "o",             required=false) String o,
-            @RequestParam(value = "visibility",        required=false) String visibility,
-            @RequestParam(value = "type",        required=false) String type,
+            @RequestParam(value = "visibility",    required=false) String visibility,
+            // Type was moved as endpoint-type field of the template.
+            //@RequestParam(value = "type",        required=false) String type, 
             @RequestParam Map<String,String> allParams,
             @RequestBody String postBody) {
 
@@ -193,7 +190,10 @@ public class ELink extends BaseRestController {
 
             // NOTE: informat was defaulted to JSON before! Now it is TURTLE.
             // NOTE: outformat was defaulted to turtle, if acceptHeader=="*/*" and informat==null, otherwise to JSON. Now it is TURTLE.
-
+            // NOTE: switched back to JSON since we use MySQL and RDF is no longer supported, but JSON only.
+            nifParameters.setInformat(RDFSerialization.JSON);
+            nifParameters.setOutformat(RDFSerialization.JSON);
+            
             Template template;
             if(nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)){
                 JSONObject jsonObj = new JSONObject(nifParameters.getInput());
@@ -202,19 +202,20 @@ public class ELink extends BaseRestController {
                 //AccessDeniedException can be thrown, if current authentication is the anonymousUser
                 template = new Template(
                         OwnedResource.Visibility.getByString(visibility),
-                        Template.Type.getByString(type),
+                        Template.Type.getByString(jsonObj.getString("endpoint-type")),
                         jsonObj.getString("endpoint"),
                         jsonObj.getString("query"),
                         jsonObj.getString("label"),
                         jsonObj.getString("description")
                 );
-            }else{
-                Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
-                template = new Template(
-                        OwnedResource.Visibility.getByString(visibility),
-                        Template.Type.getByString(type),
-                        model);
-                templateValidator.validateTemplateEndpoint(template.getEndpoint());
+            } else {
+                throw new BadRequestException("Other formats then JSON are no longer supported for templates.");
+//                Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
+//                template = new Template(
+//                        OwnedResource.Visibility.getByString(visibility),
+//                        Template.Type.getByString(jsonObj.getString("endpoint-type")),
+//                        model);
+//                templateValidator.validateTemplateEndpoint(template.getEndpoint());
             }
 
             templateDAO.save(template);
@@ -223,7 +224,8 @@ public class ELink extends BaseRestController {
             if (nifParameters.getOutformat().equals(RDFConstants.RDFSerialization.JSON)) {
                 ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
                 serialization = ow.writeValueAsString(template);
-            } else{
+            } else {
+                // Should never fail to.
                 serialization= rdfConversionService.serializeRDF(template.getRDF(), nifParameters.getOutformat());
             }
 

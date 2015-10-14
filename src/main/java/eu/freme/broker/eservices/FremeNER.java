@@ -51,6 +51,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import eu.freme.broker.exception.ExternalServiceFailedException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.persistence.dao.TemplateDAO;
+import eu.freme.common.persistence.model.Template;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 import eu.freme.eservices.elink.api.DataEnricher;
@@ -60,8 +62,11 @@ import java.util.ArrayList;
 @Profile("broker")
 public class FremeNER extends BaseRestController {
 
-	@Autowired
-	EEntityService entityAPI;
+    @Autowired
+    EEntityService entityAPI;
+        
+    @Autowired
+    TemplateDAO templateDAO;
         
     @Autowired
     DataEnricher dataEnricher;
@@ -206,7 +211,8 @@ public class FremeNER extends BaseRestController {
                 HashMap<String, String> templateParams = new HashMap<>();
                 if(enrichementType != null) {
                     if(enrichementType.equals("dbpedia-categories")) {
-                        outModel = dataEnricher.enrichNIF(outModel, 300, templateParams);
+                        Template template = templateDAO.findOneById(300);
+                        outModel = dataEnricher.enrichWithTemplate(outModel, template, templateParams);
                     }
                 }
 
