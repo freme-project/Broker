@@ -21,6 +21,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
 import eu.freme.eservices.pipelines.serialization.Pipeline;
@@ -85,5 +86,40 @@ public class CRUDTest extends PipelinesCommon {
 		//assertEquals(pipelineInfo.getOwner(), readPipeline.getOwner());
 
 		assertEquals(serializedRequests, readPipeline.getSerializedRequests());
+	}
+
+	@Test
+	public void testCreatePrivateWithOneAndReadWithOther() throws UnirestException {
+		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight("en");
+		SerializedRequest linkRequest = RequestFactory.createLink("3");    // Geo pos
+
+		List<SerializedRequest> serializedRequests = Arrays.asList(entityRequest, linkRequest);
+		String body = RequestFactory.toJson(serializedRequests);
+		HttpResponse<String> response = baseRequestPost("templates", tokenWithPermission)
+				.queryString("visibility", OwnedResource.Visibility.PRIVATE.name())
+				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
+				.body(new JsonNode(body))
+				.asString();
+		assertEquals(HttpStatus.SC_OK, response.getStatus());
+
+		// get id of pipeline
+		String pipelineInfoStr = response.getBody();
+		Pipeline pipelineInfo = RequestFactory.templateFromJson(pipelineInfoStr);
+		long id = pipelineInfo.getId();
+
+		// now query pipeline with id
+		HttpResponse<String> readResponse = baseRequestGet("templates/" + id, tokenWithPermission).asString();
+		assertEquals(HttpStatus.SC_OK, readResponse.getStatus());
+		Pipeline readPipeline = RequestFactory.templateFromJson(readResponse.getBody());
+		assertEquals(pipelineInfo.getId(), readPipeline.getId());
+		//assertEquals(pipelineInfo.getOwner(), readPipeline.getOwner());
+
+		assertEquals(serializedRequests, readPipeline.getSerializedRequests());
+
+		// now try to read pipeline with other user
+		logger.info("You will see some AccessDeniedExceptions - this is OK.");
+		HttpResponse<String> readResponseOther = baseRequestGet("templates/" + id, tokenWithOutPermission).asString();
+		assertEquals(HttpStatus.SC_UNAUTHORIZED, readResponseOther.getStatus());
+		logger.info("Response for unauthorized user: " + readResponseOther.getBody());
 	}
 }
