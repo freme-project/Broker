@@ -17,6 +17,8 @@
  */
 package eu.freme.broker.tools.internationalization;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,6 +34,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.log4j.Logger;
@@ -39,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.i18n.api.EInternationalizationAPI;
 import eu.freme.i18n.okapi.nif.converter.ConversionException;
@@ -106,7 +110,32 @@ public class EInternationalizationInputFilter implements Filter {
 			// read data from query string input parameter
 			is = new ReaderInputStream(new StringReader(inputQueryString), "UTF-8");
 		}
-
+		
+		// check if roundtripping is needed
+		String outformat = null;
+		ServletResponse newResponse = res;
+		boolean roundTripping = false;
+		
+		// the buffer input stream will store the skeleton file later on.
+		BufferStream bs = null;
+		
+		if( req.getParameter("outformat") != null){
+			outformat = req.getParameter("outformat");
+		} else if( req instanceof HttpServletRequest && ((HttpServletRequest)req).getHeader("Accept") != null){
+			outformat = ((HttpServletRequest)req).getHeader("Accept");
+		}
+		if( contentTypes.contains(outformat) && res instanceof HttpServletResponse){
+			if(!outformat.equals(informat)){
+				String msg = String.format("Cannot convert informat\"%s\" to outformat \"%s\"" , informat, outformat);
+				throw new BadRequestException(msg);
+			}
+			bs = new BufferStream(is);
+			is = bs;
+			// the LoggingServletResponse captures the result of enrichment in a buffer.
+			newResponse = new LoggingServletResponse((HttpServletResponse)res);
+			roundTripping = true;
+		}
+		
 		Reader nif;
 		try {
 			nif = eInternationalizationApi.convertToTurtle(is,
@@ -116,8 +145,27 @@ public class EInternationalizationInputFilter implements Filter {
 			throw new InternalServerErrorException();
 		}
 		BodySwappingServletRequest bssr = new BodySwappingServletRequest(
-				(HttpServletRequest) req, nif);
-		chain.doFilter(bssr, res);
+				(HttpServletRequest) req, nif, roundTripping);
+		
+		chain.doFilter(bssr, newResponse);
+		
+		// when no roundtripping is needed then it should stop here
+		if( !roundTripping ){
+			return;
+		}
+		
+		System.err.println(convertInputStreamToString(bs.getInputStream()));
+		System.err.println("###");
+		System.err.println(convertInputStreamToString(((LoggingServletResponse)newResponse).getInputStream()));
+		
+		Reader reader = eInternationalizationApi.convertBack(bs.getInputStream(), ((LoggingServletResponse)newResponse).getInputStream());
+		BufferedReader br = new BufferedReader(reader);
+		
+		String line;
+		while((line=br.readLine()) != null){
+			res.getWriter().println(line);
+		}
+		br.close();
 	}
 
 	public void init(FilterConfig filterConfig) {

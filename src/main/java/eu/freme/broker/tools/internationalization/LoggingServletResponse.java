@@ -18,6 +18,8 @@
 package eu.freme.broker.tools.internationalization;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,6 +33,8 @@ import java.util.TreeMap;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletResponse;
+import javax.servlet.ServletResponseWrapper;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -39,46 +43,35 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.input.ReaderInputStream;
 
-public class BodySwappingServletResponse extends HttpServletResponseWrapper{
+public class LoggingServletResponse extends HttpServletResponseWrapper{
+	
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-	private ServletOutputStreamWrapper outputStream;
-
-	public BodySwappingServletResponse(HttpServletResponse response, OutputStream newOutput) {
+	public LoggingServletResponse(HttpServletResponse response) throws IOException {
 		super(response);
-		outputStream = new ServletOutputStreamWrapper(newOutput);
 	}
 
 	public ServletOutputStream getOutputStream(){
-		return outputStream;
-	}
-
-	private class ServletOutputStreamWrapper extends ServletOutputStream {
-
-		private boolean finished = false;
-		OutputStream os;
-		
-		public ServletOutputStreamWrapper(OutputStream os) {
-			this.os = os;
-		}
-
-		@Override
-		public boolean isReady() {
-			return !finished;
-		}
-
-		@Override
-		public void setWriteListener(WriteListener listener) {
-		}
-
-		@Override
-		public void write(int b) throws IOException {
-		}
-		
-		public void writeStream(InputStream is) throws IOException{
-			int b=0;
-			while((b=is.read()) != -1){
-				write(b);
+		return new ServletOutputStream() {
+			
+			@Override
+			public void write(int b) throws IOException {
+				baos.write(b);
 			}
-		}
+			
+			@Override
+			public void setWriteListener(WriteListener listener) {
+			}
+			
+			@Override
+			public boolean isReady() {
+				return true;
+			}
+		};
 	}
+	
+	public InputStream getInputStream(){
+		return new ByteArrayInputStream(baos.toByteArray());
+	}
+
 }

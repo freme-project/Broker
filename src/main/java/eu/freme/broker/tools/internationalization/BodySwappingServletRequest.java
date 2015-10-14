@@ -36,54 +36,66 @@ public class BodySwappingServletRequest extends HttpServletRequestWrapper {
 
 	private Reader body;
 
-	public BodySwappingServletRequest(HttpServletRequest request, Reader body) {
+	/**
+	 * When this flag is set to true then the parameter "outformat" will be
+	 * overriden by turtle. This is used for roundtripping. The
+	 * BodySwappingServletResponse will take care to convert the stream to the
+	 * original outformat.
+	 */
+	private boolean changeResponse;
+
+	public BodySwappingServletRequest(HttpServletRequest request, Reader body,
+			boolean changeResponse) {
 		super(request);
 		this.body = body;
+		this.changeResponse = changeResponse;
 	}
 
 	public BufferedReader getReader() {
 		return new BufferedReader(body);
 	}
-	
-	public ServletInputStream getInputStream(){
+
+	public ServletInputStream getInputStream() {
 		return new ServletInputStreamWrapper(body);
 	}
-	
+
 	@Override
-	public String getParameter(String name){
-		if( name.toLowerCase().equals("informat")){
+	public String getParameter(String name) {
+		if (name.toLowerCase().equals("informat")) {
 			return "turtle";
-		} if( name.equals("input") ){
+		}
+		if (name.equals("input")) {
 			return null;
-		} else{
+		} else if (changeResponse && name.toLowerCase().equals("outformat")) {
+			return "turtle";
+		} else {
 			return super.getParameter(name);
 		}
 	}
-	
-    @Override
-    public Map<String, String[]> getParameterMap()
-    {
-    	TreeMap<String, String[]> map = new TreeMap<String, String[]>();
-    	map.putAll(super.getParameterMap());
-    	map.put("informat", new String[]{"turtle"});
-    	map.remove("input");
-    	
-        return Collections.unmodifiableMap(map);
-    }   
-    
-    @Override
-    public Enumeration<String> getParameterNames()
-    {
-        return Collections.enumeration(getParameterMap().keySet());
-    }
 
-    @Override
-    public String[] getParameterValues(final String name)
-    {
-        return getParameterMap().get(name);
-    }
+	@Override
+	public Map<String, String[]> getParameterMap() {
+		TreeMap<String, String[]> map = new TreeMap<String, String[]>();
+		map.putAll(super.getParameterMap());
+		map.put("informat", new String[] { "turtle" });
+		map.remove("input");
 
+		if (changeResponse) {
+			map.put("outformat", new String[] { "turtle" });
+		}
 
+		return Collections.unmodifiableMap(map);
+	}
+
+	@Override
+	public Enumeration<String> getParameterNames() {
+		return Collections.enumeration(getParameterMap().keySet());
+	}
+
+	@Override
+	public String[] getParameterValues(final String name) {
+		return getParameterMap().get(name);
+	}
 
 	private class ServletInputStreamWrapper extends ServletInputStream {
 
@@ -97,7 +109,7 @@ public class BodySwappingServletRequest extends HttpServletRequestWrapper {
 		@Override
 		public int read() throws IOException {
 			int i = ris.read();
-			if( i == -1 ){
+			if (i == -1) {
 				finished = true;
 			}
 			return i;
