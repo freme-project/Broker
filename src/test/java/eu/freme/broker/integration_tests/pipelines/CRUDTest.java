@@ -35,9 +35,7 @@ public class CRUDTest extends PipelinesCommon {
 
 	@Test
 	public void testCreateDefault() throws UnirestException {
-
-		String data = "This summer there is the Zomerbar in Antwerp, one of the most beautiful cities in Belgium.";
-		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight(data, "en");
+		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight("en");
 		SerializedRequest linkRequest = RequestFactory.createLink("3");    // Geo pos
 
 		List<SerializedRequest> serializedRequests = Arrays.asList(entityRequest, linkRequest);
