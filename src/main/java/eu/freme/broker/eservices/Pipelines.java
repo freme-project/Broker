@@ -166,6 +166,18 @@ public class Pipelines extends BaseRestController {
 		}
 	}
 
+	@RequestMapping(
+			value = "pipelining/templates",
+			method = RequestMethod.GET,
+			produces = "application/json"
+	)
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
+	public ResponseEntity<String> read() {
+		List<Pipeline> readablePipelines = pipelineDAO.findAllReadAccessible();
+		String serializedPipelines = RequestFactory.templatesToJson(readablePipelines);
+		return createOKJSONResponse(serializedPipelines);
+	}
+
 	private ResponseEntity<String> createOKJSONResponse(final String contents) {
 		MultiValueMap<String, String> headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.getMimeType());

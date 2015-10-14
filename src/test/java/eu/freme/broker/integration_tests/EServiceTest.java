@@ -17,29 +17,27 @@
  */
 package eu.freme.broker.integration_tests;
 
-import static org.junit.Assert.*;
+import com.hp.hpl.jena.shared.AssertionFailureException;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
+import eu.freme.broker.eservices.BaseRestController;
+import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.conversion.rdf.RDFConversionService;
+import org.apache.log4j.Logger;
+import org.json.JSONObject;
+import org.junit.Before;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.freme.broker.eservices.BaseRestController;
-import org.json.JSONObject;
-import org.junit.Before;
-import org.apache.log4j.Logger;
-
-import com.hp.hpl.jena.shared.AssertionFailureException;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
-
-import eu.freme.common.conversion.rdf.RDFConstants;
-import eu.freme.common.conversion.rdf.RDFConversionService;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.http.HttpStatus;
+import static org.junit.Assert.*;
 
 /**
  * Created by Arne on 29.07.2015.
@@ -58,10 +56,10 @@ public abstract class EServiceTest {
     public static String tokenWithOutPermission;
     public static String tokenAdmin;
 
-    final String usernameWithPermission = "userwithpermission";
-    final String passwordWithPermission = "testpassword";
-    final String usernameWithoutPermission = "userwithoutpermission";
-    final String passwordWithoutPermission = "testpassword";
+    protected final String usernameWithPermission = "userwithpermission";
+    protected final String passwordWithPermission = "testpassword";
+    protected final String usernameWithoutPermission = "userwithoutpermission";
+    protected final String passwordWithoutPermission = "testpassword";
 
     private boolean authenticate = false;
     private static boolean authenticated = false;

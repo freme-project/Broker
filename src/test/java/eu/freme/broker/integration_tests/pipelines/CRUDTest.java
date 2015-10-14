@@ -18,17 +18,13 @@
 package eu.freme.broker.integration_tests.pipelines;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
-import eu.freme.eservices.pipelines.requests.SerializedRequest;
 import eu.freme.eservices.pipelines.serialization.Pipeline;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -40,42 +36,14 @@ public class CRUDTest extends PipelinesCommon {
 
 	@Test
 	public void testCreateDefault() throws UnirestException {
-		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight("en");
-		SerializedRequest linkRequest = RequestFactory.createLink("3");    // Geo pos
-
-		List<SerializedRequest> serializedRequests = Arrays.asList(entityRequest, linkRequest);
-		String body = RequestFactory.toJson(serializedRequests);
-		HttpResponse<String> response = baseRequestPost("templates", tokenWithPermission)
-				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
-				.body(new JsonNode(body))
-				.asString();
-		// print some response info
-		logger.info("response.getStatus() = " + response.getStatus());
-		logger.info("response.getStatusText() = " + response.getStatusText());
-		logger.info("response.contentType = " + response.getHeaders().getFirst("content-type"));
-		logger.debug("response.body = " + response.getBody());
-		assertEquals(HttpStatus.SC_OK, response.getStatus());
-		Pipeline pipelineInfo = RequestFactory.templateFromJson(response.getBody());
+		Pipeline pipelineInfo = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
 		assertFalse(pipelineInfo.isPersist());
 		assertTrue(pipelineInfo.getId() > 0);
 	}
 
 	@Test
 	public void testCreateAndRead() throws UnirestException {
-		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight("en");
-		SerializedRequest linkRequest = RequestFactory.createLink("3");    // Geo pos
-
-		List<SerializedRequest> serializedRequests = Arrays.asList(entityRequest, linkRequest);
-		String body = RequestFactory.toJson(serializedRequests);
-		HttpResponse<String> response = baseRequestPost("templates", tokenWithPermission)
-				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
-				.body(new JsonNode(body))
-				.asString();
-		assertEquals(HttpStatus.SC_OK, response.getStatus());
-
-		// get id of pipeline
-		String pipelineInfoStr = response.getBody();
-		Pipeline pipelineInfo = RequestFactory.templateFromJson(pipelineInfoStr);
+		Pipeline pipelineInfo = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PRIVATE);
 		long id = pipelineInfo.getId();
 
 		// now query pipeline with id
@@ -83,28 +51,12 @@ public class CRUDTest extends PipelinesCommon {
 		assertEquals(HttpStatus.SC_OK, readResponse.getStatus());
 		Pipeline readPipeline = RequestFactory.templateFromJson(readResponse.getBody());
 		assertEquals(pipelineInfo.getId(), readPipeline.getId());
-		//assertEquals(pipelineInfo.getOwner(), readPipeline.getOwner());
-
-		assertEquals(serializedRequests, readPipeline.getSerializedRequests());
+		assertEquals(pipelineInfo.getSerializedRequests(), readPipeline.getSerializedRequests());
 	}
 
 	@Test
 	public void testCreatePrivateWithOneAndReadWithOther() throws UnirestException {
-		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight("en");
-		SerializedRequest linkRequest = RequestFactory.createLink("3");    // Geo pos
-
-		List<SerializedRequest> serializedRequests = Arrays.asList(entityRequest, linkRequest);
-		String body = RequestFactory.toJson(serializedRequests);
-		HttpResponse<String> response = baseRequestPost("templates", tokenWithPermission)
-				.queryString("visibility", OwnedResource.Visibility.PRIVATE.name())
-				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
-				.body(new JsonNode(body))
-				.asString();
-		assertEquals(HttpStatus.SC_OK, response.getStatus());
-
-		// get id of pipeline
-		String pipelineInfoStr = response.getBody();
-		Pipeline pipelineInfo = RequestFactory.templateFromJson(pipelineInfoStr);
+		Pipeline pipelineInfo = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PRIVATE);
 		long id = pipelineInfo.getId();
 
 		// now query pipeline with id
@@ -112,14 +64,37 @@ public class CRUDTest extends PipelinesCommon {
 		assertEquals(HttpStatus.SC_OK, readResponse.getStatus());
 		Pipeline readPipeline = RequestFactory.templateFromJson(readResponse.getBody());
 		assertEquals(pipelineInfo.getId(), readPipeline.getId());
-		//assertEquals(pipelineInfo.getOwner(), readPipeline.getOwner());
-
-		assertEquals(serializedRequests, readPipeline.getSerializedRequests());
+		assertEquals(pipelineInfo.getSerializedRequests(), readPipeline.getSerializedRequests());
 
 		// now try to read pipeline with other user
 		logger.info("You will see some AccessDeniedExceptions - this is OK.");
 		HttpResponse<String> readResponseOther = baseRequestGet("templates/" + id, tokenWithOutPermission).asString();
 		assertEquals(HttpStatus.SC_UNAUTHORIZED, readResponseOther.getStatus());
 		logger.info("Response for unauthorized user: " + readResponseOther.getBody());
+	}
+
+	@Test
+	public void testCreateAndReadMultiple() throws UnirestException {
+		logger.info("Creating one public and one private pipeline per user");
+		createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
+		createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PRIVATE);
+		createDefaultTemplate(tokenWithOutPermission, OwnedResource.Visibility.PUBLIC);
+		createDefaultTemplate(tokenWithOutPermission, OwnedResource.Visibility.PRIVATE);
+
+		// now try to read pipeline with other user
+		logger.info("Each user tries to read pipelines; only 3 should be visible.");
+		List<Pipeline> pipelinesFromUser1 = readTemplates(tokenWithPermission);
+		assertTrue(pipelinesFromUser1.size() >= 3);	// TODO: delete pipelines after each test, then this can be "equals"
+		for (Pipeline pipeline : pipelinesFromUser1) {
+			assertTrue(pipeline.getOwner().equals(usernameWithPermission) || pipeline.getVisibility().equals(OwnedResource.Visibility.PUBLIC.name()));
+		}
+		List<Pipeline> pipelinesFromUser2 = readTemplates(tokenWithOutPermission);
+		assertTrue(pipelinesFromUser2.size() >= 3);
+		for (Pipeline pipeline : pipelinesFromUser2) {
+			assertTrue(pipeline.getOwner().equals(usernameWithoutPermission) || pipeline.getVisibility().equals(OwnedResource.Visibility.PUBLIC.name()));
+		}
+		List<Pipeline> pipelinesFromAdmin = readTemplates(tokenAdmin);
+		assertTrue(pipelinesFromAdmin.size() >= 2);
+		// TODO: shouldn't the admin see all templates?
 	}
 }

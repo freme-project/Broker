@@ -22,8 +22,11 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.broker.integration_tests.EServiceTest;
 import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
+import eu.freme.eservices.pipelines.serialization.Pipeline;
+import org.apache.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -63,9 +66,9 @@ public abstract class PipelinesCommon extends EServiceTest {
 				.asString();
 
 		// print some response info
-		System.out.println("response.getStatus() = " + response.getStatus());
-		System.out.println("response.getStatusText() = " + response.getStatusText());
-		System.out.println("response.contentType = " + response.getHeaders().getFirst("content-type"));
+		logger.info("response.getStatus() = " + response.getStatus());
+		logger.info("response.getStatusText() = " + response.getStatusText());
+		logger.info("response.contentType = " + response.getHeaders().getFirst("content-type"));
 		//System.out.println("response.getBody() = " + response.getBody());
 
 		RDFConstants.RDFSerialization responseContentType = RDFConstants.RDFSerialization.fromValue(response.getHeaders().getFirst("content-type"));
@@ -102,5 +105,33 @@ public abstract class PipelinesCommon extends EServiceTest {
 		}
 		RDFConstants.RDFSerialization serialization = RDFConstants.RDFSerialization.fromValue(contentType);
 		return serialization != null ? serialization : RDFConstants.RDFSerialization.TURTLE;
+	}
+
+	protected Pipeline createDefaultTemplate(final String token, final OwnedResource.Visibility visibility) throws UnirestException {
+		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight("en");
+		SerializedRequest linkRequest = RequestFactory.createLink("3");    // Geo pos
+
+		List<SerializedRequest> serializedRequests = Arrays.asList(entityRequest, linkRequest);
+		String body = RequestFactory.toJson(serializedRequests);
+		HttpResponse<String> response = baseRequestPost("templates", token)
+				.queryString("visibility", visibility.name())
+				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
+				.body(new JsonNode(body))
+				.asString();
+		// print some response info
+		logger.info("response.getStatus() = " + response.getStatus());
+		logger.info("response.getStatusText() = " + response.getStatusText());
+		logger.info("response.contentType = " + response.getHeaders().getFirst("content-type"));
+		logger.debug("response.body = " + response.getBody());
+		assertEquals(HttpStatus.SC_OK, response.getStatus());
+		Pipeline pipelineInfo = RequestFactory.templateFromJson(response.getBody());
+		pipelineInfo.setSerializedRequests(serializedRequests);
+		return pipelineInfo;
+	}
+
+	protected List<Pipeline> readTemplates(final String token) throws UnirestException {
+		HttpResponse<String> response = baseRequestGet("templates", token).asString();
+		assertEquals(HttpStatus.SC_OK, response.getStatus());
+		return RequestFactory.templatesFromJson(response.getBody());
 	}
 }
