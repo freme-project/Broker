@@ -2,7 +2,7 @@ package eu.freme.broker.integration_tests;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.freme.conversion.rdf.RDFConstants;
+import eu.freme.common.conversion.rdf.RDFConstants;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
@@ -60,7 +60,7 @@ public class UTF8ContentTest extends IntegrationTest{
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
     }
     */
-
+/*
     @Test
     public void testELink() throws Exception{
         logger.info("Test e-Link");
@@ -81,7 +81,7 @@ public class UTF8ContentTest extends IntegrationTest{
         //Deletes temporary template
         eLinkTest.testELinkTemplatesDelete(id);
     }
-
+*/
     @Test
     public void testFremeNer() throws UnirestException, IOException{
         HttpResponse<String> response;

@@ -31,18 +31,19 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
-import eu.freme.conversion.rdf.RDFConstants;
-import eu.freme.conversion.rdf.RDFConversionService;
+import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.conversion.rdf.RDFConversionService;
 
 /**
  * Created by Arne on 29.07.2015.
  */
 public abstract class IntegrationTest {
 
+    public static String baseUrl;
     private String url = null;
     private String service;
     public RDFConversionService converter;
-    
+
     public IntegrationTest(String service){
         this.service = service;
     }
@@ -72,6 +73,12 @@ public abstract class IntegrationTest {
     public String getUrl() {
         return url;
     }
+
+    public void setService(String service){
+        this.service = service;
+        url = baseUrl + service;
+    }
+
 
 
     //Reads a text file line by line. Use this when testing API with examples from /test/resources/
