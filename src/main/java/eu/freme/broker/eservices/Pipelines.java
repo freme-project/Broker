@@ -117,7 +117,7 @@ public class Pipelines extends BaseRestController {
 			pipelineDAO.save(pipeline);
 
 			// now get the id of the pipeline.
-			String response = "{\"id\": \"" + pipeline.getId() + "\", \"persist\": " + pipeline.isPersistent() + '}';
+			String response = "{\"id\": " + pipeline.getId() + ", \"persist\": " + pipeline.isPersistent() + '}';
 
 			MultiValueMap<String, String> headers = new HttpHeaders();
 			headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.getMimeType());
