@@ -20,8 +20,11 @@ package eu.freme.broker.integration_tests;
 import java.io.IOException;
 
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
@@ -32,49 +35,62 @@ import eu.freme.common.conversion.rdf.RDFConstants;
  */
 public class EInternationalizationTest extends IntegrationTest {
 
-    //Tests E-Internationalization Service used for converting html and xliff to nif format
-    // against POST /e-entity/freme-ner/documents
-    public EInternationalizationTest(){super("/e-entity/freme-ner/documents");}
+	// Tests E-Internationalization Service used for converting html and xliff
+	// to nif format
+	// against POST /e-entity/freme-ner/documents
+	public EInternationalizationTest() {
+		super("/e-entity/freme-ner/documents");
+	}
 
-    String dataset = "dbpedia";
-    String[] sample_xliff = {"test1.xlf"};
-    String[] sample_html = {"aa324.html","test10.html","test12.html"};
-    String resourcepath= "src/test/resources/e-internationalization/";
+	String dataset = "dbpedia";
+	String[] sample_xliff = { "test1.xlf" };
+	String[] sample_html = { "aa324.html", "test10.html", "test12.html" };
+	String resourcepath = "src/test/resources/e-internationalization/";
 
-    @Test
-    public void TestEInternationalization() throws IOException, UnirestException {
-        //See EInternationalizationFilter
-//        for (String sample_file : sample_xliff) {
-//            testContentTypeandInformat("application/x-xliff+xml",readFile(resourcepath+sample_file));
-//        }
-        for (String sample_file : sample_html) {
-            testContentTypeandInformat("text/html",readFile(resourcepath+sample_file));
-        }
-    }
+	@Test
+	public void TestEInternationalization() throws IOException,
+			UnirestException {
+		// See EInternationalizationFilter
+		// for (String sample_file : sample_xliff) {
+		// testContentTypeandInformat("application/x-xliff+xml",readFile(resourcepath+sample_file));
+		// }
+		for (String sample_file : sample_html) {
+			testContentTypeandInformat("text/html", readFile(resourcepath
+					+ sample_file));
+		}
+	}
 
-    protected HttpRequestWithBody baseRequestPost() {
-        return super.baseRequestPost("")
-                .queryString("dataset", dataset);
-    }
+	protected HttpRequestWithBody baseRequestPost() {
+		return super.baseRequestPost("").queryString("dataset", dataset);
+	}
 
-    private void testContentTypeandInformat(String format, String data) throws UnirestException, IOException {
-        HttpResponse<String> response;
-        //With Content-Type header
-        response = baseRequestPost()
-                .header("Content-Type", format)
-                .queryString("language", "en")
-                .body(data)
-                .asString();
+	private void testContentTypeandInformat(String format, String data)
+			throws UnirestException, IOException {
+		HttpResponse<String> response;
+		// With Content-Type header
+		response = baseRequestPost().header("Content-Type", format)
+				.queryString("language", "en").body(data).asString();
 
-        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+		validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
-        //With informat QueryString
-        response = baseRequestPost()
-                .queryString("informat", format)
-                .queryString("language", "en")
-                .body(data)
-                .asString();
-        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
-    }
+		// With informat QueryString
+		response = baseRequestPost().queryString("informat", format)
+				.queryString("language", "en").body(data).asString();
+		validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+	}
 
+	@Test
+	public void testRoundTripping() throws UnirestException {
+
+		HttpResponse<String> response = Unirest.post(super.getBaseUrl() + "/e-entity/freme-ner/documents")
+				.queryString("language", "en")
+				.queryString("dataset", "dbpedia")
+				.queryString("informat", "text/html")
+				.queryString("outformat", "text/html")
+				.body("<p>Berlin is a city in Germany</p>")
+				.asString();
+
+		assertEquals(response.getStatus(), 200);
+		assertTrue(response.getBody().length() > 0);
+	}
 }

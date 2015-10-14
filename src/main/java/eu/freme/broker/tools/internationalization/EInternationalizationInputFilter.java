@@ -17,7 +17,10 @@
  */
 package eu.freme.broker.tools.internationalization;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,16 +34,20 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
+import com.mashape.unirest.http.HttpResponse;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
@@ -70,10 +77,13 @@ public class EInternationalizationInputFilter implements Filter {
 		contentTypes.add(EInternationalizationAPI.MIME_TYPE_XLIFF_1_2
 				.toLowerCase());
 	}
-
-	public void doFilter(ServletRequest req, ServletResponse res,
-			FilterChain chain) throws IOException, ServletException {
-
+	
+	/**
+	 * Determines format of request. Returns null if the format is not suitable for eInternationalization Filter.
+	 * @param req
+	 * @return
+	 */
+	public String getInformat(HttpServletRequest req){
 		String informat = req.getParameter("informat");
 		if (informat == null && req.getContentType() != null) {
 			informat = req.getContentType();
@@ -82,90 +92,129 @@ public class EInternationalizationInputFilter implements Filter {
 				informat = parts[0].trim();
 			}
 		}
+		if( informat == null ){
+			return informat;
+		}
+		informat = informat.toLowerCase();
+		if( contentTypes.contains(informat)){
+			return informat;
+		} else{
+			return null;
+		}
+	}
+	
+	/**
+	 * Determines format of request. Returns null if the format is not suitable for eInternationalization Filter.
+	 * @param req
+	 * @return
+	 */
+	public String getOutformat(HttpServletRequest req){
+		String outformat = req.getParameter("outformat");
+		if (outformat == null && req.getHeader("Accept") != null) {
+			outformat = req.getHeader("Accept");
+			String[] parts = outformat.split(";");
+			if (parts.length > 1) {
+				outformat = parts[0].trim();
+			}
+		}
+		if( outformat == null ){
+			return null;
+		}
+		outformat = outformat.toLowerCase();
+		if( contentTypes.contains(outformat)){
+			return outformat;
+		} else{
+			return null;
+		}
+	}
+	
+	public void doFilter(ServletRequest req, ServletResponse res,
+			FilterChain chain) throws IOException, ServletException  {
 
+		if( !(req instanceof HttpServletRequest) || !(res instanceof HttpServletResponse)){
+			chain.doFilter(req, res);
+			return;
+		}
+		
+		HttpServletRequest httpRequest = (HttpServletRequest)req;
+		HttpServletResponse httpResponse = (HttpServletResponse)res;
+
+		String informat = getInformat(httpRequest);
+		String outformat = getOutformat(httpRequest);
+		
+		if( outformat != null && (informat == null || !outformat.equals(informat))){
+			throw new BadRequestException("Can only convert to outformat \"" + outformat + "\" when informat is also \"" + outformat + "\"");
+		}
+		
 		if (informat == null) {
 			chain.doFilter(req, res);
 			return;
 		}
-
-		if (!contentTypes.contains(informat.toLowerCase())) {
-			chain.doFilter(req, res);
-			return;
+		
+		boolean roundtripping = false;
+		if( outformat != null ){
+			roundtripping = true;
+			logger.debug("convert from " + informat + " to " + outformat);
+		} else{
+			logger.debug("convert input from " + informat + " to nif");			
 		}
 
-		if (!(req instanceof HttpServletRequest)) {
-			chain.doFilter(req, res);
-			return;
-		}
-
-		logger.debug("convert input from " + informat + " to nif");
-
-		InputStream is = null;
+		// do conversion of informat to nif
+		// create BodySwappingServletRequest
+		
+		InputStream requestInputStream = null;
 
 		String inputQueryString = req.getParameter("input");
 		if (inputQueryString == null) {
 			// read data from request body
-			is = req.getInputStream();
+			requestInputStream = req.getInputStream();
 		} else {
 			// read data from query string input parameter
-			is = new ReaderInputStream(new StringReader(inputQueryString), "UTF-8");
+			requestInputStream = new ReaderInputStream(new StringReader(inputQueryString), "UTF-8");
 		}
 		
-		// check if roundtripping is needed
-		String outformat = null;
-		ServletResponse newResponse = res;
-		boolean roundTripping = false;
-		
-		// the buffer input stream will store the skeleton file later on.
-		BufferStream bs = null;
-		
-		if( req.getParameter("outformat") != null){
-			outformat = req.getParameter("outformat");
-		} else if( req instanceof HttpServletRequest && ((HttpServletRequest)req).getHeader("Accept") != null){
-			outformat = ((HttpServletRequest)req).getHeader("Accept");
+		// copy request content to buffer
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		BufferedInputStream bis = new BufferedInputStream(requestInputStream);
+		byte[] buffer = new byte[1024];
+		int read=0;
+		while((read=bis.read(buffer)) != -1){
+			baos.write(buffer, 0, read);
 		}
-		if( contentTypes.contains(outformat) && res instanceof HttpServletResponse){
-			if(!outformat.equals(informat)){
-				String msg = String.format("Cannot convert informat\"%s\" to outformat \"%s\"" , informat, outformat);
-				throw new BadRequestException(msg);
-			}
-			bs = new BufferStream(is);
-			is = bs;
-			// the LoggingServletResponse captures the result of enrichment in a buffer.
-			newResponse = new LoggingServletResponse((HttpServletResponse)res);
-			roundTripping = true;
-		}
+		bis.close();
 		
+		// create request wrapper that converts the body of the request from the original format to turtle
 		Reader nif;
+		
+		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 		try {
-			nif = eInternationalizationApi.convertToTurtle(is,
+			nif = eInternationalizationApi.convertToTurtle(bais,
 					informat.toLowerCase());
 		} catch (ConversionException e) {
 			logger.error("Error", e);
 			throw new InternalServerErrorException();
 		}
 		BodySwappingServletRequest bssr = new BodySwappingServletRequest(
-				(HttpServletRequest) req, nif, roundTripping);
+				(HttpServletRequest) req, nif, roundtripping);
+
+		// do conversion from turtle to original format if needed
+		ServletResponse newResponse = res;
+		if( roundtripping ){
+			InputStream originalInputStream = new ByteArrayInputStream(baos.toByteArray());
+			try {
+				newResponse = new ConversionHttpServletResponseWrapper(httpResponse, eInternationalizationApi, originalInputStream, informat, outformat);
+			} catch (ConversionException e) {
+				logger.error("Conversion failed", e);
+				throw new InternalServerErrorException("Conversion failed");
+			}
+		}
 		
 		chain.doFilter(bssr, newResponse);
-		
-		// when no roundtripping is needed then it should stop here
-		if( !roundTripping ){
-			return;
-		}
-		
-		System.err.println(convertInputStreamToString(bs.getInputStream()));
-		System.err.println("###");
-		System.err.println(convertInputStreamToString(((LoggingServletResponse)newResponse).getInputStream()));
-		
-		Reader reader = eInternationalizationApi.convertBack(bs.getInputStream(), ((LoggingServletResponse)newResponse).getInputStream());
-		BufferedReader br = new BufferedReader(reader);
-		
-		String line;
-		while((line=br.readLine()) != null){
-			res.getWriter().println(line);
-		}
-		br.close();
+//		
+//		if( roundtripping ){
+//			ConversionHttpServletResponseWrapper conversionWrapper = (ConversionHttpServletResponseWrapper)newResponse;
+//			conversionWrapper.writeBackToClient();
+//		}
 	}
 
 	public void init(FilterConfig filterConfig) {
