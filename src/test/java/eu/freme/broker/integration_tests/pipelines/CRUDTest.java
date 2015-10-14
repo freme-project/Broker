@@ -23,10 +23,14 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
+import eu.freme.eservices.pipelines.serialization.Pipeline;
+import org.apache.http.HttpStatus;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Gerald Haesendonck
@@ -49,6 +53,34 @@ public class CRUDTest extends PipelinesCommon {
 		System.out.println("response.getStatusText() = " + response.getStatusText());
 		System.out.println("response.contentType = " + response.getHeaders().getFirst("content-type"));
 		System.out.println("response.body = " + response.getBody());
+		assertEquals(HttpStatus.SC_OK, response.getStatus());
 	}
 
+	@Test
+	public void testCreateAndRead() throws UnirestException {
+		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight("en");
+		SerializedRequest linkRequest = RequestFactory.createLink("3");    // Geo pos
+
+		List<SerializedRequest> serializedRequests = Arrays.asList(entityRequest, linkRequest);
+		String body = RequestFactory.toJson(serializedRequests);
+		HttpResponse<String> response = baseRequestPost("templates", tokenWithPermission)
+				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
+				.body(new JsonNode(body))
+				.asString();
+		assertEquals(HttpStatus.SC_OK, response.getStatus());
+
+		// get id of pipeline
+		String pipelineInfoStr = response.getBody();
+		Pipeline pipelineInfo = RequestFactory.templateFromJson(pipelineInfoStr);
+		long id = pipelineInfo.getId();
+
+		// now query pipeline with id
+		HttpResponse<String> readResponse = baseRequestGet("templates/" + id, tokenWithPermission).asString();
+		assertEquals(HttpStatus.SC_OK, readResponse.getStatus());
+		Pipeline readPipeline = RequestFactory.templateFromJson(readResponse.getBody());
+		assertEquals(pipelineInfo.getId(), readPipeline.getId());
+		//assertEquals(pipelineInfo.getOwner(), readPipeline.getOwner());
+
+		assertEquals(serializedRequests, readPipeline.getSerializedRequests());
+	}
 }
