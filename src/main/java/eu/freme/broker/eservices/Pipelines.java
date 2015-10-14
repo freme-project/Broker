@@ -17,33 +17,33 @@
  */
 package eu.freme.broker.eservices;
 
-import java.util.List;
-
+import com.google.gson.JsonSyntaxException;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.freme.broker.exception.AccessDeniedException;
+import eu.freme.broker.exception.BadRequestException;
+import eu.freme.broker.exception.InternalServerErrorException;
+import eu.freme.broker.exception.NotAcceptableException;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.persistence.dao.PipelineDAO;
 import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.common.persistence.model.Pipeline;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
-
-import com.google.gson.JsonSyntaxException;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
-import eu.freme.broker.exception.BadRequestException;
-import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.broker.exception.NotAcceptableException;
 import eu.freme.eservices.pipelines.core.PipelineResponse;
 import eu.freme.eservices.pipelines.core.PipelineService;
 import eu.freme.eservices.pipelines.core.ServiceException;
 import eu.freme.eservices.pipelines.requests.RequestBuilder;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author Gerald Haesendonck
@@ -95,7 +95,7 @@ public class Pipelines extends BaseRestController {
 			throw new BadRequestException(unirestException.getMessage());
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
-			// throw a FREME exception if anything goes really wrong...
+			// throw an Internal Server exception if anything goes really wrong...
 			throw new InternalServerErrorException(t.getMessage());
 		}
 	}
@@ -131,9 +131,12 @@ public class Pipelines extends BaseRestController {
 		} catch (eu.freme.common.exception.BadRequestException e) {
 			logger.error(e.getMessage(), e);
 			throw new BadRequestException(e.getMessage());
+		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new AccessDeniedException(ex.getMessage());
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
-			// throw a FREME exception if anything goes really wrong...
+			// throw an Internal Server exception if anything goes really wrong...
 			throw new InternalServerErrorException(t.getMessage());
 		}
 	}
@@ -153,6 +156,13 @@ public class Pipelines extends BaseRestController {
 		} catch (NumberFormatException ex) {
 			logger.error(ex.getMessage(), ex);
 			throw new BadRequestException("The id has to be an integer number. " + ex.getMessage());
+		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new AccessDeniedException(ex.getMessage());
+		} catch (Throwable t) {
+			logger.error(t.getMessage(), t);
+			// throw an Internal Server exception if anything goes really wrong...
+			throw new InternalServerErrorException(t.getMessage());
 		}
 	}
 
