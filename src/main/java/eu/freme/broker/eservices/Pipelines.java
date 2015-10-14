@@ -143,6 +143,7 @@ public class Pipelines extends BaseRestController {
 			method = RequestMethod.GET,
 			produces = "application/json"
 	)
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> read(@PathVariable(value = "id") String id) {
 		try {
 			long idNr = Long.parseLong(id);
