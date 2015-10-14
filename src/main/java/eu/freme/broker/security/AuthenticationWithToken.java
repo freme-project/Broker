@@ -1,5 +1,7 @@
 /**
- * Copyright (C) 2015 Deutsches Forschungszentrum für Künstliche Intelligenz (http://freme-project.eu)
+ * Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+ * Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+ * Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +22,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
-import eu.freme.broker.security.database.Token;
+import eu.freme.common.persistence.model.Token;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */

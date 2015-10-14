@@ -1,5 +1,7 @@
 /**
- * Copyright (C) 2015 Deutsches Forschungszentrum für Künstliche Intelligenz (http://freme-project.eu)
+ * Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+ * Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+ * Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +44,7 @@ public class UserControllerTest {
 	@Before
 	public void setup() {
 		baseUrl = IntegrationTestSetup.getURLEndpoint();
-		
+
 		ConfigurableApplicationContext context = IntegrationTestSetup.getApplicationContext();
 		adminUsername = context.getEnvironment().getProperty("admin.username");
 		adminPassword = context.getEnvironment().getProperty("admin.password");
@@ -55,19 +57,21 @@ public class UserControllerTest {
 		String password = "mypassword";
 
 		logger.info("create user");
+		logger.info(baseUrl + "/user");
 		HttpResponse<String> response = Unirest.post(baseUrl + "/user")
 				.queryString("username", username)
 				.queryString("password", password).asString();
+		System.out.println("STATUS: "+response.getStatus());
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
 		String responseUsername = new JSONObject(response.getBody()).getString("name");
 		assertTrue(username.equals(responseUsername));
-		
+
 		logger.info("create user with dublicate username - should not work, exception is ok");
 		response = Unirest.post(baseUrl + "/user")
 				.queryString("username", username)
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
-		
+
 		logger.info("create users with invalid usernames - should not work");
 		response = Unirest.post(baseUrl + "/user")
 				.queryString("username", "123")
@@ -78,7 +82,7 @@ public class UserControllerTest {
 				.queryString("username", "*abc")
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
-		
+
 		response = Unirest.post(baseUrl + "/user")
 				.queryString("username", adminUsername)
 				.queryString("password", password).asString();
@@ -123,14 +127,14 @@ public class UserControllerTest {
 				.delete(baseUrl + "/user/" + otherUsername)
 				.header("X-Auth-Token", token).asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
-		
+
 		logger.info("cannot do authenticated call with username / password, only token should work");
 		response = Unirest
 				.delete(baseUrl + "/user/" + username)
 				.header("X-Auth-Username", username)
 				.header("X-Auth-Password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
-		
+
 		logger.info("get user information");
 		response = Unirest
 				.get(baseUrl + "/user/" + username)
@@ -138,36 +142,38 @@ public class UserControllerTest {
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
 		responseUsername = new JSONObject(response.getBody()).getString("name");
 		assertTrue(responseUsername.equals(username));
-		
+
+
 		logger.info("delete own user - should work");
 		response = Unirest
 				.delete(baseUrl + "/user/" + username)
 				.header("X-Auth-Token", token).asString();
 		assertTrue(response.getStatus() == HttpStatus.NO_CONTENT.value());
+
 	}
-	
+
 	@Test
 	public void testAdmin() throws UnirestException{
-		
+
 		String username = "carlos";
 		String password = "carlosss";
 		logger.info("create user \"" + username + "\" and get token");
-		
+
 		HttpResponse<String> response = Unirest.post(baseUrl + "/user")
 				.queryString("username", username)
 				.queryString("password", password).asString();
-		
+
 		response = Unirest
 				.post(baseUrl + BaseRestController.authenticationEndpoint)
 				.header("X-Auth-Username", username)
 				.header("X-Auth-Password", password).asString();
 		String token = new JSONObject(response.getBody()).getString("token");
-		
+
 		logger.info("try to access /user endpoint from user account - should not work");
 		response = Unirest
 				.get(baseUrl + "/user")
 				.header("X-Auth-Token", token).asString();
-		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());		
+		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
 
 		logger.info("access /user endpoint with admin credentials");
 		response = Unirest
@@ -179,19 +185,27 @@ public class UserControllerTest {
 		response = Unirest
 				.get(baseUrl + "/user")
 				.header("X-Auth-Token", token).asString();
-		assertTrue(response.getStatus() == HttpStatus.OK.value());		
-		
+		assertTrue(response.getStatus() == HttpStatus.OK.value());
+
+		logger.info("access user through access token passed via query string");
+		response = Unirest
+				.get(baseUrl + "/user")
+				.queryString("token", token).asString();
+		assertTrue(response.getStatus() == HttpStatus.OK.value());
+
+
 		logger.info("admin can delete carlos");
 		response = Unirest
 				.delete(baseUrl + "/user/" + username)
 				.header("X-Auth-Token", token).asString();
-		
-		assertTrue(response.getStatus() == HttpStatus.NO_CONTENT.value());			
-		
+
+
+		assertTrue(response.getStatus() == HttpStatus.NO_CONTENT.value());
+
 		response = Unirest
 				.get(baseUrl + "/user")
 				.header("X-Auth-Token", token).asString();
-		assertTrue(response.getStatus() == HttpStatus.OK.value());		
+		assertTrue(response.getStatus() == HttpStatus.OK.value());
 
 	}
 }

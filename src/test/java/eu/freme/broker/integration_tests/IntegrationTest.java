@@ -39,27 +39,19 @@ import eu.freme.conversion.rdf.RDFConversionService;
  */
 public abstract class IntegrationTest {
 
-    public static String baseUrl;
-    private String url;
+    private String url = null;
     private String service;
-    public static RDFConversionService converter;
+    public RDFConversionService converter;
     
     public IntegrationTest(String service){
         this.service = service;
-        if(baseUrl!=null)
-            url = baseUrl + service;
     }
 
     @Before
     public void setup(){
-        baseUrl = IntegrationTestSetup.getURLEndpoint();
-        url = baseUrl + service;
-        converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
-    }
 
-    public void setService(String service){
-        this.service = service;
-        url = baseUrl + service;
+        url = IntegrationTestSetup.getURLEndpoint() + service;
+        converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
     }
 
     //All HTTP Methods used in FREME are defined.

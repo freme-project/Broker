@@ -1,5 +1,7 @@
 /**
- * Copyright (C) 2015 Deutsches Forschungszentrum für Künstliche Intelligenz (http://freme-project.eu)
+ * Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+ * Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+ * Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,31 +20,30 @@ package eu.freme.broker;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Configuration;
 
 import com.github.isrsal.logging.LoggingFilter;
 
 import eu.freme.broker.tools.NIFParameterFactory;
-import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.RDFSerializationFormats;
-import eu.freme.conversion.ConversionApplicationConfig;
 
-/**
- * configures broker without api endpoints and e-Services
- * 
- * @author Jan Nehring - jan.nehring@dfki.de
- */
-
-@SpringBootApplication
-@Import(ConversionApplicationConfig.class)
-public class BrokerConfig {
+@Configuration
+public class FremeCommonConfig {
 	
+    @Bean
+    public RDFSerializationFormats rdfFormats(){
+    	return new RDFSerializationFormats();
+    }
+    @Bean
+    public NIFParameterFactory getNifParameterFactory(){
+    	return new NIFParameterFactory();
+    }
+    
+
 	/**
 	 * Create a filter that logs all requests input and output
-	 * @return
 	 */
     @Bean
     public FilterRegistrationBean loggingFilter() {
@@ -52,20 +53,5 @@ public class BrokerConfig {
         urlPatterns.add("/*");
     	filter.setUrlPatterns(urlPatterns);
         return filter;
-    }
-    
-    @Bean
-    public RDFSerializationFormats rdfFormats(){
-    	return new RDFSerializationFormats();
-    }
-    
-    @Bean
-    public RDFELinkSerializationFormats eLinkRdfFormats(){
-    	return new RDFELinkSerializationFormats();
-    }
-
-    @Bean
-    public NIFParameterFactory getNifParameterFactory(){
-    	return new NIFParameterFactory();
     }
 }
