@@ -68,6 +68,7 @@ public abstract class EServiceTest {
 
     public EServiceTest(String service){
         this.service = service;
+        Unirest.setTimeouts(10000, 180000);
     }
 
     @Before
