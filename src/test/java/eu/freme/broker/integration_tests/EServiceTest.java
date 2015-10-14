@@ -187,12 +187,13 @@ public abstract class EServiceTest {
     }
 
     //Used for constructiong Templates with sparql queries in E-link and E-Link Security Test
-    String constructTemplate(String label, String query, String endpoint, String description) {
+    String constructTemplate(String label, String query, String endpoint, String description, String endpointType) {
         query = query.replaceAll("\n","\\\\n");
         return  " {\n" +
                 "\"label\":\""+ label + "\",\n"+
                 " \"query\":\""+query+"\",\n" +
                 " \"endpoint\":\""+endpoint+"\",\n" +
+                " \"endpoint-type\":\""+endpointType+"\",\n" +
                 "\"description\":\""+ description + "\"\n"+
                 " }";
     }
