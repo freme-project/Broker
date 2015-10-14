@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -99,14 +100,18 @@ public class Pipelines extends BaseRestController {
 		}
 	}
 
+	// TODO: comments
 	@RequestMapping(value = "/pipelining/templates",
 					method = RequestMethod.POST,
 					consumes = "application/json",
-					produces = "application/json")
+					produces = "application/json"
+	)
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> create(
 			@RequestBody String requests,
 			@RequestParam(value = "visibility", required = false) String visibility,
-			@RequestParam (value = "persist", defaultValue = "false", required = false) String persist) {
+			@RequestParam (value = "persist", defaultValue = "false", required = false) String persist
+	) {
 
 		try {
 			// just to perform a first validation of the pipeline...
@@ -136,4 +141,14 @@ public class Pipelines extends BaseRestController {
 			throw new InternalServerErrorException(t.getMessage());
 		}
 	}
+
+//	@RequestMapping(
+//			value = "pipelining/templates/{id}",
+//			method = RequestMethod.GET,
+//			produces = "application/json"
+//	)
+//	public ResponseEntity<String> read(@PathVariable(value = "id") String id) {
+//
+//		return null;
+//	}
 }
