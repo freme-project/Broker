@@ -1,0 +1,63 @@
+@prefix dsp:   <http://dublincore.org/dc-dsp#> .
+@prefix schema: <http://schema.org/> .
+@prefix olia:  <http://purl.org/olia/olia.owl#> .
+@prefix rutg:  <http://rdfunit.aksw.org/data/generators#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rlog:  <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .
+@prefix nif:   <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
+@prefix rutp:  <http://rdfunit.aksw.org/data/patterns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix oslc:  <http://open-services.net/ns/core#> .
+@prefix p:     <http://127.0.0.1:9995/spotlight#> .
+@prefix rut:   <http://rdfunit.aksw.org/ns/core#> .
+@prefix rutr:  <http://rdfunit.aksw.org/data/results#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rutt:  <http://rdfunit.aksw.org/data/tests#> .
+@prefix spin:  <http://spinrdf.org/spin#> .
+@prefix ruts:  <http://rdfunit.aksw.org/data/testsuite#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<http://freme-project.eu/#char=0,15>
+        a                     nif:RFC5147String , nif:Context , nif:Sentence ;
+        nif:anchorOf          "This is Germany" ;
+        nif:beginIndex        "0" ;
+        nif:endIndex          "15" ;
+        nif:firstWord         <http://freme-project.eu/#char=0,4> ;
+        nif:isString          "This is Germany" ;
+        nif:lastWord          <http://freme-project.eu/#char=8,15> ;
+        nif:referenceContext  <http://freme-project.eu/#char=0,15> ;
+        nif:word              <http://freme-project.eu/#char=5,7> .
+
+<http://freme-project.eu/#char=5,7>
+        a                     nif:RFC5147String , nif:Word ;
+        nif:anchorOf          "is" ;
+        nif:beginIndex        "5" ;
+        nif:endIndex          "7" ;
+        nif:nextWord          <http://freme-project.eu/#char=8,15> ;
+        nif:previousWord      <http://freme-project.eu/#char=0,4> ;
+        nif:referenceContext  <http://freme-project.eu/#char=0,15> ;
+        nif:sentence          <http://freme-project.eu/#char=0,15> .
+
+<http://freme-project.eu/#char=0,4>
+        a                     nif:RFC5147String , nif:Word ;
+        nif:anchorOf          "This" ;
+        nif:beginIndex        "0" ;
+        nif:endIndex          "4" ;
+        nif:nextWord          <http://freme-project.eu/#char=5,7> ;
+        nif:referenceContext  <http://freme-project.eu/#char=0,15> ;
+        nif:sentence          <http://freme-project.eu/#char=0,15> ;
+        itsrdf:taIdentRef     <http://dbpedia.org/resource/Sathya_Sai_Baba> .
+
+<http://freme-project.eu/#char=8,15>
+        a                     nif:RFC5147String , nif:Word ;
+        nif:anchorOf          "Germany" ;
+        nif:beginIndex        "8" ;
+        nif:endIndex          "15" ;
+        nif:previousWord      <http://freme-project.eu/#char=5,7> ;
+        nif:referenceContext  <http://freme-project.eu/#char=0,15> ;
+        nif:sentence          <http://freme-project.eu/#char=0,15> ;
+        itsrdf:taIdentRef     <http://dbpedia.org/resource/Germany> .
