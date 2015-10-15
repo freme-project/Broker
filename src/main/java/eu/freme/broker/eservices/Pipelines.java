@@ -19,11 +19,9 @@ package eu.freme.broker.eservices;
 
 import com.google.gson.JsonSyntaxException;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.freme.broker.exception.AccessDeniedException;
-import eu.freme.broker.exception.BadRequestException;
-import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.broker.exception.NotAcceptableException;
+import eu.freme.broker.exception.*;
 import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.exception.OwnedResourceNotFoundException;
 import eu.freme.common.persistence.dao.PipelineDAO;
 import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.common.persistence.model.Pipeline;
@@ -33,6 +31,7 @@ import eu.freme.eservices.pipelines.core.ServiceException;
 import eu.freme.eservices.pipelines.requests.RequestBuilder;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
+import eu.freme.eservices.pipelines.serialization.Serializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
@@ -76,7 +75,7 @@ public class Pipelines extends BaseRestController {
 	)
 	public ResponseEntity<String> pipeline(@RequestBody String requests) {
 		try {
-			List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
+			List<SerializedRequest> serializedRequests = Serializer.fromJson(requests);
 			PipelineResponse pipelineResult = pipelineAPI.chain(serializedRequests);
 			MultiValueMap<String, String> headers = new HttpHeaders();
 			headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getContentType());
@@ -108,21 +107,28 @@ public class Pipelines extends BaseRestController {
 	)
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> create(
-			@RequestBody String requests,
+			@RequestBody String pipelineInfo,
 			@RequestParam(value = "visibility", required = false) String visibility,
 			@RequestParam (value = "persist", defaultValue = "false", required = false) String persist
 	) {
 
 		try {
 			// just to perform a first validation of the pipeline...
-			List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
+			eu.freme.eservices.pipelines.serialization.Pipeline pipeline = Serializer.templateFromJson(pipelineInfo);
+			//List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
 
 			boolean toPersist = Boolean.parseBoolean(persist);
-			Pipeline pipeline = new Pipeline(OwnedResource.Visibility.getByString(visibility), "label", "description", requests, toPersist);
-			pipelineDAO.save(pipeline);
+			Pipeline pipelineResource = new Pipeline(
+					OwnedResource.Visibility.getByString(visibility),
+					pipeline.getLabel(),
+					pipeline.getDescription(),
+					pipeline.getSerializedRequests(),
+					toPersist);
+			pipelineDAO.save(pipelineResource);
 
 			// now get the id of the pipeline.
-			String response = "{\"id\": " + pipeline.getId() + ", \"persist\": " + pipeline.isPersistent() + '}';
+			String response = Serializer.toJson(pipelineResource);
+			//String response = "{\"id\": " + pipelineResource.getId() + ", \"persist\": " + pipelineResource.isPersistent() + '}';
 			return createOKJSONResponse(response);
 		} catch (JsonSyntaxException jsonException) {
 			logger.error(jsonException.getMessage(), jsonException);
@@ -147,18 +153,17 @@ public class Pipelines extends BaseRestController {
 			produces = "application/json"
 	)
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
-	public ResponseEntity<String> read(@PathVariable(value = "id") String id) {
+	public ResponseEntity<String> read(@PathVariable(value = "id") long id) {
 		try {
-			long idNr = Long.parseLong(id);
-			Pipeline pipeline = pipelineDAO.findOneById(idNr);
-			String serializedPipeline = RequestFactory.toJson(pipeline);
+			Pipeline pipeline = pipelineDAO.findOneById(id);
+			String serializedPipeline = Serializer.toJson(pipeline);
 			return createOKJSONResponse(serializedPipeline);
-		} catch (NumberFormatException ex) {
-			logger.error(ex.getMessage(), ex);
-			throw new BadRequestException("The id has to be an integer number. " + ex.getMessage());
 		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
 			logger.error(ex.getMessage(), ex);
 			throw new AccessDeniedException(ex.getMessage());
+		} catch (OwnedResourceNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new TemplateNotFoundException("Could not find the pipeline template with id " + id);
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 			// throw an Internal Server exception if anything goes really wrong...
@@ -173,9 +178,36 @@ public class Pipelines extends BaseRestController {
 	)
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> read() {
-		List<Pipeline> readablePipelines = pipelineDAO.findAllReadAccessible();
-		String serializedPipelines = RequestFactory.templatesToJson(readablePipelines);
-		return createOKJSONResponse(serializedPipelines);
+		try {
+			List<Pipeline> readablePipelines = pipelineDAO.findAllReadAccessible();
+			String serializedPipelines = Serializer.templatesToJson(readablePipelines);
+			return createOKJSONResponse(serializedPipelines);
+		} catch (Throwable t) {
+			logger.error(t.getMessage(), t);
+			// throw an Internal Server exception if anything goes really wrong...
+			throw new InternalServerErrorException(t.getMessage());
+		}
+	}
+
+	@RequestMapping(
+			value = "pipelining/templates/{id}",
+			method = RequestMethod.DELETE
+	)
+	public ResponseEntity<String> delete(@PathVariable("id") long id) {
+		try {
+			pipelineDAO.delete(pipelineDAO.findOneById(id));
+			return new ResponseEntity<>("The pipeline was sucessfully removed.", HttpStatus.OK);
+		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new AccessDeniedException(ex.getMessage());
+		} catch (OwnedResourceNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new TemplateNotFoundException("Could not find the pipeline template with id " + id);
+		} catch (Throwable t) {
+			logger.error(t.getMessage(), t);
+			// throw an Internal Server exception if anything goes really wrong...
+			throw new InternalServerErrorException(t.getMessage());
+		}
 	}
 
 	private ResponseEntity<String> createOKJSONResponse(final String contents) {

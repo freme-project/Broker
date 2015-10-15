@@ -20,8 +20,8 @@ package eu.freme.broker.integration_tests.pipelines;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.common.persistence.model.OwnedResource;
-import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.serialization.Pipeline;
+import eu.freme.eservices.pipelines.serialization.Serializer;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -39,6 +39,7 @@ public class CRUDTest extends PipelinesCommon {
 		Pipeline pipelineInfo = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
 		assertFalse(pipelineInfo.isPersist());
 		assertTrue(pipelineInfo.getId() > 0);
+		deleteTemplate(tokenWithPermission, pipelineInfo.getId(), HttpStatus.SC_OK);
 	}
 
 	@Test
@@ -49,9 +50,10 @@ public class CRUDTest extends PipelinesCommon {
 		// now query pipeline with id
 		HttpResponse<String> readResponse = baseRequestGet("templates/" + id, tokenWithPermission).asString();
 		assertEquals(HttpStatus.SC_OK, readResponse.getStatus());
-		Pipeline readPipeline = RequestFactory.templateFromJson(readResponse.getBody());
+		Pipeline readPipeline = Serializer.templateFromJson(readResponse.getBody());
 		assertEquals(pipelineInfo.getId(), readPipeline.getId());
 		assertEquals(pipelineInfo.getSerializedRequests(), readPipeline.getSerializedRequests());
+		deleteTemplate(tokenWithPermission, id, HttpStatus.SC_OK);
 	}
 
 	@Test
@@ -62,7 +64,7 @@ public class CRUDTest extends PipelinesCommon {
 		// now query pipeline with id
 		HttpResponse<String> readResponse = baseRequestGet("templates/" + id, tokenWithPermission).asString();
 		assertEquals(HttpStatus.SC_OK, readResponse.getStatus());
-		Pipeline readPipeline = RequestFactory.templateFromJson(readResponse.getBody());
+		Pipeline readPipeline = Serializer.templateFromJson(readResponse.getBody());
 		assertEquals(pipelineInfo.getId(), readPipeline.getId());
 		assertEquals(pipelineInfo.getSerializedRequests(), readPipeline.getSerializedRequests());
 
@@ -71,30 +73,42 @@ public class CRUDTest extends PipelinesCommon {
 		HttpResponse<String> readResponseOther = baseRequestGet("templates/" + id, tokenWithOutPermission).asString();
 		assertEquals(HttpStatus.SC_UNAUTHORIZED, readResponseOther.getStatus());
 		logger.info("Response for unauthorized user: " + readResponseOther.getBody());
+
+		deleteTemplate(tokenWithPermission, id, HttpStatus.SC_OK);
 	}
 
 	@Test
 	public void testCreateAndReadMultiple() throws UnirestException {
 		logger.info("Creating one public and one private pipeline per user");
-		createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
-		createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PRIVATE);
-		createDefaultTemplate(tokenWithOutPermission, OwnedResource.Visibility.PUBLIC);
-		createDefaultTemplate(tokenWithOutPermission, OwnedResource.Visibility.PRIVATE);
+		Pipeline pipeline1 = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
+		Pipeline pipeline2 = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PRIVATE);
+		Pipeline pipeline3 = createDefaultTemplate(tokenWithOutPermission, OwnedResource.Visibility.PUBLIC);
+		Pipeline pipeline4 = createDefaultTemplate(tokenWithOutPermission, OwnedResource.Visibility.PRIVATE);
 
 		// now try to read pipeline with other user
 		logger.info("Each user tries to read pipelines; only 3 should be visible.");
 		List<Pipeline> pipelinesFromUser1 = readTemplates(tokenWithPermission);
-		assertTrue(pipelinesFromUser1.size() >= 3);	// TODO: delete pipelines after each test, then this can be "equals"
+		assertEquals(3, pipelinesFromUser1.size());	// TODO: delete pipelines after each test, then this can be "equals"
 		for (Pipeline pipeline : pipelinesFromUser1) {
 			assertTrue(pipeline.getOwner().equals(usernameWithPermission) || pipeline.getVisibility().equals(OwnedResource.Visibility.PUBLIC.name()));
 		}
 		List<Pipeline> pipelinesFromUser2 = readTemplates(tokenWithOutPermission);
-		assertTrue(pipelinesFromUser2.size() >= 3);
+		assertEquals(3, pipelinesFromUser2.size());
 		for (Pipeline pipeline : pipelinesFromUser2) {
 			assertTrue(pipeline.getOwner().equals(usernameWithoutPermission) || pipeline.getVisibility().equals(OwnedResource.Visibility.PUBLIC.name()));
 		}
 		List<Pipeline> pipelinesFromAdmin = readTemplates(tokenAdmin);
-		assertTrue(pipelinesFromAdmin.size() >= 2);
+		assertEquals(2, pipelinesFromAdmin.size());
 		// TODO: shouldn't the admin see all templates?
+
+		deleteTemplate(tokenWithPermission, pipeline1.getId(), HttpStatus.SC_OK);
+		deleteTemplate(tokenWithPermission, pipeline2.getId(), HttpStatus.SC_OK);
+		deleteTemplate(tokenWithOutPermission, pipeline3.getId(), HttpStatus.SC_OK);
+		deleteTemplate(tokenWithOutPermission, pipeline4.getId(), HttpStatus.SC_OK);
+	}
+
+	@Test
+	public void testDeleteNonExisting() throws UnirestException {
+		deleteTemplate(tokenWithPermission, -5, HttpStatus.SC_NOT_FOUND);
 	}
 }
