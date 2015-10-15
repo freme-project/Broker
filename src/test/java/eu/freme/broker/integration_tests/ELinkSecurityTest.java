@@ -3,7 +3,6 @@ package eu.freme.broker.integration_tests;
 import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.broker.FremeCommonConfig;
 import eu.freme.common.conversion.rdf.RDFConstants;
@@ -35,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = FremeCommonConfig.class)
 @ActiveProfiles("broker")
-public class ELinkSecurityTest extends IntegrationTest {
+public class ELinkSecurityTest extends EServiceTest {
 
     public ELinkSecurityTest() throws UnirestException {
         super("/e-link/");
@@ -48,14 +47,14 @@ public class ELinkSecurityTest extends IntegrationTest {
 
 
         // add a template for the first user
-        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
         assertNotNull(templateid);
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), deleteTemplate("999", tokenWithPermission));
-        assertEquals(HttpStatus.NOT_FOUND.value(), getTemplate("999", tokenWithPermission));
-        assertEquals(HttpStatus.NOT_FOUND.value(), updateTemplate("999", tokenWithPermission, constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), "http://dbpedia.org/sparql/", "Some description"), "public", null, null));
+        assertEquals(HttpStatus.NOT_FOUND.value(), deleteTemplate(999, tokenWithPermission));
+        assertEquals(HttpStatus.NOT_FOUND.value(), getTemplate(999, tokenWithPermission));
+        assertEquals(HttpStatus.NOT_FOUND.value(), updateTemplate(999, tokenWithPermission, constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), "http://dbpedia.org/sparql/", "Some description", "sparql"), "public", null, null));
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
-        assertEquals(HttpStatus.NOT_FOUND.value(), doELink(nifContent, "999", tokenWithOutPermission));
+        assertEquals(HttpStatus.NOT_FOUND.value(), doELink(nifContent, 999, tokenWithOutPermission));
 
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
@@ -67,7 +66,7 @@ public class ELinkSecurityTest extends IntegrationTest {
         logger.info("testAnonymousUser");
 
 
-        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
         assertNotNull(templateid);
 
         logger.info("try to create template as anonymous user... should not work");
@@ -81,7 +80,7 @@ public class ELinkSecurityTest extends IntegrationTest {
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
         assertEquals(HttpStatus.OK.value(), doELink(nifContent, templateid, null));
         logger.info("try to update a public template as anonymous user... should not work");
-        assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate(templateid, null, constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"), "http://dbpedia.org/sparql/", "Some description"), "private",null, null));
+        assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate(templateid, null, constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"), "http://dbpedia.org/sparql/", "Some description", "sparql"), "private",null, null));
         logger.info("try to delete public template as anonymous user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteTemplate(templateid, null));
 
@@ -95,15 +94,15 @@ public class ELinkSecurityTest extends IntegrationTest {
 
         // add a template for the first user
         logger.info("create private template for user 1");
-        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
         logger.info("created template with id: " + templateid);
         assertNotNull(templateid);
         logger.info("create public template for user 1");
-        String templateid1 = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
+        long templateid1 = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
         logger.info("created template with id: " + templateid1);
         assertNotNull(templateid1);
         logger.info("create private template for user 2");
-        String templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithOutPermission);
+        long templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithOutPermission);
         logger.info("created template with id: " + templateid2);
         assertNotNull(templateid2);
 
@@ -120,8 +119,8 @@ public class ELinkSecurityTest extends IntegrationTest {
         logger.info("testUpdateTemplate");
         // add a template for the first user
         logger.info("create private template for user 1");
-        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
-        String template = constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"), "http://dbpedia.org/sparql/", "Some description");
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        String template = constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"), "http://dbpedia.org/sparql/", "Some description", "sparql");
 
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission,
                         template,
@@ -129,9 +128,9 @@ public class ELinkSecurityTest extends IntegrationTest {
         );
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, "public", null, null));
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, null, "ldf", null));
-        assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, null, null, usernameWithPermission));
+        assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission, template, null, null, usernameWithoutPermission));
 
-        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithPermission));
+        assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithOutPermission));
     }
 
     @Test
@@ -141,7 +140,7 @@ public class ELinkSecurityTest extends IntegrationTest {
 
         // add a template for the first user
         logger.info("create private template for user 1");
-        String templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
         logger.info("private template for user 1 has id: " + templateid);
         assertNotNull(templateid);
 
@@ -158,13 +157,13 @@ public class ELinkSecurityTest extends IntegrationTest {
         assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.singletonList(templateid), tokenWithPermission));
         logger.info("try to update private template as other user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate(templateid, tokenWithOutPermission,
-                constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),"http://dbpedia.org/sparql/", "Some description"), "private", null, null));
+                constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),"http://dbpedia.org/sparql/", "Some description", "sparql"), "private", null, null));
         logger.info("try to delete private template as other user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteTemplate(templateid, tokenWithOutPermission));
 
         logger.info("try to update private template as owner. Set visibility to public... should work");
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission,
-                constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),"http://dbpedia.org/sparql/", "Some description"), "public", null, null));
+                constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),"http://dbpedia.org/sparql/", "Some description", "sparql"), "public", null, null));
 
         logger.info("try to fetch public template as other user... should work");
         assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithOutPermission));
@@ -176,13 +175,13 @@ public class ELinkSecurityTest extends IntegrationTest {
         assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.singletonList(templateid), tokenWithPermission));
         logger.info("try to update public template as other user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate(templateid, tokenWithOutPermission,
-                constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),"http://dbpedia.org/sparql/", "Some description"), "private", null, null));
+                constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),"http://dbpedia.org/sparql/", "Some description", "sparql"), "private", null, null));
         logger.info("try to delete public template as other user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteTemplate(templateid, tokenWithOutPermission));
 
         logger.info("try to set public template to private as owner. Set visibility to private... should work");
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission,
-                constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),"http://dbpedia.org/sparql/", "Some description"), "private", null, null));
+                constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),"http://dbpedia.org/sparql/", "Some description", "sparql"), "private", null, null));
         logger.info("re-try to fetch private template as other user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), getTemplate(templateid, tokenWithOutPermission));
 
@@ -199,10 +198,10 @@ public class ELinkSecurityTest extends IntegrationTest {
 
 
         logger.info("create private template");
-        String id = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission);
+        long id = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission);
 
         logger.info("create public template");
-        String idPublic = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "public", tokenWithPermission);
+        long idPublic = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "public", tokenWithPermission);
 
         logger.info("read nif to enrich");
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
@@ -222,7 +221,7 @@ public class ELinkSecurityTest extends IntegrationTest {
         deleteTemplate(idPublic, tokenWithPermission);
     }
 
-    private int doELink(String nifContent, String templateId, String token) throws UnirestException, IOException {
+    private int doELink(String nifContent, long templateId, String token) throws UnirestException, IOException {
         HttpResponse<String> response = baseRequestPost("documents", token)
                 .queryString("templateid", templateId)
                 .queryString("informat", "turtle")
@@ -236,7 +235,7 @@ public class ELinkSecurityTest extends IntegrationTest {
     }
 
     //Tests GET e-link/templates/
-    public int getAllTemplates(List<String> expectedIDs, String token) throws UnirestException, IOException {
+    public int getAllTemplates(List<Long> expectedIDs, String token) throws UnirestException, IOException {
         HttpResponse<String> response;
 
         response = baseRequestGet("templates", token)
@@ -249,24 +248,24 @@ public class ELinkSecurityTest extends IntegrationTest {
         JSONArray jsonArray = new JSONArray(response.getBody());
         assertEquals(expectedIDs.size(), jsonArray.length());
 
-        ArrayList<String> tempIDs = new ArrayList<>(expectedIDs);
+        ArrayList<Long> tempIDs = new ArrayList<>(expectedIDs);
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String id = jsonObject.getString("id");
+            long id = jsonObject.getLong("id");
             assertTrue(tempIDs.remove(id));
         }
         return response.getStatus();
     }
 
     //Tests POST e-link/templates/
-    public String createTemplate(String filename, String visibility, String token) throws Exception {
+    public long createTemplate(String filename, String visibility, String token) throws Exception {
         String query = readFile(filename);
 
         HttpResponse<String> response = baseRequestPost("templates", token)
                 .queryString("visibility", visibility)
                 .queryString("informat", "json")
                 .queryString("outformat", "json")
-                .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description"))
+                .body(constructTemplate("Some label", query, "http://dbpedia.org/sparql/", "Some description", "sparql"))
                 .asString();
 
         if(response.getStatus() == HttpStatus.UNAUTHORIZED.value())
@@ -275,15 +274,15 @@ public class ELinkSecurityTest extends IntegrationTest {
 
         JSONObject jsonObj = new JSONObject(response.getBody());
 
-        String id = jsonObj.getString("id");
+        long id = jsonObj.getLong("id");
         // check, if id is numerical
-        assertTrue(id.matches("\\d+"));
+        //assertTrue(id.matches("\\d+"));
 
         return id;
     }
 
     //Tests GET e-link/templates/
-    public int getTemplate(String id, String token) throws UnirestException, IOException {
+    public int getTemplate(long id, String token) throws UnirestException, IOException {
 
         HttpResponse<String> response = baseRequestGet("templates/" + id, token)
                 .queryString("outformat", "json").asString();
@@ -295,7 +294,7 @@ public class ELinkSecurityTest extends IntegrationTest {
 
 
     //Tests PUT e-link/templates/
-    public int updateTemplate(String id, String token, String template, String visibility, String type, String owner) throws IOException, UnirestException {
+    public int updateTemplate(long id, String token, String template, String visibility, String type, String owner) throws IOException, UnirestException {
         //String query = readFile(filename);
 
         HttpRequestWithBody request = baseRequestPut("templates/" + id, token)
@@ -314,9 +313,9 @@ public class ELinkSecurityTest extends IntegrationTest {
         if (response.getStatus() == HttpStatus.OK.value()) {
             validateNIFResponse(response, RDFConstants.RDFSerialization.JSON);
             JSONObject jsonObj = new JSONObject(response.getBody());
-            String newid = jsonObj.getString("id");
+            long newid = jsonObj.getLong("id");
             // check, if id is numerical
-            assertTrue(newid.matches("\\d+"));
+
             assertEquals(id, newid);
             if(!Strings.isNullOrEmpty(visibility)) {
                 String newVisibility = jsonObj.getString("visibility");
@@ -326,7 +325,10 @@ public class ELinkSecurityTest extends IntegrationTest {
                 String newType = jsonObj.getString("type");
                 assertEquals(type.toLowerCase(), newType.toLowerCase());
             }
-            //String newOwner = jsonObj.getString("owner");
+            if(!Strings.isNullOrEmpty(owner)) {
+                String newOwner = jsonObj.getJSONObject("owner").getString("name");
+                assertEquals(owner, newOwner);
+            }
         }
 
         return response.getStatus();
@@ -334,7 +336,7 @@ public class ELinkSecurityTest extends IntegrationTest {
     }
 
     //Tests DELETE e-link/templates/
-    public int deleteTemplate(String id, String token) throws UnirestException {
+    public int deleteTemplate(long id, String token) throws UnirestException {
         HttpResponse<String> response = baseRequestDelete("templates/" + id, token)
                 .asString();
         return response.getStatus();

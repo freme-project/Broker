@@ -30,7 +30,7 @@ import com.mashape.unirest.http.HttpResponse;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 
-public class TildeETerminologyTest extends IntegrationTest {
+public class TildeETerminologyTest extends EServiceTest {
 
 	public TildeETerminologyTest() {
 		super("/e-terminology/tilde");
