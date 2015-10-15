@@ -164,7 +164,7 @@ public class EInternationalizationFilter implements Filter {
 					+ "\"");
 		}
 
-		if (!outputFormats.contains(outformat)) {
+		if (outformat != null && !outputFormats.contains(outformat)) {
 			throw new BadRequestException("\"" + outformat
 					+ "\" is not a valid output format");
 		}

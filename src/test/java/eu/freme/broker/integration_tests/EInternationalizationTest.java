@@ -17,9 +17,12 @@
  */
 package eu.freme.broker.integration_tests;
 
+import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -80,17 +83,43 @@ public class EInternationalizationTest extends EServiceTest {
 	}
 
 	@Test
-	public void testRoundTripping() throws UnirestException {
-
-		HttpResponse<String> response = Unirest.post(super.getBaseUrl() + "/e-entity/freme-ner/documents")
+	public void testRoundTripping() throws UnirestException, IOException {
+		HttpResponse<String> response = Unirest
+				.post(super.getBaseUrl() + "/e-entity/freme-ner/documents")
 				.queryString("language", "en")
 				.queryString("dataset", "dbpedia")
 				.queryString("informat", "text/html")
 				.queryString("outformat", "text/html")
-				.body("<p>Berlin is a city in Germany</p>")
+				.body("<p>Berlin is a city in Germany</p>").asString();
+
+		assertEquals(response.getStatus(), 200);
+		assertTrue(response.getBody().length() > 0);
+
+		String xliff = FileUtils.readFileToString(new File(
+				"src/test/resources/e-internationalization/test1.xlf"));
+		response = Unirest
+				.post(super.getBaseUrl() + "/e-entity/freme-ner/documents")
+				.queryString("language", "en")
+				.queryString("dataset", "dbpedia")
+				.queryString("informat", "text/html")
+				.queryString("outformat", "text/html").body(xliff).asString();
+
+		assertEquals(response.getStatus(), 200);
+		assertTrue(response.getBody().length() > 0);
+	}
+
+	@Test
+	public void testXml() throws UnirestException {
+		HttpResponse<String> response = Unirest
+				.post(super.getBaseUrl() + "/e-entity/freme-ner/documents")
+				.queryString("language", "en")
+				.queryString("dataset", "dbpedia")
+				.queryString("informat", "text/xml")
+				.body("<note><to>Tove</to><from>Jani</from><heading>Reminder</heading><body>Don't forget me this weekend!</body></note>")
 				.asString();
 
 		assertEquals(response.getStatus(), 200);
 		assertTrue(response.getBody().length() > 0);
 	}
+
 }
