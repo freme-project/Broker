@@ -88,7 +88,7 @@ public class Pipelines extends BaseRestController {
 		} catch (JsonSyntaxException jsonException) {
 			logger.error(jsonException.getMessage(), jsonException);
 			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
-			throw new NotAcceptableException("Error detected in the JSON body contents: " + errormsg);
+			throw new BadRequestException("Error detected in the JSON body contents: " + errormsg);
 		} catch (UnirestException unirestException) {
 			logger.error(unirestException.getMessage(), unirestException);
 			throw new BadRequestException(unirestException.getMessage());
@@ -133,7 +133,7 @@ public class Pipelines extends BaseRestController {
 		} catch (JsonSyntaxException jsonException) {
 			logger.error(jsonException.getMessage(), jsonException);
 			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
-			throw new NotAcceptableException("Error detected in the JSON body contents: " + errormsg);
+			throw new BadRequestException("Error detected in the JSON body contents: " + errormsg);
 		} catch (eu.freme.common.exception.BadRequestException e) {
 			logger.error(e.getMessage(), e);
 			throw new BadRequestException(e.getMessage());
@@ -199,7 +199,7 @@ public class Pipelines extends BaseRestController {
 			return new ResponseEntity<>("The pipeline was sucessfully removed.", HttpStatus.OK);
 		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
 			logger.error(ex.getMessage(), ex);
-			throw new AccessDeniedException(ex.getMessage());
+			throw new ForbiddenException(ex.getMessage());
 		} catch (OwnedResourceNotFoundException ex) {
 			logger.error(ex.getMessage(), ex);
 			throw new TemplateNotFoundException("Could not find the pipeline template with id " + id);

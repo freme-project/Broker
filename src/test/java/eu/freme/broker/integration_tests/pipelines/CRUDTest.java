@@ -111,4 +111,11 @@ public class CRUDTest extends PipelinesCommon {
 	public void testDeleteNonExisting() throws UnirestException {
 		deleteTemplate(tokenWithPermission, -5, HttpStatus.SC_NOT_FOUND);
 	}
+
+	@Test
+	public void testDeleteFromAnother() throws UnirestException {
+		Pipeline pipeline = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
+		deleteTemplate(tokenWithOutPermission, pipeline.getId(), HttpStatus.SC_FORBIDDEN);
+		deleteTemplate(tokenWithPermission, pipeline.getId(), HttpStatus.SC_OK);
+	}
 }
