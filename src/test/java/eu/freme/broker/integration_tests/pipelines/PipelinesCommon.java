@@ -136,4 +136,12 @@ public abstract class PipelinesCommon extends EServiceTest {
 		assertEquals(HttpStatus.SC_OK, response.getStatus());
 		return Serializer.templatesFromJson(response.getBody());
 	}
+
+	protected void deleteTemplate(final String token, long id, int expectedResponseCode) throws UnirestException {
+		HttpResponse<String> response = baseRequestDelete("templates/" + id, token).asString();
+		assertEquals(expectedResponseCode, response.getStatus());
+		if (expectedResponseCode == HttpStatus.SC_OK) {
+			assertEquals("The pipeline was sucessfully removed.", response.getBody());
+		}
+	}
 }

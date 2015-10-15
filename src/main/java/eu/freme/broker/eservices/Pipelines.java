@@ -155,15 +155,11 @@ public class Pipelines extends BaseRestController {
 			produces = "application/json"
 	)
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
-	public ResponseEntity<String> read(@PathVariable(value = "id") String id) {
+	public ResponseEntity<String> read(@PathVariable(value = "id") long id) {
 		try {
-			long idNr = Long.parseLong(id);
-			Pipeline pipeline = pipelineDAO.findOneById(idNr);
+			Pipeline pipeline = pipelineDAO.findOneById(id);
 			String serializedPipeline = Serializer.toJson(pipeline);
 			return createOKJSONResponse(serializedPipeline);
-		} catch (NumberFormatException ex) {
-			logger.error(ex.getMessage(), ex);
-			throw new BadRequestException("The id has to be an integer number. " + ex.getMessage());
 		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
 			logger.error(ex.getMessage(), ex);
 			throw new AccessDeniedException(ex.getMessage());
@@ -181,9 +177,33 @@ public class Pipelines extends BaseRestController {
 	)
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> read() {
-		List<Pipeline> readablePipelines = pipelineDAO.findAllReadAccessible();
-		String serializedPipelines = Serializer.templatesToJson(readablePipelines);
-		return createOKJSONResponse(serializedPipelines);
+		try {
+			List<Pipeline> readablePipelines = pipelineDAO.findAllReadAccessible();
+			String serializedPipelines = Serializer.templatesToJson(readablePipelines);
+			return createOKJSONResponse(serializedPipelines);
+		} catch (Throwable t) {
+			logger.error(t.getMessage(), t);
+			// throw an Internal Server exception if anything goes really wrong...
+			throw new InternalServerErrorException(t.getMessage());
+		}
+	}
+
+	@RequestMapping(
+			value = "pipelining/templates/{id}",
+			method = RequestMethod.DELETE
+	)
+	public ResponseEntity<String> delete(@PathVariable("id") long id) {
+		try {
+			pipelineDAO.delete(pipelineDAO.findOneById(id));
+			return new ResponseEntity<>("The pipeline was sucessfully removed.", HttpStatus.OK);
+		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new AccessDeniedException(ex.getMessage());
+		} catch (Throwable t) {
+			logger.error(t.getMessage(), t);
+			// throw an Internal Server exception if anything goes really wrong...
+			throw new InternalServerErrorException(t.getMessage());
+		}
 	}
 
 	private ResponseEntity<String> createOKJSONResponse(final String contents) {
