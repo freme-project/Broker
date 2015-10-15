@@ -32,7 +32,7 @@ import eu.freme.common.conversion.rdf.RDFConstants;
  * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 06.08.15.
  */
 @Ignore
-public class EInternationalizationTest extends IntegrationTest {
+public class EInternationalizationTest extends EServiceTest {
 
     //Tests E-Internationalization Service used for converting html and xliff to nif format
     // against POST /e-entity/freme-ner/documents

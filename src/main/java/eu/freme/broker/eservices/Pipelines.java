@@ -17,31 +17,33 @@
  */
 package eu.freme.broker.eservices;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.google.gson.JsonSyntaxException;
 import com.mashape.unirest.http.exceptions.UnirestException;
-
+import eu.freme.broker.exception.AccessDeniedException;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.exception.NotAcceptableException;
+import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.persistence.dao.PipelineDAO;
+import eu.freme.common.persistence.model.OwnedResource;
+import eu.freme.common.persistence.model.Pipeline;
 import eu.freme.eservices.pipelines.core.PipelineResponse;
 import eu.freme.eservices.pipelines.core.PipelineService;
 import eu.freme.eservices.pipelines.core.ServiceException;
 import eu.freme.eservices.pipelines.requests.RequestBuilder;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author Gerald Haesendonck
@@ -53,6 +55,9 @@ public class Pipelines extends BaseRestController {
 
 	@Autowired
 	PipelineService pipelineAPI;
+
+	@Autowired
+	PipelineDAO pipelineDAO;
 
 	/**
 	 * <p>Calls the pipelining service.</p>
@@ -77,17 +82,105 @@ public class Pipelines extends BaseRestController {
 			headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getContentType());
 			return new ResponseEntity<>(pipelineResult.getBody(), headers, HttpStatus.OK);
 		} catch (ServiceException serviceError) {
+			logger.error(serviceError.getMessage(), serviceError);
 			MultiValueMap<String, String> headers = new HttpHeaders();
 			headers.add(HttpHeaders.CONTENT_TYPE, serviceError.getResponse().getContentType());
 			return new ResponseEntity<>(serviceError.getMessage(), headers, serviceError.getStatus());
 		} catch (JsonSyntaxException jsonException) {
+			logger.error(jsonException.getMessage(), jsonException);
 			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
 			throw new NotAcceptableException("Error detected in the JSON body contents: " + errormsg);
 		} catch (UnirestException unirestException) {
+			logger.error(unirestException.getMessage(), unirestException);
 			throw new BadRequestException(unirestException.getMessage());
 		} catch (Throwable t) {
-			// throw a FREME exception if anything goes really wrong...
+			logger.error(t.getMessage(), t);
+			// throw an Internal Server exception if anything goes really wrong...
 			throw new InternalServerErrorException(t.getMessage());
 		}
+	}
+
+	// TODO: comments
+	@RequestMapping(value = "/pipelining/templates",
+					method = RequestMethod.POST,
+					consumes = "application/json",
+					produces = "application/json"
+	)
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
+	public ResponseEntity<String> create(
+			@RequestBody String requests,
+			@RequestParam(value = "visibility", required = false) String visibility,
+			@RequestParam (value = "persist", defaultValue = "false", required = false) String persist
+	) {
+
+		try {
+			// just to perform a first validation of the pipeline...
+			List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
+
+			boolean toPersist = Boolean.parseBoolean(persist);
+			Pipeline pipeline = new Pipeline(OwnedResource.Visibility.getByString(visibility), "label", "description", requests, toPersist);
+			pipelineDAO.save(pipeline);
+
+			// now get the id of the pipeline.
+			String response = "{\"id\": " + pipeline.getId() + ", \"persist\": " + pipeline.isPersistent() + '}';
+			return createOKJSONResponse(response);
+		} catch (JsonSyntaxException jsonException) {
+			logger.error(jsonException.getMessage(), jsonException);
+			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
+			throw new NotAcceptableException("Error detected in the JSON body contents: " + errormsg);
+		} catch (eu.freme.common.exception.BadRequestException e) {
+			logger.error(e.getMessage(), e);
+			throw new BadRequestException(e.getMessage());
+		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new AccessDeniedException(ex.getMessage());
+		} catch (Throwable t) {
+			logger.error(t.getMessage(), t);
+			// throw an Internal Server exception if anything goes really wrong...
+			throw new InternalServerErrorException(t.getMessage());
+		}
+	}
+
+	@RequestMapping(
+			value = "pipelining/templates/{id}",
+			method = RequestMethod.GET,
+			produces = "application/json"
+	)
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
+	public ResponseEntity<String> read(@PathVariable(value = "id") String id) {
+		try {
+			long idNr = Long.parseLong(id);
+			Pipeline pipeline = pipelineDAO.findOneById(idNr);
+			String serializedPipeline = RequestFactory.toJson(pipeline);
+			return createOKJSONResponse(serializedPipeline);
+		} catch (NumberFormatException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new BadRequestException("The id has to be an integer number. " + ex.getMessage());
+		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new AccessDeniedException(ex.getMessage());
+		} catch (Throwable t) {
+			logger.error(t.getMessage(), t);
+			// throw an Internal Server exception if anything goes really wrong...
+			throw new InternalServerErrorException(t.getMessage());
+		}
+	}
+
+	@RequestMapping(
+			value = "pipelining/templates",
+			method = RequestMethod.GET,
+			produces = "application/json"
+	)
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
+	public ResponseEntity<String> read() {
+		List<Pipeline> readablePipelines = pipelineDAO.findAllReadAccessible();
+		String serializedPipelines = RequestFactory.templatesToJson(readablePipelines);
+		return createOKJSONResponse(serializedPipelines);
+	}
+
+	private ResponseEntity<String> createOKJSONResponse(final String contents) {
+		MultiValueMap<String, String> headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.getMimeType());
+		return new ResponseEntity<>(contents, headers, HttpStatus.OK);
 	}
 }

@@ -11,8 +11,9 @@ public interface FremeNERService {
 
     @RequestMapping(method = RequestMethod.POST, value = "/freme-ner-test")
     public String enrich(
-    		@RequestParam(value = "language", required = false) String language,
-    		@RequestParam(value = "enrichement", required = false) String enrichementType,
-    	    @RequestBody(required = false) String postBody);
-
+    		@RequestBody String text,
+    		@RequestParam String language,
+    		@RequestParam String outformat,
+    		@RequestParam String rdfPrefix
+    );
 }

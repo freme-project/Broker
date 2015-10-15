@@ -32,13 +32,14 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 
 import eu.freme.common.conversion.rdf.RDFConstants;
 
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * Created by jonathan on 28.07.15.
  */
 @Ignore
-public class FremeNERTest extends IntegrationTest{
-
+public class FremeNERTest extends EServiceTest {
 
     String[] availableLanguages = {"en","de","it","nl","fr","es"};
     String dataset = "dbpedia";
@@ -48,14 +49,52 @@ public class FremeNERTest extends IntegrationTest{
     public FremeNERTest(){super("/e-entity/freme-ner/");}
 
     protected HttpRequestWithBody baseRequestPost(String function) {
-        return super.baseRequestPost(function)
-                .queryString("dataset", dataset);
+        return super.baseRequestPost(function);
+
     }
 
     protected HttpRequest baseRequestGet(String function) {
-        return super.baseRequestGet(function).queryString("dataset", dataset);
+        return super.baseRequestGet(function);
     }
 
+    @Test
+    public void testDatasetManagement() throws UnirestException , IOException {
+        String testDataset=readFile("src/test/resources/e-entity/small-dataset-rdfs.nt");
+        String testUpdatedDataset=readFile("src/test/resources/e-entity/small-dataset.nt");
+
+        String testDatasetName = "integration-test-dataset";
+
+
+        HttpResponse<String> response= baseRequestGet("datasets/"+testDatasetName).asString();
+        if (response.getStatus()!=200) {
+
+            response=baseRequestPost("datasets")
+                    .queryString("informat", "n-triples")
+                    .queryString("description","Test-Description")
+                    .queryString("language","en")
+                    .queryString("name",testDatasetName)
+                    .body(testDataset)
+                    .asString();
+            assertTrue(response.getStatus()<=201);
+        }
+        response= baseRequestGet("datasets/"+testDatasetName)
+                .queryString("outformat","turtle").asString();
+        assertTrue(response.getStatus()==200);
+        /*
+        TODO:Fix PUT e-entity/datasets/{dataset-name}
+        response=baseRequestPut("datasets/"+testDatasetName)
+                .queryString("informat","n-triples")
+                .queryString("language","en")
+                .body(testUpdatedDataset).asString();
+
+        System.out.println(response.getStatus());
+        System.out.println(response.getBody());
+        */
+        response=baseRequestDelete("datasets/" + testDatasetName).asString();
+        assertTrue(response.getStatus()==200);
+
+
+    }
 
     @Test
     public void TestFremeNER() throws UnirestException, IOException, UnsupportedEncodingException {
@@ -74,6 +113,7 @@ public class FremeNERTest extends IntegrationTest{
                     .queryString("input", testinput)
                     .queryString("language", lang)
                     .queryString("informat", "text")
+                    .queryString("dataset", dataset)
                     .asString();
             validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
@@ -81,6 +121,7 @@ public class FremeNERTest extends IntegrationTest{
             //Plaintext Input in Body
             response = baseRequestPost("documents")
                     .queryString("language", lang)
+                    .queryString("dataset", dataset)
                     .header("Content-Type", "text/plain")
                     .body(testinput)
                     .asString();
@@ -89,6 +130,7 @@ public class FremeNERTest extends IntegrationTest{
             //NIF Input in Body (Turtle)
             response = baseRequestPost("documents").header("Content-Type", "text/turtle")
                     .queryString("language", lang)
+                    .queryString("dataset", dataset)
                     .body(data).asString();
             validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
 
@@ -98,6 +140,7 @@ public class FremeNERTest extends IntegrationTest{
             response = baseRequestPost("documents")
                     .queryString("input", testinput)
                     .queryString("language", lang)
+                    .queryString("dataset", dataset)
                     .queryString("informat", "text")
                     .queryString("prefix", "http://test-prefix.com")
                     .asString();
@@ -108,6 +151,7 @@ public class FremeNERTest extends IntegrationTest{
             response = Unirest.get(getUrl() + "documents?informat=text&input=" + testinputEncoded + "&language=" + lang + "&dataset=" + dataset).asString();
             response = baseRequestGet("documents")
                     .queryString("informat", "text")
+                    .queryString("dataset", dataset)
                     .queryString("input", testinputEncoded)
                     .queryString("language", lang)
                     .asString();

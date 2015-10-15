@@ -12,10 +12,10 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 
 import eu.freme.broker.tools.StarterHelper;
 
-@ComponentScan(basePackages = "eu.freme.broker", excludeFilters = @Filter(type = FilterType.REGEX, pattern = { "eu.freme.broker.security.*" }))
+//@ComponentScan(basePackages = "eu.freme.broker", excludeFilters = @Filter(type = FilterType.REGEX, pattern = { "eu.freme.broker.security.*" }))
 @Profile("cloud-freme-ner")
 @EnableDiscoveryClient
-@EnableAutoConfiguration(exclude = { org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class, })
+//@EnableAutoConfiguration(exclude = { org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class, })
 @Import(FremeNERStarter.class)
 /**
  * Start FREME ner as part of FREME cloud

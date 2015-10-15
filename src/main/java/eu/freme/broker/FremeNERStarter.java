@@ -30,6 +30,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Profile;
 
 import eu.freme.broker.tools.StarterHelper;
+import eu.freme.common.FREMECommonConfig;
 import eu.freme.fremener.FremeNer;
 
 /**
@@ -38,10 +39,10 @@ import eu.freme.fremener.FremeNer;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @SpringBootApplication
-@ComponentScan(basePackages = "eu.freme.broker", excludeFilters = @Filter(type = FilterType.REGEX, pattern = { "eu.freme.broker.security.*" }))
-@EnableAutoConfiguration(exclude = { org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class, })
+//@ComponentScan(basePackages = "eu.freme.broker", excludeFilters = @Filter(type = FilterType.REGEX, pattern = { "eu.freme.broker.security.*" }))
+//@EnableAutoConfiguration(exclude = { org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class, })
 @Configuration
-@Import({ CommonConfig.class })
+@Import({ CommonConfig.class, FREMECommonConfig.class })
 @Profile("fremener")
 public class FremeNERStarter {
 
