@@ -19,11 +19,9 @@ package eu.freme.broker.eservices;
 
 import com.google.gson.JsonSyntaxException;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.freme.broker.exception.AccessDeniedException;
-import eu.freme.broker.exception.BadRequestException;
-import eu.freme.broker.exception.InternalServerErrorException;
-import eu.freme.broker.exception.NotAcceptableException;
+import eu.freme.broker.exception.*;
 import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.exception.OwnedResourceNotFoundException;
 import eu.freme.common.persistence.dao.PipelineDAO;
 import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.common.persistence.model.Pipeline;
@@ -163,6 +161,9 @@ public class Pipelines extends BaseRestController {
 		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
 			logger.error(ex.getMessage(), ex);
 			throw new AccessDeniedException(ex.getMessage());
+		} catch (OwnedResourceNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new TemplateNotFoundException("Could not find the pipeline template with id " + id);
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 			// throw an Internal Server exception if anything goes really wrong...
@@ -199,6 +200,9 @@ public class Pipelines extends BaseRestController {
 		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
 			logger.error(ex.getMessage(), ex);
 			throw new AccessDeniedException(ex.getMessage());
+		} catch (OwnedResourceNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new TemplateNotFoundException("Could not find the pipeline template with id " + id);
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 			// throw an Internal Server exception if anything goes really wrong...
