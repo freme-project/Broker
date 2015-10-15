@@ -118,7 +118,7 @@ public class Pipelines extends BaseRestController {
 			List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
 
 			boolean toPersist = Boolean.parseBoolean(persist);
-			Pipeline pipeline = new Pipeline(OwnedResource.Visibility.getByString(visibility), requests, toPersist);
+			Pipeline pipeline = new Pipeline(OwnedResource.Visibility.getByString(visibility), "label", "description", requests, toPersist);
 			pipelineDAO.save(pipeline);
 
 			// now get the id of the pipeline.
