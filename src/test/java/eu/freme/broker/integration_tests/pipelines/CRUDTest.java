@@ -22,6 +22,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.serialization.Pipeline;
+import eu.freme.eservices.pipelines.serialization.Serializer;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -49,7 +50,7 @@ public class CRUDTest extends PipelinesCommon {
 		// now query pipeline with id
 		HttpResponse<String> readResponse = baseRequestGet("templates/" + id, tokenWithPermission).asString();
 		assertEquals(HttpStatus.SC_OK, readResponse.getStatus());
-		Pipeline readPipeline = RequestFactory.templateFromJson(readResponse.getBody());
+		Pipeline readPipeline = Serializer.templateFromJson(readResponse.getBody());
 		assertEquals(pipelineInfo.getId(), readPipeline.getId());
 		assertEquals(pipelineInfo.getSerializedRequests(), readPipeline.getSerializedRequests());
 	}
@@ -62,7 +63,7 @@ public class CRUDTest extends PipelinesCommon {
 		// now query pipeline with id
 		HttpResponse<String> readResponse = baseRequestGet("templates/" + id, tokenWithPermission).asString();
 		assertEquals(HttpStatus.SC_OK, readResponse.getStatus());
-		Pipeline readPipeline = RequestFactory.templateFromJson(readResponse.getBody());
+		Pipeline readPipeline = Serializer.templateFromJson(readResponse.getBody());
 		assertEquals(pipelineInfo.getId(), readPipeline.getId());
 		assertEquals(pipelineInfo.getSerializedRequests(), readPipeline.getSerializedRequests());
 
