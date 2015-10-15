@@ -193,6 +193,7 @@ public class Pipelines extends BaseRestController {
 			value = "pipelining/templates/{id}",
 			method = RequestMethod.DELETE
 	)
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> delete(@PathVariable("id") long id) {
 		try {
 			pipelineDAO.delete(pipelineDAO.findOneById(id));
