@@ -125,7 +125,7 @@ public class EInternationalizationTest extends EServiceTest {
 	@Test
 	public void testOdt() throws IOException, UnirestException{
 		
-		File file = new File("src/test/resources/e-internationalization/WelcomeToBerlin.odt");
+		File file = new File("src/test/resources/e-internationalization/odt-test.odt");
 		byte[] data = FileUtils.readFileToByteArray(file);
 		
 		HttpResponse<String> response = Unirest

@@ -206,12 +206,17 @@ public class EInternationalizationFilter implements Filter {
 			baos.write(buffer, 0, read);
 		}
 		bis.close();
-
+		
 		// create request wrapper that converts the body of the request from the
 		// original format to turtle
 		Reader nif;
+		
+		byte[] baosData = baos.toByteArray();
+		if( baosData.length == 0 ){
+			throw new BadRequestException("No input data found in request."); 
+		}
 
-		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+		ByteArrayInputStream bais = new ByteArrayInputStream(baosData);
 		try {
 			nif = eInternationalizationApi.convertToTurtle(bais,
 					informat.toLowerCase());
@@ -226,7 +231,7 @@ public class EInternationalizationFilter implements Filter {
 		ServletResponse newResponse = res;
 		if (roundtripping) {
 			InputStream originalInputStream = new ByteArrayInputStream(
-					baos.toByteArray());
+					baosData);
 			try {
 				newResponse = new ConversionHttpServletResponseWrapper(
 						httpResponse, eInternationalizationApi,
