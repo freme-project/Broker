@@ -182,7 +182,7 @@ public class ELink extends BaseRestController {
             // Type was moved as endpoint-type field of the template.
             //@RequestParam(value = "type",        required=false) String type, 
             @RequestParam Map<String,String> allParams,
-            @RequestBody String postBody) {
+            @RequestBody String postBody) throws InvalidTemplateEndpointException {
 
         try {
 

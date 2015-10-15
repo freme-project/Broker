@@ -15,7 +15,7 @@ import java.io.IOException;
  * Created by Arne Binder (arne.b.binder@gmail.com) on 15.09.2015.
  */
 @Ignore
-public class UTF8ContentTest extends IntegrationTest{
+public class UTF8ContentTest extends EServiceTest{
 
     String inputSimple = "Madrid (/məˈdrɪd/, Spanish: [maˈðɾið], locally: [maˈðɾiθ, -ˈðɾi]) is a south-western European city and the capital and largest municipality of Spain.";
     String inputNifTurtle;

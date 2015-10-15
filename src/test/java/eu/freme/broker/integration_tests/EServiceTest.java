@@ -200,6 +200,11 @@ public abstract class EServiceTest {
         authenticate = true;
     }
 
+
+    public void setService(String service){
+        this.service = service;
+        url = baseUrl + service;
+    }
     public void createUser(String username, String password) throws UnirestException {
 
         HttpResponse<String> response = Unirest.post(getBaseUrl() + "/user")
