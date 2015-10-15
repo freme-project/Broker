@@ -217,7 +217,7 @@ public class EInternationalizationFilter implements Filter {
 					informat.toLowerCase());
 		} catch (ConversionException e) {
 			logger.error("Error", e);
-			throw new InternalServerErrorException();
+			throw new InternalServerErrorException("Conversion from \"" + informat + "\" to NIF failed");
 		}
 		BodySwappingServletRequest bssr = new BodySwappingServletRequest(
 				(HttpServletRequest) req, nif, roundtripping);
