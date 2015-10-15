@@ -58,7 +58,16 @@ import eu.freme.i18n.okapi.nif.converter.ConversionException;
 @Profile("broker")
 public class EInternationalizationFilter implements Filter {
 
+	/*
+	 * EInternationalization accepts these formats for conversion to NIF
+	 */
 	private HashSet<String> contentTypes;
+
+	/*
+	 * EInternationalization accepts these formats for roundtripping
+	 */
+	private HashSet<String> outputFormats;
+
 	private Logger logger = Logger.getLogger(EInternationalizationFilter.class);
 
 	@Autowired
@@ -68,6 +77,14 @@ public class EInternationalizationFilter implements Filter {
 		contentTypes = new HashSet<String>();
 		contentTypes.add(EInternationalizationAPI.MIME_TYPE_HTML.toLowerCase());
 		contentTypes.add(EInternationalizationAPI.MIME_TYPE_XLIFF_1_2
+				.toLowerCase());
+		contentTypes.add(EInternationalizationAPI.MIME_TYPE_XML.toLowerCase());
+		contentTypes.add(EInternationalizationAPI.MIME_TYPE_ODT.toLowerCase());
+
+		outputFormats = new HashSet<String>();
+		outputFormats
+				.add(EInternationalizationAPI.MIME_TYPE_HTML.toLowerCase());
+		outputFormats.add(EInternationalizationAPI.MIME_TYPE_XLIFF_1_2
 				.toLowerCase());
 	}
 
@@ -145,6 +162,11 @@ public class EInternationalizationFilter implements Filter {
 			throw new BadRequestException("Can only convert to outformat \""
 					+ outformat + "\" when informat is also \"" + outformat
 					+ "\"");
+		}
+
+		if (!outputFormats.contains(outformat)) {
+			throw new BadRequestException("\"" + outformat
+					+ "\" is not a valid output format");
 		}
 
 		if (informat == null) {
