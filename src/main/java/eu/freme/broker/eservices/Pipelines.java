@@ -149,6 +149,34 @@ public class Pipelines extends BaseRestController {
 
 	@RequestMapping(
 			value = "pipelining/templates/{id}",
+			method = RequestMethod.PUT,
+			produces = "application/json"
+	)
+	public ResponseEntity<String> update(
+			@PathVariable(value = "id") long id,
+			@RequestBody String pipelineInfo,
+			@RequestParam(value = "visibility", required = false) String visibility,
+			@RequestParam (value = "persist", defaultValue = "false", required = false) String persist
+	) {
+		try {
+			Pipeline pipeline = pipelineDAO.findOneById(id);
+			// TODO
+		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new ForbiddenException(ex.getMessage());
+		} catch (OwnedResourceNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new TemplateNotFoundException("Could not find the pipeline template with id " + id);
+		} catch (Throwable t) {
+			logger.error(t.getMessage(), t);
+			// throw an Internal Server exception if anything goes really wrong...
+			throw new InternalServerErrorException(t.getMessage());
+		}
+		return null;
+	}
+
+	@RequestMapping(
+			value = "pipelining/templates/{id}",
 			method = RequestMethod.GET,
 			produces = "application/json"
 	)
