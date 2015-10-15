@@ -26,6 +26,7 @@ import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
 import eu.freme.eservices.pipelines.serialization.Pipeline;
+import eu.freme.eservices.pipelines.serialization.Serializer;
 import org.apache.http.HttpStatus;
 
 import java.util.Arrays;
@@ -57,7 +58,7 @@ public abstract class PipelinesCommon extends EServiceTest {
 	 */
 	protected HttpResponse<String> sendRequest(int expectedResponseCode, final SerializedRequest... requests) throws UnirestException {
 		List<SerializedRequest> serializedRequests = Arrays.asList(requests);
-		String body = RequestFactory.toJson(requests);
+		String body = Serializer.toJson(requests);
 		//System.out.println("request.body = " + body);
 
 		HttpResponse<String> response = baseRequestPost("chain")
@@ -111,8 +112,9 @@ public abstract class PipelinesCommon extends EServiceTest {
 		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight("en");
 		SerializedRequest linkRequest = RequestFactory.createLink("3");    // Geo pos
 
-		List<SerializedRequest> serializedRequests = Arrays.asList(entityRequest, linkRequest);
-		String body = RequestFactory.toJson(serializedRequests);
+		String serializedRequests = Serializer.toJson(entityRequest, linkRequest);
+		Pipeline pipeline = new Pipeline("a label", "a description", serializedRequests);
+		String body = Serializer.toJson(pipeline);
 		HttpResponse<String> response = baseRequestPost("templates", token)
 				.queryString("visibility", visibility.name())
 				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
@@ -124,7 +126,7 @@ public abstract class PipelinesCommon extends EServiceTest {
 		logger.info("response.contentType = " + response.getHeaders().getFirst("content-type"));
 		logger.debug("response.body = " + response.getBody());
 		assertEquals(HttpStatus.SC_OK, response.getStatus());
-		Pipeline pipelineInfo = RequestFactory.templateFromJson(response.getBody());
+		Pipeline pipelineInfo = Serializer.templateFromJson(response.getBody());
 		pipelineInfo.setSerializedRequests(serializedRequests);
 		return pipelineInfo;
 	}
@@ -132,6 +134,6 @@ public abstract class PipelinesCommon extends EServiceTest {
 	protected List<Pipeline> readTemplates(final String token) throws UnirestException {
 		HttpResponse<String> response = baseRequestGet("templates", token).asString();
 		assertEquals(HttpStatus.SC_OK, response.getStatus());
-		return RequestFactory.templatesFromJson(response.getBody());
+		return Serializer.templatesFromJson(response.getBody());
 	}
 }

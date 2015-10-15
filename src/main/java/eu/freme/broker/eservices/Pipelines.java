@@ -33,6 +33,7 @@ import eu.freme.eservices.pipelines.core.ServiceException;
 import eu.freme.eservices.pipelines.requests.RequestBuilder;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
+import eu.freme.eservices.pipelines.serialization.Serializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
@@ -76,7 +77,7 @@ public class Pipelines extends BaseRestController {
 	)
 	public ResponseEntity<String> pipeline(@RequestBody String requests) {
 		try {
-			List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
+			List<SerializedRequest> serializedRequests = Serializer.fromJson(requests);
 			PipelineResponse pipelineResult = pipelineAPI.chain(serializedRequests);
 			MultiValueMap<String, String> headers = new HttpHeaders();
 			headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getContentType());
@@ -108,21 +109,28 @@ public class Pipelines extends BaseRestController {
 	)
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> create(
-			@RequestBody String requests,
+			@RequestBody String pipelineInfo,
 			@RequestParam(value = "visibility", required = false) String visibility,
 			@RequestParam (value = "persist", defaultValue = "false", required = false) String persist
 	) {
 
 		try {
 			// just to perform a first validation of the pipeline...
-			List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
+			eu.freme.eservices.pipelines.serialization.Pipeline pipeline = Serializer.templateFromJson(pipelineInfo);
+			//List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
 
 			boolean toPersist = Boolean.parseBoolean(persist);
-			Pipeline pipeline = new Pipeline(OwnedResource.Visibility.getByString(visibility), "label", "description", requests, toPersist);
-			pipelineDAO.save(pipeline);
+			Pipeline pipelineResource = new Pipeline(
+					OwnedResource.Visibility.getByString(visibility),
+					pipeline.getLabel(),
+					pipeline.getDescription(),
+					pipeline.getSerializedRequests(),
+					toPersist);
+			pipelineDAO.save(pipelineResource);
 
 			// now get the id of the pipeline.
-			String response = "{\"id\": " + pipeline.getId() + ", \"persist\": " + pipeline.isPersistent() + '}';
+			String response = Serializer.toJson(pipelineResource);
+			//String response = "{\"id\": " + pipelineResource.getId() + ", \"persist\": " + pipelineResource.isPersistent() + '}';
 			return createOKJSONResponse(response);
 		} catch (JsonSyntaxException jsonException) {
 			logger.error(jsonException.getMessage(), jsonException);
@@ -151,7 +159,7 @@ public class Pipelines extends BaseRestController {
 		try {
 			long idNr = Long.parseLong(id);
 			Pipeline pipeline = pipelineDAO.findOneById(idNr);
-			String serializedPipeline = RequestFactory.toJson(pipeline);
+			String serializedPipeline = Serializer.toJson(pipeline);
 			return createOKJSONResponse(serializedPipeline);
 		} catch (NumberFormatException ex) {
 			logger.error(ex.getMessage(), ex);
@@ -174,7 +182,7 @@ public class Pipelines extends BaseRestController {
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> read() {
 		List<Pipeline> readablePipelines = pipelineDAO.findAllReadAccessible();
-		String serializedPipelines = RequestFactory.templatesToJson(readablePipelines);
+		String serializedPipelines = Serializer.templatesToJson(readablePipelines);
 		return createOKJSONResponse(serializedPipelines);
 	}
 
