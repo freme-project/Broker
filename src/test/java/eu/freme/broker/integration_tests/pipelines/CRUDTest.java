@@ -88,22 +88,27 @@ public class CRUDTest extends PipelinesCommon {
 		// now try to read pipeline with other user
 		logger.info("Each user tries to read pipelines; only 3 should be visible.");
 		List<Pipeline> pipelinesFromUser1 = readTemplates(tokenWithPermission);
-		assertTrue(pipelinesFromUser1.size() >= 3);	// TODO: delete pipelines after each test, then this can be "equals"
+		assertEquals(3, pipelinesFromUser1.size());	// TODO: delete pipelines after each test, then this can be "equals"
 		for (Pipeline pipeline : pipelinesFromUser1) {
 			assertTrue(pipeline.getOwner().equals(usernameWithPermission) || pipeline.getVisibility().equals(OwnedResource.Visibility.PUBLIC.name()));
 		}
 		List<Pipeline> pipelinesFromUser2 = readTemplates(tokenWithOutPermission);
-		assertTrue(pipelinesFromUser2.size() >= 3);
+		assertEquals(3, pipelinesFromUser2.size());
 		for (Pipeline pipeline : pipelinesFromUser2) {
 			assertTrue(pipeline.getOwner().equals(usernameWithoutPermission) || pipeline.getVisibility().equals(OwnedResource.Visibility.PUBLIC.name()));
 		}
 		List<Pipeline> pipelinesFromAdmin = readTemplates(tokenAdmin);
-		assertTrue(pipelinesFromAdmin.size() >= 2);
+		assertEquals(2, pipelinesFromAdmin.size());
 		// TODO: shouldn't the admin see all templates?
 
 		deleteTemplate(tokenWithPermission, pipeline1.getId(), HttpStatus.SC_OK);
 		deleteTemplate(tokenWithPermission, pipeline2.getId(), HttpStatus.SC_OK);
 		deleteTemplate(tokenWithOutPermission, pipeline3.getId(), HttpStatus.SC_OK);
 		deleteTemplate(tokenWithOutPermission, pipeline4.getId(), HttpStatus.SC_OK);
+	}
+
+	@Test
+	public void testDeleteNonExisting() throws UnirestException {
+		deleteTemplate(tokenWithPermission, -5, HttpStatus.SC_NOT_FOUND);
 	}
 }

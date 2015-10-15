@@ -139,6 +139,7 @@ public abstract class PipelinesCommon extends EServiceTest {
 
 	protected void deleteTemplate(final String token, long id, int expectedResponseCode) throws UnirestException {
 		HttpResponse<String> response = baseRequestDelete("templates/" + id, token).asString();
+		logger.info("Response body: " + response.getBody());
 		assertEquals(expectedResponseCode, response.getStatus());
 		if (expectedResponseCode == HttpStatus.SC_OK) {
 			assertEquals("The pipeline was sucessfully removed.", response.getBody());
