@@ -121,5 +121,23 @@ public class EInternationalizationTest extends EServiceTest {
 		assertEquals(response.getStatus(), 200);
 		assertTrue(response.getBody().length() > 0);
 	}
+	
+	@Test
+	public void testOdt() throws IOException, UnirestException{
+		
+		File file = new File("src/test/resources/e-internationalization/WelcomeToBerlin.odt");
+		byte[] data = FileUtils.readFileToByteArray(file);
+		
+		HttpResponse<String> response = Unirest
+				.post(super.getBaseUrl() + "/e-entity/freme-ner/documents")
+				.queryString("language", "en")
+				.queryString("dataset", "dbpedia")
+				.queryString("informat", "application/x-openoffice")
+				.body(data)
+				.asString();
+
+		assertEquals(response.getStatus(), 200);
+		assertTrue(response.getBody().length() > 0);
+	}
 
 }
