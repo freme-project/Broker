@@ -131,6 +131,28 @@ public abstract class PipelinesCommon extends EServiceTest {
 		return pipelineInfo;
 	}
 
+	protected String updateTemplate(final String token, final Pipeline newPipeline, int expectedResponseCode) throws UnirestException {
+		// mind that all info is gathered from the newPipeline. The request itself expects owner, visibility and persistence
+		// as parameters!
+		String owner = newPipeline.getOwner();
+		String visibility = newPipeline.getVisibility();
+		String toPersist = Boolean.toString(newPipeline.isPersist());
+		String body = Serializer.toJson(newPipeline);
+		HttpResponse<String> response = baseRequestPut("templates/" + newPipeline.getId(), token)
+				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
+				.queryString("owner", owner)
+				.queryString("visibility", visibility)
+				.queryString("persist", toPersist)
+				.body(new JsonNode(body))
+				.asString();
+		logger.info("response.getStatus() = " + response.getStatus());
+		logger.info("response.getStatusText() = " + response.getStatusText());
+		logger.info("response.contentType = " + response.getHeaders().getFirst("content-type"));
+		logger.debug("response.body = " + response.getBody());
+		assertEquals(expectedResponseCode, response.getStatus());
+		return response.getBody();
+	}
+
 	protected List<Pipeline> readTemplates(final String token) throws UnirestException {
 		HttpResponse<String> response = baseRequestGet("templates", token).asString();
 		assertEquals(HttpStatus.SC_OK, response.getStatus());

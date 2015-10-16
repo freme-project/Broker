@@ -118,4 +118,15 @@ public class CRUDTest extends PipelinesCommon {
 		deleteTemplate(tokenWithOutPermission, pipeline.getId(), HttpStatus.SC_FORBIDDEN);
 		deleteTemplate(tokenWithPermission, pipeline.getId(), HttpStatus.SC_OK);
 	}
+
+	@Test
+	public void testSimpleUpdate() throws UnirestException {
+		Pipeline pipeline = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
+		pipeline.setDescription("This is a new description!");
+		pipeline.setLabel("And a new label too!");
+		String serialized = updateTemplate(tokenWithPermission, pipeline, HttpStatus.SC_OK);
+		Pipeline newPipeline = Serializer.templateFromJson(serialized);
+		assertEquals(pipeline, newPipeline);
+		deleteTemplate(tokenWithPermission, pipeline.getId(), HttpStatus.SC_OK);
+	}
 }

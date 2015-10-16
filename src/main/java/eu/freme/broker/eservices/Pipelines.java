@@ -23,8 +23,10 @@ import eu.freme.broker.exception.*;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.exception.OwnedResourceNotFoundException;
 import eu.freme.common.persistence.dao.PipelineDAO;
+import eu.freme.common.persistence.dao.UserDAO;
 import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.common.persistence.model.Pipeline;
+import eu.freme.common.persistence.model.User;
 import eu.freme.eservices.pipelines.core.PipelineResponse;
 import eu.freme.eservices.pipelines.core.PipelineService;
 import eu.freme.eservices.pipelines.core.ServiceException;
@@ -57,6 +59,9 @@ public class Pipelines extends BaseRestController {
 
 	@Autowired
 	PipelineDAO pipelineDAO;
+
+	@Autowired
+	UserDAO userDAO;
 
 	/**
 	 * <p>Calls the pipelining service.</p>
@@ -114,21 +119,18 @@ public class Pipelines extends BaseRestController {
 
 		try {
 			// just to perform a first validation of the pipeline...
-			eu.freme.eservices.pipelines.serialization.Pipeline pipeline = Serializer.templateFromJson(pipelineInfo);
+			eu.freme.eservices.pipelines.serialization.Pipeline pipelineInfoObj = Serializer.templateFromJson(pipelineInfo);
 			//List<SerializedRequest> serializedRequests = RequestFactory.fromJson(requests);
 
 			boolean toPersist = Boolean.parseBoolean(persist);
-			Pipeline pipelineResource = new Pipeline(
+			Pipeline pipeline = new Pipeline(
 					OwnedResource.Visibility.getByString(visibility),
-					pipeline.getLabel(),
-					pipeline.getDescription(),
-					pipeline.getSerializedRequests(),
+					pipelineInfoObj.getLabel(),
+					pipelineInfoObj.getDescription(),
+					pipelineInfoObj.getSerializedRequests(),
 					toPersist);
-			pipelineDAO.save(pipelineResource);
-
-			// now get the id of the pipeline.
-			String response = Serializer.toJson(pipelineResource);
-			//String response = "{\"id\": " + pipelineResource.getId() + ", \"persist\": " + pipelineResource.isPersistent() + '}';
+			pipelineDAO.save(pipeline);
+			String response = Serializer.toJson(pipeline);
 			return createOKJSONResponse(response);
 		} catch (JsonSyntaxException jsonException) {
 			logger.error(jsonException.getMessage(), jsonException);
@@ -150,29 +152,70 @@ public class Pipelines extends BaseRestController {
 	@RequestMapping(
 			value = "pipelining/templates/{id}",
 			method = RequestMethod.PUT,
+			consumes = "application/json",
 			produces = "application/json"
 	)
 	public ResponseEntity<String> update(
 			@PathVariable(value = "id") long id,
-			@RequestBody String pipelineInfo,
+			@RequestParam(value = "owner", required=false) String ownerName,
 			@RequestParam(value = "visibility", required = false) String visibility,
-			@RequestParam (value = "persist", defaultValue = "false", required = false) String persist
+			@RequestParam(value = "persist", required = false) String persist,
+			@RequestBody(required = false) String pipelineInfo
 	) {
 		try {
 			Pipeline pipeline = pipelineDAO.findOneById(id);
-			// TODO
+			if (pipelineInfo != null && !pipelineInfo.isEmpty()) {
+				eu.freme.eservices.pipelines.serialization.Pipeline pipelineInfoObj = Serializer.templateFromJson(pipelineInfo);
+				String newLabel = pipelineInfoObj.getLabel();
+				if (newLabel != null && !newLabel.equals(pipeline.getLabel())) {
+					pipeline.setLabel(newLabel);
+				}
+				String newDescription = pipelineInfoObj.getDescription();
+				if (newDescription != null && !newDescription.equals(pipeline.getDescription())) {
+					pipeline.setDescription(newDescription);
+				}
+				String newRequests = pipelineInfoObj.getSerializedRequests();
+				if (newRequests != null && !newRequests.equals(pipeline.getSerializedRequests())) {
+					pipeline.setSerializedRequests(newRequests);
+				}
+			}
+			if (visibility != null && !visibility.equals(pipeline.getVisibility().name())) {
+				pipeline.setVisibility(OwnedResource.Visibility.getByString(visibility));
+			}
+			if (persist != null) {
+				boolean toPersist = Boolean.parseBoolean(persist);
+				if (toPersist != pipeline.isPersistent()) {
+					pipeline.setPersist(toPersist);
+				}
+			}
+			if (ownerName != null && !ownerName.equals(pipeline.getOwner().getName())) {
+				User newOwner = userDAO.getRepository().findOneByName(ownerName);
+				if (newOwner == null) {
+					throw new BadRequestException("Can not change owner of the dataset. User \"" + ownerName + "\" does not exist.");
+				}
+				pipeline.setOwner(newOwner);
+			}
+			pipelineDAO.save(pipeline);
+			String response = Serializer.toJson(pipeline);
+			return createOKJSONResponse(response);
 		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
 			logger.error(ex.getMessage(), ex);
 			throw new ForbiddenException(ex.getMessage());
 		} catch (OwnedResourceNotFoundException ex) {
 			logger.error(ex.getMessage(), ex);
 			throw new TemplateNotFoundException("Could not find the pipeline template with id " + id);
+		} catch (JsonSyntaxException jsonException) {
+			logger.error(jsonException.getMessage(), jsonException);
+			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
+			throw new BadRequestException("Error detected in the JSON body contents: " + errormsg);
+		} catch (eu.freme.common.exception.BadRequestException e) {
+			logger.error(e.getMessage(), e);
+			throw new BadRequestException(e.getMessage());
 		} catch (Throwable t) {
 			logger.error(t.getMessage(), t);
 			// throw an Internal Server exception if anything goes really wrong...
 			throw new InternalServerErrorException(t.getMessage());
 		}
-		return null;
 	}
 
 	@RequestMapping(
