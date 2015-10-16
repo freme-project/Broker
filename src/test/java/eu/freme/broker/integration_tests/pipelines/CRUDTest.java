@@ -19,6 +19,7 @@ package eu.freme.broker.integration_tests.pipelines;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.eservices.pipelines.serialization.Pipeline;
 import eu.freme.eservices.pipelines.serialization.Serializer;
@@ -127,6 +128,15 @@ public class CRUDTest extends PipelinesCommon {
 		String serialized = updateTemplate(tokenWithPermission, pipeline, HttpStatus.SC_OK);
 		Pipeline newPipeline = Serializer.templateFromJson(serialized);
 		assertEquals(pipeline, newPipeline);
+		deleteTemplate(tokenWithPermission, pipeline.getId(), HttpStatus.SC_OK);
+	}
+
+	@Test
+	public void testExecuteTemplate() throws UnirestException {
+		Pipeline pipeline = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
+		long id = pipeline.getId();
+		String contents = "The Atomium in Brussels is the symbol of Belgium.";
+		HttpResponse<String> response = sendRequest(HttpStatus.SC_OK, id, contents, RDFConstants.RDFSerialization.PLAINTEXT);
 		deleteTemplate(tokenWithPermission, pipeline.getId(), HttpStatus.SC_OK);
 	}
 }

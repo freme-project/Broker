@@ -70,7 +70,7 @@ public abstract class PipelinesCommon extends EServiceTest {
 		logger.info("response.getStatus() = " + response.getStatus());
 		logger.info("response.getStatusText() = " + response.getStatusText());
 		logger.info("response.contentType = " + response.getHeaders().getFirst("content-type"));
-		//System.out.println("response.getBody() = " + response.getBody());
+		logger.debug("response.getBody() = " + response.getBody());
 
 		RDFConstants.RDFSerialization responseContentType = RDFConstants.RDFSerialization.fromValue(response.getHeaders().getFirst("content-type"));
 		RDFConstants.RDFSerialization accept = getContentTypeOfLastResponse(serializedRequests);
@@ -81,6 +81,22 @@ public abstract class PipelinesCommon extends EServiceTest {
 			assertEquals(responseContentType, accept);
 		}
 
+		return response;
+	}
+
+	protected HttpResponse<String> sendRequest(int expectedResponseCode, long id, final String contents, final RDFConstants.RDFSerialization contentType) throws UnirestException{
+		HttpResponse<String> response = baseRequestPost("chain/" + id)
+				.header("content-type", contentType.contentType())
+				.body(contents)
+				.asString();
+
+		// print some response info
+		logger.info("response.getStatus() = " + response.getStatus());
+		logger.info("response.getStatusText() = " + response.getStatusText());
+		logger.info("response.contentType = " + response.getHeaders().getFirst("content-type"));
+		logger.debug("response.getBody() = " + response.getBody());
+
+		assertEquals(expectedResponseCode, response.getStatus());
 		return response;
 	}
 

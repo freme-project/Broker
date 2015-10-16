@@ -68,7 +68,7 @@ public class Pipelines extends BaseRestController {
 	 * <p>Some predefined Requests can be formed using the class {@link RequestFactory}. It also converts request objects
 	 * from and to JSON.</p>
 	 * <p><To create custom requests, use the {@link RequestBuilder}.</p>
-	 * <p>Examples can be found in the unit tests in the Pipelines repository.</p>
+	 * <p>Examples can be found in the unit tests in {@link eu/freme/broker/integration_tests/pipelines}.</p>
 	 * @param requests	The requests to send to the service.
 	 * @return          The response of the last request.
 	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
@@ -101,6 +101,27 @@ public class Pipelines extends BaseRestController {
 			logger.error(t.getMessage(), t);
 			// throw an Internal Server exception if anything goes really wrong...
 			throw new InternalServerErrorException(t.getMessage());
+		}
+	}
+
+	@RequestMapping(value = "/pipelining/chain/{id}",
+			method = RequestMethod.POST,
+			consumes = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3", "text/plain"},
+			produces = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3"}
+	)
+	public ResponseEntity<String> pipeline(@RequestBody String body, @PathVariable long id) {
+		try {
+			Pipeline pipeline = pipelineDAO.findOneById(id);
+			List<SerializedRequest> serializedRequests = Serializer.fromJson(pipeline.getSerializedRequests());
+			serializedRequests.get(0).setBody(body);
+			return pipeline(Serializer.toJson(serializedRequests));
+		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new AccessDeniedException(ex.getMessage());
+		} catch (JsonSyntaxException jsonException) {
+			logger.error(jsonException.getMessage(), jsonException);
+			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
+			throw new BadRequestException("Error detected in the JSON body contents: " + errormsg);
 		}
 	}
 
