@@ -202,7 +202,7 @@ public class ELink extends BaseRestController {
                 //AccessDeniedException can be thrown, if current authentication is the anonymousUser
                 template = new Template(
                         OwnedResource.Visibility.getByString(visibility),
-                        Template.Type.getByString(jsonObj.getString("endpoint-type")),
+                        Template.Type.getByString(jsonObj.getString("type")),
                         jsonObj.getString("endpoint"),
                         jsonObj.getString("query"),
                         jsonObj.getString("label"),
