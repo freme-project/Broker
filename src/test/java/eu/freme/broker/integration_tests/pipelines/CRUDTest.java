@@ -26,7 +26,6 @@ import eu.freme.eservices.pipelines.requests.SerializedRequest;
 import eu.freme.eservices.pipelines.serialization.Pipeline;
 import eu.freme.eservices.pipelines.serialization.Serializer;
 import org.apache.http.HttpStatus;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -112,7 +111,6 @@ public class CRUDTest extends PipelinesCommon {
 	}
 
 	@Test
-	@Ignore // using the second template doesn't seem to work? TODO: debug this!
 	public void testAllMethods() throws UnirestException {
 
 		// create 2 templates
@@ -134,8 +132,14 @@ public class CRUDTest extends PipelinesCommon {
 
 		// use pipelines
 		String contents = "The Atomium in Brussels is the symbol of Belgium.";
-		sendRequest(HttpStatus.SC_OK, pipeline1.getId(), contents, RDFConstants.RDFSerialization.PLAINTEXT);
-		sendRequest(HttpStatus.SC_OK, pipeline2.getId(), contents, RDFConstants.RDFSerialization.PLAINTEXT);
+		sendRequest(tokenWithPermission, HttpStatus.SC_OK, pipeline1.getId(), contents, RDFConstants.RDFSerialization.PLAINTEXT);
+		sendRequest(tokenWithPermission, HttpStatus.SC_OK, pipeline2.getId(), contents, RDFConstants.RDFSerialization.PLAINTEXT);
+
+		// update pipeline 1
+		pipeline1.setVisibility(OwnedResource.Visibility.PRIVATE.name());
+		updateTemplate(tokenWithPermission, pipeline1, HttpStatus.SC_OK);
+		storedPipeline1 = readTemplate(tokenWithPermission, pipeline1.getId());
+		assertEquals(pipeline1, storedPipeline1);
 
 		// delete pipelines
 		deleteTemplate(tokenWithPermission, pipeline1.getId(), HttpStatus.SC_OK);
@@ -170,7 +174,7 @@ public class CRUDTest extends PipelinesCommon {
 		Pipeline pipeline = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
 		long id = pipeline.getId();
 		String contents = "The Atomium in Brussels is the symbol of Belgium.";
-		HttpResponse<String> response = sendRequest(HttpStatus.SC_OK, id, contents, RDFConstants.RDFSerialization.PLAINTEXT);
+		HttpResponse<String> response = sendRequest(tokenWithPermission, HttpStatus.SC_OK, id, contents, RDFConstants.RDFSerialization.PLAINTEXT);
 		deleteTemplate(tokenWithPermission, pipeline.getId(), HttpStatus.SC_OK);
 	}
 }

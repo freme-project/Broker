@@ -84,8 +84,8 @@ public abstract class PipelinesCommon extends EServiceTest {
 		return response;
 	}
 
-	protected HttpResponse<String> sendRequest(int expectedResponseCode, long id, final String contents, final RDFConstants.RDFSerialization contentType) throws UnirestException{
-		HttpResponse<String> response = baseRequestPost("chain/" + id)
+	protected HttpResponse<String> sendRequest(final String token, int expectedResponseCode, long id, final String contents, final RDFConstants.RDFSerialization contentType) throws UnirestException{
+		HttpResponse<String> response = baseRequestPost("chain/" + id, token)
 				.header("content-type", contentType.contentType())
 				.body(contents)
 				.asString();
