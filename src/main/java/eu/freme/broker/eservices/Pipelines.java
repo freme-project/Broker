@@ -122,10 +122,6 @@ public class Pipelines extends BaseRestController {
 			logger.error(jsonException.getMessage(), jsonException);
 			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
 			throw new BadRequestException("Error detected in the JSON body contents: " + errormsg);
-		} catch (Throwable t) {
-			logger.error(t.getMessage(), t);
-			// throw an Internal Server exception if anything goes really wrong...
-			throw new InternalServerErrorException(t.getMessage());
 		}
 	}
 
