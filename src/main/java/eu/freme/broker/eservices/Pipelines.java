@@ -148,7 +148,7 @@ public class Pipelines extends BaseRestController {
 					OwnedResource.Visibility.getByString(visibility),
 					pipelineInfoObj.getLabel(),
 					pipelineInfoObj.getDescription(),
-					pipelineInfoObj.getSerializedRequests(),
+					Serializer.toJson(pipelineInfoObj.getSerializedRequests()),
 					toPersist);
 			pipelineDAO.save(pipeline);
 			String response = Serializer.toJson(pipeline);
@@ -195,9 +195,10 @@ public class Pipelines extends BaseRestController {
 				if (newDescription != null && !newDescription.equals(pipeline.getDescription())) {
 					pipeline.setDescription(newDescription);
 				}
-				String newRequests = pipelineInfoObj.getSerializedRequests();
-				if (newRequests != null && !newRequests.equals(pipeline.getSerializedRequests())) {
-					pipeline.setSerializedRequests(newRequests);
+				List<SerializedRequest> oldRequests = Serializer.fromJson(pipeline.getSerializedRequests());
+				List<SerializedRequest> newRequests = pipelineInfoObj.getSerializedRequests();
+				if (newRequests != null && !newRequests.equals(oldRequests)) {
+					pipeline.setSerializedRequests(Serializer.toJson(newRequests));
 				}
 			}
 			if (visibility != null && !visibility.equals(pipeline.getVisibility().name())) {

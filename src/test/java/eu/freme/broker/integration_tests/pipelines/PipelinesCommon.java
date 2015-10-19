@@ -127,8 +127,8 @@ public abstract class PipelinesCommon extends EServiceTest {
 	protected Pipeline createDefaultTemplate(final String token, final OwnedResource.Visibility visibility) throws UnirestException {
 		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight("en");
 		SerializedRequest linkRequest = RequestFactory.createLink("3");    // Geo pos
+		List<SerializedRequest> serializedRequests = Arrays.asList(entityRequest, linkRequest);
 
-		String serializedRequests = Serializer.toJson(entityRequest, linkRequest);
 		Pipeline pipeline = new Pipeline("a label", "a description", serializedRequests);
 		String body = Serializer.toJson(pipeline);
 		HttpResponse<String> response = baseRequestPost("templates", token)
