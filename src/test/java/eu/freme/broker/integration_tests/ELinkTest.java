@@ -21,15 +21,14 @@ public class ELinkTest extends EServiceTest {
     }
 
 
-    @Ignore
     @Test
     public void TestELinkExplore() throws UnirestException, IOException {
+        HttpResponse<String> response;
 
 
         String rdf_resource = "http://dbpedia.org/resource/Berlin";
         String endpoint = "http://dbpedia.org/sparql";
-
-        HttpResponse<String> response;
+        /*
 
         response=baseRequestPost("/explore")
                 .header("informat","turtle")
@@ -50,9 +49,9 @@ public class ELinkTest extends EServiceTest {
                 .asString();
 
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
-
+        */
         rdf_resource ="asdf";
-        endpoint = "http://localhost:8000/mockups/sparql";
+        endpoint = "http://127.0.0.1:8000/mockups/sparql";
         response=baseRequestPost("/explore")
                 .header("informat","turtle")
                 .header("outformat","turtle")

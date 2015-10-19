@@ -3,6 +3,7 @@ package eu.freme.broker.integration_tests.mockups;
 import java.io.File;
 import java.io.IOException;
 
+import eu.freme.broker.eservices.BaseRestController;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpHeaders;
@@ -15,12 +16,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class ELinkMockupEndpoint {
+public class ELinkMockupEndpoint extends BaseRestController {
 	
-	@RequestMapping("mockups/sparql")
+	@RequestMapping("/mockups/sparql")
 	public ResponseEntity<String> sendRDF(
-			@RequestHeader( value="outformat") String outformat,
-			@RequestHeader( value="Content-Type") String contentType
+			@RequestHeader( value="outformat", required=false) String outformat,
+			@RequestHeader( value="Content-Type", required=false) String contentType
+
 	) throws IOException{
 
 
@@ -33,6 +35,7 @@ public class ELinkMockupEndpoint {
 		headers.add("Content-Type", contentType);
 		outformat= (outformat == null) ? "turtle" : outformat;
 		headers.add("outformat",outformat);
+
 
 
 		ResponseEntity<String> response = new ResponseEntity<String>(fileContent, headers, HttpStatus.OK);
