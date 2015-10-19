@@ -127,9 +127,13 @@ public abstract class PipelinesCommon extends EServiceTest {
 	protected Pipeline createDefaultTemplate(final String token, final OwnedResource.Visibility visibility) throws UnirestException {
 		SerializedRequest entityRequest = RequestFactory.createEntitySpotlight("en");
 		SerializedRequest linkRequest = RequestFactory.createLink("3");    // Geo pos
-		List<SerializedRequest> serializedRequests = Arrays.asList(entityRequest, linkRequest);
+		return createTemplate(token, visibility, "a label", "a description", entityRequest, linkRequest);
+	}
 
-		Pipeline pipeline = new Pipeline("a label", "a description", serializedRequests);
+	protected Pipeline createTemplate(final String token, final OwnedResource.Visibility visibility, final String label, final String description, final SerializedRequest... requests) throws UnirestException {
+		List<SerializedRequest> serializedRequests = Arrays.asList(requests);
+
+		Pipeline pipeline = new Pipeline(label, description, serializedRequests);
 		String body = Serializer.toJson(pipeline);
 		HttpResponse<String> response = baseRequestPost("templates", token)
 				.queryString("visibility", visibility.name())
@@ -173,6 +177,12 @@ public abstract class PipelinesCommon extends EServiceTest {
 		HttpResponse<String> response = baseRequestGet("templates", token).asString();
 		assertEquals(HttpStatus.SC_OK, response.getStatus());
 		return Serializer.templatesFromJson(response.getBody());
+	}
+
+	protected Pipeline readTemplate(final String token, long id) throws UnirestException {
+		HttpResponse<String> response = baseRequestGet("templates/" + id, token).asString();
+		assertEquals(HttpStatus.SC_OK, response.getStatus());
+		return Serializer.templateFromJson(response.getBody());
 	}
 
 	protected void deleteTemplate(final String token, long id, int expectedResponseCode) throws UnirestException {
