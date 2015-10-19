@@ -1,0 +1,11 @@
+<http://www.freme-project.org/resource/Milan_Dojchinovski> <http://www.w3.org/2004/02/skos/core#:prefLabel> "Milan Dojchinovski"@en .
+<http://www.freme-project.org/resource/Milan_Dojchinovski> <http://www.w3.org/2004/02/skos/core#:altLabel> "Milan D."@en .
+<http://www.freme-project.org/resource/Milan_Dojchinovski> <http://www.w3.org/2000/01/rdf-schema#label> "Milan"@en .
+<http://www.freme-project.org/resource/Milan_Dojchinovski> <http://www.w3.org/dsad/a> "Mico"@en .
+<http://www.freme-project.org/resource/Nilesh_Chakraborty> <http://www.w3.org/2004/02/skos/core#:prefLabel> "Nilesh Chakraborty"@en .
+<http://www.freme-project.org/resource/Nilesh_Chakraborty> <http://www.w3.org/2004/02/skos/core#:altLabel> "Nilesh"@en .
+<http://www.freme-project.org/resource/Ciro_Baron> <http://www.w3.org/2004/02/skos/core#:prefLabel> "Ciro Baron"@en .
+<http://www.freme-project.org/resource/Ciro_Baron> <http://www.w3.org/2004/02/skos/core#:altLabel> "Ciro"@en .
+<http://www.freme-project.org/resource/INFAI> <http://www.w3.org/2004/02/skos/core#:prefLabel> "Institute for Applied Informatics"@en .
+<http://www.freme-project.org/resource/INFAI> <http://www.w3.org/2004/02/skos/core#:altLabel> "INFAI"@en .
+<http://www.freme-project.org/resource/INFAI> <http://www.w3.org/2000/01/rdf-schema#label> "INFai"@en .

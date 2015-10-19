@@ -56,7 +56,7 @@ public class IntegrationTestSetup {
 		}
 
 		if (startFreme) {
-			context = SpringApplication.run(Broker.class, new String[]{"--spring.profiles.active=broker"});
+			context = SpringApplication.run(IntegrationTestConfig.class, new String[]{"--spring.profiles.active=broker"});
 		}
 
 		alreadySetup = true;
