@@ -21,9 +21,12 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.persistence.model.OwnedResource;
+import eu.freme.eservices.pipelines.requests.RequestFactory;
+import eu.freme.eservices.pipelines.requests.SerializedRequest;
 import eu.freme.eservices.pipelines.serialization.Pipeline;
 import eu.freme.eservices.pipelines.serialization.Serializer;
 import org.apache.http.HttpStatus;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -106,6 +109,37 @@ public class CRUDTest extends PipelinesCommon {
 		deleteTemplate(tokenWithPermission, pipeline2.getId(), HttpStatus.SC_OK);
 		deleteTemplate(tokenWithOutPermission, pipeline3.getId(), HttpStatus.SC_OK);
 		deleteTemplate(tokenWithOutPermission, pipeline4.getId(), HttpStatus.SC_OK);
+	}
+
+	@Test
+	@Ignore // using the second template doesn't seem to work? TODO: debug this!
+	public void testAllMethods() throws UnirestException {
+
+		// create 2 templates
+		Pipeline pipeline1 = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
+		SerializedRequest nerRequest = RequestFactory.createEntityFremeNER("en", "dbpedia");
+		SerializedRequest translateRequest = RequestFactory.createTranslation("en", "fr");
+		Pipeline pipeline2 = createTemplate(tokenWithPermission, OwnedResource.Visibility.PRIVATE, "NER-Translate", "Apply FRENE NER and then e-Translate", nerRequest, translateRequest);
+
+		// list the pipelines
+		List<Pipeline> pipelines = readTemplates(tokenWithPermission);
+		assertEquals(pipeline1, pipelines.get(0));
+		assertEquals(pipeline2, pipelines.get(1));
+
+		// read individual pipelines
+		Pipeline storedPipeline1 = readTemplate(tokenWithPermission, pipeline1.getId());
+		Pipeline storedPipeline2 = readTemplate(tokenWithPermission, pipeline2.getId());
+		assertEquals(pipeline1, storedPipeline1);
+		assertEquals(pipeline2, storedPipeline2);
+
+		// use pipelines
+		String contents = "The Atomium in Brussels is the symbol of Belgium.";
+		sendRequest(HttpStatus.SC_OK, pipeline1.getId(), contents, RDFConstants.RDFSerialization.PLAINTEXT);
+		sendRequest(HttpStatus.SC_OK, pipeline2.getId(), contents, RDFConstants.RDFSerialization.PLAINTEXT);
+
+		// delete pipelines
+		deleteTemplate(tokenWithPermission, pipeline1.getId(), HttpStatus.SC_OK);
+		deleteTemplate(tokenWithPermission, pipeline2.getId(), HttpStatus.SC_OK);
 	}
 
 	@Test
