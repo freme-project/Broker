@@ -17,9 +17,13 @@
  */
 package eu.freme.broker.eservices;
 
+import com.google.common.base.Strings;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,7 +68,11 @@ public class TildeETerminology extends BaseRestController {
 			@RequestBody(required = false) String postBody,
 			@RequestParam(value = "source-lang") String sourceLang,
 			@RequestParam(value = "target-lang") String targetLang,
-			@RequestParam(value = "domain", defaultValue = "") String domain) {
+			@RequestParam(value = "domain", defaultValue = "") String domain,
+			@RequestParam(value = "mode", defaultValue = "full") String mode,
+			@RequestParam(value = "collection", required = false) String collection,
+			@RequestHeader(value = "X-Auth-Token", required= false) String token
+	) {
 
 		// merge long and short parameters - long parameters override short
 		// parameters
@@ -118,7 +126,13 @@ public class TildeETerminology extends BaseRestController {
 					.queryString("domain", domain)
 					.header("Accept", "application/turtle")
 					.header("Content-Type", "application/turtle")
+					.queryString("mode", mode)
+					.queryString("collection", collection)
+					.queryString("key", "")
+					.header("Authentication", "Basic RlJFTUU6dXxGcjNtM19zJGN1ciQ=")
+					.queryString("key", token)
 					.body(nifString).asString();
+
 
 			if (response.getStatus() != HttpStatus.OK.value()) {
 				throw new ExternalServiceFailedException(

@@ -17,6 +17,8 @@
  */
 package eu.freme.broker.eservices;
 
+import com.google.common.base.Strings;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -69,7 +71,10 @@ public class TildeETranslation extends BaseRestController {
 			@RequestBody(required = false) String postBody,
 			@RequestParam(value = "source-lang") String sourceLang,
 			@RequestParam(value = "target-lang") String targetLang,
-			@RequestParam(value = "domain", defaultValue = "") String domain) {
+			@RequestParam(value = "domain", defaultValue = "") String domain,
+			@RequestParam(value = "system", defaultValue = "full") String system,
+			@RequestHeader(value = "X-Auth-Token", required= false) String token
+	) {
 
 		// merge long and short parameters - long parameters override short
 		// parameters
@@ -118,6 +123,10 @@ public class TildeETranslation extends BaseRestController {
 					.routeParam("target-lang", targetLang)
 					.header("Accept", "application/x-turtle")
 					.header("Content-Type", "application/x-turtle")
+					.queryString("system", system)
+					.header("Authentication", "Basic RlJFTUU6dXxGcjNtM19zJGN1ciQ=")
+					.queryString("domain", domain)
+					.queryString("key", token)
 					.body(rdfConversionService.serializeRDF(inputModel,
 							RDFSerialization.TURTLE)).asString();
 
