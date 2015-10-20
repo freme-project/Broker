@@ -128,7 +128,6 @@ public class TildeETerminology extends BaseRestController {
 					.header("Content-Type", "application/turtle")
 					.queryString("mode", mode)
 					.queryString("collection", collection)
-					.queryString("key", "")
 					.header("Authentication", "Basic RlJFTUU6dXxGcjNtM19zJGN1ciQ=")
 					.queryString("key", token)
 					.body(nifString).asString();
