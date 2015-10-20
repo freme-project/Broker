@@ -279,7 +279,6 @@ public class ELink extends BaseRestController {
             //validateTemplateID(templateId);
             // check read access
             Template template = templateDAO.findOneById(templateId);
-            decisionManager.decide(SecurityContextHolder.getContext().getAuthentication(), template, accessLevelHelper.writeAccess());
 
             // Was the nif-input empty?
             if(nifParameters.getInput()!=null) {
