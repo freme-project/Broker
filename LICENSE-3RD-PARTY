@@ -8,37 +8,31 @@
                         http://www.apache.org/licenses/
 
 applies to:
-	- Apache Commons - commons-validator:1.4.1, Copyright 2015 The Apache Software Foundation. All Rights Reserved.
-	- Apache Commons IO - commons-csv:1.1, Copyright 2011–2015 The Apache Software Foundation
-	- Apache Maven - maven-core:3.3.3, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Apache Maven - maven-model:3.3.3, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Apache Maven Plugins - maven-assembly-plugin:2.5.1, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Apache Maven Plugins - maven-clean-plugin:2.5, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Apache Maven Plugins - maven-compiler-plugin:3.1, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Apache Maven Plugins - maven-deploy-plugin:2.8.2, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Apache Maven Plugins - maven-install-plugin:2.5.2, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Apache Maven Plugins - maven-jar-plugin:2.5, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Apache Maven Plugins - maven-resources-plugin:2.6, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Apache Maven Plugins - maven-site-plugin:3.4, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Apache Maven Plugins - maven-surefire-plugin:2.17, Copyright 2002–2015 The Apache Software Foundation. All rights reserved.
-	- Freme - conversion:0.4-SNAPSHOT
-	- Freme - e-entity:0.4-SNAPSHOT
-	- Freme - e-internationalization:0.2-SNAPSHOT
-	- Freme - e-link:0.4-SNAPSHOT
-	- Freme - e-publishing:0.4-SNAPSHOT
-	- Freme - pipelines:0.2-SNAPSHOT
-	- Google Guava - guava:18.0, Copyright 2011 The Guava Authors
-	- License Plugin - license-maven-plugin:2.3, Copyright 2008 Mycila (mathieu.carbou@gmail.com)
-	- Plexus Common Utilites - plexus-utils:3.0.22
+	- Apache Commons: Validator - commons-validator:1.4.1, Copyright 2015 The Apache Software Foundation. All Rights Reserved.
+	- Apache Maven Plugins - maven-assembly-plugin:2.5.1, Copyright 2002-2015 The Apache Software Foundation. All rights reserved.
+	- Apache Maven Plugins - maven-clean-plugin:2.5, Copyright 2002-2015 The Apache Software Foundation. All rights reserved.
+	- Apache Maven Plugins - maven-compiler-plugin:3.1, Copyright 2002-2015 The Apache Software Foundation. All rights reserved.
+	- Apache Maven Plugins - maven-deploy-plugin:2.8.2, Copyright 2002-2015 The Apache Software Foundation. All rights reserved.
+	- Apache Maven Plugins - maven-install-plugin:2.5.2, Copyright 2002-2015 The Apache Software Foundation. All rights reserved.
+	- Apache Maven Plugins - maven-jar-plugin:2.5, Copyright 2002-2015 The Apache Software Foundation. All rights reserved.
+	- Apache Maven Plugins - maven-resources-plugin:2.6, Copyright 2002-2015 The Apache Software Foundation. All rights reserved.
+	- Apache Maven Plugins - maven-site-plugin:3.4, Copyright 2002-2015 The Apache Software Foundation. All rights reserved.
+	- Apache Maven Plugins - maven-surefire-plugin:2.17, Copyright 2002-2015 The Apache Software Foundation. All rights reserved.
+	- Freme: Common - common:0.4-SNAPSHOT, Copyright 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds, Institut für Angewandte Informatik e. V. an der Universität Leipzig, Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL
+	- Freme: E-Entity - e-entity:0.4-SNAPSHOT, Copyright 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds, Institut für Angewandte Informatik e. V. an der Universität Leipzig, Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL
+	- Freme: E-Internalisation - e-internationalization:0.2-SNAPSHOT, Copyright 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds, Institut für Angewandte Informatik e. V. an der Universität Leipzig, Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL
+	- Freme: E-Link - e-link:0.4-SNAPSHOT, Copyright 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds, Institut für Angewandte Informatik e. V. an der Universität Leipzig, Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL
+	- Freme: E-Publishing - e-publishing:0.3, Copyright 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds, Institut für Angewandte Informatik e. V. an der Universität Leipzig, Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL
+	- Freme: Pipelines - pipelines:0.2-SNAPSHOT, Copyright 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds, Institut für Angewandte Informatik e. V. an der Universität Leipzig, Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL
+	- Guava - guava:18.0, Copyright 2011 The Guava Authors
+	- License Maven Plugin - license-maven-plugin:2.3, Copyright 2008 Mycila (mathieu.carbou@gmail.com)
 	- Spring Boot - spring-boot-maven-plugin:1.2.5.RELEASE
-	- Spring Boot - spring-boot-starter-data-jpa:1.2.5.RELEASE
 	- Spring Boot - spring-boot-starter-jersey:1.2.5.RELEASE
 	- Spring Boot - spring-boot-starter-log4j:1.2.5.RELEASE
 	- Spring Boot - spring-boot-starter-security:1.2.5.RELEASE
-	- Spring Boot - spring-boot-starter-test:1.2.5.RELEASE
 	- Spring Boot - spring-boot-starter-web:1.2.5.RELEASE
 	- Spring Boot - spring-boot-starter:1.2.5.RELEASE
-	- Spring Web MVC - spring-mvc-logger:0.2
+	- Spring MVC: Logger - spring-mvc-logger:0.2
 
 -----------------------------------------------------------------------------
 
@@ -483,7 +477,7 @@ applies to:
                             Version 2, June 1991
 
 applies to:
-	- MySQL Connector/J - mysql-connector-java:5.1.35, Copyright 2015, Oracle Corporation and/or its affiliates
+	- MySQL Drivers: Connector/J - mysql-connector-java:5.1.35, Copyright 2015, Oracle Corporation and/or its affiliates
 
 -----------------------------------------------------------------------------
 
@@ -826,23 +820,6 @@ Public License instead of this License.
 
 -----------------------------------------------------------------------------
 
-                        H2 Database
-            (http://www.h2database.com/html/license.html)
-
-applies to:
-	- H2 Database  - h2:1.4.187
-
------------------------------------------------------------------------------
-
-This software contains unmodified binary redistributions for
-H2 database engine (http://www.h2database.com/),
-which is dual licensed and available under the MPL 2.0
-(Mozilla Public License) or under the EPL 1.0 (Eclipse Public License).
-An original copy of the license agreement can be found at:
-http://www.h2database.com/html/license.html
-
------------------------------------------------------------------------------
-
 
                                The JSON License
                          http://json.org/license.html
@@ -878,7 +855,7 @@ THE SOFTWARE.
                              http://mit-license.org/
 
 applies to:
-	- Unirest - unirest-java:1.4.5, Copyright 2013-2015 Mashape
+	- Unirest - unirest-java:1.4.6, Copyright 2013-2015 Mashape
 
 -----------------------------------------------------------------------------
 
