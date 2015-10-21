@@ -42,7 +42,7 @@ public class ELinkSecurityTest extends EServiceTest {
         enableAuthenticate();
     }
 
-    @Ignore
+    
     @Test
     public void invalidTemplateId() throws Exception{
 
@@ -62,7 +62,6 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
     @Test
-
     public void testAnonymousUser() throws Exception {
         logger.info("testAnonymousUser");
 
@@ -93,7 +92,7 @@ public class ELinkSecurityTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
 
-    @Ignore
+    
     @Test
     public void testGetAllTemplates() throws Exception {
         logger.info("testGetAllTemplates");
@@ -121,7 +120,7 @@ public class ELinkSecurityTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid2, tokenWithOutPermission));
     }
 
-    @Ignore
+    
     @Test
     public void testUpdateTemplate() throws Exception {
         logger.info("testUpdateTemplate");
@@ -141,7 +140,7 @@ public class ELinkSecurityTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithOutPermission));
     }
 
-    @Ignore
+    
     @Test
     public void testTemplateHandlingWithSecurity() throws Exception {
         logger.info("testTemplateHandlingWithSecurity");
@@ -200,7 +199,7 @@ public class ELinkSecurityTest extends EServiceTest {
 
 
 
-
+    
     @Test
     public void testELinkDocuments() throws Exception {
         logger.info("testELinkDocuments");
