@@ -71,7 +71,7 @@ public class TildeETerminology extends BaseRestController {
 			@RequestParam(value = "domain", defaultValue = "") String domain,
 			@RequestParam(value = "mode", defaultValue = "full") String mode,
 			@RequestParam(value = "collection", required = false) String collection,
-			@RequestHeader(value = "X-Auth-Token", required= false) String token
+			@RequestHeader(value = "key", required= false) String key
 	) {
 
 		// merge long and short parameters - long parameters override short
@@ -129,7 +129,7 @@ public class TildeETerminology extends BaseRestController {
 					.queryString("mode", mode)
 					.queryString("collection", collection)
 					.header("Authentication", "Basic RlJFTUU6dXxGcjNtM19zJGN1ciQ=")
-					.queryString("key", token)
+					.queryString("key", key)
 					.body(nifString).asString();
 
 

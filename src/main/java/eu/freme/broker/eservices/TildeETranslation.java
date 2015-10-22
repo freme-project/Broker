@@ -73,7 +73,7 @@ public class TildeETranslation extends BaseRestController {
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "domain", defaultValue = "") String domain,
 			@RequestParam(value = "system", defaultValue = "full") String system,
-			@RequestHeader(value = "X-Auth-Token", required= false) String token
+			@RequestHeader(value = "key", required= false) String key
 	) {
 
 		// merge long and short parameters - long parameters override short
@@ -126,7 +126,7 @@ public class TildeETranslation extends BaseRestController {
 					.queryString("system", system)
 					.header("Authentication", "Basic RlJFTUU6dXxGcjNtM19zJGN1ciQ=")
 					.queryString("domain", domain)
-					.queryString("key", token)
+					.queryString("key", key)
 					.body(rdfConversionService.serializeRDF(inputModel,
 							RDFSerialization.TURTLE)).asString();
 
