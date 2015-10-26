@@ -282,7 +282,7 @@ public class ELinkSecurityTest extends EServiceTest {
                 .queryString("visibility", visibility)
                 .queryString("informat", "json")
                 .queryString("outformat", "json")
-                .queryString("endpoint-type","sparql")
+                .queryString("type","sparql")
                 .body(constructTemplate("Some label", query, "http://127.0.0.1:8000/mockups/sparql", "Some description", "sparql"))
                 .asString();
 

@@ -191,7 +191,7 @@ public abstract class EServiceTest {
                 "\"label\":\""+ label + "\",\n"+
                 " \"query\":\""+query+"\",\n" +
                 " \"endpoint\":\""+endpoint+"\",\n" +
-                " \"endpoint-type\":\""+endpointType+"\",\n" +
+                " \"type\":\""+endpointType+"\",\n" +
                 "\"description\":\""+ description + "\"\n"+
                 " }";
     }
