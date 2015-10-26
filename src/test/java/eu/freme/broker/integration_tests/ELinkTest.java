@@ -15,9 +15,11 @@ import java.io.IOException;
 public class ELinkTest extends EServiceTest {
 
 
-
-    public ELinkTest(){
+    String baseUrl;
+    public ELinkTest() throws UnirestException {
         super("/e-link");
+        super.setup();
+        baseUrl=super.getBaseUrl().replace("localhost","127.0.0.1");
     }
 
 
@@ -51,7 +53,7 @@ public class ELinkTest extends EServiceTest {
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
         */
         rdf_resource ="asdf";
-        endpoint = "http://127.0.0.1:8000/mockups/sparql";
+        endpoint = baseUrl+"/mockups/sparql";
         response=baseRequestPost("/explore")
                 .header("informat","turtle")
                 .header("outformat","turtle")
