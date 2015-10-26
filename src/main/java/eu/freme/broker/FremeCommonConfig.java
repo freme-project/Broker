@@ -20,6 +20,7 @@ package eu.freme.broker;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.freme.broker.tools.BrokerExceptionHandler;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +41,9 @@ public class FremeCommonConfig {
     public NIFParameterFactory getNifParameterFactory(){
     	return new NIFParameterFactory();
     }
-    
+
+    @Bean
+    public BrokerExceptionHandler brokerExceptionHandler() { return new BrokerExceptionHandler(); }
 
 	/**
 	 * Create a filter that logs all requests input and output
