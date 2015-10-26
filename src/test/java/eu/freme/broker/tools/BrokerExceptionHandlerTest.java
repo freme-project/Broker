@@ -2,6 +2,7 @@ package eu.freme.broker.tools;
 
 import eu.freme.broker.Broker;
 import eu.freme.broker.FremeCommonConfig;
+import eu.freme.broker.eservices.BaseRestController;
 import eu.freme.broker.exception.AccessDeniedException;
 import org.apache.log4j.Logger;
 import org.junit.Test;

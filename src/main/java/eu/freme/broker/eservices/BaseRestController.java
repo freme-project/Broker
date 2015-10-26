@@ -172,6 +172,7 @@ public abstract class BaseRestController {
 	public ResponseEntity<String> handler (HttpServletRequest req, Exception exception) {
 		return brokerExceptionHandler.handleError(req, exception);
 	}
+
 	/**
 	 * Create a ResponseEntity for a REST API method. It accepts a Jena Model
 	 * and an RDFSerialization format. It converts the model to a string in the
