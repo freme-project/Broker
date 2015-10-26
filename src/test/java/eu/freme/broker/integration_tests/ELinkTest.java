@@ -52,7 +52,8 @@ public class ELinkTest extends EServiceTest {
 
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
         */
-        rdf_resource ="asdf";
+        rdf_resource ="http://dbpedia.org/resource/Berlin";
+
         endpoint = baseUrl+"/mockups/sparql";
         response=baseRequestPost("/explore")
                 .header("informat","turtle")
@@ -63,7 +64,20 @@ public class ELinkTest extends EServiceTest {
                 .asString();
 
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        /*
+        endpoint= baseUrl+"/mockups/ldf";
+        //endpoint="http://fragments.dbpedia.org/2014/en";
+//        endpoint="http://dbpedia.org/sparql";
+        response=baseRequestPost("/explore")
+                .header("informat","turtle")
+                .header("outformat","turtle")
+                .queryString("endpoint-type","ldf")
+                .queryString("resource", rdf_resource)
+                .queryString("endpoint", endpoint)
+                .asString();
 
+        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        */
 
 
     }

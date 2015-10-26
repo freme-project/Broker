@@ -86,8 +86,6 @@ public class FremeNERTest extends EServiceTest {
                 .queryString("language","en")
                 .body(testUpdatedDataset).asString();
 
-        System.out.println(response.getStatus());
-        System.out.println(response.getBody());
         */
         response=baseRequestDelete("datasets/" + testDatasetName).asString();
         assertTrue(response.getStatus()==200);

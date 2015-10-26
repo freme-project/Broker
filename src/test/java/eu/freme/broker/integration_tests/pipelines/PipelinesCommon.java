@@ -59,7 +59,6 @@ public abstract class PipelinesCommon extends EServiceTest {
 	protected HttpResponse<String> sendRequest(int expectedResponseCode, final SerializedRequest... requests) throws UnirestException {
 		List<SerializedRequest> serializedRequests = Arrays.asList(requests);
 		String body = Serializer.toJson(requests);
-		//System.out.println("request.body = " + body);
 
 		HttpResponse<String> response = baseRequestPost("chain")
 				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())

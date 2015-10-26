@@ -61,7 +61,6 @@ public class UserControllerTest {
 		HttpResponse<String> response = Unirest.post(baseUrl + "/user")
 				.queryString("username", username)
 				.queryString("password", password).asString();
-		System.out.println("STATUS: "+response.getStatus());
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
 		String responseUsername = new JSONObject(response.getBody()).getString("name");
 		assertTrue(username.equals(responseUsername));

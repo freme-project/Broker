@@ -44,7 +44,6 @@ public class ELinkSecurityTest extends EServiceTest {
         super("/e-link/");
         super.setup();
         baseUrl = super.getBaseUrl().replace("localhost","127.0.0.1");
-        logger.info("ASADASFASD"+baseUrl + "/mockups/sparql");
         enableAuthenticate();
     }
 
