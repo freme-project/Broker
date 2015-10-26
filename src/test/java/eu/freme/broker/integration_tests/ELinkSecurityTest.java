@@ -55,7 +55,7 @@ public class ELinkSecurityTest extends EServiceTest {
 
 
         // add a template for the first user
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission, "sparql");
         assertNotNull(templateid);
 
         assertEquals(HttpStatus.NOT_FOUND.value(), deleteTemplate(999, tokenWithPermission));
@@ -73,11 +73,11 @@ public class ELinkSecurityTest extends EServiceTest {
         logger.info("testAnonymousUser");
 
 
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission, "sparql");
         assertNotNull(templateid);
         try {
             logger.info("try to create template as anonymous user... should not work");
-            Throwable exception = exceptionThrownBy(() -> createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", null));
+            Throwable exception = exceptionThrownBy(() -> createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", null, "sparql"));
             assertEquals(AccessDeniedException.class, exception.getClass());
             logger.info("try to fetch all templates as anonymous user... should work");
             assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.singletonList(templateid), null));
@@ -107,15 +107,15 @@ public class ELinkSecurityTest extends EServiceTest {
 
         // add a template for the first user
         logger.info("create private template for user 1");
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission, "sparql");
         logger.info("created template with id: " + templateid);
         assertNotNull(templateid);
         logger.info("create public template for user 1");
-        long templateid1 = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
+        long templateid1 = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission, "sparql");
         logger.info("created template with id: " + templateid1);
         assertNotNull(templateid1);
         logger.info("create private template for user 2");
-        long templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithOutPermission);
+        long templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithOutPermission, "sparql");
         logger.info("created template with id: " + templateid2);
         assertNotNull(templateid2);
 
@@ -133,7 +133,7 @@ public class ELinkSecurityTest extends EServiceTest {
         logger.info("testUpdateTemplate");
         // add a template for the first user
         logger.info("create private template for user 1");
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission, "sparql");
         String template = constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"), baseUrl + "/mockups/sparql", "Some description", "sparql");
 
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission,
@@ -155,7 +155,7 @@ public class ELinkSecurityTest extends EServiceTest {
 
         // add a template for the first user
         logger.info("create private template for user 1");
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission, "sparql");
         logger.info("private template for user 1 has id: " + templateid);
         assertNotNull(templateid);
 
@@ -212,36 +212,44 @@ public class ELinkSecurityTest extends EServiceTest {
         logger.info("testELinkDocuments");
 
 
-        logger.info("create private template");
-        long id = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission);
+        logger.info("create private template with sparql endpoint");
+        long id1 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission, "sparql");
+
+        logger.info("create private template with ldf endpoint");
+        long id2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission, "ldf");
+
 
         logger.info("create public template");
-        long idPublic = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "public", tokenWithPermission);
+        long idPublic = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "public", tokenWithPermission, "sparql");
         try {
             logger.info("read nif to enrich");
             String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
 
-            //TODO: Remember to uncomment when readding to Broker Master! Just for purposes of reproducing ConcurrentModificationException!
-            //logger.info("try to enrich via private template as other user... should not work");
-            //assertEquals(HttpStatus.UNAUTHORIZED.value(), doELink(nifContent, id, tokenWithOutPermission));
+            logger.info("try to enrich via private template as other user... should not work");
+            assertEquals(HttpStatus.UNAUTHORIZED.value(), doELink(nifContent, id1, tokenWithOutPermission));
 
-            logger.info("try to enrich via private template as template owner... should work");
-            assertEquals(HttpStatus.OK.value(), doELink(nifContent, id, tokenWithPermission));
+            logger.info("try to enrich via private sparql template as template owner... should work");
+            assertEquals(HttpStatus.OK.value(), doELink(nifContent, id1, tokenWithPermission));
+            logger.info("try to enrich via private ldf template as template owner... should work");
+            assertEquals(HttpStatus.OK.value(), doELink(nifContent, id2, tokenWithPermission));
             logger.info("try to enrich via public template as other user... should work");
             assertEquals(HttpStatus.OK.value(), doELink(nifContent, idPublic, tokenWithOutPermission));
             logger.info("try to enrich via public template as template owner... should work");
             assertEquals(HttpStatus.OK.value(), doELink(nifContent, idPublic, tokenWithPermission));
         } catch (AssertionError a) {
             logger.info("assertion failed, deleting templates from database before displaying error message");
-            logger.info("delete private template");
-            deleteTemplate(id, tokenWithPermission);
+            logger.info("delete private sparql template");
+            deleteTemplate(id1, tokenWithPermission);
+            logger.info("delete private ldf template");
+            deleteTemplate(id2, tokenWithPermission);
             logger.info("delete public template");
             deleteTemplate(idPublic, tokenWithPermission);
             throw( a);
         }
-
-        logger.info("delete private template");
-        deleteTemplate(id, tokenWithPermission);
+        logger.info("delete private sparql template");
+        deleteTemplate(id1, tokenWithPermission);
+        logger.info("delete private ldf template");
+        deleteTemplate(id2, tokenWithPermission);
         logger.info("delete public template");
         deleteTemplate(idPublic, tokenWithPermission);
     }
@@ -283,14 +291,14 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
     //Tests POST e-link/templates/
-    public long createTemplate(String filename, String visibility, String token) throws Exception {
+    public long createTemplate(String filename, String visibility, String token, String endpointType) throws Exception {
         String query = readFile(filename);
 
         HttpResponse<String> response = baseRequestPost("templates", token)
                 .queryString("visibility", visibility)
                 .queryString("informat", "json")
                 .queryString("outformat", "json")
-                .queryString("type","sparql")
+                .queryString("type",endpointType)
                 .body(constructTemplate("Some label", query, baseUrl + "/mockups/sparql", "Some description", "sparql"))
                 .asString();
 
