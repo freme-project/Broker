@@ -178,7 +178,8 @@ public class ELink extends BaseRestController {
             //@RequestParam(value = "f",             required=false) String f,
             //@RequestParam(value = "outformat",     required=false) String outformat,
             //@RequestParam(value = "o",             required=false) String o,
-            @RequestParam(value = "visibility",    required=false) String visibility,
+            // Type was moved as endpoint-type field of the template.
+            //@RequestParam(value = "visibility",    required=false) String visibility,
             // Type was moved as endpoint-type field of the template.
             //@RequestParam(value = "type",        required=false) String type, 
             @RequestParam Map<String,String> allParams,
@@ -200,14 +201,7 @@ public class ELink extends BaseRestController {
                 templateValidator.validateTemplateEndpoint(jsonObj.getString("endpoint"));
 
                 //AccessDeniedException can be thrown, if current authentication is the anonymousUser
-                template = new Template(
-                        OwnedResource.Visibility.getByString(visibility),
-                        Template.Type.getByString(jsonObj.getString("type")),
-                        jsonObj.getString("endpoint"),
-                        jsonObj.getString("query"),
-                        jsonObj.getString("label"),
-                        jsonObj.getString("description")
-                );
+                template = new Template(jsonObj);
             } else {
                 throw new BadRequestException("Other formats then JSON are no longer supported for templates.");
 //                Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
@@ -264,8 +258,6 @@ public class ELink extends BaseRestController {
             //@RequestParam(value = "f",             required=false) String f,
             //@RequestParam(value = "outformat",     required=false) String outformat,
             //@RequestParam(value = "o",             required=false) String o,
-            @RequestParam(value = "visibility",    required=false) String visibility,
-            @RequestParam(value = "type",        required=false) String type,
             @RequestParam(value = "owner",    required=false) String ownerName,
             @PathVariable("templateid") long templateId,
             @RequestParam Map<String,String> allParams,
@@ -284,21 +276,11 @@ public class ELink extends BaseRestController {
             if(nifParameters.getInput()!=null) {
                 if (nifParameters.getInformat().equals(RDFConstants.RDFSerialization.JSON)) {
                     JSONObject jsonObj = new JSONObject(nifParameters.getInput());
-                    template.setQuery(jsonObj.getString("query"));
-                    template.setEndpoint(jsonObj.getString("endpoint"));
-                    template.setLabel(jsonObj.getString("label"));
-                    template.setDescription(jsonObj.getString("description"));
+                    template.update(jsonObj);
                 } else {
                     Model model = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
                     template.setTemplateWithModel(model);
                 }
-            }
-
-            if(!Strings.isNullOrEmpty(visibility)) {
-                template.setVisibility(OwnedResource.Visibility.getByString(visibility));
-            }
-            if(!Strings.isNullOrEmpty(type)) {
-                template.setType(Template.Type.getByString(type));
             }
 
             templateDAO.save(template);
