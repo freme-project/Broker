@@ -349,7 +349,7 @@ public class ELink extends BaseRestController {
 				User owner = userDAO.getRepository().findOneByName(ownerName);
 				if (owner == null)
 					throw new BadRequestException(
-							"Can not change owner of the dataset. User \""
+							"Can not change owner of the template. User \""
 									+ ownerName + "\" does not exist.");
 				templateDAO.updateOwner(template, owner);
 			}
