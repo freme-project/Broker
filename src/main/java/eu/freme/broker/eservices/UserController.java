@@ -74,7 +74,7 @@ public class UserController extends BaseRestController {
 		try {
 			String hashedPassword = PasswordHasher.getSaltedHash(password);
 			User user = new User(username, hashedPassword, User.roleUser);
-			userDAO.save(user);
+			user = userDAO.save(user);
 			return user;
 		} catch (Exception e) {
 			logger.error(e);

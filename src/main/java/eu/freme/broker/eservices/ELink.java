@@ -256,7 +256,7 @@ public class ELink extends BaseRestController {
 				// templateValidator.validateTemplateEndpoint(template.getEndpoint());
 			}
 
-			templateDAO.save(template);
+			template = templateDAO.save(template);
 
 			String serialization;
 			if (nifParameters.getOutformat().equals(
@@ -343,7 +343,7 @@ public class ELink extends BaseRestController {
 				}
 			}
 
-			templateDAO.save(template);
+			template = templateDAO.save(template);
 
 			if (!Strings.isNullOrEmpty(ownerName)) {
 				User owner = userDAO.getRepository().findOneByName(ownerName);
@@ -351,7 +351,7 @@ public class ELink extends BaseRestController {
 					throw new BadRequestException(
 							"Can not change owner of the dataset. User \""
 									+ ownerName + "\" does not exist.");
-				templateDAO.updateOwner(template, owner);
+				template = templateDAO.updateOwner(template, owner);
 			}
 
 			String serialization;

@@ -179,7 +179,7 @@ public class Pipelines extends BaseRestController {
 					pipelineInfoObj.getDescription(),
 					Serializer.toJson(pipelineInfoObj.getSerializedRequests()),
 					toPersist);
-			pipelineDAO.save(pipeline);
+			pipeline = pipelineDAO.save(pipeline);
 			String response = Serializer.toJson(pipeline);
 			return createOKJSONResponse(response);
 		} catch (JsonSyntaxException jsonException) {
@@ -263,7 +263,7 @@ public class Pipelines extends BaseRestController {
 				}
 				pipeline.setOwner(newOwner);
 			}
-			pipelineDAO.save(pipeline);
+			pipeline = pipelineDAO.save(pipeline);
 			String response = Serializer.toJson(pipeline);
 			return createOKJSONResponse(response);
 		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
