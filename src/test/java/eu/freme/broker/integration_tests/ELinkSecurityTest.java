@@ -5,6 +5,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.broker.FremeCommonConfig;
+import eu.freme.broker.tools.BrokerExceptionHandler;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
@@ -47,8 +49,6 @@ public class ELinkSecurityTest extends EServiceTest {
         enableAuthenticate();
     }
 
-
-
     @Test
     public void invalidTemplateId() throws Exception{
 
@@ -75,6 +75,7 @@ public class ELinkSecurityTest extends EServiceTest {
         long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission, "sparql");
         assertNotNull(templateid);
         try {
+
             logger.info("try to create template as anonymous user... should not work");
             Throwable exception = exceptionThrownBy(() -> createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", null, "sparql"));
             assertEquals(AccessDeniedException.class, exception.getClass());

@@ -168,10 +168,12 @@ public abstract class BaseRestController {
 	 * @param exception
 	 * @return
 	 */
-	@ExceptionHandler(Exception.class)
+	/*@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handler (HttpServletRequest req, Exception exception) {
 		return brokerExceptionHandler.handleError(req, exception);
-	}
+	}*/
+
+
 
 	/**
 	 * Create a ResponseEntity for a REST API method. It accepts a Jena Model

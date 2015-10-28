@@ -12,6 +12,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -25,7 +26,7 @@ import java.util.HashMap;
  * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 26.10.15.
  */
 
-
+@ControllerAdvice
 public class BrokerExceptionHandler extends HashMap<String, String>{
 
     private Exception expectedException=null;
