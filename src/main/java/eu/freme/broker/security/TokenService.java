@@ -36,7 +36,7 @@ public class TokenService {
 
 	public Token generateNewToken(User user) {
 		Token token = new Token(UUID.randomUUID().toString(), user);
-		tokenRepository.save(token);
+		token = tokenRepository.save(token);
 		return token;
 	}
 
@@ -50,7 +50,7 @@ public class TokenService {
 	
 	public Token updateLastUsed(Token token){
 		token.setLastUsedDate(new Date());
-		tokenRepository.save(token);
+		token = tokenRepository.save(token);
 		return token;
 	}
 }

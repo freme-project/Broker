@@ -37,7 +37,7 @@ public class ExceptionHandlerService {
 	 * @return
 	 */
 	public ResponseEntity<String> handleError(HttpServletRequest req,
-			Exception exception) {
+			Throwable exception) {
 		logger.error("Request: " + req.getRequestURL() + " raised ", exception);
 
 		HttpStatus statusCode = null;
@@ -87,7 +87,7 @@ public class ExceptionHandlerService {
 	 * @throws IOException
 	 */
 	public void writeExceptionToResponse(HttpServletRequest request,
-			HttpServletResponse response, Exception exception)
+			HttpServletResponse response, Throwable exception)
 			throws IOException {
 		ResponseEntity<String> responseEntity = handleError(request, exception);
 		response.setStatus(responseEntity.getStatusCode().value());
