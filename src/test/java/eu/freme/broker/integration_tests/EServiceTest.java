@@ -185,14 +185,15 @@ public abstract class EServiceTest {
     }
 
     //Used for constructiong Templates with sparql queries in E-link and E-Link Security Test
-    String constructTemplate(String label, String query, String endpoint, String description, String endpointType) {
+    String constructTemplate(String label, String query, String endpoint, String description, String endpointType, String visibility) {
         query = query.replaceAll("\n","\\\\n");
         return  " {\n" +
                 "\"label\":\""+ label + "\",\n"+
                 " \"query\":\""+query+"\",\n" +
                 " \"endpoint\":\""+endpoint+"\",\n" +
                 " \"type\":\""+endpointType+"\",\n" +
-                "\"description\":\""+ description + "\"\n"+
+                "\"description\":\""+ description + "\",\n"+
+                "\"visibility\":\""+ visibility + "\"\n"+
                 " }";
     }
 
@@ -200,11 +201,6 @@ public abstract class EServiceTest {
         authenticate = true;
     }
 
-
-    public void setService(String service){
-        this.service = service;
-        url = baseUrl + service;
-    }
     public void createUser(String username, String password) throws UnirestException {
 
         HttpResponse<String> response = Unirest.post(getBaseUrl() + "/user")

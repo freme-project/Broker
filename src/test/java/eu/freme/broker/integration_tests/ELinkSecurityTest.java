@@ -8,12 +8,9 @@ import eu.freme.broker.FremeCommonConfig;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
@@ -48,18 +45,17 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
 
-
     @Test
     public void invalidTemplateId() throws Exception{
 
 
         // add a template for the first user
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission, "sparql");
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
         assertNotNull(templateid);
 
         assertEquals(HttpStatus.NOT_FOUND.value(), deleteTemplate(999, tokenWithPermission));
         assertEquals(HttpStatus.NOT_FOUND.value(), getTemplate(999, tokenWithPermission));
-        assertEquals(HttpStatus.NOT_FOUND.value(), updateTemplate(999, tokenWithPermission, constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl + "/mockups/sparql", "Some description", "sparql"), "public", null, null));
+        assertEquals(HttpStatus.NOT_FOUND.value(), updateTemplate(999, tokenWithPermission, constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), "http://dbpedia.org/sparql/", "Some description", "sparql", "public"), null));
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
         assertEquals(HttpStatus.NOT_FOUND.value(), doELink(nifContent, 999, tokenWithOutPermission));
 
@@ -68,11 +64,12 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
     @Test
+
     public void testAnonymousUser() throws Exception {
         logger.info("testAnonymousUser");
 
 
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission, "sparql");
+        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
         assertNotNull(templateid);
         try {
             logger.info("try to create template as anonymous user... should not work");
@@ -98,7 +95,6 @@ public class ELinkSecurityTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
 
-    
     @Test
     public void testGetAllTemplates() throws Exception {
         logger.info("testGetAllTemplates");
@@ -126,7 +122,6 @@ public class ELinkSecurityTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid2, tokenWithOutPermission));
     }
 
-    
     @Test
     public void testUpdateTemplate() throws Exception {
         logger.info("testUpdateTemplate");
@@ -146,7 +141,6 @@ public class ELinkSecurityTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithOutPermission));
     }
 
-    
     @Test
     public void testTemplateHandlingWithSecurity() throws Exception {
         logger.info("testTemplateHandlingWithSecurity");
@@ -217,6 +211,8 @@ public class ELinkSecurityTest extends EServiceTest {
         logger.info("create private template with ldf endpoint");
         long id2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission, "ldf");
 
+        logger.info("read nif to enrich");
+        String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
 
         logger.info("create public template");
         long idPublic = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "public", tokenWithPermission, "sparql");

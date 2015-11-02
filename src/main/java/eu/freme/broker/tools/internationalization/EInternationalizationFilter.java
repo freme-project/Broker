@@ -43,6 +43,7 @@ import org.springframework.stereotype.Component;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
+import eu.freme.broker.tools.ExceptionHandlerService;
 import eu.freme.i18n.api.EInternationalizationAPI;
 import eu.freme.i18n.okapi.nif.converter.ConversionException;
 
@@ -58,6 +59,9 @@ import eu.freme.i18n.okapi.nif.converter.ConversionException;
 @Profile("broker")
 public class EInternationalizationFilter implements Filter {
 
+	@Autowired
+	ExceptionHandlerService exceptionHandlerService;
+	
 	/*
 	 * EInternationalization accepts these formats for conversion to NIF
 	 */
@@ -156,17 +160,22 @@ public class EInternationalizationFilter implements Filter {
 
 		String informat = getInformat(httpRequest);
 		String outformat = getOutformat(httpRequest);
-
+		
+		
 		if (outformat != null
 				&& (informat == null || !outformat.equals(informat))) {
-			throw new BadRequestException("Can only convert to outformat \""
+			Exception exception = new BadRequestException("Can only convert to outformat \""
 					+ outformat + "\" when informat is also \"" + outformat
 					+ "\"");
+			exceptionHandlerService.writeExceptionToResponse(httpRequest, httpResponse, exception);
+			return;
 		}
 
 		if (outformat != null && !outputFormats.contains(outformat)) {
-			throw new BadRequestException("\"" + outformat
+			Exception exception = new BadRequestException("\"" + outformat
 					+ "\" is not a valid output format");
+			exceptionHandlerService.writeExceptionToResponse(httpRequest, httpResponse, exception);
+			return;
 		}
 
 		if (informat == null) {
@@ -213,7 +222,9 @@ public class EInternationalizationFilter implements Filter {
 		
 		byte[] baosData = baos.toByteArray();
 		if( baosData.length == 0 ){
-			throw new BadRequestException("No input data found in request."); 
+			Exception exception = new BadRequestException("No input data found in request."); 
+			exceptionHandlerService.writeExceptionToResponse(httpRequest, httpResponse, exception);
+			return;
 		}
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(baosData);

@@ -81,7 +81,7 @@
 		<dependency>
 			<groupId>eu.freme</groupId>
 			<artifactId>e-publishing</artifactId>
-			<version>0.3</version>
+			<version>0.4-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
