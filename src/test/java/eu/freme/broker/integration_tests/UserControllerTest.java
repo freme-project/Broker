@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import eu.freme.broker.eservices.BaseRestController;
 
+@Ignore
 public class UserControllerTest {
 
 	String baseUrl = null;
