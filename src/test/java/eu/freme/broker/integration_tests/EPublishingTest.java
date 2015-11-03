@@ -44,12 +44,7 @@ public class EPublishingTest extends EServiceTest {
     }
 
     @Test
-    @Ignore
     public void testValidJSON() throws UnirestException, IOException {
-
-        // TODO: wait for issue: Unit tests on windows #15 https://github.com/freme-project/e-Publishing/issues/15
-        // Avoid java.io.IOException: Unable to delete temporary files on windows machines
-        Assume.assumeTrue(!System.getProperty( "os.name" ).startsWith( "Windows" ));
 
         HttpResponse<InputStream> response = Unirest.post(getUrl()+"html")
                 .field("htmlZip", new File("src/test/resources/e-publishing/alice.zip"))
