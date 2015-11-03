@@ -64,7 +64,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class FremeNER extends BaseRestController {
     
 
-    @Value("${datasets.wand?:default}")
+    @Value("#{datasets.wand?:default}")
     String wandKey;
     
     public void setWandKey(String wandKey) {
