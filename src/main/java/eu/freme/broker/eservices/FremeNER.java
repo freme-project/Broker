@@ -111,6 +111,7 @@ public class FremeNER extends BaseRestController {
             }
            
             System.out.println("wand key: " + wandKey);
+            logger.log(Level.INFO, "wand key: " + wandKey);
             if(dataset.equals("wand")) {
                 if(datasetKey != null) {
                     if(datasetKey.equals(wandKey)) {
