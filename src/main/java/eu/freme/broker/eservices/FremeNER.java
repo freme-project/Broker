@@ -57,11 +57,15 @@ import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 import eu.freme.eservices.elink.api.DataEnricher;
 import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Value;
 
 @RestController
 @Profile("broker")
 public class FremeNER extends BaseRestController {
-
+    
+    @Value("${datasets.wand}")
+    String wandKey;
+    
     @Autowired
     EEntityService entityAPI;
         
@@ -96,6 +100,7 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "numLinks", required = false) String numLinksParam,
 			@RequestParam(value = "enrichement", required = false) String enrichementType,
 			@RequestParam(value = "mode", required = false) String mode,
+			@RequestParam(value = "datasetKey", required = false) String datasetKey,
             @RequestParam Map<String,String> allParams,
             @RequestBody(required = false) String postBody) {
         try {
@@ -104,8 +109,23 @@ public class FremeNER extends BaseRestController {
                     // The language specified with the langauge parameter is not supported.
                     throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
             }
+           
+           
+            if(dataset.equals("wand")) {
+                if(datasetKey != null) {
+                    if(datasetKey.equals(wandKey)) {
+                        // The user has access right to the dataset.
+                    } else {
+                        throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
+                    }
+                } else {
+                    throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
+                }
+            }
 
 
+           
+           
             ArrayList<String> rMode = new ArrayList<>();
             
             // Check the MODE parameter.
