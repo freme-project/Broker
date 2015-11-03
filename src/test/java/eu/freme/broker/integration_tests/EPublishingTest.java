@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.adobe.epubcheck.api.EpubCheck;
 import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -66,9 +67,10 @@ public class EPublishingTest extends EServiceTest {
         //File epubFile = new File("/path/to/your/epub/file.epub");
 
         // simple constructor; errors are printed on stderr stream
-        // EpubCheck epubcheck = new EpubCheck(targetFile);
+        EpubCheck epubcheck = new EpubCheck(targetFile);
 
         // validate() returns true if no errors or warnings are found
-        // assertTrue(epubcheck.validate());
+        logger.info("validate epub file");
+        assertTrue(epubcheck.validate());
     }
 }
