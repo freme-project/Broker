@@ -63,6 +63,7 @@ import org.springframework.beans.factory.annotation.Value;
 @Profile("broker")
 public class FremeNER extends BaseRestController {
     
+
     @Value("${datasets.wand ?: default}")
     String wandKey;
     
