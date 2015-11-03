@@ -118,7 +118,7 @@ public class FremeNER extends BaseRestController {
                     if(datasetKey.equals(wandKey)) {
                         // The user has access right to the dataset.
                     } else {
-                        throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
+                        throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset" + wandKey);
                     }
                 } else {
                     throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
