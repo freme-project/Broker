@@ -64,12 +64,12 @@ import org.springframework.beans.factory.annotation.Value;
 public class FremeNER extends BaseRestController {
     
 
-    @Value("#{wandkey?:default}")
-    String wandKey;
+//    @Value("${datasets.wandkey}")
+//    String wandKey;
     
-    public void setWandKey(String wandKey) {
-        this.wandKey = wandKey;
-    }
+//    public void setWandKey(String wandKey) {
+//        this.wandKey = wandKey;
+//    }
     
     @Autowired
     EEntityService entityAPI;
@@ -114,20 +114,20 @@ public class FremeNER extends BaseRestController {
                     // The language specified with the langauge parameter is not supported.
                     throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
             }
-           
-            System.out.println("wand key: " + wandKey);
-            logger.debug("wand key: " + wandKey);
-            if(dataset.equals("wand")) {
-                if(datasetKey != null) {
-                    if(datasetKey.equals(wandKey)) {
-                        // The user has access right to the dataset.
-                    } else {
-                        throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset" + wandKey);
-                    }
-                } else {
-                    throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
-                }
-            }
+
+//            System.out.println("wand key: " + wandKey);
+//            logger.debug("wand key: " + wandKey);
+//            if(dataset.equals("wand")) {
+//                if(datasetKey != null) {
+//                    if(datasetKey.equals(wandKey)) {
+//                        // The user has access right to the dataset.
+//                    } else {
+//                        throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset" + wandKey);
+//                    }
+//                } else {
+//                    throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
+//                }
+//            }
 
 
            
