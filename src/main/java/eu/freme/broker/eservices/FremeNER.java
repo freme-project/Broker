@@ -67,6 +67,10 @@ public class FremeNER extends BaseRestController {
     @Value("${datasets.wand?:default}")
     String wandKey;
     
+    public void setWandKey(String wandKey) {
+        this.wandKey = wandKey;
+    }
+    
     @Autowired
     EEntityService entityAPI;
         
