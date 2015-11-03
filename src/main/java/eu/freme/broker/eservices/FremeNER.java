@@ -110,7 +110,7 @@ public class FremeNER extends BaseRestController {
                     throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
             }
            
-           
+            System.out.println("wand key: " + wandKey);
             if(dataset.equals("wand")) {
                 if(datasetKey != null) {
                     if(datasetKey.equals(wandKey)) {
