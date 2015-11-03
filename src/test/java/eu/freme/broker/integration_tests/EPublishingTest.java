@@ -63,8 +63,6 @@ public class EPublishingTest extends EServiceTest {
         outStream.write(buffer);
         outStream.flush();
         assertTrue(targetFile.length()>0);
-        //TODO: validate epub??
-        //File epubFile = new File("/path/to/your/epub/file.epub");
 
         // simple constructor; errors are printed on stderr stream
         EpubCheck epubcheck = new EpubCheck(targetFile);
