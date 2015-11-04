@@ -394,7 +394,7 @@ public class FremeNER extends BaseRestController {
             RequestMethod.DELETE })
 	public ResponseEntity<String> removeDataset(
 			@PathVariable(value = "name") String name) {
-            return callBackend(fremeNerEndpoint+"/api/datasets/"+name, HttpMethod.DELETE, null);
+            return callBackend(fremeNerEndpoint+"/datasets/"+name, HttpMethod.DELETE, null);
         }
 
 
