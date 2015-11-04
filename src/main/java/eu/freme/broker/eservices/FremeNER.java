@@ -64,12 +64,8 @@ import org.springframework.beans.factory.annotation.Value;
 public class FremeNER extends BaseRestController {
     
 
-//    @Value("${datasets.wandkey}")
-//    String wandKey;
-    
-//    public void setWandKey(String wandKey) {
-//        this.wandKey = wandKey;
-//    }
+    @Value("${datasets.wandkey:default}")
+    String wandKey;
     
     @Autowired
     EEntityService entityAPI;
@@ -109,6 +105,9 @@ public class FremeNER extends BaseRestController {
             @RequestParam Map<String,String> allParams,
             @RequestBody(required = false) String postBody) {
         try {
+        	
+        	System.err.println(wandKey);
+        	
             // Check the language parameter.
            if(!SUPPORTED_LANGUAGES.contains(language)){
                     // The language specified with the langauge parameter is not supported.
