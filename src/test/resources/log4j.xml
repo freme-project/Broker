@@ -1,13 +1,24 @@
-# LOG4J configuration
-#log4j.rootLogger=INFO, console
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
-#log4j.appender.console=org.apache.log4j.ConsoleAppender
-#log4j.appender.console.layout=org.apache.log4j.PatternLayout
-#log4j.appender.console.layout.ConversionPattern=%-7p %d [%t] %c %x - %m%n
-#log4j.appender.console.filter=org.apache.log4j.filter.ExpressionFilter
-#log4j.appender.console.filter.expression= EXCEPTION ~= eu.freme.broker.exception.AccessDeniedException || EXCEPTION ~=org.springframework.security.access.AccessDeniedException
-#log4j.appender.console.filter.acceptOnMatch=false
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%-7p %d [%t] %c %x - %m%n"/>
+        </layout>
+        <filter class="org.apache.log4j.filter.ExpressionFilter">
+            <param name="Expression" value="EXCEPTION ~= eu.freme.broker.exception.AccessDeniedException || EXCEPTION ~=org.springframework.security.access.AccessDeniedException"/>
+            <param name="AcceptOnMatch" value="false"/>
+        </filter>
+    </appender>
+    <logger name="com.github.isrsal.logging.LoggingFilter">
+        <level value="DEBUG"/>
+    </logger>
 
-#log4j.logger.com.github.isrsal.logging.LoggingFilter=DEBUG
+    <root>
+        <priority value ="INFO" />
+        <appender-ref ref="console" />
+    </root>
 
-# log4j.logger.org.hibernate.SQL=debug
+</log4j:configuration>
