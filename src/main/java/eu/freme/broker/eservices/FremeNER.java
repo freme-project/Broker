@@ -106,7 +106,7 @@ public class FremeNER extends BaseRestController {
             @RequestBody(required = false) String postBody) {
         try {
         	
-        	System.err.println(wandKey);
+        	logger.error(wandKey);
         	
             // Check the language parameter.
            if(!SUPPORTED_LANGUAGES.contains(language)){
