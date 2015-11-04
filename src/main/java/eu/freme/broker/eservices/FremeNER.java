@@ -75,6 +75,8 @@ public class FremeNER extends BaseRestController {
         
     @Autowired
     DataEnricher dataEnricher;
+    
+    private final String fremeNerEndpoint = "http://rv2622.1blu.de:8081/api";
 
     public final Set<String> SUPPORTED_LANGUAGES = new HashSet<>(Arrays.asList(new String[]{
             "en", "de", "nl", "it", "fr", "es", "ru"
@@ -105,28 +107,27 @@ public class FremeNER extends BaseRestController {
             @RequestParam Map<String,String> allParams,
             @RequestBody(required = false) String postBody) {
         try {
-        	
-        	System.err.println(wandKey);
-        	
+            
+            logger.error(wandKey);
+            logger.error(datasetKey);
+
             // Check the language parameter.
            if(!SUPPORTED_LANGUAGES.contains(language)){
                     // The language specified with the langauge parameter is not supported.
                     throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
             }
 
-//            System.out.println("wand key: " + wandKey);
-//            logger.debug("wand key: " + wandKey);
-//            if(dataset.equals("wand")) {
-//                if(datasetKey != null) {
-//                    if(datasetKey.equals(wandKey)) {
-//                        // The user has access right to the dataset.
-//                    } else {
-//                        throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset" + wandKey);
-//                    }
-//                } else {
-//                    throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
-//                }
-//            }
+            if(dataset.equals("wand")) {
+                if(datasetKey != null) {
+                    if(datasetKey.equals(wandKey)) {
+                        // The user has access right to the dataset.
+                    } else {
+                        throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset" + wandKey);
+                    }
+                } else {
+                    throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
+                }
+            }
 
 
            
@@ -306,7 +307,7 @@ public class FremeNER extends BaseRestController {
 
             if (endpoint != null) {
                 // fed via SPARQL endpoint
-                return callBackend("http://139.18.2.231:8080/api/datasets?format=" + format
+                return callBackend(fremeNerEndpoint+"/datasets?format=" + format
                         + "&name=" + name
                         + "&description=" + URLEncoder.encode(description, "UTF-8")
                         + "&language=" + language
@@ -314,7 +315,7 @@ public class FremeNER extends BaseRestController {
                         + "&sparql=" + URLEncoder.encode(sparql, "UTF-8"), HttpMethod.POST, null);
             } else {
                 // datasets is sent
-                return callBackend("http://139.18.2.231:8080/api/datasets?format=" + format
+                return callBackend(fremeNerEndpoint+"/datasets?format=" + format
                         + "&name=" + name
                         + "&language=" + language, HttpMethod.POST, nifParameters.getInput());
             }
@@ -365,7 +366,7 @@ public class FremeNER extends BaseRestController {
                         break;
                 }
 
-                return callBackend("http://139.18.2.231:8080/api/datasets" + name + "?format=" + format
+                return callBackend(fremeNerEndpoint+"/datasets" + name + "?format=" + format
                     + "&language=" + language, HttpMethod.PUT, nifParameters.getInput());
             }catch(Exception e){
                 logger.error(e.getMessage(), e);
@@ -379,7 +380,7 @@ public class FremeNER extends BaseRestController {
             RequestMethod.GET })
 	public ResponseEntity<String> getDataset(
             @PathVariable(value = "name") String name) {
-            return callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.GET, null);
+            return callBackend(fremeNerEndpoint+"/datasets/"+name, HttpMethod.GET, null);
         }
 
         // Get info about all available datasets.
@@ -387,7 +388,7 @@ public class FremeNER extends BaseRestController {
 	@RequestMapping(value = "/e-entity/freme-ner/datasets", method = {
             RequestMethod.GET })
 	public ResponseEntity<String> getAllDatasets() {
-            return callBackend("http://139.18.2.231:8080/api/datasets", HttpMethod.GET, null);
+            return callBackend(fremeNerEndpoint+"/datasets", HttpMethod.GET, null);
         }
         
         // Removing a specific dataset.
@@ -396,7 +397,7 @@ public class FremeNER extends BaseRestController {
             RequestMethod.DELETE })
 	public ResponseEntity<String> removeDataset(
 			@PathVariable(value = "name") String name) {
-            return callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.DELETE, null);
+            return callBackend(fremeNerEndpoint+"/api/datasets/"+name, HttpMethod.DELETE, null);
         }
 
 
