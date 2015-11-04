@@ -105,28 +105,26 @@ public class FremeNER extends BaseRestController {
             @RequestParam Map<String,String> allParams,
             @RequestBody(required = false) String postBody) {
         try {
-        	
-        	logger.error(wandKey);
-        	
+            
+            logger.error(wandKey);
+
             // Check the language parameter.
            if(!SUPPORTED_LANGUAGES.contains(language)){
                     // The language specified with the langauge parameter is not supported.
                     throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
             }
 
-//            System.out.println("wand key: " + wandKey);
-//            logger.debug("wand key: " + wandKey);
-//            if(dataset.equals("wand")) {
-//                if(datasetKey != null) {
-//                    if(datasetKey.equals(wandKey)) {
-//                        // The user has access right to the dataset.
-//                    } else {
-//                        throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset" + wandKey);
-//                    }
-//                } else {
-//                    throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
-//                }
-//            }
+            if(dataset.equals("wand")) {
+                if(datasetKey != null) {
+                    if(datasetKey.equals(wandKey)) {
+                        // The user has access right to the dataset.
+                    } else {
+                        throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset" + wandKey);
+                    }
+                } else {
+                    throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
+                }
+            }
 
 
            
