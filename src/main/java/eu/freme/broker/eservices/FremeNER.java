@@ -107,6 +107,7 @@ public class FremeNER extends BaseRestController {
         try {
             
             logger.error(wandKey);
+            logger.error(datasetKey);
 
             // Check the language parameter.
            if(!SUPPORTED_LANGUAGES.contains(language)){
