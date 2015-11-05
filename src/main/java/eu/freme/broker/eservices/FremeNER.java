@@ -108,9 +108,6 @@ public class FremeNER extends BaseRestController {
             @RequestBody(required = false) String postBody) {
         try {
             
-            logger.error(wandKey);
-            logger.error(datasetKey);
-
             // Check the language parameter.
            if(!SUPPORTED_LANGUAGES.contains(language)){
                     // The language specified with the langauge parameter is not supported.
@@ -397,7 +394,7 @@ public class FremeNER extends BaseRestController {
             RequestMethod.DELETE })
 	public ResponseEntity<String> removeDataset(
 			@PathVariable(value = "name") String name) {
-            return callBackend(fremeNerEndpoint+"/api/datasets/"+name, HttpMethod.DELETE, null);
+            return callBackend(fremeNerEndpoint+"/datasets/"+name, HttpMethod.DELETE, null);
         }
 
 
