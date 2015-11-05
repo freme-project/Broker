@@ -170,6 +170,7 @@ public class ELink extends BaseRestController {
 			@RequestParam(value = "endpoint-type", required = false) String endpointType) {
 		try {
 
+                    templateValidator.validateTemplateEndpoint(endpoint);
 			NIFParameterSet nifParameters = this.normalizeNif("", acceptHeader,
 					contentTypeHeader, allParams, false);
 
@@ -183,6 +184,9 @@ public class ELink extends BaseRestController {
 					.getMimeType());
 			return new ResponseEntity<>(serialization, responseHeaders,
 					HttpStatus.OK);
+		} catch (InvalidTemplateEndpointException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new InvalidTemplateEndpointException(ex.getMessage());
 		} catch (UnsupportedEndpointType | BadRequestException
 				| UnsupportedOperationException ex) {
 			logger.error(ex.getMessage(), ex);
