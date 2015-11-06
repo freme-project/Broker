@@ -314,6 +314,7 @@ public class FremeNER extends BaseRestController {
                 // datasets is sent
                 return callBackend(fremeNerEndpoint+"/datasets?format=" + format
                         + "&name=" + name
+                        + "&description=" + URLEncoder.encode(description, "UTF-8")
                         + "&language=" + language, HttpMethod.POST, nifParameters.getInput());
             }
         } catch(Exception e){
@@ -363,7 +364,7 @@ public class FremeNER extends BaseRestController {
                         break;
                 }
 
-                return callBackend(fremeNerEndpoint+"/datasets" + name + "?format=" + format
+                return callBackend(fremeNerEndpoint+"/datasets/" + name + "?format=" + format
                     + "&language=" + language, HttpMethod.PUT, nifParameters.getInput());
             }catch(Exception e){
                 logger.error(e.getMessage(), e);
