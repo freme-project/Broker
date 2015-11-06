@@ -363,7 +363,7 @@ public class FremeNER extends BaseRestController {
                         break;
                 }
 
-                return callBackend(fremeNerEndpoint+"/datasets" + name + "?format=" + format
+                return callBackend(fremeNerEndpoint+"/datasets/" + name + "?format=" + format
                     + "&language=" + language, HttpMethod.PUT, nifParameters.getInput());
             }catch(Exception e){
                 logger.error(e.getMessage(), e);
