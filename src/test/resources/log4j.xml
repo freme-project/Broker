@@ -7,10 +7,10 @@
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%-7p %d [%t] %c %x - %m%n"/>
         </layout>
-        <filter class="org.apache.log4j.filter.ExpressionFilter">
+  <!--      <filter class="org.apache.log4j.filter.ExpressionFilter">
             <param name="Expression" value="EXCEPTION ~= eu.freme.broker.exception.AccessDeniedException || EXCEPTION ~=org.springframework.security.access.AccessDeniedException"/>
             <param name="AcceptOnMatch" value="false"/>
-        </filter>
+        </filter>-->
     </appender>
     <logger name="com.github.isrsal.logging.LoggingFilter">
         <level value="DEBUG"/>

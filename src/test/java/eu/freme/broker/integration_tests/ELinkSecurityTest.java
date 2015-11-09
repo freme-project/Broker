@@ -52,15 +52,12 @@ public class ELinkSecurityTest extends EServiceTest {
     @Before
     public void replaceBaseUrl(){
         baseUrl= getBaseUrl().replace("localhost","127.0.0.1");
-        Appender f=(Appender) Logger.getRootLogger().getAllAppenders().nextElement();
-        logger.error(f.getFilter().toString());
-        logger.error(f.toString());
+        loggerIgnore(eu.freme.broker.exception.AccessDeniedException.class);
+        loggerIgnore(org.springframework.security.access.AccessDeniedException.class);
     }
 
-    @Test
-    public void doNothing() {};
 
-    @Ignore
+
     @Test
     public void invalidTemplateId() throws Exception{
 
@@ -78,7 +75,6 @@ public class ELinkSecurityTest extends EServiceTest {
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
-    @Ignore
     @Test
 
     public void testAnonymousUser() throws Exception {
@@ -105,7 +101,6 @@ public class ELinkSecurityTest extends EServiceTest {
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
-    @Ignore
     @Test
     public void testGetAllTemplates() throws Exception {
         logger.info("testGetAllTemplates");
@@ -133,7 +128,6 @@ public class ELinkSecurityTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid1, tokenWithPermission));
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid2, tokenWithOutPermission));
     }
-    @Ignore
 
     @Test
     public void testUpdateTemplate() throws Exception {
@@ -153,7 +147,7 @@ public class ELinkSecurityTest extends EServiceTest {
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithOutPermission));
     }
-    @Ignore
+
 
     @Test
     public void testTemplateHandlingWithSecurity() throws Exception {
@@ -214,9 +208,11 @@ public class ELinkSecurityTest extends EServiceTest {
 
 
 
-    @Ignore
     @Test
     public void testELinkDocuments() throws Exception {
+
+        loggerUnignore(org.springframework.security.access.AccessDeniedException.class);
+        loggerUnignore(eu.freme.broker.exception.AccessDeniedException.class);
         logger.info("testELinkDocuments");
 
 
