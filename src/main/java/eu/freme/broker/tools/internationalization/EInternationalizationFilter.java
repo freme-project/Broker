@@ -39,6 +39,7 @@ import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import eu.freme.broker.exception.BadRequestException;
@@ -157,6 +158,11 @@ public class EInternationalizationFilter implements Filter {
 
 		HttpServletRequest httpRequest = (HttpServletRequest) req;
 		HttpServletResponse httpResponse = (HttpServletResponse) res;
+		
+		if( httpRequest.getMethod().equals("OPTIONS")){
+			chain.doFilter(req, res);
+			return;
+		}
 
 		String informat = getInformat(httpRequest);
 		String outformat = getOutformat(httpRequest);

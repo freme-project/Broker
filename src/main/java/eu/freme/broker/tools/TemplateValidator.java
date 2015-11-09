@@ -35,7 +35,7 @@ public class TemplateValidator {
     public void validateTemplateEndpoint(String uri) {
         UrlValidator urlValidator = new UrlValidator();
         if(!urlValidator.isValid(uri)) {
-            throw new InvalidTemplateEndpointException("The SPARQL endpoint URL \""+uri+"\" is invalid.");
+            throw new InvalidTemplateEndpointException("The endpoint URL \""+uri+"\" is invalid.");
         }
     }
     

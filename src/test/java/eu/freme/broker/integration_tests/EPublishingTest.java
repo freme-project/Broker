@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.adobe.epubcheck.api.EpubCheck;
 import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -44,12 +45,7 @@ public class EPublishingTest extends EServiceTest {
     }
 
     @Test
-    @Ignore
     public void testValidJSON() throws UnirestException, IOException {
-
-        // TODO: wait for issue: Unit tests on windows #15 https://github.com/freme-project/e-Publishing/issues/15
-        // Avoid java.io.IOException: Unable to delete temporary files on windows machines
-        Assume.assumeTrue(!System.getProperty( "os.name" ).startsWith( "Windows" ));
 
         HttpResponse<InputStream> response = Unirest.post(getUrl()+"html")
                 .field("htmlZip", new File("src/test/resources/e-publishing/alice.zip"))
@@ -67,13 +63,12 @@ public class EPublishingTest extends EServiceTest {
         outStream.write(buffer);
         outStream.flush();
         assertTrue(targetFile.length()>0);
-        //TODO: validate epub??
-        //File epubFile = new File("/path/to/your/epub/file.epub");
 
         // simple constructor; errors are printed on stderr stream
-        // EpubCheck epubcheck = new EpubCheck(targetFile);
+        EpubCheck epubcheck = new EpubCheck(targetFile);
 
         // validate() returns true if no errors or warnings are found
-        // assertTrue(epubcheck.validate());
+        logger.info("validate epub file");
+        assertTrue(epubcheck.validate());
     }
 }
