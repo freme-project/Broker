@@ -17,9 +17,6 @@
  */
 package eu.freme.broker.integration_tests;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.hp.hpl.jena.shared.AssertionFailureException;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -30,8 +27,6 @@ import eu.freme.broker.eservices.BaseRestController;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConversionService;
 import org.apache.log4j.Appender;
-import eu.freme.common.persistence.model.OwnedResource;
-import eu.freme.common.persistence.model.Template;
 import org.apache.log4j.Logger;
 import org.apache.log4j.filter.ExpressionFilter;
 import org.json.JSONObject;
@@ -191,23 +186,7 @@ public abstract class EServiceTest {
 
     }
 
-    //Used for constructiong Templates with sparql queries in E-link and E-Link Security Test
-    String constructTemplate(String label, String query, String endpoint, String description, String endpointType, String visibility) throws JsonProcessingException {
-        Template template = new Template(null, OwnedResource.Visibility.getByString(visibility), Template.Type.getByString(endpointType), endpoint, query, label, description);
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        String serialization = ow.writeValueAsString(template);
-        return serialization;
-        /*
-        query = query.replaceAll("\n","\\\\n");
-        return  " {\n" +
-                "\"label\":\""+ label + "\",\n"+
-                " \"query\":\""+query+"\",\n" +
-                " \"endpoint\":\""+endpoint+"\",\n" +
-                " \"type\":\""+endpointType+"\",\n" +
-                "\"description\":\""+ description + "\",\n"+
-                "\"visibility\":\""+ visibility + "\"\n"+
-                " }";*/
-    }
+
 
     public void enableAuthenticate() {
         authenticate = true;
