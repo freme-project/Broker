@@ -49,7 +49,7 @@ public class ELinkMockupEndpoint extends BaseRestController {
 	) throws IOException{
 
 
-		File file = new File("src/test/resources/mockup-endpoint-data/ldf.html");
+		File file = new File("src/test/resources/mockup-endpoint-data/ldf-resource.txt");
 		String fileContent = FileUtils.readFileToString(file);
 		HttpHeaders headers = new HttpHeaders();
 

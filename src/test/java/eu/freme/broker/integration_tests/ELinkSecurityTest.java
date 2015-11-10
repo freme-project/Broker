@@ -14,6 +14,7 @@ import eu.freme.common.persistence.model.Template;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -240,13 +241,51 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
     @Test
-    public void TestELinkExplore() throws UnirestException, IOException {
+    public void TestELinkExploreSparqlMockup() throws UnirestException, IOException {
         HttpResponse<String> response;
 
+        String rdf_resource = "http://dbpedia.org/resource/Berlin";
+        String endpoint = baseUrl+"/mockups/sparql";
+
+        rdf_resource = "http://dbpedia.org/resource/Berlin";
+
+        response=baseRequestPost("/explore")
+                .header("informat","turtle")
+                .header("outformat","turtle")
+                .queryString("endpoint-type","sparql")
+                .queryString("resource", rdf_resource)
+                .queryString("endpoint", endpoint)
+                .asString();
+
+        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+    }
+
+    @Test
+    public void TestELinkExploreLdfMockup() throws UnirestException, IOException {
 
         String rdf_resource = "http://dbpedia.org/resource/Berlin";
+        String endpoint = baseUrl+"/mockups/ldf";
+
+        HttpResponse<String> response = baseRequestPost("/explore")
+                .header("informat","turtle")
+                .header("outformat","turtle")
+                .queryString("endpoint-type","ldf")
+                .queryString("resource", rdf_resource)
+                .queryString("endpoint", endpoint)
+                .asString();
+
+        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+
+    }
+
+    //disable, when TestELinkExploreLdfMockup() and TestELinkExploreSparqlMockup() work
+    @Test
+    public void TestELinkExploreOrig() throws UnirestException, IOException {
+
+        String rdf_resource = "http://dbpedia.org/resource/abcde";
         String endpoint = "http://dbpedia.org/sparql";
-        /*
+
+        HttpResponse<String> response;
 
         response=baseRequestPost("/explore")
                 .header("informat","turtle")
@@ -267,34 +306,6 @@ public class ELinkSecurityTest extends EServiceTest {
                 .asString();
 
         validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
-        */
-        rdf_resource ="http://dbpedia.org/resource/Berlin";
-
-        endpoint = baseUrl+"/mockups/sparql";
-        response=baseRequestPost("/explore")
-                .header("informat","turtle")
-                .header("outformat","turtle")
-                .queryString("endpoint-type","sparql")
-                .queryString("resource", rdf_resource)
-                .queryString("endpoint", endpoint)
-                .asString();
-
-        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
-        /*
-        endpoint= baseUrl+"/mockups/ldf";
-        //endpoint="http://fragments.dbpedia.org/2014/en";
-//        endpoint="http://dbpedia.org/sparql";
-        response=baseRequestPost("/explore")
-                .header("informat","turtle")
-                .header("outformat","turtle")
-                .queryString("endpoint-type","ldf")
-                .queryString("resource", rdf_resource)
-                .queryString("endpoint", endpoint)
-                .asString();
-
-        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
-        */
-
 
     }
 
