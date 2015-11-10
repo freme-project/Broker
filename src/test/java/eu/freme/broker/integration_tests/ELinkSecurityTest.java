@@ -234,6 +234,66 @@ public class ELinkSecurityTest extends EServiceTest {
         }
     }
 
+    @Test
+    public void TestELinkExplore() throws UnirestException, IOException {
+        HttpResponse<String> response;
+
+
+        String rdf_resource = "http://dbpedia.org/resource/Berlin";
+        String endpoint = "http://dbpedia.org/sparql";
+        /*
+
+        response=baseRequestPost("/explore")
+                .header("informat","turtle")
+                .header("outformat","turtle")
+                .queryString("resource", rdf_resource)
+                .queryString("endpoint", endpoint)
+                .asString();
+
+        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+
+        endpoint = "http://fragments.dbpedia.org/2014/en";
+        response=baseRequestPost("/explore")
+                .header("informat","turtle")
+                .header("outformat","turtle")
+                .queryString("endpoint-type","ldf")
+                .queryString("resource", rdf_resource)
+                .queryString("endpoint", endpoint)
+                .asString();
+
+        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        */
+        rdf_resource ="http://dbpedia.org/resource/Berlin";
+
+        endpoint = baseUrl+"/mockups/sparql";
+        response=baseRequestPost("/explore")
+                .header("informat","turtle")
+                .header("outformat","turtle")
+                .queryString("endpoint-type","sparql")
+                .queryString("resource", rdf_resource)
+                .queryString("endpoint", endpoint)
+                .asString();
+
+        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        /*
+        endpoint= baseUrl+"/mockups/ldf";
+        //endpoint="http://fragments.dbpedia.org/2014/en";
+//        endpoint="http://dbpedia.org/sparql";
+        response=baseRequestPost("/explore")
+                .header("informat","turtle")
+                .header("outformat","turtle")
+                .queryString("endpoint-type","ldf")
+                .queryString("resource", rdf_resource)
+                .queryString("endpoint", endpoint)
+                .asString();
+
+        validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
+        */
+
+
+    }
+
+
     private int doELink(String nifContent, long templateId, String token) throws UnirestException, IOException {
         HttpResponse<String> response = baseRequestPost("documents", token)
                 .queryString("templateid", templateId)
