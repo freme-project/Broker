@@ -60,13 +60,12 @@ public class ELinkSecurityTest extends EServiceTest {
     @Test
     public void doNothing() {};
 
-    @Ignore
     @Test
     public void invalidTemplateId() throws Exception{
 
 
         // add a template for the first user
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "public"), tokenWithPermission);
         assertNotNull(templateid);
 
         assertEquals(HttpStatus.NOT_FOUND.value(), deleteTemplate(999, tokenWithPermission));
@@ -78,18 +77,17 @@ public class ELinkSecurityTest extends EServiceTest {
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
-    @Ignore
-    @Test
 
+    @Test
     public void testAnonymousUser() throws Exception {
         logger.info("testAnonymousUser");
 
 
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
+        long templateid = createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "public"), tokenWithPermission);
         assertNotNull(templateid);
 
         logger.info("try to create template as anonymous user... should not work");
-        Throwable exception = exceptionThrownBy(() -> createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", null));
+        Throwable exception = exceptionThrownBy(() -> createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "public"), null));
         assertEquals(AccessDeniedException.class, exception.getClass());
         logger.info("try to fetch all templates as anonymous user... should work");
         assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.singletonList(templateid), null));
@@ -105,7 +103,7 @@ public class ELinkSecurityTest extends EServiceTest {
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
-    @Ignore
+
     @Test
     public void testGetAllTemplates() throws Exception {
         logger.info("testGetAllTemplates");
@@ -113,15 +111,15 @@ public class ELinkSecurityTest extends EServiceTest {
 
         // add a template for the first user
         logger.info("create private template for user 1");
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "private"), tokenWithPermission);
         logger.info("created template with id: " + templateid);
         assertNotNull(templateid);
         logger.info("create public template for user 1");
-        long templateid1 = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "public", tokenWithPermission);
+        long templateid1 = createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "public"), tokenWithPermission);
         logger.info("created template with id: " + templateid1);
         assertNotNull(templateid1);
         logger.info("create private template for user 2");
-        long templateid2 = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithOutPermission);
+        long templateid2 = createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "private"), tokenWithOutPermission);
         logger.info("created template with id: " + templateid2);
         assertNotNull(templateid2);
 
@@ -133,14 +131,13 @@ public class ELinkSecurityTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid1, tokenWithPermission));
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid2, tokenWithOutPermission));
     }
-    @Ignore
 
     @Test
     public void testUpdateTemplate() throws Exception {
         logger.info("testUpdateTemplate");
         // add a template for the first user
         logger.info("create private template for user 1");
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "private"), tokenWithPermission);
         String template = constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql","public");
 
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission,
@@ -153,7 +150,6 @@ public class ELinkSecurityTest extends EServiceTest {
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithOutPermission));
     }
-    @Ignore
 
     @Test
     public void testTemplateHandlingWithSecurity() throws Exception {
@@ -162,7 +158,7 @@ public class ELinkSecurityTest extends EServiceTest {
 
         // add a template for the first user
         logger.info("create private template for user 1");
-        long templateid = createTemplate("src/test/resources/rdftest/e-link/sparql1.ttl", "private", tokenWithPermission);
+        long templateid = createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "private"), tokenWithPermission);
         logger.info("private template for user 1 has id: " + templateid);
         assertNotNull(templateid);
 
@@ -212,19 +208,16 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
 
-
-
-    @Ignore
     @Test
     public void testELinkDocuments() throws Exception {
         logger.info("testELinkDocuments");
 
 
         logger.info("create private template");
-        long id = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "private", tokenWithPermission);
+        long id = createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "private"), tokenWithPermission);
 
         logger.info("create public template");
-        long idPublic = createTemplate("src/test/resources/rdftest/e-link/sparql3.ttl", "public", tokenWithPermission);
+        long idPublic = createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "public"), tokenWithPermission);
 
         logger.info("read nif to enrich");
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
@@ -282,13 +275,13 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
     //Tests POST e-link/templates/
-    public long createTemplate(String filename, String visibility, String token) throws Exception {
-        String query = readFile(filename);
+    public long createTemplate(String template, String token) throws Exception {
+        //String query = readFile(filename);
 
         HttpResponse<String> response = baseRequestPost("templates", token)
                 .queryString("informat", "json")
                 .queryString("outformat", "json")
-                .body(constructTemplate("Some label", query, baseUrl+ "/mockups/sparql", "Some description", "sparql", visibility))
+                .body(template)//constructTemplate("Some label", template, baseUrl+ "/mockups/sparql", "Some description", "sparql", visibility))
                 .asString();
 
         if(response.getStatus() == HttpStatus.UNAUTHORIZED.value())
