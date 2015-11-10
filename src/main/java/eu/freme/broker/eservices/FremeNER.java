@@ -57,11 +57,16 @@ import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 import eu.freme.eservices.elink.api.DataEnricher;
 import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Value;
 
 @RestController
 @Profile("broker")
 public class FremeNER extends BaseRestController {
+    
 
+    @Value("${datasets.wandkey:default}")
+    String wandKey;
+    
     @Autowired
     EEntityService entityAPI;
         
@@ -70,6 +75,8 @@ public class FremeNER extends BaseRestController {
         
     @Autowired
     DataEnricher dataEnricher;
+    
+    private final String fremeNerEndpoint = "http://rv2622.1blu.de:8081/api";
 
     public final Set<String> SUPPORTED_LANGUAGES = new HashSet<>(Arrays.asList(new String[]{
             "en", "de", "nl", "it", "fr", "es", "ru"
@@ -96,16 +103,32 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "numLinks", required = false) String numLinksParam,
 			@RequestParam(value = "enrichement", required = false) String enrichementType,
 			@RequestParam(value = "mode", required = false) String mode,
+			@RequestParam(value = "datasetKey", required = false) String datasetKey,
             @RequestParam Map<String,String> allParams,
             @RequestBody(required = false) String postBody) {
         try {
+            
             // Check the language parameter.
            if(!SUPPORTED_LANGUAGES.contains(language)){
                     // The language specified with the langauge parameter is not supported.
                     throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
             }
 
+            if(dataset.equals("wand")) {
+                if(datasetKey != null) {
+                    if(datasetKey.equals(wandKey)) {
+                        // The user has access right to the dataset.
+                    } else {
+                        throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset" + wandKey);
+                    }
+                } else {
+                    throw new eu.freme.broker.exception.AccessDeniedException("You dont have access right for this dataset");
+                }
+            }
 
+
+           
+           
             ArrayList<String> rMode = new ArrayList<>();
             
             // Check the MODE parameter.
@@ -281,7 +304,7 @@ public class FremeNER extends BaseRestController {
 
             if (endpoint != null) {
                 // fed via SPARQL endpoint
-                return callBackend("http://139.18.2.231:8080/api/datasets?format=" + format
+                return callBackend(fremeNerEndpoint+"/datasets?format=" + format
                         + "&name=" + name
                         + "&description=" + URLEncoder.encode(description, "UTF-8")
                         + "&language=" + language
@@ -289,8 +312,9 @@ public class FremeNER extends BaseRestController {
                         + "&sparql=" + URLEncoder.encode(sparql, "UTF-8"), HttpMethod.POST, null);
             } else {
                 // datasets is sent
-                return callBackend("http://139.18.2.231:8080/api/datasets?format=" + format
+                return callBackend(fremeNerEndpoint+"/datasets?format=" + format
                         + "&name=" + name
+                        + "&description=" + URLEncoder.encode(description, "UTF-8")
                         + "&language=" + language, HttpMethod.POST, nifParameters.getInput());
             }
         } catch(Exception e){
@@ -340,7 +364,7 @@ public class FremeNER extends BaseRestController {
                         break;
                 }
 
-                return callBackend("http://139.18.2.231:8080/api/datasets" + name + "?format=" + format
+                return callBackend(fremeNerEndpoint+"/datasets/" + name + "?format=" + format
                     + "&language=" + language, HttpMethod.PUT, nifParameters.getInput());
             }catch(Exception e){
                 logger.error(e.getMessage(), e);
@@ -354,7 +378,7 @@ public class FremeNER extends BaseRestController {
             RequestMethod.GET })
 	public ResponseEntity<String> getDataset(
             @PathVariable(value = "name") String name) {
-            return callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.GET, null);
+            return callBackend(fremeNerEndpoint+"/datasets/"+name, HttpMethod.GET, null);
         }
 
         // Get info about all available datasets.
@@ -362,7 +386,7 @@ public class FremeNER extends BaseRestController {
 	@RequestMapping(value = "/e-entity/freme-ner/datasets", method = {
             RequestMethod.GET })
 	public ResponseEntity<String> getAllDatasets() {
-            return callBackend("http://139.18.2.231:8080/api/datasets", HttpMethod.GET, null);
+            return callBackend(fremeNerEndpoint+"/datasets", HttpMethod.GET, null);
         }
         
         // Removing a specific dataset.
@@ -371,7 +395,7 @@ public class FremeNER extends BaseRestController {
             RequestMethod.DELETE })
 	public ResponseEntity<String> removeDataset(
 			@PathVariable(value = "name") String name) {
-            return callBackend("http://139.18.2.231:8080/api/datasets/"+name, HttpMethod.DELETE, null);
+            return callBackend(fremeNerEndpoint+"/datasets/"+name, HttpMethod.DELETE, null);
         }
 
 

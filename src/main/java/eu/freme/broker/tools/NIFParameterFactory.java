@@ -21,6 +21,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.freme.broker.exception.BadRequestException;
+import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 
 import java.util.Arrays;
@@ -97,6 +98,12 @@ public class NIFParameterFactory {
 								+ "\"");
 			}
 			thisOutformat = rdfSerializationFormats.get(outformat);
+			
+			if(thisOutformat == RDFConstants.RDFSerialization.PLAINTEXT){
+				throw new BadRequestException(
+						"Parameter outformat has invalid value \"" + outformat
+								+ "\"");
+			}
 		} else {
 			if (!rdfSerializationFormats.containsKey(acceptHeader)) {
 				throw new BadRequestException(
@@ -104,6 +111,13 @@ public class NIFParameterFactory {
 								+ acceptHeader + "\"");
 			}
 			thisOutformat = rdfSerializationFormats.get(acceptHeader);
+			
+
+			if(thisOutformat == RDFConstants.RDFSerialization.PLAINTEXT){
+				throw new BadRequestException(
+						"Parameter outformat has invalid value \"" + acceptHeader
+								+ "\"");
+			}
 		}
 
 		String thisPrefix;

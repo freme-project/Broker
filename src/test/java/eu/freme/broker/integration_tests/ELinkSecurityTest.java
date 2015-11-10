@@ -52,9 +52,8 @@ public class ELinkSecurityTest extends EServiceTest {
     @Before
     public void replaceBaseUrl(){
         baseUrl= getBaseUrl().replace("localhost","127.0.0.1");
-        Appender f=(Appender) Logger.getRootLogger().getAllAppenders().nextElement();
-        logger.error(f.getFilter().toString());
-        logger.error(f.toString());
+        loggerIgnore(eu.freme.broker.exception.AccessDeniedException.class);
+        loggerIgnore(org.springframework.security.access.AccessDeniedException.class);
     }
 
     @Test
@@ -151,6 +150,7 @@ public class ELinkSecurityTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid,tokenWithOutPermission));
     }
 
+
     @Test
     public void testTemplateHandlingWithSecurity() throws Exception {
         logger.info("testTemplateHandlingWithSecurity");
@@ -210,6 +210,9 @@ public class ELinkSecurityTest extends EServiceTest {
 
     @Test
     public void testELinkDocuments() throws Exception {
+
+        loggerUnignore(org.springframework.security.access.AccessDeniedException.class);
+        loggerUnignore(eu.freme.broker.exception.AccessDeniedException.class);
         logger.info("testELinkDocuments");
 
 

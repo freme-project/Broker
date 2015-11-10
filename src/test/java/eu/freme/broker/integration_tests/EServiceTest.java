@@ -29,9 +29,11 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.broker.eservices.BaseRestController;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConversionService;
+import org.apache.log4j.Appender;
 import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.common.persistence.model.Template;
 import org.apache.log4j.Logger;
+import org.apache.log4j.filter.ExpressionFilter;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -41,8 +43,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import eu.freme.common.*;
 
 import static org.junit.Assert.*;
 
@@ -233,6 +233,52 @@ public abstract class EServiceTest {
         assertTrue(response.getStatus() == HttpStatus.OK.value());
         String token = new JSONObject(response.getBody()).getString("token");
         return token;
+    }
+
+    public void loggerIgnore(Throwable x){
+        loggerIgnore(x.getClass());
+    }
+    public void loggerIgnore(Class x){
+        loggerIgnore(x.getName());
+    }
+    public void loggerIgnore(String x) {
+
+        String newExpression="EXCEPTION ~="+x;
+        Appender appender=(Appender)Logger.getRootLogger().getAllAppenders().nextElement();
+
+        String oldExpression;
+        ExpressionFilter exp;
+        try {
+            exp= ((ExpressionFilter) appender.getFilter());
+            oldExpression=exp.getExpression();
+            if (!oldExpression.contains(newExpression)) {
+                exp.setExpression(oldExpression+" || " + newExpression);
+                exp.activateOptions();
+            }
+        } catch (NullPointerException e) {
+            exp= new ExpressionFilter();
+            exp.setExpression(newExpression);
+            exp.setAcceptOnMatch(false);
+            exp.activateOptions();
+            appender.clearFilters();
+            appender.addFilter(exp);
+        }
+    }
+
+    public void loggerUnignore(Class x) {
+        loggerUnignore(x.getName());
+    }
+
+    public void loggerUnignore(String x) {
+
+        Appender appender=(Appender)Logger.getRootLogger().getAllAppenders().nextElement();
+
+        ExpressionFilter exp= ((ExpressionFilter) appender.getFilter());
+        exp.setExpression(exp.getExpression().replace("|| EXCEPTION ~="+x,"").replace("EXCEPTION ~="+x+ "||",""));
+        exp.activateOptions();
+        appender.clearFilters();
+        appender.addFilter(exp);
+
     }
 
 }
