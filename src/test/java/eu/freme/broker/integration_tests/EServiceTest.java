@@ -58,6 +58,8 @@ public abstract class EServiceTest {
     public static String tokenWithOutPermission;
     public static String tokenAdmin;
 
+    public static final String accessDeniedExceptions = "eu.freme.broker.exception.AccessDeniedException || EXCEPTION ~=org.springframework.security.access.AccessDeniedException";
+
     protected final String usernameWithPermission = "userwithpermission";
     protected final String passwordWithPermission = "testpassword";
     protected final String usernameWithoutPermission = "userwithoutpermission";
@@ -214,9 +216,6 @@ public abstract class EServiceTest {
         return token;
     }
 
-    public void loggerIgnore(Throwable x){
-        loggerIgnore(x.getClass());
-    }
     public void loggerIgnore(Class x){
         loggerIgnore(x.getName());
     }

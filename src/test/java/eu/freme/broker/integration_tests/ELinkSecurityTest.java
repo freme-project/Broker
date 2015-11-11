@@ -51,12 +51,7 @@ public class ELinkSecurityTest extends EServiceTest {
     @Before
     public void replaceBaseUrl(){
         baseUrl= getBaseUrl().replace("localhost","127.0.0.1");
-        loggerIgnore(eu.freme.broker.exception.AccessDeniedException.class);
-        loggerIgnore(org.springframework.security.access.AccessDeniedException.class);
     }
-
-    @Test
-    public void doNothing() {};
 
     @Test
     public void invalidTemplateId() throws Exception{
@@ -94,10 +89,15 @@ public class ELinkSecurityTest extends EServiceTest {
         logger.info("try to use e-link with public template as anonymous user... should work");
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
         assertEquals(HttpStatus.OK.value(), doELink(nifContent, templateid, null));
+
+
+
+        loggerIgnore(accessDeniedExceptions);
         logger.info("try to update a public template as anonymous user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate(templateid, null, constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"), baseUrl+ "/mockups/sparql", "Some description", "sparql", "private"),null));
         logger.info("try to delete public template as anonymous user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteTemplate(templateid, null));
+        loggerUnignore(accessDeniedExceptions);
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
@@ -164,8 +164,11 @@ public class ELinkSecurityTest extends EServiceTest {
         // User without permission should not be able to query, update or delete another user's private template
         // User with permission should
         // Public templates can be queried, but not updated or deleted by another user.
+
+        loggerIgnore(accessDeniedExceptions);
         logger.info("try to fetch private template as other user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), getTemplate(templateid, tokenWithOutPermission));
+        loggerUnignore(accessDeniedExceptions);
         logger.info("try to fetch private template as owner... should work");
         assertEquals(HttpStatus.OK.value(), getTemplate(templateid, tokenWithPermission));
         logger.info("fetch all templates as other user... should return an empty list");
@@ -173,11 +176,12 @@ public class ELinkSecurityTest extends EServiceTest {
         logger.info("fetch all templates as owner... should return template: "+templateid);
         assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.singletonList(templateid), tokenWithPermission));
         logger.info("try to update private template as other user... should not work");
+        loggerIgnore(accessDeniedExceptions);
         assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate(templateid, tokenWithOutPermission,
                 constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),baseUrl+ "/mockups/sparql", "Some description", "sparql", "private"), null));
         logger.info("try to delete private template as other user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteTemplate(templateid, tokenWithOutPermission));
-
+        loggerUnignore(accessDeniedExceptions);
         logger.info("try to update private template as owner. Set visibility to public... should work");
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission,
                 constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),baseUrl+ "/mockups/sparql", "Some description", "sparql", "public"), null));
@@ -191,17 +195,19 @@ public class ELinkSecurityTest extends EServiceTest {
         logger.info("fetch all templates as owner... should return template: "+templateid);
         assertEquals(HttpStatus.OK.value(), getAllTemplates(Collections.singletonList(templateid), tokenWithPermission));
         logger.info("try to update public template as other user... should not work");
+        loggerIgnore(accessDeniedExceptions);
         assertEquals(HttpStatus.UNAUTHORIZED.value(), updateTemplate(templateid, tokenWithOutPermission,
                 constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),baseUrl+ "/mockups/sparql", "Some description", "sparql", "private"),  null));
         logger.info("try to delete public template as other user... should not work");
         assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteTemplate(templateid, tokenWithOutPermission));
-
+        loggerUnignore(accessDeniedExceptions);
         logger.info("try to set public template to private as owner. Set visibility to private... should work");
         assertEquals(HttpStatus.OK.value(), updateTemplate(templateid, tokenWithPermission,
                 constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql3.ttl"),baseUrl+ "/mockups/sparql", "Some description", "sparql", "private"), null));
         logger.info("re-try to fetch private template as other user... should not work");
+        loggerIgnore(accessDeniedExceptions);
         assertEquals(HttpStatus.UNAUTHORIZED.value(), getTemplate(templateid, tokenWithOutPermission));
-
+        loggerUnignore(accessDeniedExceptions);
         logger.info("try to delete private template as owner... should work");
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }
@@ -210,8 +216,6 @@ public class ELinkSecurityTest extends EServiceTest {
     @Test
     public void testELinkDocuments() throws Exception {
 
-        loggerUnignore(org.springframework.security.access.AccessDeniedException.class);
-        loggerUnignore(eu.freme.broker.exception.AccessDeniedException.class);
         logger.info("testELinkDocuments");
 
 
@@ -225,7 +229,9 @@ public class ELinkSecurityTest extends EServiceTest {
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
         try {
             logger.info("try to enrich via private template as other user... should not work");
+            loggerIgnore(accessDeniedExceptions);
             assertEquals(HttpStatus.UNAUTHORIZED.value(), doELink(nifContent, id, tokenWithOutPermission));
+            loggerUnignore(accessDeniedExceptions);
             logger.info("try to enrich via private template as template owner... should work");
             assertEquals(HttpStatus.OK.value(), doELink(nifContent, id, tokenWithPermission));
             logger.info("try to enrich via public template as other user... should work");
