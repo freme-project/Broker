@@ -2,6 +2,7 @@ package eu.freme.broker.integration_tests.mockups;
 
 import java.io.File;
 import java.io.IOException;
+import org.apache.log4j.Logger;
 
 import eu.freme.broker.eservices.BaseRestController;
 import org.apache.commons.io.FileUtils;
@@ -17,14 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ELinkMockupEndpoint extends BaseRestController {
-	
+
+
 	@RequestMapping("/mockups/sparql")
 	public ResponseEntity<String> sendRDFsparql(
 			@RequestHeader( value="outformat", required=false) String outformat,
 			@RequestHeader( value="Content-Type", required=false) String contentType
 
 	) throws IOException{
-
 		File file = new File("src/test/resources/mockup-endpoint-data/dbpedia-spotlight.txt");
 		String fileContent = FileUtils.readFileToString(file);		
 		HttpHeaders headers = new HttpHeaders();
