@@ -48,6 +48,8 @@ public class ELinkSecurityTest extends EServiceTest {
     private String baseUrl;
     private String mockupEnrichUrl;
 
+    private static final String notFoundException = "eu.freme.common.exception.OwnedResourceNotFoundException || EXCEPTION ~=eu.freme.common.exception.TemplateNotFoundException";
+
     @Before
     public void replaceBaseUrl(){
         baseUrl= getBaseUrl().replace("localhost","127.0.0.1");
@@ -62,12 +64,13 @@ public class ELinkSecurityTest extends EServiceTest {
         long templateid = createTemplate(constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), mockupEnrichUrl, "Some description", "sparql", "public"), tokenWithPermission);
         assertNotNull(templateid);
 
+        loggerIgnore(notFoundException);
         assertEquals(HttpStatus.NOT_FOUND.value(), deleteTemplate(999, tokenWithPermission));
         assertEquals(HttpStatus.NOT_FOUND.value(), getTemplate(999, tokenWithPermission));
         assertEquals(HttpStatus.NOT_FOUND.value(), updateTemplate(999, tokenWithPermission, constructTemplate("Some label", readFile("src/test/resources/rdftest/e-link/sparql1.ttl"), mockupEnrichUrl, "Some description", "sparql", "public"), null));
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
         assertEquals(HttpStatus.NOT_FOUND.value(), doELink(nifContent, 999, tokenWithOutPermission));
-
+        loggerUnignore(notFoundException);
 
         assertEquals(HttpStatus.OK.value(), deleteTemplate(templateid, tokenWithPermission));
     }

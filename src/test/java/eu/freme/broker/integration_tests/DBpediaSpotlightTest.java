@@ -35,7 +35,7 @@ import eu.freme.common.conversion.rdf.RDFConstants;
 /**
  * Created by jonathan on 28.07.15.
  */
-@Ignore
+
 public class DBpediaSpotlightTest extends EServiceTest {
 
 
