@@ -42,7 +42,7 @@ public class FremeNERTest extends EServiceTest {
 
     String[] availableLanguages = {"en","de","it","nl","fr","es"};
     String dataset = "dbpedia";
-    String testinput= "Enrich this Content please";
+    String testinput= "This is Germany";
 
 
     public FremeNERTest(){super("/e-entity/freme-ner/");}

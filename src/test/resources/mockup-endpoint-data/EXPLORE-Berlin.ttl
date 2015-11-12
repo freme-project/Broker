@@ -1,0 +1,308 @@
+<http://dbpedia.org/resource/Berlin>
+        a       <http://dbpedia.org/class/yago/Object100002684> , <http://dbpedia.org/class/yago/Capital108518505> , <http://www.ontologydesignpatterns.org/ont/d0.owl#Location> , <http://dbpedia.org/ontology/AdministrativeRegion> , <http://dbpedia.org/class/yago/GermanStateCapitals> , <http://dbpedia.org/class/yago/Region108630985> , <http://dbpedia.org/ontology/Region> , <http://dbpedia.org/class/yago/YagoGeoEntity> , <http://dbpedia.org/class/yago/Center108523483> , <http://dbpedia.org/class/yago/Site108651247> , <http://schema.org/AdministrativeArea> , <http://dbpedia.org/ontology/PopulatedPlace> , <http://dbpedia.org/class/yago/CapitalsInEurope> , <http://dbpedia.org/class/yago/Tract108673395> , <http://dbpedia.org/class/yago/Seat108647945> , <http://dbpedia.org/class/yago/AdministrativeDistrict108491826> , <http://dbpedia.org/class/yago/Country108544813> , <http://umbel.org/umbel/rc/Location_Underspecified> , <http://dbpedia.org/ontology/Place> , <http://www.opengis.net/gml/_Feature> , <http://dbpedia.org/class/yago/HostCitiesOfTheSummerOlympicGames> , <http://dbpedia.org/ontology/Wikidata:Q532> , <http://umbel.org/umbel/rc/Village> , <http://umbel.org/umbel/rc/PopulatedPlace> , <http://dbpedia.org/class/yago/City108524735> , <http://dbpedia.org/class/yago/Area108497294> , <http://dbpedia.org/class/yago/UrbanArea108675967> , <http://dbpedia.org/class/yago/YagoLegalActorGeo> , <http://umbel.org/umbel/rc/City> , <http://dbpedia.org/class/yago/District108552138> , <http://dbpedia.org/class/yago/EuropeanCapitalsOfCulture> , <http://dbpedia.org/class/yago/StateCapital108695539> , <http://schema.org/Place> , <http://dbpedia.org/class/yago/StatesAndTerritoriesEstablishedIn1237> , <http://dbpedia.org/class/yago/PhysicalEntity100001930> , <http://dbpedia.org/class/yago/Location100027167> , <http://dbpedia.org/class/yago/PopulatedPlacesEstablishedInThe13thCentury> , <http://dbpedia.org/class/yago/StatesOfGermany> , <http://dbpedia.org/class/yago/GeographicalArea108574314> , <http://dbpedia.org/class/yago/Municipality108626283> , <http://dbpedia.org/class/yago/YagoPermanentlyLocatedEntity> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Berlin (/bərˈlɪn/; German pronunciation: [bɛɐ̯ˈliːn] ) is the capital city of Germany and one of the 16 states of Germany. With a population of 3.4 million people, Berlin is Germany's largest city, the second most populous city proper, and the seventh most populous urban area in the European Union. Located in northeastern Germany on the River Spree, it is the center of the Berlin-Brandenburg Metropolitan Region, which has about 4.5 million residents from over 180 nations."@en ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "Berlin"@fr , "Berlin"@en , "Berlin"@de , "Berlin"@pl , "Берлин"@ru , "ベルリン"@ja , "Berlín"@es , "برلين"@ar , "Berlino"@it , "Berlim"@pt , "柏林"@zh , "Berlijn"@nl ;
+        <http://dbpedia.org/ontology/PopulatedPlace/areaTotal>
+                "891.85"^^<http://dbpedia.org/datatype/squareKilometre> ;
+        <http://dbpedia.org/ontology/abstract>
+                "Berlin (/bərˈlɪn/; German pronunciation: [bɛɐ̯ˈliːn] ) is the capital city of Germany and one of the 16 states of Germany. With a population of 3.4 million people, Berlin is Germany's largest city, the second most populous city proper, and the seventh most populous urban area in the European Union. Located in northeastern Germany on the River Spree, it is the center of the Berlin-Brandenburg Metropolitan Region, which has about 4.5 million residents from over 180 nations. Due to its location in the European Plain, Berlin is influenced by a temperate seasonal climate. Around one third of the city's area is composed of forests, parks, gardens, rivers and lakes.First documented in the 13th century, Berlin became the capital of the Kingdom of Prussia (1701–1918), the German Empire (1871–1918), the Weimar Republic (1919–33) and the Third Reich (1933–45). Berlin in the 1920s was the third largest municipality in the world. After World War II, the city, along with the German state, was divided - into East Berlin — capital of the German Democratic Republic, colloquially identified in English as East Germany — and West Berlin, a political exclave (surrounded by the Berlin Wall from 1961 to 1989) and a de facto state of the Federal Republic of Germany, known colloquially in English as West Germany from 1949 to 1990. Following German reunification in 1990, the city was once more designated as the capital of all Germany.Berlin is a world city of culture, politics, media, and science, hosting 147 foreign embassies. Its economy is primarily based on high-tech industries and the service sector, encompassing a diverse range of creative industries, research facilities, media corporations, and convention venues. Berlin also serves as a continental hub for air and rail transport and is a popular tourist destination. Significant industries include IT, pharmaceuticals, biomedical engineering, biotechnology, electronics, traffic engineering, and renewable energy.Berlin is home to renowned universities, research institutes, orchestras, museums, and celebrities and is host to many sporting events. Its urban setting and historical legacy have made it a popular location for international film productions. The city is well known for its festivals, diverse architecture, nightlife, contemporary arts, public transportation networks, and an extremely high quality of living."@en ;
+        <http://dbpedia.org/ontology/areaCode>
+                "030" ;
+        <http://dbpedia.org/ontology/areaTotal>
+                8.9185E8 ;
+        <http://dbpedia.org/ontology/country>
+                <http://dbpedia.org/resource/Germany> ;
+        <http://dbpedia.org/ontology/elevation>
+                "34.0"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/ontology/leader>
+                <http://dbpedia.org/resource/Klaus_Wowereit> ;
+        <http://dbpedia.org/ontology/leaderParty>
+                <http://dbpedia.org/resource/Christian_Democratic_Union_(Germany)> , <http://dbpedia.org/resource/Social_Democratic_Party_of_Germany> ;
+        <http://dbpedia.org/ontology/leaderTitle>
+                "Governing Mayor"@en ;
+        <http://dbpedia.org/ontology/populationAsOf>
+                "2013-10-31"^^<http://www.w3.org/2001/XMLSchema#date> ;
+        <http://dbpedia.org/ontology/populationTotal>
+                "3415091"^^<http://www.w3.org/2001/XMLSchema#nonNegativeInteger> ;
+        <http://dbpedia.org/ontology/postalCode>
+                "10115–14199" ;
+        <http://dbpedia.org/ontology/thumbnail>
+                <http://commons.wikimedia.org/wiki/Special:FilePath/Berlin_Montage_4.jpg?width=300> ;
+        <http://dbpedia.org/ontology/wikiPageExternalLink>
+                <http://www.berlin.de/international/index.en.php> , <http://www.exberliner.com/> , <http://berlin.unlike.net/> , <http://www.berlin.de/en/> ;
+        <http://dbpedia.org/ontology/wikiPageID>
+                3354 ;
+        <http://dbpedia.org/ontology/wikiPageRevisionID>
+                606295350 ;
+        <http://dbpedia.org/property/align>
+                "right"@en ;
+        <http://dbpedia.org/property/aprHighC>
+                "13.2"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/aprLowC>
+                "4.2"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/aprMeanC>
+                "8.7"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/aprRainDays>
+                "7.8"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/aprRainMm>
+                "37.1"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/aprSun>
+                159 ;
+        <http://dbpedia.org/property/area>
+                "891.85"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/augHighC>
+                "23.6"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/augLowC>
+                "14.1"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/augMeanC>
+                "18.9"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/augRainDays>
+                7 ;
+        <http://dbpedia.org/property/augRainMm>
+                "58.2"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/augSun>
+                "210.8"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/blankInfoSec>
+                <http://dbpedia.org/resource/.berlin> ;
+        <http://dbpedia.org/property/blankNameSec>
+                <http://dbpedia.org/resource/GeoTLD> ;
+        <http://dbpedia.org/property/caption>
+                "Brandenburg Gate at blue hour"@en , "Berlin Mitte skyline in the 21st century. Landmarks from left to right: Reichstag, Fernsehturm Berlin, Berliner Dom, City hall, Brandenburg Gate"@en , "Looking through Karl-Liebknecht-Straße and Berlin Cathedral"@en ;
+        <http://dbpedia.org/property/coaSize>
+                70 ;
+        <http://dbpedia.org/property/coordinatesDisplay>
+                "display=inline, title"@en ;
+        <http://dbpedia.org/property/date>
+                "September 2010"@en , "April 2013"@en ;
+        <http://dbpedia.org/property/decHighC>
+                "4.4"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/decLowC>
+                "−0.4"@en ;
+        <http://dbpedia.org/property/decMeanC>
+                2 ;
+        <http://dbpedia.org/property/decRainDays>
+                "11.4"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/decRainMm>
+                "55.3"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/decSun>
+                "37.2"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/demonym>
+                "Berliner"@en ;
+        <http://dbpedia.org/property/divisions>
+                12 ;
+        <http://dbpedia.org/property/elevation>
+                34 ;
+        <http://dbpedia.org/property/febHighC>
+                "4.2"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/febLowC>
+                "−1.6"@en ;
+        <http://dbpedia.org/property/febMeanC>
+                "1.3"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/febRainDays>
+                8 ;
+        <http://dbpedia.org/property/febRainMm>
+                "33.3"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/febSun>
+                "73.5"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/flag>
+                "Flag_of_Berlin.svg"@en ;
+        <http://dbpedia.org/property/float>
+                "left"@en ;
+        <http://dbpedia.org/property/gdp>
+                "101.4"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/gdpYear>
+                2011 ;
+        <http://dbpedia.org/property/hasPhotoCollection>
+                <http://wifo5-03.informatik.uni-mannheim.de/flickrwrappr/photos/Berlin> ;
+        <http://dbpedia.org/property/image>
+                "Cityscape Berlin.jpg"@en , "Berlin view from Park Inn 03.jpg"@en , "Berlin Brandenburger Tor Abend.jpg"@en ;
+        <http://dbpedia.org/property/imageCaption>
+                "Clockwise: Charlottenburg Palace, Fernsehturm Berlin, Reichstag building, Berlin Cathedral, Alte Nationalgalerie, Potsdamer Platz and Brandenburg Gate."@en ;
+        <http://dbpedia.org/property/isoRegion>
+                "DE-BE"@en ;
+        <http://dbpedia.org/property/janHighC>
+                "2.9"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/janLowC>
+                "−1.5"@en ;
+        <http://dbpedia.org/property/janMeanC>
+                "0.5"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/janRainDays>
+                10 ;
+        <http://dbpedia.org/property/janRainMm>
+                "42.3"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/janSun>
+                "46.5"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/julHighC>
+                24 ;
+        <http://dbpedia.org/property/julLowC>
+                "14.7"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/julMeanC>
+                19 ;
+        <http://dbpedia.org/property/julRainDays>
+                7 ;
+        <http://dbpedia.org/property/julRainMm>
+                "55.5"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/julSun>
+                217 ;
+        <http://dbpedia.org/property/junHighC>
+                "21.8"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/junLowC>
+                "12.3"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/junMeanC>
+                17 ;
+        <http://dbpedia.org/property/junRainDays>
+                7 ;
+        <http://dbpedia.org/property/junRainMm>
+                "68.7"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/junSun>
+                222 ;
+        <http://dbpedia.org/property/kfz>
+                "B( )"@en ;
+        <http://dbpedia.org/property/latd>
+                52 ;
+        <http://dbpedia.org/property/latm>
+                31 ;
+        <http://dbpedia.org/property/leader>
+                "Klaus Wowereit"@en ;
+        <http://dbpedia.org/property/leaderParty>
+                "SPD"@en ;
+        <http://dbpedia.org/property/leaderTitle>
+                <http://dbpedia.org/resource/Governing_Mayor_of_Berlin> ;
+        <http://dbpedia.org/property/left>
+                "religion"@en ;
+        <http://dbpedia.org/property/location>
+                "Berlin"@en ;
+        <http://dbpedia.org/property/longd>
+                13 ;
+        <http://dbpedia.org/property/longm>
+                23 ;
+        <http://dbpedia.org/property/map>
+                "Berlin in Germany and EU.png"@en ;
+        <http://dbpedia.org/property/mapSize>
+                270 ;
+        <http://dbpedia.org/property/mapText>
+                "Location within European Union and Germany"@en ;
+        <http://dbpedia.org/property/marHighC>
+                "8.5"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/marLowC>
+                "1.3"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/marMeanC>
+                "4.9"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/marRainDays>
+                "9.1"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/marRainMm>
+                "40.5"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/marSun>
+                "120.9"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/mayHighC>
+                "18.9"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/mayLowC>
+                9 ;
+        <http://dbpedia.org/property/mayMeanC>
+                14 ;
+        <http://dbpedia.org/property/mayRainDays>
+                "8.9"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/mayRainMm>
+                "53.8"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/maySun>
+                "220.1"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/metricFirst>
+                "yes"@en ;
+        <http://dbpedia.org/property/name>
+                "Berlin"@en ;
+        <http://dbpedia.org/property/novHighC>
+                "7.1"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/novLowC>
+                "2.2"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/novMeanC>
+                "4.7"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/novRainDays>
+                "9.6"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/novRainMm>
+                "43.6"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/novSun>
+                51 ;
+        <http://dbpedia.org/property/nuts>
+                "DE3"@en ;
+        <http://dbpedia.org/property/octHighC>
+                "13.4"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/octLowC>
+                "6.4"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/octMeanC>
+                "9.9"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/octRainDays>
+                "7.6"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/octRainMm>
+                "37.3"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/octSun>
+                "111.6"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/plz>
+                10115 ;
+        <http://dbpedia.org/property/popDate>
+                "2013-10-31"^^<http://www.w3.org/2001/XMLSchema#date> ;
+        <http://dbpedia.org/property/population>
+                3415091 ;
+        <http://dbpedia.org/property/right>
+                "percent"@en ;
+        <http://dbpedia.org/property/rulingParty>
+                <http://dbpedia.org/resource/Social_Democratic_Party_of_Germany> , <http://dbpedia.org/resource/Christian_Democratic_Union_(Germany)> ;
+        <http://dbpedia.org/property/sepHighC>
+                "18.8"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/sepLowC>
+                "10.6"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/sepMeanC>
+                "14.7"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/sepRainDays>
+                "7.8"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/sepRainMm>
+                "45.1"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/sepSun>
+                156 ;
+        <http://dbpedia.org/property/singleLine>
+                "yes"@en ;
+        <http://dbpedia.org/property/source>
+                "World Meteorological Organization , HKO"@en ;
+        <http://dbpedia.org/property/state>
+                "Berlin"@en ;
+        <http://dbpedia.org/property/stateCoa>
+                "Coat of arms of Berlin.svg"@en ;
+        <http://dbpedia.org/property/title>
+                "Religion in Berlin - 2010"@en ;
+        <http://dbpedia.org/property/unLocode>
+                "DEBER"@en ;
+        <http://dbpedia.org/property/unitRainDays>
+                "1.0"^^<http://dbpedia.org/datatype/millimetre> ;
+        <http://dbpedia.org/property/vorwahl>
+                30 ;
+        <http://dbpedia.org/property/votes>
+                4 ;
+        <http://dbpedia.org/property/website>
+                <http://www.berlin.de/international/index.en.php> ;
+        <http://dbpedia.org/property/width>
+                360 , 125 , 285 ;
+        <http://dbpedia.org/property/yearHighC>
+                "13.4"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/yearLowC>
+                "5.9"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://dbpedia.org/property/yearSun>
+                "1625.6"^^<http://www.w3.org/2001/XMLSchema#double> ;
+        <http://purl.org/dc/terms/subject>
+                <http://dbpedia.org/resource/Category:Populated_places_established_in_the_13th_century> , <http://dbpedia.org/resource/Category:Cities_with_millions_of_inhabitants> , <http://dbpedia.org/resource/Category:Members_of_the_Hanseatic_League> , <http://dbpedia.org/resource/Category:Berlin> , <http://dbpedia.org/resource/Category:Capitals_in_Europe> , <http://dbpedia.org/resource/Category:City-states> , <http://dbpedia.org/resource/Category:German_state_capitals> ;
+        <http://www.georss.org/georss/point>
+                "52.516666666666666 13.383333333333333" ;
+        <http://www.w3.org/2002/07/owl#sameAs>
+                <http://de.dbpedia.org/resource/Berlin> , <http://yago-knowledge.org/resource/Berlin> , <http://el.dbpedia.org/resource/Βερολίνο> , <http://pl.dbpedia.org/resource/Berlin> , <http://ja.dbpedia.org/resource/ベルリン> , <http://it.dbpedia.org/resource/Berlino> , <http://cs.dbpedia.org/resource/Berlín> , <http://es.dbpedia.org/resource/Berlín> , <http://pt.dbpedia.org/resource/Berlim> , <http://gadm.geovocab.org/id/3_22976> , <http://sws.geonames.org/6547383/> , <http://www4.wiwiss.fu-berlin.de/eurostat/resource/regions/Berlin> , <http://sw.cyc.com/concept/Mx4rvVjrhpwpEbGdrcN5Y29ycA> , <http://linkedgeodata.org/triplify/node240109189> , <http://nl.dbpedia.org/resource/Berlijn> , <http://fr.dbpedia.org/resource/Berlin> , <http://sws.geonames.org/2950157/> , <http://id.dbpedia.org/resource/Berlin> , <http://eu.dbpedia.org/resource/Berlin> , <http://sws.geonames.org/2950159/> , <http://wikidata.dbpedia.org/resource/Q64> , <http://rdf.freebase.com/ns/m.0156q> , <http://ko.dbpedia.org/resource/베를린> , <http://wikidata.org/entity/Q64> ;
+        <http://www.w3.org/2003/01/geo/wgs84_pos#lat>
+                "52.516666666666666"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <http://www.w3.org/2003/01/geo/wgs84_pos#long>
+                "13.383333333333333"^^<http://www.w3.org/2001/XMLSchema#float> ;
+        <http://www.w3.org/ns/prov#wasDerivedFrom>
+                <http://en.wikipedia.org/wiki/Berlin?oldid=606295350> ;
+        <http://xmlns.com/foaf/0.1/depiction>
+                <http://commons.wikimedia.org/wiki/Special:FilePath/Berlin_Montage_4.jpg> ;
+        <http://xmlns.com/foaf/0.1/homepage>
+                <http://www.berlin.de/international/index.en.php> ;
+        <http://xmlns.com/foaf/0.1/isPrimaryTopicOf>
+                <http://en.wikipedia.org/wiki/Berlin> .
