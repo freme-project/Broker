@@ -63,10 +63,12 @@ public class FremeNERTest extends EServiceTest {
 
         String testDatasetName = "integration-test-dataset";
 
-
+        logger.info("check if the test-dataset is already available (via get request)...");
+        loggerIgnore("eu.freme.broker.exception.ExternalServiceFailedException || EXCEPTION ~=org.springframework.web.client.HttpClientErrorException");
         HttpResponse<String> response= baseRequestGet("datasets/"+testDatasetName).asString();
+        loggerUnignore("eu.freme.broker.exception.ExternalServiceFailedException || EXCEPTION ~=org.springframework.web.client.HttpClientErrorException");
         if (response.getStatus()!=200) {
-
+            logger.info("assume the test-dataset is not available yet, create it...");
             response=baseRequestPost("datasets")
                     .queryString("informat", "n-triples")
                     .queryString("description","Test-Description")
@@ -76,6 +78,7 @@ public class FremeNERTest extends EServiceTest {
                     .asString();
             assertTrue(response.getStatus()<=201);
         }
+        logger.info("query the test-dataset...");
         response= baseRequestGet("datasets/"+testDatasetName)
                 .queryString("outformat","turtle").asString();
         assertTrue(response.getStatus()==200);
@@ -87,6 +90,7 @@ public class FremeNERTest extends EServiceTest {
                 .body(testUpdatedDataset).asString();
 
         */
+        logger.info("delete the test-dataset...");
         response=baseRequestDelete("datasets/" + testDatasetName).asString();
         assertTrue(response.getStatus()==200);
 
