@@ -39,4 +39,29 @@ public class MockupEndpoint extends BaseRestController {
 		return response;
 	}
 
+	// use regEx to include the file extension
+	@RequestMapping("/mockups/tilde-translate/{filename}/{sourceLang}/{targetLang}")
+	public ResponseEntity<String> sendRDFfileContentTranslate(
+			@RequestHeader( value="outformat", required=false) String outformat,
+			@RequestHeader( value="Content-Type", required=false) String contentType,
+			@PathVariable String sourceLang,
+			@PathVariable String targetLang,
+			@PathVariable String filename
+
+	) throws IOException{
+
+		File file = new File("src/test/resources/mockup-endpoint-data/"+filename);
+		String fileContent = FileUtils.readFileToString(file);
+		HttpHeaders headers = new HttpHeaders();
+
+		contentType= (contentType == null) ? "text/turtle" : contentType;
+
+		headers.add("Content-Type", contentType);
+		outformat= (outformat == null) ? "turtle" : outformat;
+		headers.add("outformat",outformat);
+
+		ResponseEntity<String> response = new ResponseEntity<String>(fileContent, headers, HttpStatus.OK);
+		return response;
+	}
+
 }
