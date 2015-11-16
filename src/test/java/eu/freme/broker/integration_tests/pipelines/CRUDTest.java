@@ -72,9 +72,10 @@ public class CRUDTest extends PipelinesCommon {
 		assertEquals(pipelineInfo.getSerializedRequests(), readPipeline.getSerializedRequests());
 
 		// now try to read pipeline with other user
-		logger.info("You will see some AccessDeniedExceptions - this is OK.");
+		loggerIgnore(accessDeniedExceptions);
 		HttpResponse<String> readResponseOther = baseRequestGet("templates/" + id, tokenWithOutPermission).asString();
 		assertEquals(HttpStatus.SC_UNAUTHORIZED, readResponseOther.getStatus());
+		loggerUnignore(accessDeniedExceptions);
 		logger.info("Response for unauthorized user: " + readResponseOther.getBody());
 
 		deleteTemplate(tokenWithPermission, id, HttpStatus.SC_OK);
