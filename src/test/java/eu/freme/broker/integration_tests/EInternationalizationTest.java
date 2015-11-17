@@ -106,6 +106,18 @@ public class EInternationalizationTest extends EServiceTest {
 
 		assertEquals(response.getStatus(), 200);
 		assertTrue(response.getBody().length() > 0);
+		
+		String longHtml = FileUtils.readFileToString(new File(
+				"src/test/resources/e-internationalization/long-html.html"));
+		response = Unirest
+				.post(super.getBaseUrl() + "/e-entity/freme-ner/documents")
+				.queryString("language", "en")
+				.queryString("dataset", "dbpedia")
+				.queryString("informat", "text/html")
+				.queryString("outformat", "text/html").body(longHtml).asString();
+
+		assertEquals(response.getStatus(), 200);
+		assertTrue(response.getBody().length() > 0);
 	}
 
 	@Test

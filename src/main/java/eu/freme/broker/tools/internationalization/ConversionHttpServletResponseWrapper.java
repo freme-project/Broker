@@ -35,12 +35,7 @@ public class ConversionHttpServletResponseWrapper extends
 	/*
 	 * this stream takes original file and
 	 */
-	ConversionOutputStream conversionStream;
-
-	/*
-	 * this holds the output stream that can be written to the user.
-	 */
-	ServletOutputStream originalOutputStream;
+	DummyOutputStream conversionStream;
 
 	EInternationalizationAPI api;
 
@@ -53,30 +48,31 @@ public class ConversionHttpServletResponseWrapper extends
 		this.api = api;
 		markupInTurtle = new ReaderInputStream(api.convertToTurtleWithMarkups(
 				originalRequest, informat));
-		originalOutputStream = response.getOutputStream();
-		conversionStream = new ConversionOutputStream();
+		//originalOutputStream = response.getOutputStream();
+		conversionStream = new DummyOutputStream();
 	}
 
 	public ServletOutputStream getOutputStream() {
 		return conversionStream;
 	}
 
-	public void writeBackToClient(byte[] data) throws IOException {
-		InputStream enrichedData = new ByteArrayInputStream(data);
+	public byte[] writeBackToClient() throws IOException {
+		InputStream enrichedData = conversionStream.getInputStream();
 		Reader reader = api.convertBack(markupInTurtle, enrichedData);
 		BufferedInputStream is = new BufferedInputStream(new ReaderInputStream(
 				reader));
 		byte[] buffer = new byte[1024];
 		int read = 0;
-		int length = 0;
+		long length = 0;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		while ((read = is.read(buffer)) != -1) {
 			length += read;
-			originalOutputStream.write(buffer, 0, read);
+			baos.write(buffer, 0, read);
 		}
 		is.close();
-		this.setContentLength(length);
-		originalOutputStream.flush();
-		originalOutputStream.close();
+		setContentLengthLong(length);
+		
+		return baos.toByteArray();
 	}
 
 	@Override
@@ -84,17 +80,9 @@ public class ConversionHttpServletResponseWrapper extends
 		super.flushBuffer();
 	}
 
-	class ConversionOutputStream extends ServletOutputStream {
-
-		/*
-		 * this buffer records the output stream of the underlying API call.
-		 */
-		ByteArrayOutputStream baos;
-		boolean finished = false;
-
-		public ConversionOutputStream() {
-			baos = new ByteArrayOutputStream();
-		}
+	class DummyOutputStream extends ServletOutputStream{
+		
+		private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
 		@Override
 		public boolean isReady() {
@@ -107,34 +95,12 @@ public class ConversionHttpServletResponseWrapper extends
 
 		@Override
 		public void write(int b) throws IOException {
-			if (!finished) {
-				baos.write(b);
-			}
+			buffer.write(b);
 		}
-
-		@Override
-		public void write(byte[] b) throws IOException {
-			if (!finished) {
-				baos.write(b);
-			}
-		}
-
-		@Override
-		public void write(byte[] b, int off, int len) throws IOException {
-			if (!finished) {
-				baos.write(b, off, len);
-			}
-		}
-
-		@Override
-		public void flush() throws IOException {
-			super.flush();
-			if (!finished) {
-				byte[] data = baos.toByteArray();
-				baos.reset();
-				writeBackToClient(data);
-			}
-			finished = true;
+		
+		public InputStream getInputStream(){
+			return new ByteArrayInputStream(buffer.toByteArray());
 		}
 	}
+
 }
