@@ -55,7 +55,7 @@ public class Broker {
 
 	@Value("${workspace.location}")
 	String workspaceLocation;
-	
+
     @Bean
     public RDFELinkSerializationFormats eLinkRdfFormats(){
     	return new RDFELinkSerializationFormats();

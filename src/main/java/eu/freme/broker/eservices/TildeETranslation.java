@@ -20,6 +20,7 @@ package eu.freme.broker.eservices;
 import com.google.common.base.Strings;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +55,8 @@ public class TildeETranslation extends BaseRestController {
 	@Autowired
 	TranslationConversionService translationConversionService;
 
-	private String endpoint = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
+	@Value("${freme.broker.tildeETranslationUrl:https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}}")
+	private String endpoint;// = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
 
 	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
 	public ResponseEntity<String> tildeTranslate(

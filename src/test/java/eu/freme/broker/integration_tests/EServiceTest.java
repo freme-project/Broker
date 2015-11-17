@@ -26,7 +26,9 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.broker.eservices.BaseRestController;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConversionService;
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.filter.ExpressionFilter;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -55,6 +57,8 @@ public abstract class EServiceTest {
     public static String tokenWithPermission;
     public static String tokenWithOutPermission;
     public static String tokenAdmin;
+
+    public static final String accessDeniedExceptions = "eu.freme.broker.exception.AccessDeniedException || EXCEPTION ~=org.springframework.security.access.AccessDeniedException";
 
     protected final String usernameWithPermission = "userwithpermission";
     protected final String passwordWithPermission = "testpassword";
@@ -184,18 +188,7 @@ public abstract class EServiceTest {
 
     }
 
-    //Used for constructiong Templates with sparql queries in E-link and E-Link Security Test
-    String constructTemplate(String label, String query, String endpoint, String description, String endpointType, String visibility) {
-        query = query.replaceAll("\n","\\\\n");
-        return  " {\n" +
-                "\"label\":\""+ label + "\",\n"+
-                " \"query\":\""+query+"\",\n" +
-                " \"endpoint\":\""+endpoint+"\",\n" +
-                " \"type\":\""+endpointType+"\",\n" +
-                "\"description\":\""+ description + "\",\n"+
-                "\"visibility\":\""+ visibility + "\"\n"+
-                " }";
-    }
+
 
     public void enableAuthenticate() {
         authenticate = true;
@@ -221,6 +214,49 @@ public abstract class EServiceTest {
         assertTrue(response.getStatus() == HttpStatus.OK.value());
         String token = new JSONObject(response.getBody()).getString("token");
         return token;
+    }
+
+    public void loggerIgnore(Class x){
+        loggerIgnore(x.getName());
+    }
+    public void loggerIgnore(String x) {
+
+        String newExpression="EXCEPTION ~="+x;
+        Appender appender=(Appender)Logger.getRootLogger().getAllAppenders().nextElement();
+
+        String oldExpression;
+        ExpressionFilter exp;
+        try {
+            exp= ((ExpressionFilter) appender.getFilter());
+            oldExpression=exp.getExpression();
+            if (!oldExpression.contains(newExpression)) {
+                exp.setExpression(oldExpression+" || " + newExpression);
+                exp.activateOptions();
+            }
+        } catch (NullPointerException e) {
+            exp= new ExpressionFilter();
+            exp.setExpression(newExpression);
+            exp.setAcceptOnMatch(false);
+            exp.activateOptions();
+            appender.clearFilters();
+            appender.addFilter(exp);
+        }
+    }
+
+    public void loggerUnignore(Class x) {
+        loggerUnignore(x.getName());
+    }
+
+    public void loggerUnignore(String x) {
+
+        Appender appender=(Appender)Logger.getRootLogger().getAllAppenders().nextElement();
+
+        ExpressionFilter exp= ((ExpressionFilter) appender.getFilter());
+        exp.setExpression(exp.getExpression().replace("|| EXCEPTION ~="+x,"").replace("EXCEPTION ~="+x+ "||",""));
+        exp.activateOptions();
+        appender.clearFilters();
+        appender.addFilter(exp);
+
     }
 
 }

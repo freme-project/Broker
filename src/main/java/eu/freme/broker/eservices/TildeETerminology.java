@@ -19,6 +19,7 @@ package eu.freme.broker.eservices;
 
 import com.google.common.base.Strings;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +52,8 @@ import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 @Profile("broker")
 public class TildeETerminology extends BaseRestController {
 
-	private String endpoint = "https://services.tilde.com/Terminology/";
+	@Value("${freme.broker.tildeETerminologyUrl:https://services.tilde.com/Terminology/}")
+	private String endpoint;// = "https://services.tilde.com/Terminology/";
 
 	@RequestMapping(value = "/e-terminology/tilde", method = RequestMethod.POST)
 	public ResponseEntity<String> tildeTranslate(
