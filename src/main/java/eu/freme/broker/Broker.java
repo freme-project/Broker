@@ -86,10 +86,5 @@ public class Broker {
 		SpringApplication.run(Broker.class, newArgs);
 	}
 	
-	@Bean
-	public FilterRegistrationBean getRateLimitingFilter(){
-    	FilterRegistrationBean filter = new FilterRegistrationBean();
-    	filter.setFilter(new RateLimitingFilter());
-        return filter;
-	}
+
 }
