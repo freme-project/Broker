@@ -1,60 +1,72 @@
 package eu.freme.broker.tools.ratelimiter;
 
-import eu.freme.broker.tools.ExceptionHandlerService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import eu.freme.broker.exception.ForbiddenException;
+import org.springframework.beans.factory.annotation.Value;
 
-import java.util.Date;
-import java.util.LinkedList;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Jonathan Sauder (jonathan.sauder@student.hpi.de) on 18.11.15.
  */
-public class RateLimiterInMemory implements RateCounter {
 
-    private static int max_n;
-    private static int max_t;
-    private static Date date= new java.util.Date();
+
+public class RateLimiterInMemory implements RateCounterInterface {
+
+    @Value("${ratelimiter.time_frame}")
+    private String time_frame_str;
+    private int time_frame;
+
+    @Value("${ratelimiter.max_requests}")
+    private String max_requests_str;
+    private int max_requests;
+
     private int i,k;
 
-    private ConcurrentHashMap<String,RateCounterObject> storedRequests;
+    private ConcurrentHashMap<String,RateCounterObject> storedRequests = new ConcurrentHashMap<>();
     RateCounterObject rateCounterObject;
 
+    public RateLimiterInMemory(){
+    }
+
     @Override
-    public void addToStoredRequests(String identifier, long timestamp) throws Exception {
-        rateCounterObject=storedRequests.get(identifier);
+    public void setup() {
+        this.time_frame=Integer.parseInt(time_frame_str);
+        this.max_requests=Integer.parseInt(max_requests_str);
+    }
 
-        if (rateCounterObject==null) {
-            storedRequests.put(identifier, new RateCounterObject(timestamp));
-        }
+    @Override
+    public void addToStoredRequests(String identifier, long timestamp) throws ForbiddenException {
 
-        else {
-            if (rateCounterObject.index==max_n) {
-                if (timestamp-rateCounterObject.arr[0]<max_t){
-                    throw new Exception("Too many Calls");
-                }
-                else {
+        System.err.println(max_requests);
+        try {
+            rateCounterObject = storedRequests.get(identifier);
+            //Array is full, now we have to compare timestamps
+            if (rateCounterObject.index == time_frame) {
+                if (timestamp - rateCounterObject.arrayOfTimestamps[0] < max_requests) {
+                    throw new ForbiddenException("Too many calls - made "+ time_frame +" Requests in "+ (timestamp - rateCounterObject.arrayOfTimestamps[0])+" miliseconds");
+                } else {
 
                     //Find first index whose time is still worth looking at
-                    i=0;
-                    while (max_t<timestamp-rateCounterObject.arr[i]) {
+                    i = 0;
+                    while (i< time_frame && max_requests < timestamp - rateCounterObject.arrayOfTimestamps[i]) {
                         i++;
                     }
                     //Move all elements of array left by that index, overwriting all obsolete indices
-                    for (k=0;k<max_n-i;k++) {
-                        rateCounterObject.arr[k]=rateCounterObject.arr[k+i];
+                    for (k = 0; k < time_frame - i; k++) {
+                        rateCounterObject.arrayOfTimestamps[k] = rateCounterObject.arrayOfTimestamps[k + i];
                     }
 
                     //Set the "last index" of the object correctly again
-                    rateCounterObject.index-=k+1;
+                    rateCounterObject.index -= k + 1;
                 }
             }
+            //Array not full, the user can still make requests
             else {
-                rateCounterObject.arr[rateCounterObject.index++]=timestamp;
+                rateCounterObject.arrayOfTimestamps[rateCounterObject.index++] = timestamp;
             }
-
+        } catch (NullPointerException e) {
+            storedRequests.put(identifier, new RateCounterObject(timestamp, max_requests));
         }
 
     }

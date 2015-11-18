@@ -4,12 +4,13 @@ package eu.freme.broker.tools.ratelimiter;
  * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 18.11.15.
  */
 public class RateCounterObject {
-    public int max_n=3;
 
-    public Long[] arr= new Long[max_n];
+    public Long[] arrayOfTimestamps;
     public int index=1;
 
-    public RateCounterObject(long timestamp){
-        this.arr[0]=timestamp;
+    public RateCounterObject(long timestamp, int max_requests){
+
+        this.arrayOfTimestamps =new Long[max_requests];
+        this.arrayOfTimestamps[0]=timestamp;
     }
 }
