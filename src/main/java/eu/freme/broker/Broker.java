@@ -18,6 +18,8 @@
 package eu.freme.broker;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -25,12 +27,16 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
+import com.github.isrsal.logging.LoggingFilter;
+
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.StarterHelper;
+import eu.freme.broker.tools.ratelimiter.RateLimitingFilter;
 import eu.freme.common.FREMECommonConfig;
 import eu.freme.eservices.eentity.EEntityConfig;
 import eu.freme.eservices.elink.ELinkConfig;
@@ -78,5 +84,12 @@ public class Broker {
 		logger.info("Starting FREME in Broker mode");
 		String[] newArgs = StarterHelper.addProfile(args, "broker");
 		SpringApplication.run(Broker.class, newArgs);
+	}
+	
+	@Bean
+	public FilterRegistrationBean getRateLimitingFilter(){
+    	FilterRegistrationBean filter = new FilterRegistrationBean();
+    	filter.setFilter(new RateLimitingFilter());
+        return filter;
 	}
 }
