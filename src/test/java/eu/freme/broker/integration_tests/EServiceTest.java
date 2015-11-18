@@ -217,9 +217,21 @@ public abstract class EServiceTest {
         return token;
     }
 
+
+    /**
+     * Sets specific LoggingFilters and initiates suppression of specified Exceptions in Log4j.
+     * @param x Class of Exception
+     * @return
+     **/
     public void loggerIgnore(Class<Throwable> x){
         loggerIgnore(x.getName());
     }
+
+    /**
+     * Sets specific LoggingFilters and initiates suppression of specified Exceptions in Log4j.
+     * @param x String name of Exception
+     * @return
+     **/
     public void loggerIgnore(String x) {
 
         String newExpression="EXCEPTION ~="+x;
@@ -248,10 +260,20 @@ public abstract class EServiceTest {
         }
     }
 
+    /**
+     * Clears specific LoggingFilters and stops their suppression of Exceptions in Log4j.
+     * @param x Class of Exception
+     * @return
+     **/
     public void loggerUnignore(Class<Throwable> x) {
         loggerUnignore(x.getName());
     }
 
+    /**
+     * Clears specific LoggingFilters and stops their suppression of Exceptions in Log4j.
+     * @param x String name of Exception
+     * @return
+     **/
     public void loggerUnignore(String x) {
         Enumeration<Appender> allAppenders= Logger.getRootLogger().getAllAppenders();
         Appender appender;
@@ -266,6 +288,11 @@ public abstract class EServiceTest {
         }
     }
 
+    /**
+     * Clears all LoggingFilters for all Appenders. Stops suppression of Exceptions in Log4j.
+     * @param
+     * @return
+     **/
     public void loggerClearFilters() {
         Enumeration<Appender> allAppenders = Logger.getRootLogger().getAllAppenders();
         Appender appender;
