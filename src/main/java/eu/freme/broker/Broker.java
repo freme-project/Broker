@@ -85,6 +85,6 @@ public class Broker {
 		String[] newArgs = StarterHelper.addProfile(args, "broker");
 		SpringApplication.run(Broker.class, newArgs);
 	}
-	
+
 
 }

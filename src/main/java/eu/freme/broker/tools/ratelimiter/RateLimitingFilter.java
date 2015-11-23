@@ -18,6 +18,7 @@
 package eu.freme.broker.tools.ratelimiter;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Filter;
@@ -29,14 +30,21 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
+import com.google.common.base.Strings;
 import eu.freme.broker.exception.ForbiddenException;
+import eu.freme.broker.exception.TooManyRequestsException;
 import eu.freme.broker.tools.ExceptionHandlerService;
+import eu.freme.common.persistence.tools.AccessLevelHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.AbstractConfigurableEmbeddedServletContainer;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.GenericFilterBean;
 
 /**
  * Filter that limits number of requets made by each user
@@ -45,7 +53,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class RateLimitingFilter implements Filter {
+public class RateLimitingFilter extends GenericFilterBean {
 
 	@Autowired
 	ExceptionHandlerService exceptionHandlerService;
@@ -53,31 +61,38 @@ public class RateLimitingFilter implements Filter {
 	@Autowired
 	RateLimiterInMemory rateLimiterInMemory;
 
+
+	@Value("${ratelimiter.enabled:false}")
+	boolean rateLimiterEnabled;
+
 	public RateLimitingFilter(){
 	}
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 
-		//TODO:
-		rateLimiterInMemory.setup();
+		if (rateLimiterEnabled) {
 
+			HttpServletRequest request = (HttpServletRequest) req;
+			Authentication user = SecurityContextHolder.getContext().getAuthentication();
 
-		Authentication user = SecurityContextHolder.getContext().getAuthentication();
-		String username= (user==null) ? req.getRemoteAddr() : user.getName();
-		try {
-			Date date=new Date();
-			rateLimiterInMemory.addToStoredRequests(username, date.getTime());
-		} catch (ForbiddenException e){
-			HttpServletResponse response=(HttpServletResponse)res;
-			HttpServletRequest request=(HttpServletRequest)req;
-			exceptionHandlerService.writeExceptionToResponse(request, response, e);
-			return;
+			String username= (user==null) ? req.getRemoteAddr() : user.getName();
+			String userRole="anonymous";
+
+			try {
+				rateLimiterInMemory.addToStoredRequests(username, new Date().getTime(), req.getContentLength(), request.getRequestURI(),userRole);
+			} catch (TooManyRequestsException e) {
+				HttpServletResponse response = (HttpServletResponse) res;
+				exceptionHandlerService.writeExceptionToResponse(request, response, e);
+				return;
+			}
 		}
+
 		chain.doFilter(req, res);
+
 	}
 
-	public void init(FilterConfig filterConfig) {}
+//	public void init(FilterConfig filterConfig) {}
 
 	public void destroy() {}
 

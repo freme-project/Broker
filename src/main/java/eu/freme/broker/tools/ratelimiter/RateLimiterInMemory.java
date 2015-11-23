@@ -1,9 +1,14 @@
 package eu.freme.broker.tools.ratelimiter;
 
 import eu.freme.broker.exception.ForbiddenException;
-import org.springframework.beans.factory.annotation.Value;
+import eu.freme.broker.exception.InternalServerErrorException;
+import eu.freme.broker.exception.TooManyRequestsException;
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.core.io.FileSystemResource;
 
 
+import javax.annotation.PostConstruct;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -13,13 +18,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RateLimiterInMemory implements RateCounterInterface {
 
-    @Value("${ratelimiter.time_frame}")
-    private String time_frame_str;
+    private int max_requests;
+    private long max_size;
     private int time_frame;
 
-    @Value("${ratelimiter.max_requests}")
-    private String max_requests_str;
-    private int max_requests;
+    Properties rateLimiterProperties;
 
     private int i,k;
 
@@ -29,45 +32,56 @@ public class RateLimiterInMemory implements RateCounterInterface {
     public RateLimiterInMemory(){
     }
 
-    @Override
-    public void setup() {
-        this.time_frame=Integer.parseInt(time_frame_str);
-        this.max_requests=Integer.parseInt(max_requests_str);
+    @PostConstruct
+    public void init() {
+
+
+        YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
+        yaml.setResources( new FileSystemResource("src/main/resources/ratelimiter.yaml"));
+        this.rateLimiterProperties = yaml.getObject();
+        this.time_frame=Integer.parseInt(rateLimiterProperties.getProperty("time-frame"))*1000;
     }
 
     @Override
-    public void addToStoredRequests(String identifier, long timestamp) throws ForbiddenException {
+    public void addToStoredRequests(String identifier, long timestamp, long size, String endpointURI, String userRole) throws TooManyRequestsException {
 
-        System.err.println(max_requests);
+        String finalIdentifier;
+        if (this.rateLimiterProperties.getProperty("rate-limits."+identifier+"."+endpointURI+"[0]")!=null) {
+            max_requests=Integer.parseInt(rateLimiterProperties.getProperty("rate-limits." + identifier + "." + endpointURI + "[0]"));
+            max_size=Long.parseLong(rateLimiterProperties.getProperty("rate-limits." + identifier + "." + endpointURI + "[1]"));
+            finalIdentifier="rate-limits." + identifier + "." + endpointURI;
+
+        } else if (this.rateLimiterProperties.getProperty("rate-limits."+identifier+".default[0]")!=null) {
+            max_requests=Integer.parseInt(rateLimiterProperties.getProperty("rate-limits." + identifier + ".default[0]"));
+            max_size=Long.parseLong(rateLimiterProperties.getProperty("rate-limits." + identifier + ".default[1]"));
+            finalIdentifier="rate-limits."+identifier+".default";
+        }
+        if (this.rateLimiterProperties.getProperty("rate-limits."+userRole+"."+endpointURI+"[0]")!=null) {
+            max_requests=Integer.parseInt(rateLimiterProperties.getProperty("rate-limits." + userRole + "." + endpointURI + "[0]"));
+            max_size=Long.parseLong(rateLimiterProperties.getProperty("rate-limits." + userRole + "." + endpointURI + "[1]"));
+            finalIdentifier="rate-limits." + userRole + "." + endpointURI;
+
+        } else if (this.rateLimiterProperties.getProperty("rate-limits."+userRole+".default[0]")!=null) {
+            max_requests=Integer.parseInt(rateLimiterProperties.getProperty("rate-limits." + userRole + ".default[0]"));
+            max_size=Long.parseLong(rateLimiterProperties.getProperty("rate-limits." + userRole + ".default[1]"));
+            finalIdentifier="rate-limits."+userRole+".default";
+        } else {
+            throw new InternalServerErrorException("No identifier found for "+identifier+"with role"+ userRole + "for resource" + endpointURI);
+        }
+
+        if (max_size==0 && max_requests==0) {
+            return;
+        }
+
         try {
-            rateCounterObject = storedRequests.get(identifier);
-            //Array is full, now we have to compare timestamps
-            if (rateCounterObject.index == time_frame) {
-                if (timestamp - rateCounterObject.arrayOfTimestamps[0] < max_requests) {
-                    throw new ForbiddenException("Too many calls - made "+ time_frame +" Requests in "+ (timestamp - rateCounterObject.arrayOfTimestamps[0])+" miliseconds");
-                } else {
-
-                    //Find first index whose time is still worth looking at
-                    i = 0;
-                    while (i< time_frame && max_requests < timestamp - rateCounterObject.arrayOfTimestamps[i]) {
-                        i++;
-                    }
-                    //Move all elements of array left by that index, overwriting all obsolete indices
-                    for (k = 0; k < time_frame - i; k++) {
-                        rateCounterObject.arrayOfTimestamps[k] = rateCounterObject.arrayOfTimestamps[k + i];
-                    }
-
-                    //Set the "last index" of the object correctly again
-                    rateCounterObject.index -= k + 1;
-                }
-            }
-            //Array not full, the user can still make requests
-            else {
-                rateCounterObject.arrayOfTimestamps[rateCounterObject.index++] = timestamp;
-            }
+            storedRequests.get(finalIdentifier).add_entry(timestamp, size);
         } catch (NullPointerException e) {
-            storedRequests.put(identifier, new RateCounterObject(timestamp, max_requests));
+            storedRequests.put(finalIdentifier, new RateCounterObject(time_frame, timestamp, max_requests+1, size+1, max_size));
+        } catch (TooManyRequestsException e){
+            throw new TooManyRequestsException(e.getMessage());
         }
 
     }
+
+
 }

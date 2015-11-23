@@ -1,0 +1,24 @@
+time-frame: "600"   # time period in seconds
+rate-limits:
+  anonymous:
+    default:
+      - "5"
+      - "10" # anomyous user has 50 requests or 1000 kb in the time period
+    /e-entity/freme-ner/documents:
+      - "10"
+      - "0" # override for anonymous user to allow 50 requests or 1000 mb in the time period
+  ROLE_USER:
+    default:
+      - "3"
+      - "1000" # anomyous user has 50 requests or 1000 kb in the time period
+    /freme-ner/datasets:
+      - "50"
+      - "2000000" # override for authenticated users to allow 50 requests or 2000 mb in the time period
+  ROLE_ADMIN:
+    default:
+      - "0"
+      - "0" # admin user has no rate limits configured
+  henry:
+    /e-translation/tilde:
+      - "50"
+      - "10000" # user henry has a special override on tilde

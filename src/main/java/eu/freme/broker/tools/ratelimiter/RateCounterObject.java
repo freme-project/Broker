@@ -1,16 +1,75 @@
 package eu.freme.broker.tools.ratelimiter;
 
+import eu.freme.broker.exception.InternalServerErrorException;
+import eu.freme.broker.exception.TooManyRequestsException;
+
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.SynchronousQueue;
+
 /**
  * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 18.11.15.
  */
 public class RateCounterObject {
 
-    public Long[] arrayOfTimestamps;
-    public int index=1;
 
-    public RateCounterObject(long timestamp, int max_requests){
+    public int index;
+    public long totalSize;
 
-        this.arrayOfTimestamps =new Long[max_requests];
-        this.arrayOfTimestamps[0]=timestamp;
+
+    public Queue<Long> timestamps;
+    public Queue<Long> sizes;
+
+
+    public long max_size;
+    public int max_requests;
+    public long time_frame;
+
+    public RateCounterObject(long time_frame, long timestamp, int max_requests, long size, long max_size){
+        this.time_frame = time_frame;
+        this.sizes=new LinkedList<Long>();
+        this.timestamps= new LinkedList<Long>();
+        this.index=0;
+        this.totalSize=0;
+        this.max_size=max_size;
+        this.max_requests=max_requests;
+
+        this.add_entry(timestamp, size);
+
+    }
+
+    public void add_entry(long timestamp, long size) throws TooManyRequestsException {
+        System.err.println("index"+index);
+        System.err.println("size"+size+ "totalsize"+ totalSize+ "maxSize"+ max_size);
+
+        if (index >= max_requests-1) {
+            if (max_requests!=0  && timestamp - timestamps.peek() < time_frame) {
+                throw new TooManyRequestsException("You exceeded the allowed "+max_requests+" requests in "+time_frame);
+            }
+            while (timestamps.peek() != null && timestamp - timestamps.peek() > time_frame) {
+                timestamps.poll();
+                totalSize -= sizes.poll();
+                index--;
+
+                //DEBUG
+                if (totalSize < 0) {
+                    throw new InternalServerErrorException("Something went wrong when calculating sizes of your requests");
+                }
+            }
+        }
+        if (index< max_requests -1) {
+
+            timestamps.add(timestamp);
+            sizes.add(size);
+            totalSize += size;
+            index++;
+
+        }
+
+        if (max_size!=0 && totalSize >= max_size*1024) {
+            throw new TooManyRequestsException("Your requests exceeded the allowed "+max_size+" kb of data. Please wait until making more requests.");
+        }
+
+
     }
 }

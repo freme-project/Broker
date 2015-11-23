@@ -8,7 +8,6 @@ import org.springframework.security.core.Authentication;
  */
 public interface RateCounterInterface {
 
-    void addToStoredRequests(String identifier, long timestamp) throws ForbiddenException;
+    void addToStoredRequests(String username, long timestamp, long size, String endpointURI, String userRole) throws ForbiddenException;
 
-    void setup();
 }

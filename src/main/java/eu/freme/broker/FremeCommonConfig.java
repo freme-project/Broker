@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.freme.broker.tools.ratelimiter.RateLimiterInMemory;
+import eu.freme.broker.tools.ratelimiter.RateLimitingFilter;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,4 +60,15 @@ public class FremeCommonConfig {
     	filter.setUrlPatterns(urlPatterns);
         return filter;
     }
+
+    @Bean
+    public FilterRegistrationBean rateLimitingFilter() {
+        FilterRegistrationBean filter = new FilterRegistrationBean();
+        filter.setFilter(new RateLimitingFilter());
+        List<String> urlPatterns = new ArrayList<String>();
+        urlPatterns.add("/*");
+        filter.setUrlPatterns(urlPatterns);
+        return filter;
+    }
+
 }
