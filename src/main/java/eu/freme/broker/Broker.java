@@ -36,7 +36,6 @@ import com.github.isrsal.logging.LoggingFilter;
 
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.StarterHelper;
-import eu.freme.broker.tools.ratelimiter.RateLimitingFilter;
 import eu.freme.common.FREMECommonConfig;
 import eu.freme.eservices.eentity.EEntityConfig;
 import eu.freme.eservices.elink.ELinkConfig;

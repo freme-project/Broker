@@ -20,9 +20,13 @@ package eu.freme.broker;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.freme.broker.security.AuthenticationFilter;
 import eu.freme.broker.tools.ratelimiter.RateLimiterInMemory;
 import eu.freme.broker.tools.ratelimiter.RateLimitingFilter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,10 +34,16 @@ import com.github.isrsal.logging.LoggingFilter;
 
 import eu.freme.broker.tools.NIFParameterFactory;
 import eu.freme.broker.tools.RDFSerializationFormats;
+import org.springframework.security.web.FilterChainProxy;
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
+import org.springframework.web.filter.GenericFilterBean;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.Filter;
 
 @Configuration
 public class FremeCommonConfig {
-	
+
     @Bean
     public RDFSerializationFormats rdfFormats(){
     	return new RDFSerializationFormats();
@@ -58,17 +68,7 @@ public class FremeCommonConfig {
         List<String> urlPatterns = new ArrayList<String>();
         urlPatterns.add("/*");
     	filter.setUrlPatterns(urlPatterns);
+        filter.setOrder(Integer.MAX_VALUE);
         return filter;
     }
-
-    @Bean
-    public FilterRegistrationBean rateLimitingFilter() {
-        FilterRegistrationBean filter = new FilterRegistrationBean();
-        filter.setFilter(new RateLimitingFilter());
-        List<String> urlPatterns = new ArrayList<String>();
-        urlPatterns.add("/*");
-        filter.setUrlPatterns(urlPatterns);
-        return filter;
-    }
-
 }

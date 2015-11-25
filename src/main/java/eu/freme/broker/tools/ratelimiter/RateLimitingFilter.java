@@ -17,10 +17,12 @@
  */
 package eu.freme.broker.tools.ratelimiter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Priority;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -31,17 +33,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-import com.google.common.base.Strings;
-import eu.freme.broker.exception.ForbiddenException;
 import eu.freme.broker.exception.TooManyRequestsException;
 import eu.freme.broker.tools.ExceptionHandlerService;
-import eu.freme.common.persistence.tools.AccessLevelHelper;
+import eu.freme.common.persistence.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.embedded.AbstractConfigurableEmbeddedServletContainer;
-import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
@@ -61,24 +60,33 @@ public class RateLimitingFilter extends GenericFilterBean {
 	@Autowired
 	RateLimiterInMemory rateLimiterInMemory;
 
-
 	@Value("${ratelimiter.enabled:false}")
 	boolean rateLimiterEnabled;
 
 	public RateLimitingFilter(){
 	}
 
+	private String username;
+	private String userRole;
+
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+
+
 
 		if (rateLimiterEnabled) {
 
 			HttpServletRequest request = (HttpServletRequest) req;
 			Authentication user = SecurityContextHolder.getContext().getAuthentication();
 
-			String username= (user==null) ? req.getRemoteAddr() : user.getName();
-			String userRole="anonymous";
+			String us = user.getPrincipal().toString();
+			username=user.getPrincipal().toString();
+			if (username.equals("anonymousUser")) {
+				username=req.getRemoteAddr();
+			}
 
+			userRole= ((SimpleGrantedAuthority)user.getAuthorities().toArray()[0]).getAuthority();
+			System.err.println(username+"\t"+userRole);
 			try {
 				rateLimiterInMemory.addToStoredRequests(username, new Date().getTime(), req.getContentLength(), request.getRequestURI(),userRole);
 			} catch (TooManyRequestsException e) {
@@ -92,7 +100,7 @@ public class RateLimitingFilter extends GenericFilterBean {
 
 	}
 
-//	public void init(FilterConfig filterConfig) {}
+	//public void init(FilterConfig filterConfig) {}
 
 	public void destroy() {}
 

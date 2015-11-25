@@ -5,6 +5,7 @@ import eu.freme.broker.exception.TooManyRequestsException;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.SynchronousQueue;
 
 /**
@@ -16,9 +17,8 @@ public class RateCounterObject {
     public int index;
     public long totalSize;
 
-
-    public Queue<Long> timestamps;
-    public Queue<Long> sizes;
+    public ConcurrentLinkedQueue<Long> timestamps;
+    public ConcurrentLinkedQueue<Long> sizes;
 
 
     public long max_size;
@@ -27,8 +27,8 @@ public class RateCounterObject {
 
     public RateCounterObject(long time_frame, long timestamp, int max_requests, long size, long max_size){
         this.time_frame = time_frame;
-        this.sizes=new LinkedList<Long>();
-        this.timestamps= new LinkedList<Long>();
+        this.sizes=new ConcurrentLinkedQueue<>();
+        this.timestamps= new ConcurrentLinkedQueue<>();
         this.index=0;
         this.totalSize=0;
         this.max_size=max_size;
@@ -39,12 +39,10 @@ public class RateCounterObject {
     }
 
     public void add_entry(long timestamp, long size) throws TooManyRequestsException {
-        System.err.println("index"+index);
-        System.err.println("size"+size+ "totalsize"+ totalSize+ "maxSize"+ max_size);
 
         if (index >= max_requests-1) {
             if (max_requests!=0  && timestamp - timestamps.peek() < time_frame) {
-                throw new TooManyRequestsException("You exceeded the allowed "+max_requests+" requests in "+time_frame);
+                throw new TooManyRequestsException("You exceeded the allowed "+max_requests+" requests in "+time_frame/1000+ ". Please try again later.");
             }
             while (timestamps.peek() != null && timestamp - timestamps.peek() > time_frame) {
                 timestamps.poll();
