@@ -1,6 +1,48 @@
 FREME Changelog
 
 ---------------------------
+FREME 0.4 - 12.11.2015
+---------------------------
+
+Documentation homepage
+* Create full homepage out of the documentation
+* Write 8 articles in knowledge base
+* Write 8 tutorials
+
+Create mockup of CKEditor
+
+General features
+
+* Release all parts of FREME as open source under the Apache 2.0 license
+* Upgrade all parts of FREME to Java 8
+* Add security layer
+
+e-Entity
+* Setup FREME NER on its own server
+* Add support for russian into FREME NER
+
+e-Link
+* Setup SPARQL server for FREME
+* Setup LDF server for FREME
+* Security for templates
+
+Creation of multilingual dataset
+* Cordis
+* Statbel
+* DBPedia abstracts
+* Document datasets on datahub.io
+
+e-Internationalization
+* HTML5 roundtripping
+
+e-Terminology
+* Add confidence scores
+* New parameter: collection id
+
+e-Translation
+* ITS 2.0 category support
+
+---------------------------
 FREME 0.3 - 01.09.2015
 ---------------------------
 
