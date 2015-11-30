@@ -21,16 +21,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.Filter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import eu.freme.broker.tools.ratelimiter.RateLimitingFilter;
 import eu.freme.common.persistence.tools.AccessLevelHelper;
 import eu.freme.common.security.voter.OwnedResourceAccessDecisionVoter;
 import eu.freme.common.security.voter.UserAccessDecisionVoter;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,6 +57,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import eu.freme.broker.security.tools.PasswordHasher;
 import eu.freme.common.persistence.model.User;
 import eu.freme.common.persistence.repository.UserRepository;
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
@@ -124,12 +129,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 				.exceptionHandling()
 				.authenticationEntryPoint(unauthorizedEntryPoint());
+		AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager());
+		//FilterRegistrationBean registration = new FilterRegistrationBean(authenticationFilter);
+		//registration.setOrder(0);
 
-		http.addFilterBefore(new AuthenticationFilter(authenticationManager()),
+		http.addFilterBefore(authenticationFilter,
 				BasicAuthenticationFilter.class).addFilterBefore(
 				new ManagementEndpointAuthenticationFilter(
 						authenticationManager()),
 				BasicAuthenticationFilter.class);
+		http.addFilterAfter(new RateLimitingFilter(), AuthenticationFilter.class);
 	}
 
 	@Bean
@@ -182,6 +191,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			}
 		};
+	}
+
+	@Autowired
+	@Qualifier(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME)
+	Filter securityFilter;
+
+	@Bean
+	public FilterRegistrationBean securityFilterChain() {
+		FilterRegistrationBean registration = new FilterRegistrationBean(securityFilter);
+		registration.setOrder(0);
+		registration
+				.setName(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME);
+		return registration;
 	}
 
 	/*
