@@ -3,15 +3,15 @@ rate-limits:
   ROLE_ANONYMOUS:
     default:
       - 0
-      - 0 # anomyous user has 50 requests or 1000 kb in the time period
+      - 0
   ROLE_USER:
     default:
       - 0
-      - 0 # anomyous user has 50 requests or 1000 kb in the time period
+      - 0
   ROLE_ADMIN:
     default:
       - 0
-      - 0 # admin user has no rate limits configured
+      - 0
   ratelimitertestuser:
     default:
       - 0

@@ -76,7 +76,7 @@ public class RateLimitingFilter extends GenericFilterBean {
 
 	@PostConstruct
 	public void setup () {
-		rateLimiterInMemory.setup(rateLimiterYaml);
+		rateLimiterInMemory.refresh(rateLimiterYaml);
 	}
 
 	public RateLimitingFilter(){
@@ -128,10 +128,9 @@ public class RateLimitingFilter extends GenericFilterBean {
 	/**
 	 * Clears all in-Memory Timestamps & Sizes of user-made requests.
 	 * Can be configured via the application.properties file
-	 * Defaults to Integer.MAX_VALUE (approximately every 24 days)
-	 *
+	 * Defaults to 1 hour (3 600 000 miliseconds)
 	 */
-	@Scheduled(fixedRateString = "${ratelimiter.clear.timer:2147483647}")
+	@Scheduled(fixedRateString = "${ratelimiter.clear.timer:3600000}")
 	public void clearRateLimiterInMemory(){
 		rateLimiterInMemory.clear();
 	}
@@ -143,6 +142,9 @@ public class RateLimitingFilter extends GenericFilterBean {
 		rateLimiterEnabled=b;
 	}
 
+	public void refresh(){
+		rateLimiterInMemory.refresh(rateLimiterYaml);
+	}
 	public void destroy() {}
 
 

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.SynchronousQueue;
 
 /**
- * Created by Jonathan Sauder (jsauder@campus.tu-berlin.de) on 18.11.15.
+ * Created by Jonathan Sauder (jonathan.sauder@student.hpi.de) on 18.11.15.
  */
 public class RateCounterObject {
 
@@ -56,16 +56,14 @@ public class RateCounterObject {
             }
         }
         if (index< max_requests -1) {
-
             timestamps.add(timestamp);
             sizes.add(size);
             totalSize += size;
             index++;
-
         }
 
-        if (max_size!=0 && totalSize >= max_size*1024) {
-            throw new TooManyRequestsException("Your requests totalling "+totalSize/1024+ "kb exceeded the allowed "+max_size+" kb of data. Please wait until making more requests.");
+        if (max_size!=0 && totalSize >= max_size) {
+            throw new TooManyRequestsException("Your requests totalling "+totalSize+ "characters exceeded the allowed "+max_size+" characters of text. Please wait until making more requests.");
         }
 
     }
