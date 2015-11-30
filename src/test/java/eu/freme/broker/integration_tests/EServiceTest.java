@@ -24,7 +24,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import eu.freme.broker.eservices.BaseRestController;
-import eu.freme.broker.tools.ratelimiter.RateLimitingFilter;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConversionService;
 import org.apache.log4j.Appender;

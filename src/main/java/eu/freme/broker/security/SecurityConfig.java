@@ -26,10 +26,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import eu.freme.broker.tools.ratelimiter.RateLimitingFilter;
-import eu.freme.common.persistence.tools.AccessLevelHelper;
-import eu.freme.common.security.voter.OwnedResourceAccessDecisionVoter;
-import eu.freme.common.security.voter.UserAccessDecisionVoter;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -138,7 +134,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements
 				new ManagementEndpointAuthenticationFilter(
 						authenticationManager()),
 				BasicAuthenticationFilter.class);
-		http.addFilterAfter(new RateLimitingFilter(), AuthenticationFilter.class);
 	}
 
 	@Bean

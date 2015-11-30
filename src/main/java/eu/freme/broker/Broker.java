@@ -50,6 +50,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 
+
 @SpringBootApplication
 @Import({ FremeCommonConfig.class, EEntityConfig.class, ELinkConfig.class,
 		EPublishingConfig.class, FREMECommonConfig.class,

@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.freme.broker.security.AuthenticationFilter;
-import eu.freme.broker.tools.ratelimiter.RateLimiterInMemory;
-import eu.freme.broker.tools.ratelimiter.RateLimitingFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
@@ -53,10 +51,6 @@ public class FremeCommonConfig {
     	return new NIFParameterFactory();
     }
 
-    @Bean
-    public RateLimiterInMemory getRateLimiterInMemory() {
-        return new RateLimiterInMemory();
-    }
 
 	/**
 	 * Create a filter that logs all requests input and output
