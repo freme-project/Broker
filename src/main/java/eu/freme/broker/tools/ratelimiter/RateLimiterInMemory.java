@@ -32,11 +32,13 @@ public class RateLimiterInMemory implements RateCounterInterface {
     }
 
     public void refresh(String rateLimiterYaml) {
-        clear();
+
         YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
         yaml.setResources( new FileSystemResource(rateLimiterYaml));
         rateLimiterProperties = yaml.getObject();
         this.time_frame=(int)rateLimiterProperties.get("time-frame")*1000;
+        clear();
+
     }
 
 
