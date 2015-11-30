@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Priority;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -42,6 +43,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.token.Token;
+
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -63,6 +67,15 @@ public class RateLimitingFilter extends GenericFilterBean {
 	@Value("${ratelimiter.enabled:false}")
 	boolean rateLimiterEnabled;
 
+
+	@Value("${ratelimiter.yaml:src/main/resources/ratelimiter.yaml}")
+	String rateLimiterYaml;
+
+	@PostConstruct
+	public void setup () {
+		rateLimiterInMemory.setup(rateLimiterYaml);
+	}
+
 	public RateLimitingFilter(){
 	}
 
@@ -77,18 +90,27 @@ public class RateLimitingFilter extends GenericFilterBean {
 		if (rateLimiterEnabled) {
 
 			HttpServletRequest request = (HttpServletRequest) req;
-			Authentication user = SecurityContextHolder.getContext().getAuthentication();
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-			String us = user.getPrincipal().toString();
-			username=user.getPrincipal().toString();
+			username=auth.getName();
 			if (username.equals("anonymousUser")) {
 				username=req.getRemoteAddr();
+			} else {
+				User user  = ((User)auth.getPrincipal());
+				username=user.getName();
 			}
 
-			userRole= ((SimpleGrantedAuthority)user.getAuthorities().toArray()[0]).getAuthority();
-			System.err.println(username+"\t"+userRole);
+			userRole= ((SimpleGrantedAuthority)auth.getAuthorities().toArray()[0]).getAuthority();
+
+			long size = req.getContentLength();
+			if (size==0) {
+				try {
+					size = request.getHeader("input").length();
+				} catch (NullPointerException e){
+				}
+			}
 			try {
-				rateLimiterInMemory.addToStoredRequests(username, new Date().getTime(), req.getContentLength(), request.getRequestURI(),userRole);
+				rateLimiterInMemory.addToStoredRequests(username, new Date().getTime(), size , request.getRequestURI(),userRole);
 			} catch (TooManyRequestsException e) {
 				HttpServletResponse response = (HttpServletResponse) res;
 				exceptionHandlerService.writeExceptionToResponse(request, response, e);
@@ -98,6 +120,13 @@ public class RateLimitingFilter extends GenericFilterBean {
 
 		chain.doFilter(req, res);
 
+	}
+
+	public boolean isRateLimiterEnabled() {
+		return rateLimiterEnabled;
+	}
+	public void setRateLimiterEnabled(boolean b){
+		rateLimiterEnabled=b;
 	}
 
 	//public void init(FilterConfig filterConfig) {}

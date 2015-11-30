@@ -2,6 +2,7 @@ package eu.freme.broker.tools.ratelimiter;
 
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.exception.TooManyRequestsException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.io.FileSystemResource;
 
@@ -17,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RateLimiterInMemory implements RateCounterInterface {
 
+
+
     private int max_requests;
     private long max_size;
     private int time_frame;
@@ -28,10 +31,9 @@ public class RateLimiterInMemory implements RateCounterInterface {
     public RateLimiterInMemory(){
     }
 
-    @PostConstruct
-    public void init() {
+    public void setup(String rateLimiterYaml) {
         YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
-        yaml.setResources( new FileSystemResource("src/main/resources/ratelimiter.yaml"));
+        yaml.setResources( new FileSystemResource(rateLimiterYaml));
         rateLimiterProperties = yaml.getObject();
         this.time_frame=(int)rateLimiterProperties.get("time-frame")*1000;
     }
@@ -60,10 +62,10 @@ public class RateLimiterInMemory implements RateCounterInterface {
         } else {
             throw new InternalServerErrorException("No identifier found for "+identifier+"with role"+ userRole + "for resource" + endpointURI);
         }
+
         if (max_size==0 && max_requests==0) {
             return;
         }
-
         try {
             storedRequests.get(finalIdentifier).add_entry(timestamp, size);
         } catch (NullPointerException e) {

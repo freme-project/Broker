@@ -1,0 +1,24 @@
+time-frame: 600   # time period in seconds
+rate-limits:
+  ROLE_ANONYMOUS:
+    default:
+      - 0
+      - 0 # anomyous user has 50 requests or 1000 kb in the time period
+  ROLE_USER:
+    default:
+      - 0
+      - 0 # anomyous user has 50 requests or 1000 kb in the time period
+  ROLE_ADMIN:
+    default:
+      - 0
+      - 0 # admin user has no rate limits configured
+  ratelimitertestuser:
+    default:
+      - 0
+      - 0
+    /e-entity/freme-ner/datasets:
+      - 2
+      - 1000
+    /e-translation/tilde:
+      - 1000
+      - 1

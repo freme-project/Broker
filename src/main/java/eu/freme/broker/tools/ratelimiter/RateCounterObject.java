@@ -41,8 +41,8 @@ public class RateCounterObject {
     public void add_entry(long timestamp, long size) throws TooManyRequestsException {
 
         if (index >= max_requests-1) {
-            if (max_requests!=0  && timestamp - timestamps.peek() < time_frame) {
-                throw new TooManyRequestsException("You exceeded the allowed "+max_requests+" requests in "+time_frame/1000+ ". Please try again later.");
+            if (timestamps.peek()==null || timestamps.peek()!=null && timestamp - timestamps.peek() < time_frame) {
+                throw new TooManyRequestsException("You exceeded the allowed "+max_requests+" requests in "+time_frame/1000+ " seconds. Please try again later.");
             }
             while (timestamps.peek() != null && timestamp - timestamps.peek() > time_frame) {
                 timestamps.poll();
@@ -65,9 +65,8 @@ public class RateCounterObject {
         }
 
         if (max_size!=0 && totalSize >= max_size*1024) {
-            throw new TooManyRequestsException("Your requests exceeded the allowed "+max_size+" kb of data. Please wait until making more requests.");
+            throw new TooManyRequestsException("Your requests totalling "+totalSize+ "kb exceeded the allowed "+max_size+" kb of data. Please wait until making more requests.");
         }
-
 
     }
 }
