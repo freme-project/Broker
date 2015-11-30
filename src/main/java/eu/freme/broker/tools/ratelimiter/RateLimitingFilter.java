@@ -40,6 +40,8 @@ import eu.freme.common.persistence.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -70,6 +72,7 @@ public class RateLimitingFilter extends GenericFilterBean {
 
 	@Value("${ratelimiter.yaml:src/main/resources/ratelimiter.yaml}")
 	String rateLimiterYaml;
+
 
 	@PostConstruct
 	public void setup () {
@@ -122,14 +125,23 @@ public class RateLimitingFilter extends GenericFilterBean {
 
 	}
 
+	/**
+	 * Clears all in-Memory Timestamps & Sizes of user-made requests.
+	 * Can be configured via the application.properties file
+	 * Defaults to Integer.MAX_VALUE (approximately every 24 days)
+	 *
+	 */
+	@Scheduled(fixedRateString = "${ratelimiter.clear.timer:2147483647}")
+	public void clearRateLimiterInMemory(){
+		rateLimiterInMemory.clear();
+	}
+
 	public boolean isRateLimiterEnabled() {
 		return rateLimiterEnabled;
 	}
 	public void setRateLimiterEnabled(boolean b){
 		rateLimiterEnabled=b;
 	}
-
-	//public void init(FilterConfig filterConfig) {}
 
 	public void destroy() {}
 

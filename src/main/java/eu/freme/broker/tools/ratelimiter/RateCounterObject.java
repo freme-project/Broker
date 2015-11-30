@@ -65,7 +65,7 @@ public class RateCounterObject {
         }
 
         if (max_size!=0 && totalSize >= max_size*1024) {
-            throw new TooManyRequestsException("Your requests totalling "+totalSize+ "kb exceeded the allowed "+max_size+" kb of data. Please wait until making more requests.");
+            throw new TooManyRequestsException("Your requests totalling "+totalSize/1024+ "kb exceeded the allowed "+max_size+" kb of data. Please wait until making more requests.");
         }
 
     }

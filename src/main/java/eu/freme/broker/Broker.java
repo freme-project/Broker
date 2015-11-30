@@ -42,6 +42,7 @@ import eu.freme.eservices.elink.ELinkConfig;
 import eu.freme.eservices.epublishing.EPublishingConfig;
 import eu.freme.eservices.pipelines.api.PipelineConfig;
 import eu.freme.i18n.api.EInternationalizationConfig;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * configures broker without api endpoints and e-Services
@@ -54,6 +55,7 @@ import eu.freme.i18n.api.EInternationalizationConfig;
 		EPublishingConfig.class, FREMECommonConfig.class,
 		PipelineConfig.class, EInternationalizationConfig.class })
 @Profile("broker")
+@EnableScheduling
 public class Broker {
 	
 	static Logger logger = Logger.getLogger(Broker.class);

@@ -2,7 +2,7 @@ time-frame: 600   # time period in seconds
 rate-limits:
   ROLE_ANONYMOUS:
     default:
-      - 50
+      - 2
       - 1000 # anomyous user has 50 requests or 1000 kb in the time period
     /e-entity/freme-ner/documents:
       - 10
