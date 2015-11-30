@@ -33,7 +33,7 @@ import eu.freme.common.conversion.rdf.RDFConstants;
 /**
  * @author Jan Nehring - jan.nehring@dfki.de
  */
-@Ignore
+
 public class TildeETranslationTest extends EServiceTest {
 
 	String sourceLang = "en";

@@ -33,7 +33,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import eu.freme.broker.eservices.BaseRestController;
 
-@Ignore
 public class UserControllerTest {
 
 	String baseUrl = null;
