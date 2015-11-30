@@ -64,8 +64,13 @@ public class RateLimitingFilter extends GenericFilterBean {
 
 
 	@PostConstruct
-	public void setup () {
-		rateLimiterInMemory.refresh(rateLimiterYaml);
+	public void setup () throws IOException {
+		try {
+			rateLimiterInMemory.refresh(rateLimiterYaml);
+		} catch (IOException e ){
+			setRateLimiterEnabled(false);
+		}
+
 	}
 
 	public RateLimitingFilter(){
@@ -132,7 +137,11 @@ public class RateLimitingFilter extends GenericFilterBean {
 	}
 
 	public void refresh(){
-		rateLimiterInMemory.refresh(rateLimiterYaml);
+		try{
+			rateLimiterInMemory.refresh(rateLimiterYaml);
+		} catch (IOException e) {
+			setRateLimiterEnabled(false);
+		}
 	}
 	public void destroy() {}
 

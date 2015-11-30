@@ -8,8 +8,11 @@ import org.springframework.core.io.FileSystemResource;
 
 
 import javax.annotation.PostConstruct;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Jonathan Sauder (jonathan.sauder@student.hpi.de) on 18.11.15.
@@ -31,13 +34,22 @@ public class RateLimiterInMemory implements RateCounterInterface {
     public RateLimiterInMemory(){
     }
 
-    public void refresh(String rateLimiterYaml) {
+    public void refresh(String rateLimiterYaml) throws IOException {
 
         YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
-        yaml.setResources( new FileSystemResource(rateLimiterYaml));
-        rateLimiterProperties = yaml.getObject();
-        this.time_frame=(int)rateLimiterProperties.get("time-frame")*1000;
-        clear();
+        try {
+
+            FileSystemResource res = new FileSystemResource(rateLimiterYaml);
+            res.getInputStream();
+            yaml.setResources(res);
+            rateLimiterProperties = yaml.getObject();
+            this.time_frame=(int)rateLimiterProperties.get("time-frame")*1000;
+            clear();
+        } catch (IOException e) {
+            Logger logger = Logger.getLogger(RateLimiterInMemory.class);
+            logger.error("Could not find ratelimiter.yaml at: "+ rateLimiterYaml);
+            throw e;
+        }
 
     }
 
