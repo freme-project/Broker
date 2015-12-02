@@ -19,7 +19,6 @@ package eu.freme.broker.tools;
 
 import static org.junit.Assert.*;
 
-import eu.freme.broker.Broker;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -36,7 +35,7 @@ import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Broker.class)
+@SpringApplicationConfiguration(classes = FremeCommonConfig.class)
 public class NIFParameterFactoryTest {
 
 	@Autowired
@@ -58,13 +57,13 @@ public class NIFParameterFactoryTest {
 				"text/turtle", "input", "text/turtle", "text/turtle",
 				"http://example.org");
 		assertTrue(set.getInput().equals("input"));
-		
+
 		thrown.expect(BadRequestException.class);
 		nifParameterFactory.constructFromHttp(null, "text/turtle",
 				"text/turtle", null, "text/turtle", "text/turtle",
 				"http://example.org");
 		thrown = ExpectedException.none();
-		
+
 		// test informat
 		set = nifParameterFactory.constructFromHttp("input", "text/turtle",
 				"application/json+ld", "abc", "text/turtle", "text/turtle",
@@ -75,12 +74,12 @@ public class NIFParameterFactoryTest {
 				"application/json+ld", "abc", "text/turtle", "application/json+ld",
 				"http://example.org");
 		assertTrue(set.getInformat().equals(RDFSerialization.JSON_LD));
-		
+
 		set = nifParameterFactory.constructFromHttp("input", null,
 				null, "abc", null, null,
 				"http://example.org");
 		assertTrue(set.getInformat().equals(RDFSerialization.TURTLE));
-		
+
 		// test outformat
 		set = nifParameterFactory.constructFromHttp("input", "text/turtle",
 				"application/json+ld", "abc", "application/json+ld", "text/turtle",

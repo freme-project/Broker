@@ -23,7 +23,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import eu.freme.broker.tools.BrokerExceptionHandler;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -70,8 +69,6 @@ public class Broker {
     	return new RDFELinkSerializationFormats();
     }
 
-	@Bean
-	public BrokerExceptionHandler brokerExceptionHandler() { return new BrokerExceptionHandler(); }
 
 
 	@PostConstruct
