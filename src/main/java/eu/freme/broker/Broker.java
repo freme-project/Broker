@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import eu.freme.broker.tools.BrokerExceptionHandler;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -68,7 +69,11 @@ public class Broker {
     public RDFELinkSerializationFormats eLinkRdfFormats(){
     	return new RDFELinkSerializationFormats();
     }
-    
+
+	@Bean
+	public BrokerExceptionHandler brokerExceptionHandler() { return new BrokerExceptionHandler(); }
+
+
 	@PostConstruct
 	public void init() {
 		// create workspace folder

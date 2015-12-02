@@ -19,6 +19,7 @@ package eu.freme.broker.tools;
 
 import static org.junit.Assert.*;
 
+import eu.freme.broker.Broker;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -35,7 +36,7 @@ import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = FremeCommonConfig.class)
+@SpringApplicationConfiguration(classes = Broker.class)
 public class NIFParameterFactoryTest {
 
 	@Autowired
