@@ -70,11 +70,14 @@ public class UserController extends BaseRestController {
 		if( password.length() < 8 ){
 			throw new BadRequestException("The passwords needs to be at least 8 characters long");
 		}
-		
+
+		if (username.equals("ROLE_USER") || username.equals("ROLE_ADMIN") || username.equals("ROLE_ANONYMOUS")) {
+			throw new BadRequestException("The username can not be" + username + " because this name is reserved for a user role");
+		}
 		try {
 			String hashedPassword = PasswordHasher.getSaltedHash(password);
 			User user = new User(username, hashedPassword, User.roleUser);
-			userDAO.save(user);
+			user = userDAO.save(user);
 			return user;
 		} catch (Exception e) {
 			logger.error(e);

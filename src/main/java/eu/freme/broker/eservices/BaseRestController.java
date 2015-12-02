@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.InternalServerErrorException;
 
 import eu.freme.broker.exception.BadRequestException;
-import eu.freme.broker.tools.*;
+
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +41,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import eu.freme.broker.exception.FREMEHttpException;
+import eu.freme.broker.tools.ExceptionHandlerService;
+import eu.freme.broker.tools.NIFParameterFactory;
+import eu.freme.broker.tools.NIFParameterSet;
+import eu.freme.broker.tools.RDFELinkSerializationFormats;
+import eu.freme.broker.tools.RDFSerializationFormats;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConversionService;
 
@@ -63,10 +68,10 @@ public abstract class BaseRestController {
 	RDFSerializationFormats rdfSerializationFormats;
 
 	@Autowired
-	BrokerExceptionHandler brokerExceptionHandler;
-
-	@Autowired
 	RDFELinkSerializationFormats rdfELinkSerializationFormats;
+	
+	@Autowired
+	ExceptionHandlerService exceptionHandlerService;
 	
 	public static final String authenticationEndpoint = "/authenticate";
 
@@ -168,12 +173,11 @@ public abstract class BaseRestController {
 	 * @param exception
 	 * @return
 	 */
-	/*@ExceptionHandler(Exception.class)
-	public ResponseEntity<String> handler (HttpServletRequest req, Exception exception) {
-		return brokerExceptionHandler.handleError(req, exception);
-	}*/
-
-
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> handleError(HttpServletRequest req,
+			Exception exception) {
+		return exceptionHandlerService.handleError(req, exception);
+	}
 
 	/**
 	 * Create a ResponseEntity for a REST API method. It accepts a Jena Model
@@ -196,7 +200,5 @@ public abstract class BaseRestController {
 		}
 		return new ResponseEntity<>(rdfString, responseHeaders, HttpStatus.OK);
 	}
-
-
 
 }

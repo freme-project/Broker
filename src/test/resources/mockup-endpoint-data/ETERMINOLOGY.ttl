@@ -1,0 +1,854 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>.
+@prefix its: <http://www.w3.org/2005/11/its>.
+@prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#>.
+@prefix cc: <http://creativecommons.org/ns#>.
+@prefix : <https://term.tilde.com/terms/>.
+@prefix void: <http://rdfs.org/ns/void#>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix tbx: <http://tbx2rdf.lider-project.eu/tbx#>.
+@prefix decomp: <http://www.w3.org/ns/lemon/decomp#>.
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix ontolex: <http://www.w3.org/ns/lemon/ontolex#>.
+@prefix ldr: <http://purl.oclc.org/NET/ldr/ns#>.
+@prefix odrl: <http://www.w3.org/ns/odrl/2/>.
+@prefix dcat: <http://www.w3.org/ns/dcat#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+
+_:autos336 rdfs:label "show"@en,
+                      "showing"@en;
+           itsrdf:taConfidence 0 .
+_:autos337 rdfs:label "source"@en;
+           itsrdf:taConfidence 0.4113.
+_:autos338 rdfs:label "light"@en,
+                      "lighted"@en,
+                      "lighting"@en,
+                      "lights"@en;
+           itsrdf:taConfidence 1 .
+<http://freme-project.eu/#char=0,17> nif:beginIndex "0"^^xsd:nonNegativeInteger;
+                                     nif:endIndex "32"^^xsd:nonNegativeInteger;
+                                     nif:isString "Show me the source of the light."@en;
+                                     a nif:Context,
+                                       nif:RFC5147String,
+                                       nif:String.
+<http://freme-project.eu/#char=0,4> nif:anchorOf "Show"@en;
+                                    nif:annotationUnit _:autos336;
+                                    nif:beginIndex "0"^^xsd:nonNegativeInteger;
+                                    nif:endIndex "4"^^xsd:nonNegativeInteger;
+                                    nif:referenceContext <http://freme-project.eu/#char=0,17>;
+                                    a nif:RFC5147String;
+                                    itsrdf:term "yes";
+                                    itsrdf:termInfoRef :1138805,
+                                                       :1143693,
+                                                       :1168087,
+                                                       :2742875,
+                                                       :524304,
+                                                       :525380,
+                                                       :627673,
+                                                       :655345,
+                                                       :991196.
+<http://freme-project.eu/#char=12,18> nif:anchorOf "source"@en;
+                                      nif:annotationUnit _:autos337;
+                                      nif:beginIndex "12"^^xsd:nonNegativeInteger;
+                                      nif:endIndex "18"^^xsd:nonNegativeInteger;
+                                      nif:referenceContext <http://freme-project.eu/#char=0,17>;
+                                      a nif:RFC5147String;
+                                      itsrdf:term "yes";
+                                      itsrdf:termInfoRef :1149362,
+                                                         :1158659,
+                                                         :1231312,
+                                                         :1231313,
+                                                         :1231314,
+                                                         :1231316,
+                                                         :2793138,
+                                                         :2966560,
+                                                         :3090486,
+                                                         :3448822,
+                                                         :406457,
+                                                         :517862,
+                                                         :591516.
+<http://freme-project.eu/#char=26,31> nif:anchorOf "light"@en;
+                                      nif:annotationUnit _:autos338;
+                                      nif:beginIndex "26"^^xsd:nonNegativeInteger;
+                                      nif:endIndex "31"^^xsd:nonNegativeInteger;
+                                      nif:referenceContext <http://freme-project.eu/#char=0,17>;
+                                      a nif:RFC5147String;
+                                      itsrdf:term "yes";
+                                      itsrdf:termInfoRef <http://aims.fao.org/aos/agrovoc/c_4322>,
+                                                         <http://aims.fao.org/aos/agrovoc/c_4326>,
+                                                         :1141539,
+                                                         :1143768,
+                                                         :1149289,
+                                                         :1149650,
+                                                         :1151565,
+                                                         :1154790,
+                                                         :1158213,
+                                                         :1160847,
+                                                         :1166250,
+                                                         :1169348,
+                                                         :1169925,
+                                                         :1173455,
+                                                         :1174787,
+                                                         :1224335,
+                                                         :1431876,
+                                                         :1435876,
+                                                         :273537,
+                                                         :2741432,
+                                                         :2741433,
+                                                         :2749463,
+                                                         :2751444,
+                                                         :2967993,
+                                                         :357406,
+                                                         :384454,
+                                                         :561792,
+                                                         :561872,
+                                                         :562040,
+                                                         :591684,
+                                                         :614579,
+                                                         :654063,
+                                                         :654064,
+                                                         :747352,
+                                                         :747375,
+                                                         :747388.
+<https://term.tilde.com/terms/> <http://purl.org/dc/elements/1.1/source> "";
+                                dct:type "TBX";
+                                tbx:encodingDesc """<p type=\"XCSURI\">http://www.ttt.org/oscarstandards/tbx/TBXXCS.xcs</p>"""^^<http://www.w3.org/1999/02/22-rdf-syntax-ns##XMLLiteral>;
+                                tbx:sourceDesc "<sourceDesc><p/></sourceDesc>"^^<http://www.w3.org/1999/02/22-rdf-syntax-ns##XMLLiteral>;
+                                a tbx:MartifHeader,
+                                  dcat:Dataset.
+:1138805 tbx:subjectField <https://term.tilde.com/domains/3226>,
+                          <https://term.tilde.com/domains/TaaS-2003>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: OOK"@en,
+                      "Radioredaktion"@en.
+:1141539 tbx:subjectField <https://term.tilde.com/domains/2426>,
+                          <https://term.tilde.com/domains/4006>,
+                          <https://term.tilde.com/domains/4421>,
+                          <https://term.tilde.com/domains/6406>,
+                          <https://term.tilde.com/domains/TaaS-0301>,
+                          <https://term.tilde.com/domains/TaaS-0303>,
+                          <https://term.tilde.com/domains/TaaS-1500>;
+         a skos:Concept;
+         rdfs:comment "Eventmanagement"@en,
+                      "Lenoch code: EC8"@en.
+:1143693 tbx:subjectField <https://term.tilde.com/domains/20>,
+                          <https://term.tilde.com/domains/TaaS-0304>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: COD"@en,
+                      "Messe"@en.
+:1143768 tbx:subjectField <https://term.tilde.com/domains/20>,
+                          <https://term.tilde.com/domains/TaaS-0304>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: COD"@en,
+                      "Messe"@en.
+:1149289 tbx:subjectField <https://term.tilde.com/domains/3606>,
+                          <https://term.tilde.com/domains/TaaS-2100>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: PH"@en,
+                      "Strahlungsphysik"@en.
+:1149362 tbx:subjectField <https://term.tilde.com/domains/3606>,
+                          <https://term.tilde.com/domains/TaaS-2100>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: PH"@en,
+                      "Strahlungsphysik"@en.
+:1149650 tbx:subjectField <https://term.tilde.com/domains/2831>,
+                          <https://term.tilde.com/domains/3206>,
+                          <https://term.tilde.com/domains/TaaS-2001>,
+                          <https://term.tilde.com/domains/TaaS-2005>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: AR"@en,
+                      "Medien|Filmproduktion"@en.
+:1151565 tbx:subjectField <https://term.tilde.com/domains/1211>,
+                          <https://term.tilde.com/domains/TaaS-0201>;
+         a skos:Concept;
+         rdfs:comment "Immobilienverwaltung|Hausverwaltung"@en,
+                      "Lenoch code: TS"@en.
+:1154790 tbx:subjectField <https://term.tilde.com/domains/44>,
+                          <https://term.tilde.com/domains/4406>,
+                          <https://term.tilde.com/domains/6821>,
+                          <https://term.tilde.com/domains/TaaS-0300>,
+                          <https://term.tilde.com/domains/TaaS-1504>;
+         a skos:Concept;
+         rdfs:comment "Arbeitssicherheit|Inverkehrbringen von Maschinen"@en,
+                      "Lenoch code: MG|TV"@en.
+:1158213 tbx:subjectField <https://term.tilde.com/domains/3606>,
+                          <https://term.tilde.com/domains/TaaS-2100>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: PH"@en,
+                      "Optik|Licht"@en.
+:1158659 tbx:subjectField <https://term.tilde.com/domains/52>,
+                          <https://term.tilde.com/domains/5206>,
+                          <https://term.tilde.com/domains/TaaS-1100>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: EN"@en,
+                      "Luftverschmutzung"@en.
+:1160847 tbx:subjectField <https://term.tilde.com/domains/6846>,
+                          <https://term.tilde.com/domains/TaaS-1500>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: IN"@en,
+                      "Nähmaschine"@en.
+:1166250 tbx:subjectField <https://term.tilde.com/domains/6411>,
+                          <https://term.tilde.com/domains/TaaS-1500>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: TE"@en,
+                      "Technik|Energietechnik|Solarenergie"@en.
+:1168087 tbx:subjectField <https://term.tilde.com/domains/48>,
+                          <https://term.tilde.com/domains/TaaS-1509>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: TR"@en,
+                      "Tourismus"@en.
+:1169348 tbx:subjectField <https://term.tilde.com/domains/6846>,
+                          <https://term.tilde.com/domains/TaaS-1500>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: PG"@en,
+                      "Zeitung"@en.
+:1169925 tbx:subjectField <https://term.tilde.com/domains/48>,
+                          <https://term.tilde.com/domains/TaaS-1509>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: TR"@en,
+                      "Transrapid"@en.
+:1173455 tbx:subjectField <https://term.tilde.com/domains/48>,
+                          <https://term.tilde.com/domains/TaaS-1509>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: TR"@en,
+                      "Technik|Motorrad"@en.
+:1174787 tbx:subjectField <https://term.tilde.com/domains/6846>,
+                          <https://term.tilde.com/domains/TaaS-1500>;
+         a skos:Concept;
+         rdfs:comment "Lenoch code: SP"@en,
+                      "Sport|Eishockey"@en.
+:1224335 tbx:subjectField <https://term.tilde.com/domains/3236>,
+                          <https://term.tilde.com/domains/TaaS-1501>;
+         a skos:Concept;
+         rdfs:comment "information technology and data processing"@en.
+:1231312 tbx:subjectField <https://term.tilde.com/domains/3236>,
+                          <https://term.tilde.com/domains/TaaS-1501>;
+         a skos:Concept;
+         rdfs:comment "information technology and data processing"@en.
+:1231313 tbx:subjectField <https://term.tilde.com/domains/3236>,
+                          <https://term.tilde.com/domains/TaaS-1501>;
+         a skos:Concept;
+         rdfs:comment "information technology and data processing"@en.
+:1231314 tbx:subjectField <https://term.tilde.com/domains/3236>,
+                          <https://term.tilde.com/domains/TaaS-1501>;
+         a skos:Concept;
+         rdfs:comment "information technology and data processing"@en.
+:1231316 tbx:subjectField <https://term.tilde.com/domains/3236>,
+                          <https://term.tilde.com/domains/TaaS-1501>;
+         a skos:Concept;
+         rdfs:comment "information technology and data processing"@en.
+:1431876 tbx:classificationCode "120303;180603;280390"@en;
+         tbx:subjectField <https://term.tilde.com/domains/12>,
+                          <https://term.tilde.com/domains/TaaS-0200>;
+         a skos:Concept;
+         rdfs:comment "intelectual domain"@en.
+:1435876 tbx:subjectField <https://term.tilde.com/domains/12>,
+                          <https://term.tilde.com/domains/TaaS-0200>;
+         a skos:Concept;
+         rdfs:comment "intelectual domain"@en.
+:273537 tbx:subjectField <https://term.tilde.com/domains/6836>,
+                         <https://term.tilde.com/domains/TaaS-1507>;
+        a skos:Concept;
+        rdfs:comment "wood industry"@en.
+:2741432 tbx:subjectField <https://term.tilde.com/domains/52>,
+                          <https://term.tilde.com/domains/TaaS-1100>;
+         a skos:Concept.
+:2741433 tbx:subjectField <https://term.tilde.com/domains/52>,
+                          <https://term.tilde.com/domains/TaaS-1100>;
+         a skos:Concept.
+:2742875 tbx:subjectField <https://term.tilde.com/domains/52>,
+                          <https://term.tilde.com/domains/TaaS-1100>;
+         a skos:Concept.
+:2749463 tbx:subjectField <https://term.tilde.com/domains/4816001>,
+                          <https://term.tilde.com/domains/TaaS-1509>;
+         a skos:Concept.
+:2751444 tbx:subjectField <https://term.tilde.com/domains/4816001>,
+                          <https://term.tilde.com/domains/TaaS-1509>;
+         a skos:Concept.
+:2793138 tbx:subjectField <https://term.tilde.com/domains/52>,
+                          <https://term.tilde.com/domains/TaaS-1100>;
+         a skos:Concept.
+:2966560 tbx:subjectField <https://term.tilde.com/domains/TaaS-1000>,
+                          <https://term.tilde.com/domains/unknown>;
+         a skos:Concept.
+:2967993 tbx:subjectField <https://term.tilde.com/domains/TaaS-1000>,
+                          <https://term.tilde.com/domains/unknown>;
+         a skos:Concept.
+:3090486 tbx:subjectField <https://term.tilde.com/domains/2811>,
+                          <https://term.tilde.com/domains/TaaS-2000>;
+         a skos:Concept.
+:3448822 tbx:subjectField <https://term.tilde.com/domains/TaaS-1501>;
+         a skos:Concept.
+:357406 tbx:subjectField <https://term.tilde.com/domains/12>,
+                         <https://term.tilde.com/domains/36>,
+                         <https://term.tilde.com/domains/TaaS-0100>,
+                         <https://term.tilde.com/domains/TaaS-0200>,
+                         <https://term.tilde.com/domains/TaaS-2100>,
+                         <https://term.tilde.com/domains/unknown>;
+        a skos:Concept;
+        rdfs:comment "LAW"@en,
+                     "POLITICS"@en,
+                     "SCIENCE"@en.
+:384454 tbx:subjectField <https://term.tilde.com/domains/3231>,
+                         <https://term.tilde.com/domains/3236>,
+                         <https://term.tilde.com/domains/3606>,
+                         <https://term.tilde.com/domains/TaaS-1501>,
+                         <https://term.tilde.com/domains/TaaS-2000>,
+                         <https://term.tilde.com/domains/TaaS-2100>;
+        a skos:Concept;
+        rdfs:comment "information and information processing"@en,
+                     "information technology and data processing"@en,
+                     "natural and applied sciences"@en.
+:406457 tbx:subjectField <https://term.tilde.com/domains/3231>,
+                         <https://term.tilde.com/domains/3236>,
+                         <https://term.tilde.com/domains/3606>,
+                         <https://term.tilde.com/domains/TaaS-1501>,
+                         <https://term.tilde.com/domains/TaaS-2000>,
+                         <https://term.tilde.com/domains/TaaS-2100>;
+        a skos:Concept;
+        rdfs:comment "information and information processing"@en,
+                     "information technology and data processing"@en,
+                     "natural and applied sciences"@en.
+:517862 tbx:subjectField <https://term.tilde.com/domains/16>,
+                         <https://term.tilde.com/domains/3221>,
+                         <https://term.tilde.com/domains/40>,
+                         <https://term.tilde.com/domains/TaaS-0300>,
+                         <https://term.tilde.com/domains/TaaS-0301>,
+                         <https://term.tilde.com/domains/TaaS-2003>;
+        a skos:Concept;
+        rdfs:comment "BUSINESS AND COMPETITION"@en,
+                     "documentation"@en,
+                     "ECONOMICS"@en.
+:524304 tbx:subjectField <https://term.tilde.com/domains/16>,
+                         <https://term.tilde.com/domains/3221>,
+                         <https://term.tilde.com/domains/40>,
+                         <https://term.tilde.com/domains/TaaS-0300>,
+                         <https://term.tilde.com/domains/TaaS-0301>,
+                         <https://term.tilde.com/domains/TaaS-2003>;
+        a skos:Concept;
+        rdfs:comment "BUSINESS AND COMPETITION"@en,
+                     "documentation"@en,
+                     "ECONOMICS"@en.
+:525380 tbx:subjectField <https://term.tilde.com/domains/16>,
+                         <https://term.tilde.com/domains/3221>,
+                         <https://term.tilde.com/domains/40>,
+                         <https://term.tilde.com/domains/TaaS-0300>,
+                         <https://term.tilde.com/domains/TaaS-0301>,
+                         <https://term.tilde.com/domains/TaaS-2003>;
+        a skos:Concept;
+        rdfs:comment "BUSINESS AND COMPETITION"@en,
+                     "documentation"@en,
+                     "ECONOMICS"@en.
+:561792 tbx:subjectField <https://term.tilde.com/domains/66>,
+                         <https://term.tilde.com/domains/TaaS-1200>;
+        a skos:Concept;
+        rdfs:comment "66 ENERGY; EL"@en,
+                     "ENERGY"@en.
+:561872 tbx:subjectField <https://term.tilde.com/domains/66>,
+                         <https://term.tilde.com/domains/TaaS-1200>;
+        a skos:Concept;
+        rdfs:comment "66 ENERGY; EL"@en,
+                     "ENERGY"@en.
+:562040 tbx:relatedConcept "tume"@en;
+        tbx:subjectField <https://term.tilde.com/domains/66>,
+                         <https://term.tilde.com/domains/TaaS-1200>;
+        a skos:Concept;
+        rdfs:comment "66 ENERGY; EL"@en,
+                     "ENERGY"@en.
+:591516 tbx:subjectField <https://term.tilde.com/domains/3606>,
+                         <https://term.tilde.com/domains/6821>,
+                         <https://term.tilde.com/domains/TaaS-1504>,
+                         <https://term.tilde.com/domains/TaaS-2100>;
+        a skos:Concept;
+        rdfs:comment "mechanical engineering"@en,
+                     "natural and applied sciences"@en.
+:591684 tbx:subjectField <https://term.tilde.com/domains/3606>,
+                         <https://term.tilde.com/domains/6821>,
+                         <https://term.tilde.com/domains/TaaS-1504>,
+                         <https://term.tilde.com/domains/TaaS-2100>;
+        a skos:Concept;
+        rdfs:comment "mechanical engineering"@en,
+                     "natural and applied sciences"@en.
+:614579 tbx:relatedConcept "lighting equipment"@en;
+        tbx:subjectField <https://term.tilde.com/domains/3231>,
+                         <https://term.tilde.com/domains/6831>,
+                         <https://term.tilde.com/domains/TaaS-1506>,
+                         <https://term.tilde.com/domains/TaaS-2000>;
+        a skos:Concept;
+        rdfs:comment "building and public works"@en,
+                     "information and information processing"@en.
+:627673 tbx:subjectField <https://term.tilde.com/domains/2831>,
+                         <https://term.tilde.com/domains/TaaS-2005>;
+        a skos:Concept;
+        rdfs:comment "culture and religion"@en.
+:654063 tbx:subjectField <https://term.tilde.com/domains/5206>,
+                         <https://term.tilde.com/domains/TaaS-1100>;
+        a skos:Concept;
+        rdfs:comment "environmental policy"@en.
+:654064 tbx:subjectField <https://term.tilde.com/domains/5206>,
+                         <https://term.tilde.com/domains/TaaS-1100>;
+        a skos:Concept;
+        rdfs:comment "environmental policy"@en.
+:655345 tbx:subjectField <https://term.tilde.com/domains/5206>,
+                         <https://term.tilde.com/domains/TaaS-1100>;
+        a skos:Concept;
+        rdfs:comment "environmental policy"@en.
+:747352 tbx:subjectField <https://term.tilde.com/domains/52>,
+                         <https://term.tilde.com/domains/TaaS-1100>;
+        a skos:Concept;
+        rdfs:comment "ENVIRONMENT"@en,
+                     "ISO 13943 113."@en.
+:747375 tbx:subjectField <https://term.tilde.com/domains/52>,
+                         <https://term.tilde.com/domains/TaaS-1100>;
+        a skos:Concept;
+        rdfs:comment "ENVIRONMENT"@en,
+                     "ISO 13943 114."@en.
+:747388 tbx:subjectField <https://term.tilde.com/domains/52>,
+                         <https://term.tilde.com/domains/TaaS-1100>;
+        a skos:Concept;
+        rdfs:comment "ENVIRONMENT"@en,
+                     "ISO 13943 115."@en.
+:991196 tbx:subjectField <https://term.tilde.com/domains/12>,
+                         <https://term.tilde.com/domains/2431>,
+                         <https://term.tilde.com/domains/3236>,
+                         <https://term.tilde.com/domains/48>,
+                         <https://term.tilde.com/domains/TaaS-0200>,
+                         <https://term.tilde.com/domains/TaaS-0306>,
+                         <https://term.tilde.com/domains/TaaS-1000>,
+                         <https://term.tilde.com/domains/TaaS-1501>,
+                         <https://term.tilde.com/domains/TaaS-1509>,
+                         <https://term.tilde.com/domains/unknown>;
+        a skos:Concept;
+        rdfs:comment "AG - Agriculture - Food Industry - Livestock Industry - Fisheries - Bio-industry  (Lenoch classification);  AS7 - land vehicle insurance (sn: other than railway rolling stock)  (Lenoch classification);  OO - Telecommunications - Signalling - Postal Services - Parcel services  (Lenoch classification);  TR5 - land transport - road traffic (sn: other than railways; rf: for vehicle industry, see: INT5 and INT6)  (Lenoch classification);  JUF - canon law  (Lenoch classification);  JU71 - social security law (nt: social security law in restricted sense)  (Lenoch classification);"@en.
+:Ausstellung-de a ontolex:LexicalEntry;
+                ontolex:canonicalForm <https://term.tilde.com/terms/Ausstellung-de#CanonicalForm>;
+                ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                ontolex:sense <https://term.tilde.com/terms/Ausstellung-de#Sense>.
+<https://term.tilde.com/terms/Ausstellung-de#CanonicalForm> ontolex:writtenRep "Ausstellung"@de.
+<https://term.tilde.com/terms/Ausstellung-de#Sense> ontolex:reference :1143693,
+                                                                      :1168087,
+                                                                      :627673.
+:Beleuchtung-de tbx:reliabilityCode 1 ,
+                                    3 ;
+                a ontolex:LexicalEntry;
+                ontolex:canonicalForm <https://term.tilde.com/terms/Beleuchtung-de#CanonicalForm>;
+                ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                ontolex:sense <https://term.tilde.com/terms/Beleuchtung-de#Sense>.
+<https://term.tilde.com/terms/Beleuchtung-de#CanonicalForm> ontolex:writtenRep "Beleuchtung"@de.
+<https://term.tilde.com/terms/Beleuchtung-de#Sense> ontolex:reference :1143768,
+                                                                      :1149650,
+                                                                      :1151565,
+                                                                      :1154790,
+                                                                      :1169925,
+                                                                      :1431876,
+                                                                      :273537,
+                                                                      :2741433,
+                                                                      :2967993,
+                                                                      :357406,
+                                                                      :384454,
+                                                                      :561872,
+                                                                      :614579,
+                                                                      :654064.
+:Emissionsquelle-de a ontolex:LexicalEntry;
+                    ontolex:canonicalForm <https://term.tilde.com/terms/Emissionsquelle-de#CanonicalForm>;
+                    ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                    ontolex:sense <https://term.tilde.com/terms/Emissionsquelle-de#Sense>.
+<https://term.tilde.com/terms/Emissionsquelle-de#CanonicalForm> ontolex:writtenRep "Emissionsquelle"@de.
+<https://term.tilde.com/terms/Emissionsquelle-de#Sense> ontolex:reference :1158659.
+:Fundstelle-de tbx:reliabilityCode 3 ;
+               a ontolex:LexicalEntry;
+               ontolex:canonicalForm <https://term.tilde.com/terms/Fundstelle-de#CanonicalForm>;
+               ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+               ontolex:sense <https://term.tilde.com/terms/Fundstelle-de#Sense>.
+<https://term.tilde.com/terms/Fundstelle-de#CanonicalForm> ontolex:writtenRep "Fundstelle"@de.
+<https://term.tilde.com/terms/Fundstelle-de#Sense> ontolex:reference :3090486.
+:Kennziffer-de a ontolex:LexicalEntry;
+               ontolex:canonicalForm <https://term.tilde.com/terms/Kennziffer-de#CanonicalForm>;
+               ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+               ontolex:sense <https://term.tilde.com/terms/Kennziffer-de#Sense>.
+<https://term.tilde.com/terms/Kennziffer-de#CanonicalForm> ontolex:writtenRep "Kennziffer"@de.
+<https://term.tilde.com/terms/Kennziffer-de#Sense> ontolex:reference :524304.
+:Leuchte-de tbx:reliabilityCode 3 ;
+            a ontolex:LexicalEntry;
+            ontolex:canonicalForm <https://term.tilde.com/terms/Leuchte-de#CanonicalForm>;
+            ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+            ontolex:sense <https://term.tilde.com/terms/Leuchte-de#Sense>.
+<https://term.tilde.com/terms/Leuchte-de#CanonicalForm> ontolex:writtenRep "Leuchte"@de.
+<https://term.tilde.com/terms/Leuchte-de#Sense> ontolex:reference :2751444.
+:Licht-de tbx:reliabilityCode 3 ;
+          a ontolex:LexicalEntry;
+          ontolex:canonicalForm <https://term.tilde.com/terms/Licht-de#CanonicalForm>;
+          ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+          ontolex:sense <https://term.tilde.com/terms/Licht-de#Sense>.
+<https://term.tilde.com/terms/Licht-de#CanonicalForm> ontolex:writtenRep "Licht"@de.
+<https://term.tilde.com/terms/Licht-de#Sense> ontolex:reference :1141539,
+                                                                :1158213,
+                                                                :1166250,
+                                                                :1224335,
+                                                                :1431876,
+                                                                :2741432,
+                                                                :561792,
+                                                                :591684,
+                                                                :654063.
+:Lichtanlage-de a ontolex:LexicalEntry;
+                ontolex:canonicalForm <https://term.tilde.com/terms/Lichtanlage-de#CanonicalForm>;
+                ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                ontolex:sense <https://term.tilde.com/terms/Lichtanlage-de#Sense>.
+<https://term.tilde.com/terms/Lichtanlage-de#CanonicalForm> ontolex:writtenRep "Lichtanlage"@de.
+<https://term.tilde.com/terms/Lichtanlage-de#Sense> ontolex:reference :1173455.
+:Lichter-de tbx:reliabilityCode 3 ;
+            a ontolex:LexicalEntry;
+            ontolex:canonicalForm <https://term.tilde.com/terms/Lichter-de#CanonicalForm>;
+            ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+            ontolex:sense <https://term.tilde.com/terms/Lichter-de#Sense>.
+<https://term.tilde.com/terms/Lichter-de#CanonicalForm> ontolex:writtenRep "Lichter"@de.
+<https://term.tilde.com/terms/Lichter-de#Sense> ontolex:reference :2751444.
+:Lichtquelle-de a ontolex:LexicalEntry;
+                ontolex:canonicalForm <https://term.tilde.com/terms/Lichtquelle-de#CanonicalForm>;
+                ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                ontolex:sense <https://term.tilde.com/terms/Lichtquelle-de#Sense>.
+<https://term.tilde.com/terms/Lichtquelle-de#CanonicalForm> ontolex:writtenRep "Lichtquelle"@de.
+<https://term.tilde.com/terms/Lichtquelle-de#Sense> ontolex:reference :1149362.
+:N%C3%A4hleuchte-de a ontolex:LexicalEntry;
+                    ontolex:canonicalForm <https://term.tilde.com/terms/N%C3%A4hleuchte-de#CanonicalForm>;
+                    ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                    ontolex:sense <https://term.tilde.com/terms/N%C3%A4hleuchte-de#Sense>.
+<https://term.tilde.com/terms/N%C3%A4hleuchte-de#CanonicalForm> ontolex:writtenRep "Nähleuchte"@de.
+<https://term.tilde.com/terms/N%C3%A4hleuchte-de#Sense> ontolex:reference :1160847.
+:Quelle-de tbx:reliabilityCode 1 ,
+                               3 ;
+           tbx:xSource <http://taas.eurotermbank.com/extractor>;
+           a ontolex:LexicalEntry;
+           ontolex:canonicalForm <https://term.tilde.com/terms/Quelle-de#CanonicalForm>;
+           ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+           ontolex:sense <https://term.tilde.com/terms/Quelle-de#Sense>.
+<https://term.tilde.com/terms/Quelle-de#CanonicalForm> ontolex:writtenRep "Quelle"@de.
+<https://term.tilde.com/terms/Quelle-de#Sense> ontolex:reference :1231312,
+                                                                 :1231313,
+                                                                 :1231314,
+                                                                 :1231316,
+                                                                 :2793138,
+                                                                 :2966560,
+                                                                 :3448822,
+                                                                 :406457,
+                                                                 :517862,
+                                                                 :591516.
+:Raumbeleuchtung-de a ontolex:LexicalEntry;
+                    ontolex:canonicalForm <https://term.tilde.com/terms/Raumbeleuchtung-de#CanonicalForm>;
+                    ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                    ontolex:sense <https://term.tilde.com/terms/Raumbeleuchtung-de#Sense>.
+<https://term.tilde.com/terms/Raumbeleuchtung-de#CanonicalForm> ontolex:writtenRep "Raumbeleuchtung"@de.
+<https://term.tilde.com/terms/Raumbeleuchtung-de#Sense> ontolex:reference :1431876.
+:Schau-de a ontolex:LexicalEntry;
+          ontolex:canonicalForm <https://term.tilde.com/terms/Schau-de#CanonicalForm>;
+          ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+          ontolex:sense <https://term.tilde.com/terms/Schau-de#Sense>.
+<https://term.tilde.com/terms/Schau-de#CanonicalForm> ontolex:writtenRep "Schau"@de.
+<https://term.tilde.com/terms/Schau-de#Sense> ontolex:reference :525380.
+:Scheinwerfer-de tbx:reliabilityCode 3 ;
+                 a ontolex:LexicalEntry;
+                 ontolex:canonicalForm <https://term.tilde.com/terms/Scheinwerfer-de#CanonicalForm>;
+                 ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                 ontolex:sense <https://term.tilde.com/terms/Scheinwerfer-de#Sense>.
+<https://term.tilde.com/terms/Scheinwerfer-de#CanonicalForm> ontolex:writtenRep "Scheinwerfer"@de.
+<https://term.tilde.com/terms/Scheinwerfer-de#Sense> ontolex:reference :2749463.
+:Sendung-de a ontolex:LexicalEntry;
+            ontolex:canonicalForm <https://term.tilde.com/terms/Sendung-de#CanonicalForm>;
+            ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+            ontolex:sense <https://term.tilde.com/terms/Sendung-de#Sense>.
+<https://term.tilde.com/terms/Sendung-de#CanonicalForm> ontolex:writtenRep "Sendung"@de.
+<https://term.tilde.com/terms/Sendung-de#Sense> ontolex:reference :1138805.
+:Show-de tbx:reliabilityCode 3 ;
+         a ontolex:LexicalEntry;
+         ontolex:canonicalForm <https://term.tilde.com/terms/Show-de#CanonicalForm>;
+         ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+         ontolex:sense <https://term.tilde.com/terms/Show-de#Sense>.
+<https://term.tilde.com/terms/Show-de#CanonicalForm> ontolex:writtenRep "Show"@de.
+<https://term.tilde.com/terms/Show-de#Sense> ontolex:reference :2742875,
+                                                               :655345.
+:Signallampe-de a ontolex:LexicalEntry;
+                ontolex:canonicalForm <https://term.tilde.com/terms/Signallampe-de#CanonicalForm>;
+                ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                ontolex:sense <https://term.tilde.com/terms/Signallampe-de#Sense>.
+<https://term.tilde.com/terms/Signallampe-de#CanonicalForm> ontolex:writtenRep "Signallampe"@de.
+<https://term.tilde.com/terms/Signallampe-de#Sense> ontolex:reference :1174787.
+:TermComp-000e09ab-2969-4356-8944-47906b686d56 a ontolex:LexicalEntry;
+                                               rdfs:label "Quelle"@en;
+                                               decomp:identifies :TermComp-000e09ab-2969-4356-8944-47906b686d56.
+:TermComp-022adf35-1a96-4d69-84c0-194625e9bf70 a ontolex:LexicalEntry;
+                                               rdfs:label "Licht"@en;
+                                               decomp:identifies :TermComp-022adf35-1a96-4d69-84c0-194625e9bf70.
+:TermComp-07c7b61f-eb97-4182-907c-94372c94524d a ontolex:LexicalEntry;
+                                               rdfs:label "Beleuchtung"@en;
+                                               decomp:identifies :TermComp-07c7b61f-eb97-4182-907c-94372c94524d.
+:TermComp-093dfe8b-4dee-4b9f-9d1d-de870cb92c63 a ontolex:LexicalEntry;
+                                               rdfs:label "Quelle"@en;
+                                               decomp:identifies :TermComp-093dfe8b-4dee-4b9f-9d1d-de870cb92c63.
+:TermComp-62ce1520-764a-4b5f-b814-67e26d53ba2e a ontolex:LexicalEntry;
+                                               rdfs:label "alight"@en;
+                                               decomp:identifies :TermComp-62ce1520-764a-4b5f-b814-67e26d53ba2e.
+:TermComp-68f3ee56-e259-45cb-81d8-c5c630700980 a ontolex:LexicalEntry;
+                                               rdfs:label "lit"@en;
+                                               decomp:identifies :TermComp-68f3ee56-e259-45cb-81d8-c5c630700980.
+:TermComp-6a064ef3-5c8c-4fac-8be0-c8a0d71c220f a ontolex:LexicalEntry;
+                                               rdfs:label "lighting"@en;
+                                               decomp:identifies :TermComp-6a064ef3-5c8c-4fac-8be0-c8a0d71c220f.
+:TermComp-7028cce3-cec4-472d-83c9-4aa23b215013 a ontolex:LexicalEntry;
+                                               rdfs:label "light"@en;
+                                               decomp:identifies :TermComp-7028cce3-cec4-472d-83c9-4aa23b215013.
+:TermComp-8e1d387e-1467-4118-afc8-7795289d60f9 a ontolex:LexicalEntry;
+                                               rdfs:label "Beleuchtung"@en;
+                                               decomp:identifies :TermComp-8e1d387e-1467-4118-afc8-7795289d60f9.
+:TermComp-9853abc3-0a58-47cf-9bd0-1bfe01719f7c a ontolex:LexicalEntry;
+                                               rdfs:label "lighted"@en;
+                                               decomp:identifies :TermComp-9853abc3-0a58-47cf-9bd0-1bfe01719f7c.
+:TermComp-edab9051-aea3-480f-9195-2d7a3397fe06 a ontolex:LexicalEntry;
+                                               rdfs:label "Quelle"@en;
+                                               decomp:identifies :TermComp-edab9051-aea3-480f-9195-2d7a3397fe06.
+:TermCompList-19311da3-8c5b-4664-9477-dd757afa6dd7 decomp:constituent :TermComp-9853abc3-0a58-47cf-9bd0-1bfe01719f7c;
+                                                   decomp:identifies :alight-en.
+:TermCompList-4c44dbc6-ae0d-473a-a9c3-036584066e68 decomp:constituent :TermComp-07c7b61f-eb97-4182-907c-94372c94524d;
+                                                   decomp:identifies :Beleuchtung-de.
+:TermCompList-5276cd37-8456-40b1-bc47-3cd54ea4bf3d decomp:constituent :TermComp-000e09ab-2969-4356-8944-47906b686d56;
+                                                   decomp:identifies :Quelle-de.
+:TermCompList-5708d4aa-53bb-4227-b279-f61780e1a9be decomp:constituent :TermComp-022adf35-1a96-4d69-84c0-194625e9bf70;
+                                                   decomp:identifies :Licht-de.
+:TermCompList-8d131f4c-24f3-467a-afc9-fd021e3a7659 decomp:constituent :TermComp-62ce1520-764a-4b5f-b814-67e26d53ba2e;
+                                                   decomp:identifies :alight-en.
+:TermCompList-9a2a9df4-014f-4180-89eb-10253d3e054c decomp:constituent :TermComp-6a064ef3-5c8c-4fac-8be0-c8a0d71c220f;
+                                                   decomp:identifies :lighting-en.
+:TermCompList-9c57f8c1-cd23-4059-97e0-77fcdef7ef7a decomp:constituent :TermComp-edab9051-aea3-480f-9195-2d7a3397fe06;
+                                                   decomp:identifies :Quelle-de.
+:TermCompList-a4062f4f-b9cc-4ad4-bf9b-a29c69358301 decomp:constituent :TermComp-68f3ee56-e259-45cb-81d8-c5c630700980;
+                                                   decomp:identifies :alight-en.
+:TermCompList-c6249504-515c-4cb7-afc3-636db97dd94b decomp:constituent :TermComp-7028cce3-cec4-472d-83c9-4aa23b215013;
+                                                   decomp:identifies :light-en.
+:TermCompList-dcccdbb6-a851-41ee-997b-0f14a32b5d5b decomp:constituent :TermComp-8e1d387e-1467-4118-afc8-7795289d60f9;
+                                                   decomp:identifies :Beleuchtung-de.
+:TermCompList-fc90a5ef-41c0-42a7-a166-96721f82a7ab decomp:constituent :TermComp-093dfe8b-4dee-4b9f-9d1d-de870cb92c63;
+                                                   decomp:identifies :Quelle-de.
+:XReference-50e5e477-9fde-4a87-bafe-7a6abf0c4c2e tbx:target <http://www.eurotermbank.com/Collection.aspx?collectionid=392>;
+                                                 tbx:value "Microsoft Public Terminology Collection".
+:XReference-92e81624-b4f4-4df9-9d60-4766127037f6 tbx:target <http://www.eurotermbank.com/Collection.aspx?collectionid=229>;
+                                                 tbx:value "Automatikos terminų žodynas".
+:alight-en a ontolex:LexicalEntry;
+           ontolex:canonicalForm <https://term.tilde.com/terms/alight-en#CanonicalForm>;
+           ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+           ontolex:sense <https://term.tilde.com/terms/alight-en#Sense>.
+<https://term.tilde.com/terms/alight-en#CanonicalForm> ontolex:writtenRep "alight"@en.
+<https://term.tilde.com/terms/alight-en#Sense> ontolex:reference :747375.
+:angez%C3%BCndet-de a ontolex:LexicalEntry;
+                    ontolex:canonicalForm <https://term.tilde.com/terms/angez%C3%BCndet-de#CanonicalForm>;
+                    ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                    ontolex:sense <https://term.tilde.com/terms/angez%C3%BCndet-de#Sense>.
+<https://term.tilde.com/terms/angez%C3%BCndet-de#CanonicalForm> ontolex:writtenRep "angezündet"@de.
+<https://term.tilde.com/terms/angez%C3%BCndet-de#Sense> ontolex:reference :747375.
+:aufflammen-de a ontolex:LexicalEntry;
+               ontolex:canonicalForm <https://term.tilde.com/terms/aufflammen-de#CanonicalForm>;
+               ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+               ontolex:sense <https://term.tilde.com/terms/aufflammen-de#Sense>.
+<https://term.tilde.com/terms/aufflammen-de#CanonicalForm> ontolex:writtenRep "aufflammen"@de.
+<https://term.tilde.com/terms/aufflammen-de#Sense> ontolex:reference :747388.
+:de a ontolex:Lexicon;
+    ontolex:entry :Ausstellung-de,
+                  :Beleuchtung-de,
+                  :Emissionsquelle-de,
+                  :Fundstelle-de,
+                  :Kennziffer-de,
+                  :Leuchte-de,
+                  :Licht-de,
+                  :Lichtanlage-de,
+                  :Lichter-de,
+                  :Lichtquelle-de,
+                  :N%C3%A4hleuchte-de,
+                  :Quelle-de,
+                  :Raumbeleuchtung-de,
+                  :Schau-de,
+                  :Scheinwerfer-de,
+                  :Sendung-de,
+                  :Show-de,
+                  :Signallampe-de,
+                  :angez%C3%BCndet-de,
+                  :aufflammen-de,
+                  <https://term.tilde.com/terms/die+Ausstellung-de>,
+                  :entz%C3%BCnden-de,
+                  :hell-de,
+                  :leicht-de,
+                  :mager-de,
+                  <https://term.tilde.com/terms/sichtbare+Strahlung-de>;
+    ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>.
+<https://term.tilde.com/terms/die+Ausstellung-de> a ontolex:LexicalEntry;
+                                                  ontolex:canonicalForm <https://term.tilde.com/terms/die+Ausstellung-de#CanonicalForm>;
+                                                  ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                                                  ontolex:sense <https://term.tilde.com/terms/die+Ausstellung-de#Sense>.
+<https://term.tilde.com/terms/die+Ausstellung-de#CanonicalForm> ontolex:writtenRep "die Ausstellung"@de.
+<https://term.tilde.com/terms/die+Ausstellung-de#Sense> ontolex:reference :991196.
+:en a ontolex:Lexicon;
+    ontolex:entry :alight-en,
+                  :exhibition-en,
+                  :exposition-en,
+                  :illumination-en,
+                  :light-en,
+                  :lighting-en,
+                  :lights-en,
+                  :show-en,
+                  :showing-en,
+                  :source-en,
+                  :spring-en,
+                  <https://term.tilde.com/terms/visible+radiation-en>;
+    ontolex:language <http://www.lexvo.org/page/iso639-3/eng>.
+:entz%C3%BCnden-de a ontolex:LexicalEntry;
+                   ontolex:canonicalForm <https://term.tilde.com/terms/entz%C3%BCnden-de#CanonicalForm>;
+                   ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                   ontolex:sense <https://term.tilde.com/terms/entz%C3%BCnden-de#Sense>.
+<https://term.tilde.com/terms/entz%C3%BCnden-de#CanonicalForm> ontolex:writtenRep "entzünden"@de.
+<https://term.tilde.com/terms/entz%C3%BCnden-de#Sense> ontolex:reference :747352.
+:exhibition-en a ontolex:LexicalEntry;
+               ontolex:canonicalForm <https://term.tilde.com/terms/exhibition-en#CanonicalForm>;
+               ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+               ontolex:sense <https://term.tilde.com/terms/exhibition-en#Sense>.
+<https://term.tilde.com/terms/exhibition-en#CanonicalForm> ontolex:writtenRep "exhibition"@en.
+<https://term.tilde.com/terms/exhibition-en#Sense> ontolex:reference :991196.
+:exposition-en a ontolex:LexicalEntry;
+               ontolex:canonicalForm <https://term.tilde.com/terms/exposition-en#CanonicalForm>;
+               ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+               ontolex:sense <https://term.tilde.com/terms/exposition-en#Sense>.
+<https://term.tilde.com/terms/exposition-en#CanonicalForm> ontolex:writtenRep "exposition"@en.
+<https://term.tilde.com/terms/exposition-en#Sense> ontolex:reference :1143693.
+:hell-de a ontolex:LexicalEntry;
+         ontolex:canonicalForm <https://term.tilde.com/terms/hell-de#CanonicalForm>;
+         ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+         ontolex:sense <https://term.tilde.com/terms/hell-de#Sense>.
+<https://term.tilde.com/terms/hell-de#CanonicalForm> ontolex:writtenRep "hell"@de.
+<https://term.tilde.com/terms/hell-de#Sense> ontolex:reference :562040.
+:illumination-en a ontolex:LexicalEntry;
+                 ontolex:canonicalForm <https://term.tilde.com/terms/illumination-en#CanonicalForm>;
+                 ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+                 ontolex:sense <https://term.tilde.com/terms/illumination-en#Sense>.
+<https://term.tilde.com/terms/illumination-en#CanonicalForm> ontolex:writtenRep "illumination"@en.
+<https://term.tilde.com/terms/illumination-en#Sense> ontolex:reference :1154790,
+                                                                       :561872.
+:leicht-de a ontolex:LexicalEntry;
+           ontolex:canonicalForm <https://term.tilde.com/terms/leicht-de#CanonicalForm>;
+           ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+           ontolex:sense <https://term.tilde.com/terms/leicht-de#Sense>.
+<https://term.tilde.com/terms/leicht-de#CanonicalForm> ontolex:writtenRep "leicht"@de.
+<https://term.tilde.com/terms/leicht-de#Sense> ontolex:reference :1435876.
+:light-en tbx:reliabilityCode 3 ;
+          a ontolex:LexicalEntry;
+          ontolex:canonicalForm <https://term.tilde.com/terms/light-en#CanonicalForm>;
+          ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+          ontolex:sense <https://term.tilde.com/terms/light-en#Sense>.
+<https://term.tilde.com/terms/light-en#CanonicalForm> ontolex:writtenRep "light"@en.
+<https://term.tilde.com/terms/light-en#Sense> ontolex:reference :1158213,
+                                                                :1160847,
+                                                                :1166250,
+                                                                :1169348,
+                                                                :1174787,
+                                                                :1224335,
+                                                                :1435876,
+                                                                :2741432,
+                                                                :2749463,
+                                                                :561792,
+                                                                :562040,
+                                                                :591684,
+                                                                :654063,
+                                                                :747352.
+:lighting-en tbx:reliabilityCode 1 ,
+                                 3 ;
+             a ontolex:LexicalEntry;
+             ontolex:canonicalForm <https://term.tilde.com/terms/lighting-en#CanonicalForm>;
+             ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+             ontolex:sense <https://term.tilde.com/terms/lighting-en#Sense>.
+<https://term.tilde.com/terms/lighting-en#CanonicalForm> ontolex:writtenRep "lighting"@en.
+<https://term.tilde.com/terms/lighting-en#Sense> ontolex:reference :1141539,
+                                                                   :1143768,
+                                                                   :1149650,
+                                                                   :1151565,
+                                                                   :1169925,
+                                                                   :1173455,
+                                                                   :1431876,
+                                                                   :273537,
+                                                                   :2741433,
+                                                                   :2967993,
+                                                                   :357406,
+                                                                   :384454,
+                                                                   :614579,
+                                                                   :654064,
+                                                                   :747388.
+:lights-en tbx:reliabilityCode 3 ;
+           a ontolex:LexicalEntry;
+           ontolex:canonicalForm <https://term.tilde.com/terms/lights-en#CanonicalForm>;
+           ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+           ontolex:sense <https://term.tilde.com/terms/lights-en#Sense>.
+<https://term.tilde.com/terms/lights-en#CanonicalForm> ontolex:writtenRep "lights"@en.
+<https://term.tilde.com/terms/lights-en#Sense> ontolex:reference :2751444.
+:mager-de a ontolex:LexicalEntry;
+          ontolex:canonicalForm <https://term.tilde.com/terms/mager-de#CanonicalForm>;
+          ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+          ontolex:sense <https://term.tilde.com/terms/mager-de#Sense>.
+<https://term.tilde.com/terms/mager-de#CanonicalForm> ontolex:writtenRep "mager"@de.
+<https://term.tilde.com/terms/mager-de#Sense> ontolex:reference :1169348.
+:show-en tbx:reliabilityCode 3 ;
+         a ontolex:LexicalEntry;
+         ontolex:canonicalForm <https://term.tilde.com/terms/show-en#CanonicalForm>;
+         ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+         ontolex:sense <https://term.tilde.com/terms/show-en#Sense>.
+<https://term.tilde.com/terms/show-en#CanonicalForm> ontolex:writtenRep "show"@en.
+<https://term.tilde.com/terms/show-en#Sense> ontolex:reference :1138805,
+                                                               :1168087,
+                                                               :2742875,
+                                                               :525380,
+                                                               :627673,
+                                                               :655345.
+:showing-en a ontolex:LexicalEntry;
+            ontolex:canonicalForm <https://term.tilde.com/terms/showing-en#CanonicalForm>;
+            ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+            ontolex:sense <https://term.tilde.com/terms/showing-en#Sense>.
+<https://term.tilde.com/terms/showing-en#CanonicalForm> ontolex:writtenRep "showing"@en.
+<https://term.tilde.com/terms/showing-en#Sense> ontolex:reference :524304.
+<https://term.tilde.com/terms/sichtbare+Strahlung-de> a ontolex:LexicalEntry;
+                                                      ontolex:canonicalForm <https://term.tilde.com/terms/sichtbare+Strahlung-de#CanonicalForm>;
+                                                      ontolex:language <http://www.lexvo.org/page/iso639-3/ger/deu>;
+                                                      ontolex:sense <https://term.tilde.com/terms/sichtbare+Strahlung-de#Sense>.
+<https://term.tilde.com/terms/sichtbare+Strahlung-de#CanonicalForm> ontolex:writtenRep "sichtbare Strahlung"@de.
+<https://term.tilde.com/terms/sichtbare+Strahlung-de#Sense> ontolex:reference :1149289.
+:source-en tbx:reliabilityCode 1 ,
+                               3 ;
+           tbx:xSource <http://www.eurotermbank.com/Collection.aspx?collectionid=229>,
+                       <http://www.eurotermbank.com/Collection.aspx?collectionid=392>;
+           tbx:xreference :XReference-50e5e477-9fde-4a87-bafe-7a6abf0c4c2e,
+                          :XReference-92e81624-b4f4-4df9-9d60-4766127037f6;
+           a ontolex:LexicalEntry;
+           ontolex:canonicalForm <https://term.tilde.com/terms/source-en#CanonicalForm>;
+           ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+           ontolex:sense <https://term.tilde.com/terms/source-en#Sense>.
+<https://term.tilde.com/terms/source-en#CanonicalForm> ontolex:writtenRep "source"@en.
+<https://term.tilde.com/terms/source-en#Sense> ontolex:reference :1149362,
+                                                                 :1158659,
+                                                                 :1231312,
+                                                                 :1231313,
+                                                                 :1231314,
+                                                                 :1231316,
+                                                                 :2793138,
+                                                                 :2966560,
+                                                                 :3090486,
+                                                                 :3448822,
+                                                                 :406457,
+                                                                 :517862,
+                                                                 :591516.
+:spring-en tbx:reliabilityCode 1 ;
+           a ontolex:LexicalEntry;
+           ontolex:canonicalForm <https://term.tilde.com/terms/spring-en#CanonicalForm>;
+           ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+           ontolex:sense <https://term.tilde.com/terms/spring-en#Sense>.
+<https://term.tilde.com/terms/spring-en#CanonicalForm> ontolex:writtenRep "spring"@en.
+<https://term.tilde.com/terms/spring-en#Sense> ontolex:reference :2966560.
+<https://term.tilde.com/terms/visible+radiation-en> a ontolex:LexicalEntry;
+                                                    ontolex:canonicalForm <https://term.tilde.com/terms/visible+radiation-en#CanonicalForm>;
+                                                    ontolex:language <http://www.lexvo.org/page/iso639-3/eng>;
+                                                    ontolex:sense <https://term.tilde.com/terms/visible+radiation-en#Sense>.
+<https://term.tilde.com/terms/visible+radiation-en#CanonicalForm> ontolex:writtenRep "visible radiation"@en.
+<https://term.tilde.com/terms/visible+radiation-en#Sense> ontolex:reference :1149289.

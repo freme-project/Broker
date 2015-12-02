@@ -15,28 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package eu.freme.broker.tools;
+package eu.freme.broker.exception;
 
-import eu.freme.broker.exception.InvalidTemplateEndpointException;
-import org.apache.commons.validator.routines.UrlValidator;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- *
- * @author Milan Dojchinovski <milan.dojchinovski@fit.cvut.cz>
- * http://dojchinovski.mk
+ * @author Jan Nehring - jan.nehring@dfki.de
  */
-@Controller
-public class TemplateValidator {
-    
-    public TemplateValidator(){
-    }
-    
-    public void validateTemplateEndpoint(String uri) {
-        UrlValidator urlValidator = new UrlValidator();
-        if(!urlValidator.isValid(uri)) {
-            throw new InvalidTemplateEndpointException("The endpoint URL \""+uri+"\" is invalid.");
-        }
-    }
-    
+@SuppressWarnings("serial")
+@ResponseStatus(value=HttpStatus.TOO_MANY_REQUESTS, reason="")
+public class TooManyRequestsException extends FREMEHttpException{
+
+	public TooManyRequestsException(String msg){
+		super(msg);
+	}
 }

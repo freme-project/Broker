@@ -1,0 +1,13 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>.
+@prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#>.
+
+<http://freme-project.eu/#char=0,11> nif:beginIndex "0"^^xsd:nonNegativeInteger;
+                                     nif:endIndex "11"^^xsd:nonNegativeInteger;
+                                     nif:isString "hello world"@en;
+                                     a nif:Context,
+                                       nif:RFC5147String,
+                                       nif:String;
+                                     itsrdf:target "guten Tag, Welt"@de.

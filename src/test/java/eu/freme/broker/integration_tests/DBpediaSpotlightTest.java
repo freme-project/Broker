@@ -35,13 +35,13 @@ import eu.freme.common.conversion.rdf.RDFConstants;
 /**
  * Created by jonathan on 28.07.15.
  */
-@Ignore
+
 public class DBpediaSpotlightTest extends EServiceTest {
 
 
     String[] availableLanguages = {"en"};
     //String[] availableLanguages = {"en","de","it","nl","fr","es"};
-    String testinput= "Berlin";
+    String testinput= "This is Germany";
 
 
     public DBpediaSpotlightTest(){super("/e-entity/dbpedia-spotlight/");}

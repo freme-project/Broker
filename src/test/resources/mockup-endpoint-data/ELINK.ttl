@@ -1,0 +1,45 @@
+@prefix dsp:   <http://dublincore.org/dc-dsp#> .
+@prefix schema: <http://schema.org/> .
+@prefix olia:  <http://purl.org/olia/olia.owl#> .
+@prefix rutg:  <http://rdfunit.aksw.org/data/generators#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rlog:  <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/rlog#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .
+@prefix nif:   <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
+@prefix rutp:  <http://rdfunit.aksw.org/data/patterns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix oslc:  <http://open-services.net/ns/core#> .
+@prefix p:     <http://127.0.0.1:9995/spotlight#> .
+@prefix rut:   <http://rdfunit.aksw.org/ns/core#> .
+@prefix rutr:  <http://rdfunit.aksw.org/data/results#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rutt:  <http://rdfunit.aksw.org/data/tests#> .
+@prefix spin:  <http://spinrdf.org/spin#> .
+@prefix ruts:  <http://rdfunit.aksw.org/data/testsuite#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<http://dbpedia.org/resource/Museum_of_Asian_Art>
+        <http://xmlns.com/foaf/0.1/based_near>
+                <http://dbpedia.org/resource/Berlin> .
+
+<http://dbpedia.org/resource/Keramik-Museum_Berlin>
+        <http://xmlns.com/foaf/0.1/based_near>
+                <http://dbpedia.org/resource/Berlin> .
+
+<http://127.0.0.1:9995/spotlight#char=0,15>
+        a                     nif:RFC5147String , nif:Sentence , nif:Context ;
+        nif:beginIndex        "0" ;
+        nif:endIndex          "15" ;
+        nif:isString          "This is Berlin." ;
+        nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,15> .
+
+<http://127.0.0.1:9995/spotlight#char=8,14>
+        a                     nif:RFC5147String , nif:Word ;
+        nif:anchorOf          "Berlin" ;
+        nif:beginIndex        "8" ;
+        nif:endIndex          "14" ;
+        nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,15> ;
+        itsrdf:taIdentRef     <http://dbpedia.org/resource/Berlin> .

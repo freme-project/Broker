@@ -17,7 +17,10 @@
  */
 package eu.freme.broker.eservices;
 
+import com.google.common.base.Strings;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +55,8 @@ public class TildeETranslation extends BaseRestController {
 	@Autowired
 	TranslationConversionService translationConversionService;
 
-	private String endpoint = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
+	@Value("${freme.broker.tildeETranslationUrl:https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}}")
+	private String endpoint;// = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
 
 	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
 	public ResponseEntity<String> tildeTranslate(
@@ -69,7 +73,10 @@ public class TildeETranslation extends BaseRestController {
 			@RequestBody(required = false) String postBody,
 			@RequestParam(value = "source-lang") String sourceLang,
 			@RequestParam(value = "target-lang") String targetLang,
-			@RequestParam(value = "domain", defaultValue = "") String domain) {
+			@RequestParam(value = "domain", defaultValue = "") String domain,
+			@RequestParam(value = "system", defaultValue = "full") String system,
+			@RequestHeader(value = "key", required= false) String key
+	) {
 
 		// merge long and short parameters - long parameters override short
 		// parameters
@@ -118,6 +125,10 @@ public class TildeETranslation extends BaseRestController {
 					.routeParam("target-lang", targetLang)
 					.header("Accept", "application/x-turtle")
 					.header("Content-Type", "application/x-turtle")
+					.queryString("system", system)
+					.header("Authentication", "Basic RlJFTUU6dXxGcjNtM19zJGN1ciQ=")
+					.queryString("domain", domain)
+					.queryString("key", key)
 					.body(rdfConversionService.serializeRDF(inputModel,
 							RDFSerialization.TURTLE)).asString();
 

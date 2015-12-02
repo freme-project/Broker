@@ -1,0 +1,130 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix dcterms: <http://purl.org/dc/terms/>.
+@prefix dc11: <http://purl.org/dc/elements/1.1/>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>.
+@prefix dbpedia: <http://dbpedia.org/resource/>.
+@prefix dbpedia-owl: <http://dbpedia.org/ontology/>.
+@prefix dbpprop: <http://dbpedia.org/property/>.
+@prefix hydra: <http://www.w3.org/ns/hydra/core#>.
+@prefix void: <http://rdfs.org/ns/void#>.
+
+<http://fragments.dbpedia.org/#dataset> hydra:member <http://fragments.dbpedia.org/2014/en#dataset>.
+<http://fragments.dbpedia.org/2014/en#dataset> a void:Dataset, hydra:Collection;
+    void:subset <http://fragments.dbpedia.org/2014/en?subject=http%3A%2F%2Fdbpedia.org%2Fresource%2FBerlin&predicate=&object=>;
+    void:uriLookupEndpoint "http://fragments.dbpedia.org/2014/en{?subject,predicate,object}";
+    hydra:search _:triplePattern.
+_:triplePattern hydra:template "http://fragments.dbpedia.org/2014/en{?subject,predicate,object}";
+    hydra:mapping _:subject, _:predicate, _:object.
+_:subject hydra:variable "subject";
+    hydra:property rdf:subject.
+_:predicate hydra:variable "predicate";
+    hydra:property rdf:predicate.
+_:object hydra:variable "object";
+    hydra:property rdf:object.
+dbpedia:Berlin <http://dbpedia.org/ontology/PopulatedPlace/areaTotal> "891.85"^^<http://dbpedia.org/datatype/squareKilometre>;
+    dbpedia-owl:abstract "Berlin (/bərˈlɪn/; German pronunciation: [bɛɐ̯ˈliːn] ) is the capital city of Germany and one of the 16 states of Germany. With a population of 3.4 million people, Berlin is Germany's largest city, the second most populous city proper, and the seventh most populous urban area in the European Union. Located in northeastern Germany on the River Spree, it is the center of the Berlin-Brandenburg Metropolitan Region, which has about 4.5 million residents from over 180 nations. Due to its location in the European Plain, Berlin is influenced by a temperate seasonal climate. Around one third of the city's area is composed of forests, parks, gardens, rivers and lakes.First documented in the 13th century, Berlin became the capital of the Kingdom of Prussia (1701–1918), the German Empire (1871–1918), the Weimar Republic (1919–33) and the Third Reich (1933–45). Berlin in the 1920s was the third largest municipality in the world. After World War II, the city, along with the German state, was divided - into East Berlin — capital of the German Democratic Republic, colloquially identified in English as East Germany — and West Berlin, a political exclave (surrounded by the Berlin Wall from 1961 to 1989) and a de facto state of the Federal Republic of Germany, known colloquially in English as West Germany from 1949 to 1990. Following German reunification in 1990, the city was once more designated as the capital of all Germany.Berlin is a world city of culture, politics, media, and science, hosting 147 foreign embassies. Its economy is primarily based on high-tech industries and the service sector, encompassing a diverse range of creative industries, research facilities, media corporations, and convention venues. Berlin also serves as a continental hub for air and rail transport and is a popular tourist destination. Significant industries include IT, pharmaceuticals, biomedical engineering, biotechnology, electronics, traffic engineering, and renewable energy.Berlin is home to renowned universities, research institutes, orchestras, museums, and celebrities and is host to many sporting events. Its urban setting and historical legacy have made it a popular location for international film productions. The city is well known for its festivals, diverse architecture, nightlife, contemporary arts, public transportation networks, and an extremely high quality of living."@en;
+    dbpedia-owl:areaCode "030";
+    dbpedia-owl:areaTotal "8.9185E8"^^xsd:double;
+    dbpedia-owl:country dbpedia:Germany;
+    dbpedia-owl:elevation "34.0"^^xsd:double;
+    dbpedia-owl:leader dbpedia:Klaus_Wowereit;
+    dbpedia-owl:leaderParty <http://dbpedia.org/resource/Christian_Democratic_Union_(Germany)>, dbpedia:Social_Democratic_Party_of_Germany;
+    dbpedia-owl:leaderTitle "Governing Mayor"@en;
+    dbpedia-owl:populationAsOf "2013-10-31"^^xsd:date;
+    dbpedia-owl:populationTotal "3415091"^^xsd:nonNegativeInteger;
+    dbpedia-owl:postalCode "10115–14199";
+    dbpedia-owl:thumbnail <http://commons.wikimedia.org/wiki/Special:FilePath/Berlin_Montage_4.jpg?width=300>;
+    dbpedia-owl:wikiPageExternalLink <http://berlin.unlike.net/>, <http://www.berlin.de/en/>, <http://www.berlin.de/international/index.en.php>, <http://www.exberliner.com/>;
+    dbpedia-owl:wikiPageID "3354"^^xsd:integer;
+    dbpedia-owl:wikiPageRevisionID "606295350"^^xsd:integer;
+    dbpprop:align "right"@en;
+    dbpprop:aprHighC "13.2"^^xsd:double;
+    dbpprop:aprLowC "4.2"^^xsd:double;
+    dbpprop:aprMeanC "8.7"^^xsd:double;
+    dbpprop:aprRainDays "7.8"^^xsd:double;
+    dbpprop:aprRainMm "37.1"^^xsd:double;
+    dbpprop:aprSun "159"^^xsd:integer;
+    dbpprop:area "891.85"^^xsd:double;
+    dbpprop:augHighC "23.6"^^xsd:double;
+    dbpprop:augLowC "14.1"^^xsd:double;
+    dbpprop:augMeanC "18.9"^^xsd:double;
+    dbpprop:augRainDays "7"^^xsd:integer;
+    dbpprop:augRainMm "58.2"^^xsd:double;
+    dbpprop:augSun "210.8"^^xsd:double;
+    dbpprop:blankInfoSec <http://dbpedia.org/resource/.berlin>;
+    dbpprop:blankNameSec dbpedia:GeoTLD;
+    dbpprop:caption "Berlin Mitte skyline in the 21st century. Landmarks from left to right: Reichstag, Fernsehturm Berlin, Berliner Dom, City hall, Brandenburg Gate"@en, "Brandenburg Gate at blue hour"@en, "Looking through Karl-Liebknecht-Straße and Berlin Cathedral"@en;
+    dbpprop:coaSize "70"^^xsd:integer;
+    dbpprop:coordinatesDisplay "display=inline, title"@en;
+    dbpprop:date "April 2013"@en, "September 2010"@en;
+    dbpprop:decHighC "4.4"^^xsd:double;
+    dbpprop:decLowC "−0.4"@en;
+    dbpprop:decMeanC "2"^^xsd:integer;
+    dbpprop:decRainDays "11.4"^^xsd:double;
+    dbpprop:decRainMm "55.3"^^xsd:double;
+    dbpprop:decSun "37.2"^^xsd:double;
+    dbpprop:demonym "Berliner"@en;
+    dbpprop:divisions "12"^^xsd:integer;
+    dbpprop:elevation "34"^^xsd:integer;
+    dbpprop:febHighC "4.2"^^xsd:double;
+    dbpprop:febLowC "−1.6"@en;
+    dbpprop:febMeanC "1.3"^^xsd:double;
+    dbpprop:febRainDays "8"^^xsd:integer;
+    dbpprop:febRainMm "33.3"^^xsd:double;
+    dbpprop:febSun "73.5"^^xsd:double;
+    dbpprop:flag "Flag_of_Berlin.svg"@en;
+    dbpprop:float "left"@en;
+    dbpprop:gdp "101.4"^^xsd:double;
+    dbpprop:gdpYear "2011"^^xsd:integer;
+    dbpprop:hasPhotoCollection <http://wifo5-03.informatik.uni-mannheim.de/flickrwrappr/photos/Berlin>;
+    dbpprop:image "Berlin Brandenburger Tor Abend.jpg"@en, "Berlin view from Park Inn 03.jpg"@en, "Cityscape Berlin.jpg"@en;
+    dbpprop:imageCaption "Clockwise: Charlottenburg Palace, Fernsehturm Berlin, Reichstag building, Berlin Cathedral, Alte Nationalgalerie, Potsdamer Platz and Brandenburg Gate."@en;
+    dbpprop:isoRegion "DE-BE"@en;
+    dbpprop:janHighC "2.9"^^xsd:double;
+    dbpprop:janLowC "−1.5"@en;
+    dbpprop:janMeanC "0.5"^^xsd:double;
+    dbpprop:janRainDays "10"^^xsd:integer;
+    dbpprop:janRainMm "42.3"^^xsd:double;
+    dbpprop:janSun "46.5"^^xsd:double;
+    dbpprop:julHighC "24"^^xsd:integer;
+    dbpprop:julLowC "14.7"^^xsd:double;
+    dbpprop:julMeanC "19"^^xsd:integer;
+    dbpprop:julRainDays "7"^^xsd:integer;
+    dbpprop:julRainMm "55.5"^^xsd:double;
+    dbpprop:julSun "217"^^xsd:integer;
+    dbpprop:junHighC "21.8"^^xsd:double;
+    dbpprop:junLowC "12.3"^^xsd:double;
+    dbpprop:junMeanC "17"^^xsd:integer;
+    dbpprop:junRainDays "7"^^xsd:integer;
+    dbpprop:junRainMm "68.7"^^xsd:double;
+    dbpprop:junSun "222"^^xsd:integer;
+    dbpprop:kfz "B( )"@en;
+    dbpprop:latd "52"^^xsd:integer;
+    dbpprop:latm "31"^^xsd:integer;
+    dbpprop:leader "Klaus Wowereit"@en;
+    dbpprop:leaderParty "SPD"@en;
+    dbpprop:leaderTitle dbpedia:Governing_Mayor_of_Berlin;
+    dbpprop:left "religion"@en;
+    dbpprop:location "Berlin"@en;
+    dbpprop:longd "13"^^xsd:integer;
+    dbpprop:longm "23"^^xsd:integer;
+    dbpprop:map "Berlin in Germany and EU.png"@en;
+    dbpprop:mapSize "270"^^xsd:integer;
+    dbpprop:mapText "Location within European Union and Germany"@en;
+    dbpprop:marHighC "8.5"^^xsd:double.
+<http://fragments.dbpedia.org/2014/en?subject=http%3A%2F%2Fdbpedia.org%2Fresource%2FBerlin&predicate=&object=> void:subset <http://fragments.dbpedia.org/2014/en?subject=http%3A%2F%2Fdbpedia.org%2Fresource%2FBerlin&predicate=&object=>;
+    a hydra:Collection, hydra:PagedCollection;
+    dcterms:title "Linked Data Fragment of DBpedia 2014"@en;
+    dcterms:description "Triple Pattern Fragment of the 'DBpedia 2014' dataset containing triples matching the pattern { <http://dbpedia.org/resource/Berlin> ?p ?o }."@en;
+    dcterms:source <http://fragments.dbpedia.org/2014/en#dataset>;
+    hydra:totalItems "246"^^xsd:integer;
+    void:triples "246"^^xsd:integer;
+    hydra:itemsPerPage "100"^^xsd:integer;
+    hydra:firstPage <http://fragments.dbpedia.org/2014/en?subject=http%3A%2F%2Fdbpedia.org%2Fresource%2FBerlin&predicate=&object=&page=1>;
+    hydra:nextPage <http://fragments.dbpedia.org/2014/en?subject=http%3A%2F%2Fdbpedia.org%2Fresource%2FBerlin&predicate=&object=&page=2>.

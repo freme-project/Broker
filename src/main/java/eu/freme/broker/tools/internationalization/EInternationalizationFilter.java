@@ -30,6 +30,7 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Component;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
+import eu.freme.broker.tools.ExceptionHandlerService;
 import eu.freme.i18n.api.EInternationalizationAPI;
 import eu.freme.i18n.okapi.nif.converter.ConversionException;
 
@@ -57,6 +59,9 @@ import eu.freme.i18n.okapi.nif.converter.ConversionException;
 @Component
 @Profile("broker")
 public class EInternationalizationFilter implements Filter {
+
+	@Autowired
+	ExceptionHandlerService exceptionHandlerService;
 
 	/*
 	 * EInternationalization accepts these formats for conversion to NIF
@@ -154,19 +159,30 @@ public class EInternationalizationFilter implements Filter {
 		HttpServletRequest httpRequest = (HttpServletRequest) req;
 		HttpServletResponse httpResponse = (HttpServletResponse) res;
 
+		if (httpRequest.getMethod().equals("OPTIONS")) {
+			chain.doFilter(req, res);
+			return;
+		}
+
 		String informat = getInformat(httpRequest);
 		String outformat = getOutformat(httpRequest);
 
 		if (outformat != null
 				&& (informat == null || !outformat.equals(informat))) {
-			throw new BadRequestException("Can only convert to outformat \""
-					+ outformat + "\" when informat is also \"" + outformat
-					+ "\"");
+			Exception exception = new BadRequestException(
+					"Can only convert to outformat \"" + outformat
+							+ "\" when informat is also \"" + outformat + "\"");
+			exceptionHandlerService.writeExceptionToResponse(httpRequest,
+					httpResponse, exception);
+			return;
 		}
 
 		if (outformat != null && !outputFormats.contains(outformat)) {
-			throw new BadRequestException("\"" + outformat
+			Exception exception = new BadRequestException("\"" + outformat
 					+ "\" is not a valid output format");
+			exceptionHandlerService.writeExceptionToResponse(httpRequest,
+					httpResponse, exception);
+			return;
 		}
 
 		if (informat == null) {
@@ -206,14 +222,18 @@ public class EInternationalizationFilter implements Filter {
 			baos.write(buffer, 0, read);
 		}
 		bis.close();
-		
+
 		// create request wrapper that converts the body of the request from the
 		// original format to turtle
 		Reader nif;
-		
+
 		byte[] baosData = baos.toByteArray();
-		if( baosData.length == 0 ){
-			throw new BadRequestException("No input data found in request."); 
+		if (baosData.length == 0) {
+			Exception exception = new BadRequestException(
+					"No input data found in request.");
+			exceptionHandlerService.writeExceptionToResponse(httpRequest,
+					httpResponse, exception);
+			return;
 		}
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(baosData);
@@ -222,27 +242,38 @@ public class EInternationalizationFilter implements Filter {
 					informat.toLowerCase());
 		} catch (ConversionException e) {
 			logger.error("Error", e);
-			throw new InternalServerErrorException("Conversion from \"" + informat + "\" to NIF failed");
+			throw new InternalServerErrorException("Conversion from \""
+					+ informat + "\" to NIF failed");
 		}
+		
 		BodySwappingServletRequest bssr = new BodySwappingServletRequest(
 				(HttpServletRequest) req, nif, roundtripping);
 
-		// do conversion from turtle to original format if needed
-		ServletResponse newResponse = res;
-		if (roundtripping) {
-			InputStream originalInputStream = new ByteArrayInputStream(
-					baosData);
-			try {
-				newResponse = new ConversionHttpServletResponseWrapper(
-						httpResponse, eInternationalizationApi,
-						originalInputStream, informat, outformat);
-			} catch (ConversionException e) {
-				logger.error("Conversion failed", e);
-				throw new InternalServerErrorException("Conversion failed");
-			}
+		if( !roundtripping ){
+			chain.doFilter(bssr, res);
+			return;
 		}
+		
+		ConversionHttpServletResponseWrapper dummyResponse;
+		
+		try {
+			dummyResponse = new ConversionHttpServletResponseWrapper(
+					httpResponse, eInternationalizationApi,
+					new ByteArrayInputStream(baosData), informat, outformat);
+			
+			chain.doFilter(bssr, dummyResponse);
 
-		chain.doFilter(bssr, newResponse);
+			ServletOutputStream sos = httpResponse.getOutputStream();
+
+			byte[] data = dummyResponse.writeBackToClient();
+			httpResponse.setContentLength(data.length);
+			sos.write(data);
+			sos.flush();
+			sos.close();
+
+		} catch (ConversionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void init(FilterConfig filterConfig) {

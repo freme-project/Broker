@@ -71,13 +71,15 @@ public class Pipelines extends BaseRestController {
 	 * <p>Examples can be found in the unit tests in {@link eu/freme/broker/integration_tests/pipelines}.</p>
 	 * @param requests	The requests to send to the service.
 	 * @return          The response of the last request.
+	 * @throws BadRequestException				The contents of the request is not valid.
 	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
 	 */
-	@RequestMapping(value = "/pipelining/chain",
+	@RequestMapping(value = "pipelining/chain",
 			method = RequestMethod.POST,
 			consumes = "application/json",
 			produces = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3"}
 	)
+	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> pipeline(@RequestBody String requests) {
 		try {
 			List<SerializedRequest> serializedRequests = Serializer.fromJson(requests);
@@ -86,6 +88,7 @@ public class Pipelines extends BaseRestController {
 			headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getContentType());
 			return new ResponseEntity<>(pipelineResult.getBody(), headers, HttpStatus.OK);
 		} catch (ServiceException serviceError) {
+			// TODO: see if this can be replaced by excsption(s) defined in the broker.
 			logger.error(serviceError.getMessage(), serviceError);
 			MultiValueMap<String, String> headers = new HttpHeaders();
 			headers.add(HttpHeaders.CONTENT_TYPE, serviceError.getResponse().getContentType());
@@ -104,7 +107,17 @@ public class Pipelines extends BaseRestController {
 		}
 	}
 
-	@RequestMapping(value = "/pipelining/chain/{id}",
+	/**
+	 * Calls the pipelining service using an existing template.
+	 * @param body	The contents to send to the pipeline. This can be a NIF or plain text document.
+	 * @param id	The id of the pipeline template to use.
+	 * @return		The response of the latest request defined in the template.
+	 * @throws AccessDeniedException			The pipeline template is not visible by the current user.
+	 * @throws BadRequestException				The contents of the request is not valid.
+	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
+	 * @throws TemplateNotFoundException		The pipeline template does not exist.
+	 */
+	@RequestMapping(value = "pipelining/chain/{id}",
 			method = RequestMethod.POST,
 			consumes = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3", "text/plain"},
 			produces = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3"}
@@ -122,11 +135,27 @@ public class Pipelines extends BaseRestController {
 			logger.error(jsonException.getMessage(), jsonException);
 			String errormsg = jsonException.getCause() != null ? jsonException.getCause().getMessage() : jsonException.getMessage();
 			throw new BadRequestException("Error detected in the JSON body contents: " + errormsg);
+		} catch (OwnedResourceNotFoundException ex) {
+			logger.error(ex.getMessage(), ex);
+			throw new TemplateNotFoundException("Could not find the pipeline template with id " + id);
 		}
 	}
 
-	// TODO: comments
-	@RequestMapping(value = "/pipelining/templates",
+	/**
+	 * Creates and stores a pipeline template.
+	 * @param pipelineInfo  A JSON string containing the fields "label", "description", "serializedRequests", which
+	 *                      define the pipeline template.
+	 * @param visibility	The visibility of the template. Can be {@literal PUBLIC} or {@literal PRIVATE}. PUBLIC means visible to anyone,
+	 *                      PRIVATE means only visible to the currently authenticated user.
+	 * @param persist		{@literal true}: store the template until deleted by someone, {@literal false} to guarantee
+	 *                                       it to be stored for one week.
+	 * @return				A JSON string containing the full pipeline info, i.e. the fields "id", "label", "description",
+	 * 						"persist", "visibility", "owner", "serializedRequests".
+	 * @throws AccessDeniedException			The pipeline template is not visible by the current user.
+	 * @throws BadRequestException				The contents of the request is not valid.
+	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
+	 */
+	@RequestMapping(value = "pipelining/templates",
 					method = RequestMethod.POST,
 					consumes = "application/json",
 					produces = "application/json"
@@ -150,7 +179,7 @@ public class Pipelines extends BaseRestController {
 					pipelineInfoObj.getDescription(),
 					Serializer.toJson(pipelineInfoObj.getSerializedRequests()),
 					toPersist);
-			pipelineDAO.save(pipeline);
+			pipeline = pipelineDAO.save(pipeline);
 			String response = Serializer.toJson(pipeline);
 			return createOKJSONResponse(response);
 		} catch (JsonSyntaxException jsonException) {
@@ -170,6 +199,23 @@ public class Pipelines extends BaseRestController {
 		}
 	}
 
+	/**
+	 * Updates an existing pipeline template.
+	 * @param id			The id of the pipeline template to update.
+	 * @param ownerName		The name of the new owner.
+	 * @param visibility    The visibility of the template. Can be {@literal PUBLIC} or {@literal PRIVATE}. PUBLIC means visible to anyone,
+	 *                      PRIVATE means only visible to the currently authenticated user.
+	 * @param persist       {@literal true}: store the template until deleted by someone, {@literal false} to guarantee
+	 *                                       it to be stored for one week.
+	 * @param pipelineInfo  A JSON string containing updated pipeline template info. The fields "label", "description", "serializedRequests"
+	 *                      define the pipeline template.
+	 * @return              A JSON string containing the updated full pipeline info, i.e. the fields "id", "label", "description",
+	 * 						"persist", "visibility", "owner", "serializedRequests".
+	 * @throws ForbiddenException				The pipeline template is not visible by the current user.
+	 * @throws BadRequestException				The contents of the request is not valid.
+	 * @throws TemplateNotFoundException		The pipeline template does not exist.
+	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
+	 */
 	@RequestMapping(
 			value = "pipelining/templates/{id}",
 			method = RequestMethod.PUT,
@@ -217,7 +263,7 @@ public class Pipelines extends BaseRestController {
 				}
 				pipeline.setOwner(newOwner);
 			}
-			pipelineDAO.save(pipeline);
+			pipeline = pipelineDAO.save(pipeline);
 			String response = Serializer.toJson(pipeline);
 			return createOKJSONResponse(response);
 		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
@@ -240,6 +286,14 @@ public class Pipelines extends BaseRestController {
 		}
 	}
 
+	/**
+	 * Reads (gets) the pipeline template with the given id.
+	 * @param id  	The id of the pipeline template to get.
+	 * @return		The pipeline templatewith the given id as a JSON string.
+	 * @throws AccessDeniedException			The pipeline template is not visible by the current user.
+	 * @throws TemplateNotFoundException		The pipeline template does not exist.
+	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
+	 */
 	@RequestMapping(
 			value = "pipelining/templates/{id}",
 			method = RequestMethod.GET,
@@ -264,6 +318,10 @@ public class Pipelines extends BaseRestController {
 		}
 	}
 
+	/**
+	 * Reads (gets) all visible pipelines.
+	 * @return  all visible pipelines as a JSON string.
+	 */
 	@RequestMapping(
 			value = "pipelining/templates",
 			method = RequestMethod.GET,
@@ -282,6 +340,14 @@ public class Pipelines extends BaseRestController {
 		}
 	}
 
+	/**
+	 * Deletes the pipeline template with the given id.
+	 * @param id	The id of the template to delete.
+	 * @return      The message "The pipeline was sucessfully removed."
+	 * @throws ForbiddenException				The pipeline template cannot be deleted by the current user.
+	 * @throws TemplateNotFoundException		The pipeline template does not exist.
+	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
+	 */
 	@RequestMapping(
 			value = "pipelining/templates/{id}",
 			method = RequestMethod.DELETE

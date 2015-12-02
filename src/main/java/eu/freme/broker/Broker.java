@@ -18,6 +18,8 @@
 package eu.freme.broker;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -26,9 +28,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+
+import com.github.isrsal.logging.LoggingFilter;
 
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.StarterHelper;
@@ -38,6 +43,7 @@ import eu.freme.eservices.elink.ELinkConfig;
 import eu.freme.eservices.epublishing.EPublishingConfig;
 import eu.freme.eservices.pipelines.api.PipelineConfig;
 import eu.freme.i18n.api.EInternationalizationConfig;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * configures broker without api endpoints and e-Services
@@ -45,11 +51,13 @@ import eu.freme.i18n.api.EInternationalizationConfig;
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 
+
 @SpringBootApplication
 @Import({ FremeCommonConfig.class, EEntityConfig.class, ELinkConfig.class,
 		EPublishingConfig.class, FREMECommonConfig.class,
 		PipelineConfig.class, EInternationalizationConfig.class })
 @Profile("broker")
+@EnableScheduling
 public class Broker {
 	
 	static Logger logger = Logger.getLogger(Broker.class);
@@ -84,4 +92,6 @@ public class Broker {
 		String[] newArgs = StarterHelper.addProfile(args, "broker");
 		SpringApplication.run(Broker.class, newArgs);
 	}
+
+
 }

@@ -20,7 +20,6 @@ package eu.freme.broker;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.freme.broker.tools.BrokerExceptionHandler;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +28,12 @@ import com.github.isrsal.logging.LoggingFilter;
 
 import eu.freme.broker.tools.NIFParameterFactory;
 import eu.freme.broker.tools.RDFSerializationFormats;
+import org.springframework.security.web.FilterChainProxy;
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
+import org.springframework.web.filter.GenericFilterBean;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.Filter;
 
 @Configuration
 public class FremeCommonConfig {
@@ -45,6 +50,11 @@ public class FremeCommonConfig {
     @Bean
     public BrokerExceptionHandler brokerExceptionHandler() { return new BrokerExceptionHandler(); }
 
+    @Bean
+    public RateLimiterInMemory getRateLimiterInMemory() {
+        return new RateLimiterInMemory();
+    }
+
 	/**
 	 * Create a filter that logs all requests input and output
 	 */
@@ -55,6 +65,7 @@ public class FremeCommonConfig {
         List<String> urlPatterns = new ArrayList<String>();
         urlPatterns.add("/*");
     	filter.setUrlPatterns(urlPatterns);
+        filter.setOrder(Integer.MAX_VALUE);
         return filter;
     }
 }
