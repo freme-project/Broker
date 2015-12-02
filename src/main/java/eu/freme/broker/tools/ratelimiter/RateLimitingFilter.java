@@ -71,7 +71,7 @@ public class RateLimitingFilter extends GenericFilterBean {
 	boolean rateLimiterEnabled;
 
 
-	@Value("${ratelimiter.yaml:src/main/resources/ratelimiter.yaml}")
+	@Value("${ratelimiter.yaml:ratelimiter.yaml}")
 	String rateLimiterYaml;
 
 

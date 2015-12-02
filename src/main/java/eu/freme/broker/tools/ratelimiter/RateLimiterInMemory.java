@@ -4,6 +4,7 @@ import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.exception.TooManyRequestsException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 
 
@@ -11,6 +12,7 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,12 +39,12 @@ public class RateLimiterInMemory implements RateCounterInterface {
     public void refresh(String rateLimiterYaml) throws IOException{
         clear();
         YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
-        File yamlfile = new File(rateLimiterYaml);
-        if (yamlfile.exists()) {
-            yaml.setResources(new FileSystemResource(yamlfile));
+        URL yamlfile = getClass().getClassLoader().getResource(rateLimiterYaml);;
+        try {
+            yaml.setResources(new FileSystemResource(yamlfile.getFile()));
             rateLimiterProperties = yaml.getObject();
             this.time_frame = (int) rateLimiterProperties.get("time-frame") * 1000;
-        } else {
+        } catch (NullPointerException e) {
             throw new IOException(rateLimiterYaml+ "not Found in Filesystem");
         }
     }
