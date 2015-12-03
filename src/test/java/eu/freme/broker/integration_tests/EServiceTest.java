@@ -49,9 +49,9 @@ import static org.junit.Assert.*;
  * If enabled via anableAuthentication() two authenticated users,
  * "userwithpermission" and "userwithoutpermission", are provided
  * to test security issues or api endpoints, which rely on authenticated access.
+ * Use addAuthentication() [optionally with getTokenWithoutPermission()] in these cases.
  * For additional authentication purposes users can be created and authenticated
- * via createUser() and authenticateUser(). Use addAuthentication()
- * [optionally with getTokenWithoutPermission()] in these cases.
+ * via createUser() and authenticateUser().
  * Furthermore a RDF response can be validated with validateNIFResponse().
  * The logging mechanism can be manipulated to avoid printing of full exception
  * stack traces for expected exceptions, see loggerIgnore() and below.
