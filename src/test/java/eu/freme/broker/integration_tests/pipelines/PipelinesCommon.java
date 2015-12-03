@@ -60,7 +60,7 @@ public abstract class PipelinesCommon extends EServiceTest {
 		List<SerializedRequest> serializedRequests = Arrays.asList(requests);
 		String body = Serializer.toJson(requests);
 
-		HttpResponse<String> response = baseRequestPost("chain")
+		HttpResponse<String> response = post("chain")
 				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
 				.body(new JsonNode(body))
 				.asString();
@@ -84,7 +84,7 @@ public abstract class PipelinesCommon extends EServiceTest {
 	}
 
 	protected HttpResponse<String> sendRequest(final String token, int expectedResponseCode, long id, final String contents, final RDFConstants.RDFSerialization contentType) throws UnirestException{
-		HttpResponse<String> response = baseRequestPost("chain/" + id, token)
+		HttpResponse<String> response = addAuthentication(post("chain/" + id), token)
 				.header("content-type", contentType.contentType())
 				.body(contents)
 				.asString();
@@ -134,7 +134,7 @@ public abstract class PipelinesCommon extends EServiceTest {
 
 		Pipeline pipeline = new Pipeline(label, description, serializedRequests);
 		String body = Serializer.toJson(pipeline);
-		HttpResponse<String> response = baseRequestPost("templates", token)
+		HttpResponse<String> response = addAuthentication(post("templates"), token)
 				.queryString("visibility", visibility.name())
 				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
 				.body(new JsonNode(body))
@@ -157,7 +157,7 @@ public abstract class PipelinesCommon extends EServiceTest {
 		String visibility = newPipeline.getVisibility();
 		String toPersist = Boolean.toString(newPipeline.isPersist());
 		String body = Serializer.toJson(newPipeline);
-		HttpResponse<String> response = baseRequestPut("templates/" + newPipeline.getId(), token)
+		HttpResponse<String> response = addAuthentication(put("templates/" + newPipeline.getId()), token)
 				.header("content-type", RDFConstants.RDFSerialization.JSON.contentType())
 				.queryString("owner", owner)
 				.queryString("visibility", visibility)
@@ -173,19 +173,19 @@ public abstract class PipelinesCommon extends EServiceTest {
 	}
 
 	protected List<Pipeline> readTemplates(final String token) throws UnirestException {
-		HttpResponse<String> response = baseRequestGet("templates", token).asString();
+		HttpResponse<String> response = addAuthentication(get("templates"), token).asString();
 		assertEquals(HttpStatus.SC_OK, response.getStatus());
 		return Serializer.templatesFromJson(response.getBody());
 	}
 
 	protected Pipeline readTemplate(final String token, long id) throws UnirestException {
-		HttpResponse<String> response = baseRequestGet("templates/" + id, token).asString();
+		HttpResponse<String> response = addAuthentication(get("templates/" + id), token).asString();
 		assertEquals(HttpStatus.SC_OK, response.getStatus());
 		return Serializer.templateFromJson(response.getBody());
 	}
 
 	protected void deleteTemplate(final String token, long id, int expectedResponseCode) throws UnirestException {
-		HttpResponse<String> response = baseRequestDelete("templates/" + id, token).asString();
+		HttpResponse<String> response = addAuthentication(delete("templates/" + id), token).asString();
 		logger.info("Response body: " + response.getBody());
 		assertEquals(expectedResponseCode, response.getStatus());
 		if (expectedResponseCode == HttpStatus.SC_OK) {

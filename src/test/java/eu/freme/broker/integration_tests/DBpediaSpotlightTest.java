@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -46,12 +45,12 @@ public class DBpediaSpotlightTest extends EServiceTest {
 
     public DBpediaSpotlightTest(){super("/e-entity/dbpedia-spotlight/");}
 
-    protected HttpRequestWithBody baseRequestPost(String function) {
-        return super.baseRequestPost(function).queryString("confidence", "0.2");
+    protected HttpRequestWithBody post(String function) {
+        return super.post(function).queryString("confidence", "0.2");
     }
 
-    protected HttpRequest baseRequestGet(String function) {
-        return super.baseRequestGet(function).queryString("confidence", "0.1");
+    protected HttpRequest get(String function) {
+        return super.get(function).queryString("confidence", "0.1");
     }
 
 
@@ -68,7 +67,7 @@ public class DBpediaSpotlightTest extends EServiceTest {
 
             //Tests POST
             //Plaintext Input in Query String
-            response = baseRequestPost("documents")
+            response = post("documents")
                     .queryString("input", testinput)
                     .queryString("language", lang)
                     .queryString("informat", "text")
@@ -77,7 +76,7 @@ public class DBpediaSpotlightTest extends EServiceTest {
 
             //Tests POST
             //Plaintext Input in Body
-            response = baseRequestPost("documents")
+            response = post("documents")
                     .queryString("language", lang)
                     .header("Content-Type", "text/plain")
                     .body(testinput)
@@ -85,7 +84,7 @@ public class DBpediaSpotlightTest extends EServiceTest {
             validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
             //Tests POST
             //NIF Input in Body (Turtle)
-            response = baseRequestPost("documents").header("Content-Type", "text/turtle")
+            response = post("documents").header("Content-Type", "text/turtle")
                     .queryString("language", lang)
                     .body(data).asString();
             validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
@@ -93,7 +92,7 @@ public class DBpediaSpotlightTest extends EServiceTest {
 
             //Tests POST
             //Test Prefix
-            response = baseRequestPost("documents")
+            response = post("documents")
                     .queryString("input", testinput)
                     .queryString("language", lang)
                     .queryString("informat", "text")
@@ -105,7 +104,7 @@ public class DBpediaSpotlightTest extends EServiceTest {
 
             //Tests GET
             //response = Unirest.get(url+"documents?informat=text&input="+testinputEncoded+"&language="+lang+"&dataset="+dataset).asString();
-            response = baseRequestGet("documents")
+            response = get("documents")
                     .queryString("informat", "text")
                     .queryString("input", testinputEncoded)
                     .queryString("language", lang)

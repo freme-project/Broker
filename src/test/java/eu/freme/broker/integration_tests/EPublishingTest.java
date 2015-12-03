@@ -26,8 +26,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import com.adobe.epubcheck.api.EpubCheck;
-import org.junit.Assume;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -47,7 +45,7 @@ public class EPublishingTest extends EServiceTest {
     @Test
     public void testValidJSON() throws UnirestException, IOException {
 
-        HttpResponse<InputStream> response = Unirest.post(getUrl()+"html")
+        HttpResponse<InputStream> response = Unirest.post(getServiceUrl()+"html")
                 .field("htmlZip", new File("src/test/resources/e-publishing/alice.zip"))
                 .field("metadata", (Object) readFile("src/test/resources/e-publishing/metadata.json"))
                 .asBinary();

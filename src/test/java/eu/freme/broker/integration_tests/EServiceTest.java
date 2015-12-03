@@ -31,9 +31,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.filter.ExpressionFilter;
 import org.json.JSONObject;
 import org.junit.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
@@ -45,21 +43,34 @@ import java.util.Enumeration;
 import static org.junit.Assert.*;
 
 /**
- * Created by Arne on 29.07.2015.
+ * This class should simplify the testing of an e-service.
+ * After instantiation for a certain service, it provides post/get/put/delete request functionality
+ * via corresponding methods, with requested url = baseUrl + service + function.
+ * If enabled via anableAuthentication() two authenticated users,
+ * "userwithpermission" and "userwithoutpermission", are provided
+ * to test security issues or api endpoints, which rely on authenticated access.
+ * For additional authentication purposes users can be created and authenticated
+ * via createUser() and authenticateUser(). Use addAuthentication()
+ * [optionally with getTokenWithoutPermission()] in these cases.
+ * Furthermore a RDF response can be validated with validateNIFResponse().
+ * The logging mechanism can be manipulated to avoid printing of full exception
+ * stack traces for expected exceptions, see loggerIgnore() and below.
  */
-
 public abstract class EServiceTest {
 
-    private String url = null;
-    private String baseUrl = null;
+    // Url of the e-Service: baseUrl + service
+    private String serviceUrl;
+    // The baseUrl is defined by the config parameter freme.test.baseurl
+    // or the Spring Boot application context and consists of PROTOCOL://HOST:PORT
+    private String baseUrl;
     private String service;
     public RDFConversionService converter;
     public Logger logger = Logger.getLogger(EServiceTest.class);
 
 
-    public static String tokenWithPermission;
-    public static String tokenWithOutPermission;
-    public static String tokenAdmin;
+    private static String tokenWithPermission;
+    private static String tokenWithOutPermission;
+    private static String tokenAdmin;
 
     public static final String accessDeniedExceptions = "eu.freme.broker.exception.AccessDeniedException || EXCEPTION ~=org.springframework.security.access.AccessDeniedException";
 
@@ -71,6 +82,14 @@ public abstract class EServiceTest {
     private boolean authenticate = false;
     private static boolean authenticated = false;
 
+    /**
+     * To instantiate an EServiceTest the service has to be set.
+     * This is needed to construct the full endpoint URL = baseUrl + service + function
+     * when using get/post/put/delete methods or to use getServiceUrl.
+     * The baseUrl is defined by the config parameter freme.test.baseurl
+     * or the Spring Boot application context and consists of PROTOCOL://HOST:PORT
+     * @param service The service to test with this instantiation
+     */
     public EServiceTest(String service){
         this.service = service;
         Unirest.setTimeouts(10000, 180000);
@@ -79,14 +98,17 @@ public abstract class EServiceTest {
     @Before
     public void setup() throws UnirestException {
         baseUrl = IntegrationTestSetup.getURLEndpoint();
-        url=baseUrl+service;
+        serviceUrl = baseUrl+service;
         converter = (RDFConversionService)IntegrationTestSetup.getContext().getBean(RDFConversionService.class);
         if(!authenticated && authenticate)
             authenticateUsers();
     }
 
+    /**
+     * This method creates and authenticats two users, userwithpermission and userwithoutpermission.
+     * @throws UnirestException
+     */
     private void authenticateUsers() throws UnirestException {
-
         //Creates two users, one intended to have permission, the other not
         createUser(usernameWithPermission, passwordWithPermission);
         tokenWithPermission = authenticateUser(usernameWithPermission, passwordWithPermission);
@@ -97,42 +119,47 @@ public abstract class EServiceTest {
         authenticated = true;
     }
 
-    //All HTTP Methods used in FREME are defined.
-    protected HttpRequestWithBody baseRequestPost(String function) {
-        return Unirest.post(url + function);
-    }
-    protected HttpRequest baseRequestGet( String function) {return Unirest.get(url + function);}
-    protected HttpRequestWithBody baseRequestDelete( String function) {
-        return Unirest.delete(url + function);
-    }
-    protected HttpRequestWithBody baseRequestPut( String function) {
-        return Unirest.put(url + function);
+    // All HTTP Methods used in FREME are defined.
+    // Overwrite them in inherited classe to add certain parameters to all requests of a kind, if needed.
+    protected HttpRequestWithBody post(String function) {return Unirest.post(serviceUrl + function);}
+    protected HttpRequest get(String function) {return Unirest.get(serviceUrl + function);}
+    protected HttpRequestWithBody delete(String function) {return Unirest.delete(serviceUrl + function);}
+    protected HttpRequestWithBody put(String function) {return Unirest.put(serviceUrl + function);}
+
+    public String getTokenWithPermission() {
+        return tokenWithPermission;
     }
 
-    protected HttpRequestWithBody baseRequestPost(String function, String token) {
-        if(token!=null)
-            return Unirest.post(url + function).header("X-Auth-Token", token);
-        return Unirest.post(url + function);
-    }
-    protected HttpRequest baseRequestGet( String function, String token) {
-        if(token!=null)
-            return Unirest.get(url + function).header("X-Auth-Token", token);
-        return Unirest.get(url + function);
-    }
-    protected HttpRequestWithBody baseRequestDelete( String function, String token) {
-        if(token!=null)
-            return Unirest.delete(url + function).header("X-Auth-Token", token);
-        return Unirest.delete(url + function);
-    }
-    protected HttpRequestWithBody baseRequestPut( String function, String token) {
-        if(token!=null)
-            return Unirest.put(url + function).header("X-Auth-Token", token);
-        return Unirest.put(url + function);
+    public String getTokenWithOutPermission() {
+        return tokenWithOutPermission;
     }
 
-    //Simple getter which returns the url to the endpoint
-    public String getUrl() {
-        return url;
+    public String getTokenAdmin() {
+        return tokenAdmin;
+    }
+
+    /**
+     * Use this method to add an authentication header to the request.
+     * If the given token is null, the request will not be modified.
+     * @param request The request to add the authentication
+     * @param token The authentication Token
+     * @param <T>
+     * @return The modified request
+     */
+    @SuppressWarnings("unchecked")
+    protected <T extends HttpRequest> T addAuthentication(T request, String token){
+        if(token==null)
+            return request;
+        return (T)request.header("X-Auth-Token", token);
+    }
+
+    protected <T extends HttpRequest> T addAuthentication(T request){
+        return addAuthentication(request, getTokenWithPermission());
+    }
+
+    //Simple getter which returns the Url of the e-Service
+    public String getServiceUrl() {
+        return serviceUrl;
     }
     public String getBaseUrl() {
         return baseUrl;
@@ -159,12 +186,7 @@ public abstract class EServiceTest {
 
         //Tests if headers are correct.
         String contentType = response.getHeaders().get("content-type").get(0).split(";")[0];
-        //TODO: Special Case due to WRONG Mime Type application/json+ld.
-        // We wait for https://github.com/freme-project/technical-discussion/issues/40
-        if (contentType.equals("application/ld+json") && nifformat.contentType().equals("application/json+ld")) {
-        } else {
-            assertEquals(contentType, nifformat.contentType());
-        }
+        assertEquals(contentType, nifformat.contentType());
 
         if(nifformat!= RDFConstants.RDFSerialization.JSON) {
             // validate RDF
@@ -191,8 +213,12 @@ public abstract class EServiceTest {
 
     }
 
-
-
+    /**
+     * Enable authentication, if needed. This triggers the creation and authentication of the
+     * users "userwithpermission" and "userwithoutpermission" and generates the corresponding
+     * security tokens. Use getTokenWithPermission and getTokenWithOutPermission to authenticate the api calls
+     * or to test security issues of the e-service.
+     */
     public void enableAuthenticate() {
         authenticate = true;
     }
