@@ -31,13 +31,16 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.filter.ExpressionFilter;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Enumeration;
 
 import static org.junit.Assert.*;
 
@@ -216,47 +219,83 @@ public abstract class EServiceTest {
         return token;
     }
 
-    public void loggerIgnore(Class x){
+
+    /**
+     * Sets specific LoggingFilters and initiates suppression of specified Exceptions in Log4j.
+     * @param x Class of Exception
+     **/
+    public void loggerIgnore(Class<Throwable> x){
         loggerIgnore(x.getName());
     }
+
+    /**
+     * Sets specific LoggingFilters and initiates suppression of specified Exceptions in Log4j.
+     * @param x String name of Exception
+     **/
     public void loggerIgnore(String x) {
 
         String newExpression="EXCEPTION ~="+x;
-        Appender appender=(Appender)Logger.getRootLogger().getAllAppenders().nextElement();
+        Enumeration<Appender> allAppenders= Logger.getRootLogger().getAllAppenders();
+        Appender appender;
 
-        String oldExpression;
-        ExpressionFilter exp;
-        try {
-            exp= ((ExpressionFilter) appender.getFilter());
-            oldExpression=exp.getExpression();
-            if (!oldExpression.contains(newExpression)) {
-                exp.setExpression(oldExpression+" || " + newExpression);
+        while (allAppenders.hasMoreElements()) {
+            appender=allAppenders.nextElement();
+            String oldExpression;
+            ExpressionFilter exp;
+            try {
+                exp = ((ExpressionFilter) appender.getFilter());
+                oldExpression = exp.getExpression();
+                if (!oldExpression.contains(newExpression)) {
+                    exp.setExpression(oldExpression + " || " + newExpression);
+                    exp.activateOptions();
+                }
+            } catch (NullPointerException e) {
+                exp = new ExpressionFilter();
+                exp.setExpression(newExpression);
+                exp.setAcceptOnMatch(false);
                 exp.activateOptions();
+                appender.clearFilters();
+                appender.addFilter(exp);
             }
-        } catch (NullPointerException e) {
-            exp= new ExpressionFilter();
-            exp.setExpression(newExpression);
-            exp.setAcceptOnMatch(false);
+        }
+    }
+
+    /**
+     * Clears specific LoggingFilters and stops their suppression of Exceptions in Log4j.
+     * @param x Class of Exception
+     **/
+    public void loggerUnignore(Class<Throwable> x) {
+        loggerUnignore(x.getName());
+    }
+
+    /**
+     * Clears specific LoggingFilters and stops their suppression of Exceptions in Log4j.
+     * @param x String name of Exception
+     **/
+    public void loggerUnignore(String x) {
+        Enumeration<Appender> allAppenders= Logger.getRootLogger().getAllAppenders();
+        Appender appender;
+
+        while (allAppenders.hasMoreElements()) {
+            appender=allAppenders.nextElement();
+            ExpressionFilter exp = ((ExpressionFilter) appender.getFilter());
+            exp.setExpression(exp.getExpression().replace("|| EXCEPTION ~=" + x, "").replace("EXCEPTION ~=" + x + "||", ""));
             exp.activateOptions();
             appender.clearFilters();
             appender.addFilter(exp);
         }
     }
 
-    public void loggerUnignore(Class x) {
-        loggerUnignore(x.getName());
+    /**
+     * Clears all LoggingFilters for all Appenders. Stops suppression of Exceptions in Log4j.
+     **/
+    public void loggerClearFilters() {
+        Enumeration<Appender> allAppenders = Logger.getRootLogger().getAllAppenders();
+        Appender appender;
+
+        while (allAppenders.hasMoreElements()) {
+            appender = allAppenders.nextElement();
+            appender.clearFilters();
+        }
     }
-
-    public void loggerUnignore(String x) {
-
-        Appender appender=(Appender)Logger.getRootLogger().getAllAppenders().nextElement();
-
-        ExpressionFilter exp= ((ExpressionFilter) appender.getFilter());
-        exp.setExpression(exp.getExpression().replace("|| EXCEPTION ~="+x,"").replace("EXCEPTION ~="+x+ "||",""));
-        exp.activateOptions();
-        appender.clearFilters();
-        appender.addFilter(exp);
-
-    }
-
 }

@@ -33,8 +33,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import eu.freme.broker.eservices.BaseRestController;
 
-@Ignore
-public class UserControllerTest {
+public class UserControllerTest extends EServiceTest {
 
 	String baseUrl = null;
 	Logger logger = Logger.getLogger(UserControllerTest.class);
@@ -42,6 +41,10 @@ public class UserControllerTest {
 	String adminUsername;
 
 	String adminPassword;
+
+	public UserControllerTest() {
+		super("");
+	}
 
 	@Before
 	public void setup() {
@@ -68,12 +71,16 @@ public class UserControllerTest {
 		assertTrue(username.equals(responseUsername));
 
 		logger.info("create user with dublicate username - should not work, exception is ok");
+		loggerIgnore("eu.freme.broker.exception.BadRequestException");
 		response = Unirest.post(baseUrl + "/user")
 				.queryString("username", username)
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
+		loggerUnignore("eu.freme.broker.exception.BadRequestException");
+
 
 		logger.info("create users with invalid usernames - should not work");
+		loggerIgnore("eu.freme.broker.exception.BadRequestException");
 		response = Unirest.post(baseUrl + "/user")
 				.queryString("username", "123")
 				.queryString("password", password).asString();
@@ -93,13 +100,17 @@ public class UserControllerTest {
 				.queryString("username", "")
 				.queryString("password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST.value());
+		loggerUnignore("eu.freme.broker.exception.BadRequestException");
+
 
 		logger.info("login with bad password should fail");
+		loggerIgnore(accessDeniedExceptions);
 		response = Unirest
 				.post(baseUrl + BaseRestController.authenticationEndpoint)
 				.header("X-Auth-Username", username)
 				.header("X-Auth-Password", password + "xyz").asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
+		loggerUnignore(accessDeniedExceptions);
 
 		logger.info("login with new user / create token");
 		response = Unirest
@@ -112,8 +123,10 @@ public class UserControllerTest {
 		assertTrue(token.length() > 0);
 
 		logger.info("delete user without providing credentials - should fail, exception is ok");
+		loggerIgnore(accessDeniedExceptions);
 		response = Unirest.delete(baseUrl + "/user/" + username).asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
+		loggerUnignore(accessDeniedExceptions);
 
 		logger.info("create a 2nd user");
 		String otherUsername = "otheruser";
@@ -124,17 +137,22 @@ public class UserControllerTest {
 		assertTrue( otherUsername.equals(responseOtherUsername));
 
 		logger.info( "delete other user should fail");
+		loggerIgnore(accessDeniedExceptions);
 		response = Unirest
 				.delete(baseUrl + "/user/" + otherUsername)
 				.header("X-Auth-Token", token).asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
+		loggerUnignore(accessDeniedExceptions);
 
 		logger.info("cannot do authenticated call with username / password, only token should work");
+		loggerIgnore(accessDeniedExceptions);
 		response = Unirest
 				.delete(baseUrl + "/user/" + username)
 				.header("X-Auth-Username", username)
 				.header("X-Auth-Password", password).asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
+		loggerUnignore(accessDeniedExceptions);
+
 
 		logger.info("get user information");
 		response = Unirest
@@ -171,10 +189,12 @@ public class UserControllerTest {
 		String token = new JSONObject(response.getBody()).getString("token");
 
 		logger.info("try to access /user endpoint from user account - should not work");
+		loggerIgnore(accessDeniedExceptions);
 		response = Unirest
 				.get(baseUrl + "/user")
 				.header("X-Auth-Token", token).asString();
 		assertTrue(response.getStatus() == HttpStatus.UNAUTHORIZED.value());
+		loggerUnignore(accessDeniedExceptions);
 
 		logger.info("access /user endpoint with admin credentials");
 		response = Unirest

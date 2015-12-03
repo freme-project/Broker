@@ -149,13 +149,18 @@ public class CRUDTest extends PipelinesCommon {
 
 	@Test
 	public void testDeleteNonExisting() throws UnirestException {
+		loggerIgnore("eu.freme.common.exception.OwnedResourceNotFoundException || EXCEPTION ~=eu.freme.broker.exception.TemplateNotFoundException");
 		deleteTemplate(tokenWithPermission, -5, HttpStatus.SC_NOT_FOUND);
+		loggerUnignore("eu.freme.common.exception.OwnedResourceNotFoundException || EXCEPTION ~=eu.freme.broker.exception.TemplateNotFoundException");
+
 	}
 
 	@Test
 	public void testDeleteFromAnother() throws UnirestException {
 		Pipeline pipeline = createDefaultTemplate(tokenWithPermission, OwnedResource.Visibility.PUBLIC);
+		loggerIgnore("eu.freme.broker.exception.ForbiddenException");
 		deleteTemplate(tokenWithOutPermission, pipeline.getId(), HttpStatus.SC_FORBIDDEN);
+		loggerUnignore("eu.freme.broker.exception.ForbiddenException");
 		deleteTemplate(tokenWithPermission, pipeline.getId(), HttpStatus.SC_OK);
 	}
 
