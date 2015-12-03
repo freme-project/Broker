@@ -106,6 +106,7 @@ public abstract class EServiceTest {
 
     /**
      * This method creates and authenticats two users, userwithpermission and userwithoutpermission.
+     * Furthermore the admin token is created.
      * @throws UnirestException
      */
     private void authenticateUsers() throws UnirestException {
