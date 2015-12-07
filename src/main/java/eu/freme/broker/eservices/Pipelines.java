@@ -93,8 +93,8 @@ public class Pipelines extends BaseRestController {
 				headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.getMimeType());
 				return new ResponseEntity<>(Serializer.toJson(pipelineResult), headers, HttpStatus.OK);
 			} else {
-				headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getPipelineResponse().getContentType());
-				PipelineResponse lastResponse = pipelineResult.getPipelineResponse();
+				headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getContent().getContentType());
+				PipelineResponse lastResponse = pipelineResult.getContent();
 				return new ResponseEntity<>(lastResponse.getBody(), headers, HttpStatus.OK);
 			}
 
