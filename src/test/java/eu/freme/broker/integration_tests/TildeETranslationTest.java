@@ -22,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -42,7 +41,7 @@ public class TildeETranslationTest extends EServiceTest {
 	public TildeETranslationTest(){super("/e-translation/tilde");}
 
 	private HttpRequestWithBody baseRequest() {
-		return baseRequestPost("")
+		return post("")
 				.queryString("source-lang", sourceLang)
 				.queryString("target-lang", targetLang);
 	}

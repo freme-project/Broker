@@ -64,7 +64,7 @@ public class EInternationalizationTest extends EServiceTest {
 	}
 
 	protected HttpRequestWithBody baseRequestPost() {
-		return super.baseRequestPost("").queryString("dataset", dataset);
+		return super.post("").queryString("dataset", dataset);
 	}
 
 	private void testContentTypeandInformat(String format, String data)

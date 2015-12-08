@@ -40,7 +40,7 @@ public class TildeETerminologyTest extends EServiceTest {
 	public void testETerminology() throws Exception {
 
 		String nif = readFile("src/test/resources/rdftest/e-terminology/example1.ttl");
-		HttpResponse<String> response = baseRequestPost("")
+		HttpResponse<String> response = post("")
 				.queryString("source-lang", "en")
 				.queryString("target-lang", "de")
 				.queryString("informat", "turtle")
@@ -49,7 +49,7 @@ public class TildeETerminologyTest extends EServiceTest {
 		assertTrue(response.getStatus() == HttpStatus.OK.value());
 
 		// not working due to bug in tilde terminology api
-		response = baseRequestPost("")
+		response = post("")
 				.queryString("source-lang", "en")
 				.queryString("target-lang", "de")
 				.queryString("informat", "text")

@@ -57,13 +57,13 @@ public class NIFParameterFactoryTest {
 				"text/turtle", "input", "text/turtle", "text/turtle",
 				"http://example.org");
 		assertTrue(set.getInput().equals("input"));
-		
+
 		thrown.expect(BadRequestException.class);
 		nifParameterFactory.constructFromHttp(null, "text/turtle",
 				"text/turtle", null, "text/turtle", "text/turtle",
 				"http://example.org");
 		thrown = ExpectedException.none();
-		
+
 		// test informat
 		set = nifParameterFactory.constructFromHttp("input", "text/turtle",
 				"application/json+ld", "abc", "text/turtle", "text/turtle",
@@ -74,12 +74,12 @@ public class NIFParameterFactoryTest {
 				"application/json+ld", "abc", "text/turtle", "application/json+ld",
 				"http://example.org");
 		assertTrue(set.getInformat().equals(RDFSerialization.JSON_LD));
-		
+
 		set = nifParameterFactory.constructFromHttp("input", null,
 				null, "abc", null, null,
 				"http://example.org");
 		assertTrue(set.getInformat().equals(RDFSerialization.TURTLE));
-		
+
 		// test outformat
 		set = nifParameterFactory.constructFromHttp("input", "text/turtle",
 				"application/json+ld", "abc", "application/json+ld", "text/turtle",

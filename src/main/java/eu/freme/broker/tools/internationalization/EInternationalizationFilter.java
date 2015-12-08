@@ -17,7 +17,6 @@
  */
 package eu.freme.broker.tools.internationalization;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,6 +35,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -201,27 +201,15 @@ public class EInternationalizationFilter implements Filter {
 		// do conversion of informat to nif
 		// create BodySwappingServletRequest
 
-		InputStream requestInputStream = null;
-
 		String inputQueryString = req.getParameter("input");
-		if (inputQueryString == null) {
-			// read data from request body
-			requestInputStream = req.getInputStream();
-		} else {
-			// read data from query string input parameter
-			requestInputStream = new ReaderInputStream(new StringReader(
-					inputQueryString), "UTF-8");
-		}
-
-		// copy request content to buffer
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		BufferedInputStream bis = new BufferedInputStream(requestInputStream);
-		byte[] buffer = new byte[1024];
-		int read = 0;
-		while ((read = bis.read(buffer)) != -1) {
-			baos.write(buffer, 0, read);
+
+		try (InputStream requestInputStream =
+					inputQueryString == null ? /* read data from request body */ req.getInputStream()
+					: /* read data from query string input parameter*/ new ReaderInputStream(new StringReader(inputQueryString), "UTF-8")) {
+			// copy request content to buffer
+			IOUtils.copy(requestInputStream, baos);
 		}
-		bis.close();
 
 		// create request wrapper that converts the body of the request from the
 		// original format to turtle

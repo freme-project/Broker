@@ -47,13 +47,13 @@ public class FremeNERTest extends EServiceTest {
 
     public FremeNERTest(){super("/e-entity/freme-ner/");}
 
-    protected HttpRequestWithBody baseRequestPost(String function) {
-        return super.baseRequestPost(function);
+    protected HttpRequestWithBody post(String function) {
+        return super.post(function);
 
     }
 
-    protected HttpRequest baseRequestGet(String function) {
-        return super.baseRequestGet(function);
+    protected HttpRequest get(String function) {
+        return super.get(function);
     }
 
     @Test
@@ -65,11 +65,11 @@ public class FremeNERTest extends EServiceTest {
 
         logger.info("check if the test-dataset is already available (via get request)...");
         loggerIgnore("eu.freme.broker.exception.ExternalServiceFailedException || EXCEPTION ~=org.springframework.web.client.HttpClientErrorException");
-        HttpResponse<String> response= baseRequestGet("datasets/"+testDatasetName).asString();
+        HttpResponse<String> response= get("datasets/"+testDatasetName).asString();
         loggerUnignore("eu.freme.broker.exception.ExternalServiceFailedException || EXCEPTION ~=org.springframework.web.client.HttpClientErrorException");
         if (response.getStatus()!=200) {
             logger.info("assume the test-dataset is not available yet, create it...");
-            response=baseRequestPost("datasets")
+            response= post("datasets")
                     .queryString("informat", "n-triples")
                     .queryString("description","Test-Description")
                     .queryString("language","en")
@@ -79,19 +79,19 @@ public class FremeNERTest extends EServiceTest {
             assertTrue(response.getStatus()<=201);
         }
         logger.info("query the test-dataset...");
-        response= baseRequestGet("datasets/"+testDatasetName)
+        response= get("datasets/"+testDatasetName)
                 .queryString("outformat","turtle").asString();
         assertTrue(response.getStatus()==200);
         /*
         TODO:Fix PUT e-entity/datasets/{dataset-name}
-        response=baseRequestPut("datasets/"+testDatasetName)
+        response=put("datasets/"+testDatasetName)
                 .queryString("informat","n-triples")
                 .queryString("language","en")
                 .body(testUpdatedDataset).asString();
 
         */
         logger.info("delete the test-dataset...");
-        response=baseRequestDelete("datasets/" + testDatasetName).asString();
+        response= delete("datasets/" + testDatasetName).asString();
         assertTrue(response.getStatus()==200);
 
 
@@ -110,7 +110,7 @@ public class FremeNERTest extends EServiceTest {
 
             //Tests POST
             //Plaintext Input in Query String
-            response = baseRequestPost("documents")
+            response = post("documents")
                     .queryString("input", testinput)
                     .queryString("language", lang)
                     .queryString("informat", "text")
@@ -120,7 +120,7 @@ public class FremeNERTest extends EServiceTest {
 
             //Tests POST
             //Plaintext Input in Body
-            response = baseRequestPost("documents")
+            response = post("documents")
                     .queryString("language", lang)
                     .queryString("dataset", dataset)
                     .header("Content-Type", "text/plain")
@@ -129,7 +129,7 @@ public class FremeNERTest extends EServiceTest {
             validateNIFResponse(response, RDFConstants.RDFSerialization.TURTLE);
             //Tests POST
             //NIF Input in Body (Turtle)
-            response = baseRequestPost("documents").header("Content-Type", "text/turtle")
+            response = post("documents").header("Content-Type", "text/turtle")
                     .queryString("language", lang)
                     .queryString("dataset", dataset)
                     .body(data).asString();
@@ -138,7 +138,7 @@ public class FremeNERTest extends EServiceTest {
 
             //Tests POST
             //Test Prefix
-            response = baseRequestPost("documents")
+            response = post("documents")
                     .queryString("input", testinput)
                     .queryString("language", lang)
                     .queryString("dataset", dataset)
@@ -149,8 +149,8 @@ public class FremeNERTest extends EServiceTest {
             //assertTrue(response.getString() contains prefix)
 
             //Tests GET
-            response = Unirest.get(getUrl() + "documents?informat=text&input=" + testinputEncoded + "&language=" + lang + "&dataset=" + dataset).asString();
-            response = baseRequestGet("documents")
+            response = Unirest.get(getServiceUrl() + "documents?informat=text&input=" + testinputEncoded + "&language=" + lang + "&dataset=" + dataset).asString();
+            response = get("documents")
                     .queryString("informat", "text")
                     .queryString("dataset", dataset)
                     .queryString("input", testinputEncoded)
