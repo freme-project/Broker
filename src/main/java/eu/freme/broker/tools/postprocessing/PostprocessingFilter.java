@@ -33,24 +33,26 @@ public class PostprocessingFilter implements Filter {
 
 
 
-
-
         if (!(req instanceof HttpServletRequest) || !(res instanceof HttpServletResponse) || req.getParameter("filter")==null) {
             chain.doFilter(req, res);
             return;
         }else{
-            CharArrayWriterResponse customResponse = new CharArrayWriterResponse(res);
-            chain.doFilter(req, res);
             HttpServletRequest httpRequest = (HttpServletRequest) req;
             HttpServletResponse httpResponse = (HttpServletResponse) res;
 
-            String filterName = httpRequest.getParameter("filter");
+            AccessibleHttpServletResponseWrapper responseWrapper = new AccessibleHttpServletResponseWrapper(httpResponse);
 
-            logger.info("using postprocessing filter: "+filterName);
-            //httpResponse.
+            chain.doFilter(httpRequest, responseWrapper);
+
+            String responseContent = "TEST";//new String(responseWrapper.getDataStream());
 
 
-            System.err.println("customResponse: "+customResponse.getOutput());
+            byte[] responseToSend = responseContent.getBytes();
+            ServletOutputStream outputStream = res.getOutputStream();
+            httpResponse.setContentLength(responseToSend.length);
+            outputStream.write(responseToSend);
+            outputStream.flush();
+            outputStream.close();
         }
 
     }
