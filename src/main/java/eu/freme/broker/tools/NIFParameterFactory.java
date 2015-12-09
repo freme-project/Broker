@@ -17,12 +17,12 @@
  */
 package eu.freme.broker.tools;
 
-import org.apache.commons.validator.routines.UrlValidator;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
+import eu.freme.common.conversion.rdf.RDFSerializationFormats;
+import org.apache.commons.validator.routines.UrlValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.HashSet;
