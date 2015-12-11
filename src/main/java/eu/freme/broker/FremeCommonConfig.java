@@ -17,18 +17,16 @@
  */
 package eu.freme.broker;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.github.isrsal.logging.LoggingFilter;
+import eu.freme.broker.tools.NIFParameterFactory;
 import eu.freme.broker.tools.ratelimiter.RateLimiterInMemory;
+import eu.freme.common.conversion.rdf.RDFSerializationFormats;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.github.isrsal.logging.LoggingFilter;
-
-import eu.freme.broker.tools.NIFParameterFactory;
-import eu.freme.broker.tools.RDFSerializationFormats;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class FremeCommonConfig {

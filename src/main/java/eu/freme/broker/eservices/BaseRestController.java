@@ -17,37 +17,25 @@
  */
 package eu.freme.broker.eservices;
 
-import java.lang.annotation.Annotation;
-import java.util.Date;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.InternalServerErrorException;
-
-import eu.freme.broker.exception.BadRequestException;
-
-import org.apache.log4j.Logger;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import com.hp.hpl.jena.rdf.model.Model;
-
-import eu.freme.broker.exception.FREMEHttpException;
+import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.tools.ExceptionHandlerService;
 import eu.freme.broker.tools.NIFParameterFactory;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
-import eu.freme.broker.tools.RDFSerializationFormats;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConversionService;
+import eu.freme.common.conversion.rdf.RDFSerializationFormats;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.InternalServerErrorException;
+import java.util.Map;
 
 /**
  * Common codes for all rest controllers.
