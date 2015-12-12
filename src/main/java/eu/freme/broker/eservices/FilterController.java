@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Strings;
 import com.hp.hpl.jena.rdf.model.Model;
 import eu.freme.broker.exception.BadRequestException;
-import eu.freme.broker.exception.FREMEHttpException;
+import eu.freme.common.exception.FREMEHttpException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.persistence.dao.FilterDAO;
@@ -66,6 +66,9 @@ public class FilterController extends BaseRestController {
             return new ResponseEntity<>(serialization, responseHeaders,
                     HttpStatus.OK);
 
+        }catch (FREMEHttpException ex){
+            logger.error(ex.getMessage());
+            throw ex;
         }catch(Exception ex){
             logger.error(ex.getMessage());
             throw new FREMEHttpException(ex.getMessage());
@@ -94,6 +97,9 @@ public class FilterController extends BaseRestController {
             String serialization = ow.writeValueAsString(filter);
             responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.getMimeType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (FREMEHttpException ex){
+            logger.error(ex.getMessage());
+            throw ex;
         }catch(Exception ex){
             logger.error(ex.getMessage());
             throw new FREMEHttpException(ex.getMessage());
@@ -112,6 +118,9 @@ public class FilterController extends BaseRestController {
             String serialization = ow.writeValueAsString(filter);
             responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.getMimeType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (FREMEHttpException ex){
+            logger.error(ex.getMessage());
+            throw ex;
         }catch(Exception ex){
             logger.error(ex.getMessage());
             throw new FREMEHttpException(ex.getMessage());
@@ -152,6 +161,9 @@ public class FilterController extends BaseRestController {
             String serialization = ow.writeValueAsString(filter);
             responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.getMimeType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (FREMEHttpException ex){
+            logger.error(ex.getMessage());
+            throw ex;
         }catch(Exception ex){
             logger.error(ex.getMessage());
             throw new FREMEHttpException(ex.getMessage());
@@ -167,6 +179,9 @@ public class FilterController extends BaseRestController {
             Filter filter = filterDAO.findOneByName(filterName);
             filterDAO.delete(filter);
             return new ResponseEntity<>("The template was sucessfully removed.", HttpStatus.OK);
+        }catch (FREMEHttpException ex){
+            logger.error(ex.getMessage());
+            throw ex;
         }catch(Exception ex){
             logger.error(ex.getMessage());
             throw new FREMEHttpException(ex.getMessage());
@@ -184,6 +199,9 @@ public class FilterController extends BaseRestController {
             String serialization = ow.writeValueAsString(filters);
             responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.getMimeType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (FREMEHttpException ex){
+            logger.error(ex.getMessage());
+            throw ex;
         }catch(Exception ex){
             logger.error(ex.getMessage());
             throw new FREMEHttpException(ex.getMessage());

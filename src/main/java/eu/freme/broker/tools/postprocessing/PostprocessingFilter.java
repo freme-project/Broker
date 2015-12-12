@@ -2,6 +2,10 @@ package eu.freme.broker.tools.postprocessing;
 
 import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.freme.broker.exception.ExternalServiceFailedException;
 import eu.freme.broker.exception.FREMEHttpException;
 import eu.freme.broker.tools.ExceptionHandlerService;
 import eu.freme.common.conversion.rdf.RDFConstants;
@@ -12,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -69,25 +74,26 @@ public class PostprocessingFilter implements Filter {
 
                     //// manipulate responseContent here
                     try {
-                        Model model = rdfConversionService.unserializeRDF(responseContent,responseType);
-                        Model result;
-                        if(req.getParameter("filter").toLowerCase().equals("extract-entities-only")) {
-                            String queryString =
-                                    "PREFIX itsrdf: <http://www.w3.org/2005/11/its/rdf#>\n" +
-                                    "CONSTRUCT {?s itsrdf:taIdentRef ?o} WHERE {?s itsrdf:taIdentRef ?o}";
-                            Query qry = QueryFactory.create(queryString);
-                            QueryExecution qe = QueryExecutionFactory.create(qry, model);
-                            /*ResultSet rs = qe.execSelect();
-                            responseContent = "";
-                            while(rs.hasNext()){
-                                responseContent += rs.next().toString()+"\n";
-                            }*/
-                            result = qe.execConstruct();
-                        }else{
-                            throw new FREMEHttpException("unknown filter: "+req.getParameter("filter"));
+                        String baseUrl = String.format("%s://%s:%d",httpRequest.getScheme(),  httpRequest.getServerName(), httpRequest.getServerPort());
+
+                        HttpResponse<String> response = Unirest
+                                .post(baseUrl+"/filter")
+                                .header("Accept", responseType.getMimeType())
+                                .header("Content-Type", responseType.getMimeType())
+                                .queryString("filter-name", req.getParameter("filter"))
+                                .body(responseContent)
+                                .asString();
+
+                        if (response.getStatus() != HttpStatus.OK.value()) {
+                            throw new FREMEHttpException(
+                                    "Postprocessing filter failed with status code: "
+                                            + response.getStatus() + " ("+response.getStatusText()+")",
+                                    HttpStatus.valueOf(response.getStatus()));
                         }
-                        responseContent = rdfConversionService.serializeRDF(result, responseType);
-                    } catch (Exception e) {
+
+                        responseContent = response.getBody();
+
+                    } catch (UnirestException e) {
                         throw new FREMEHttpException(e.getMessage());
                     }
                     ////
