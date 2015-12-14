@@ -273,6 +273,7 @@ public class EInternationalizationFilter implements Filter {
 
 		} catch (ConversionException e) {
 			e.printStackTrace();
+//			exceptionHandlerService.writeExceptionToResponse((HttpServletResponse)res,new InternalServerErrorException());
 		}
 	}
 

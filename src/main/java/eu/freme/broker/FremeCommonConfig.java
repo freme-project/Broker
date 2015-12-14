@@ -21,18 +21,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.freme.broker.tools.ratelimiter.RateLimiterInMemory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.github.isrsal.logging.LoggingFilter;
+//import eu.freme.broker.tools.loggingfilter.LoggingFilter;
 
 import eu.freme.broker.tools.NIFParameterFactory;
 import eu.freme.broker.tools.RDFSerializationFormats;
 
 @Configuration
 public class FremeCommonConfig {
-	
+
     @Bean
     public RDFSerializationFormats rdfFormats(){
     	return new RDFSerializationFormats();
@@ -49,7 +50,7 @@ public class FremeCommonConfig {
 
 	/**
 	 * Create a filter that logs all requests input and output
-	 */
+	 *//*
     @Bean
     public FilterRegistrationBean loggingFilter() {
     	FilterRegistrationBean filter = new FilterRegistrationBean();
@@ -57,7 +58,7 @@ public class FremeCommonConfig {
         List<String> urlPatterns = new ArrayList<String>();
         urlPatterns.add("/*");
     	filter.setUrlPatterns(urlPatterns);
-        filter.setOrder(Integer.MAX_VALUE);
+        filter.setOrder(0);
         return filter;
-    }
+    }*/
 }
