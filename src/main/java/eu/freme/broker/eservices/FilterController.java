@@ -100,11 +100,11 @@ public class FilterController extends BaseRestController {
                             serialization = new String(outputStream.toByteArray());
                             break;
                         default:
-                            throw new FREMEHttpException("Unsupported output format for resultset(SELECT) query: "+nifParameters.getOutformat()+". Only JSON is supported.");
+                            throw new BadRequestException("Unsupported output format for resultset(SELECT) query: "+nifParameters.getOutformat()+". Only JSON is supported.");
                     }
                     break;
                 default:
-                    throw new FREMEHttpException("Unsupported filter query. Only sparql SELECT and CONSTRUCT are permitted types.");
+                    throw new BadRequestException("Unsupported filter query. Only sparql SELECT and CONSTRUCT are allowed types.");
             }
 
             HttpHeaders responseHeaders = new HttpHeaders();
@@ -113,6 +113,9 @@ public class FilterController extends BaseRestController {
             return new ResponseEntity<>(serialization, responseHeaders,
                     HttpStatus.OK);
 
+        }catch (BadRequestException ex){
+            logger.error(ex.getMessage());
+            throw ex;
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
             throw ex;
@@ -235,7 +238,7 @@ public class FilterController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/toolbox/filter/manage/", method = RequestMethod.GET)
+    @RequestMapping(value = "/toolbox/filter/manage", method = RequestMethod.GET)
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<String> getAllFilter(
     ){

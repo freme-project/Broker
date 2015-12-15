@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.FREMEHttpException;
 import eu.freme.broker.tools.ExceptionHandlerService;
 import eu.freme.common.conversion.rdf.RDFConstants;
@@ -48,8 +49,6 @@ public class PostprocessingFilter implements Filter {
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 
-
-
         if (!(req instanceof HttpServletRequest) || !(res instanceof HttpServletResponse) || req.getParameter("filter")==null) {
             chain.doFilter(req, res);
         }else{
@@ -64,7 +63,7 @@ public class PostprocessingFilter implements Filter {
                 outType = RDFConstants.RDFSerialization.fromValue(httpRequest.getHeader("Accept"));
 
             if(outType == null){
-                throw new FREMEHttpException("Can not use filter: "+req.getParameter("filter")+" with outformat/Accept-header: " + outType.contentType()+"/"+httpRequest.getHeader("Accept"));
+                throw new BadRequestException("Can not use filter: "+req.getParameter("filter")+" with outformat/Accept-header: " + outType.contentType()+"/"+httpRequest.getHeader("Accept"));
             }
 
             // set outformat for original request to turtle
@@ -116,7 +115,6 @@ public class PostprocessingFilter implements Filter {
             outputStream.write(responseToSend);
             outputStream.flush();
             outputStream.close();
-
 
         }
     }
