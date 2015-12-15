@@ -79,6 +79,14 @@ public class FilterController extends BaseRestController {
                     // write to a ByteArrayOutputStream
                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                     switch (nifParameters.getOutformat()){
+                        case CSV:
+                            ResultSetFormatter.outputAsCSV(outputStream, resultSet);
+                            serialization = new String(outputStream.toByteArray());
+                            break;
+                        case XML:
+                            ResultSetFormatter.outputAsXML(outputStream, resultSet);
+                            serialization = new String(outputStream.toByteArray());
+                            break;
                         case TURTLE:
                         case JSON_LD:
                         case RDF_XML:
