@@ -1,5 +1,6 @@
 package eu.freme.broker.tools.postprocessing;
 
+import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -18,6 +19,8 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 02.12.2015.
@@ -53,59 +56,72 @@ public class PostprocessingFilter implements Filter {
             HttpServletRequest httpRequest = (HttpServletRequest) req;
             HttpServletResponse httpResponse = (HttpServletResponse) res;
 
-            AccessibleHttpServletResponseWrapper responseWrapper = new AccessibleHttpServletResponseWrapper(httpResponse);
-            chain.doFilter(httpRequest, responseWrapper);
-
-            ServletOutputStream outputStream = res.getOutputStream();
-
-            // get content type of response
-            String responseContentType = httpResponse.getContentType();
-            if(responseContentType!=null){
-                responseContentType = responseContentType.split(";")[0].toLowerCase();
-                // check, if content is RDF
-                RDFConstants.RDFSerialization responseType = rdfSerializationFormats.get(responseContentType);
-                if(responseType != null && responseType != RDFConstants.RDFSerialization.JSON && responseType != RDFConstants.RDFSerialization.PLAINTEXT){
-                    String responseContent = new String(responseWrapper.getDataStream());
-
-                    //// manipulate responseContent here
-                    try {
-                        String baseUrl = String.format("%s://%s:%d",httpRequest.getScheme(),  httpRequest.getServerName(), httpRequest.getServerPort());
-
-                        HttpResponse<String> response = Unirest
-                                .post(baseUrl+"/filter")
-                                .header("Accept", responseType.getMimeType())
-                                .header("Content-Type", responseType.getMimeType())
-                                .queryString("filter-name", req.getParameter("filter"))
-                                .body(responseContent)
-                                .asString();
-
-                        if (response.getStatus() != HttpStatus.OK.value()) {
-                            throw new FREMEHttpException(
-                                    "Postprocessing filter failed with status code: "
-                                            + response.getStatus() + " ("+response.getStatusText()+")",
-                                    HttpStatus.valueOf(response.getStatus()));
-                        }
-
-                        responseContent = response.getBody();
-
-                    } catch (UnirestException e) {
-                        throw new FREMEHttpException(e.getMessage());
-                    }
-                    ////
-
-                    byte[] responseToSend = responseContent.getBytes();
-                    httpResponse.setContentLength(responseToSend.length);
-                    outputStream.write(responseToSend);
-                    outputStream.flush();
-                    outputStream.close();
-                }else{
-                    throw new FREMEHttpException("Can not use filter: "+req.getParameter("filter")+" with response type: "+responseContentType);
-                }
+            String outformat = httpRequest.getParameter("outformat");
+            if(Strings.isNullOrEmpty(outformat))
+                outformat = httpRequest.getParameter("o");
+            if(Strings.isNullOrEmpty(outformat)) {
+                outformat = httpRequest.getHeader("Accept");
+                if(Strings.isNullOrEmpty(outformat))
+                    outformat  = httpRequest.getHeader("accept");
+                if (!Strings.isNullOrEmpty(outformat))
+                    outformat = outformat.split(";")[0].toLowerCase();
+            }
+            RDFConstants.RDFSerialization outType = rdfSerializationFormats.get(outformat);
+            if(outType != null && outType != RDFConstants.RDFSerialization.JSON && outType != RDFConstants.RDFSerialization.PLAINTEXT){
+                throw new FREMEHttpException("Can not use filter: "+req.getParameter("filter")+" with outformat: " + outType.contentType());
             }
 
-            outputStream.write(responseWrapper.getDataStream());
+            // set outformat for original request to turtle
+            Map<String, String[]> extraParams = new TreeMap<String, String[]>();
+            extraParams.put("outformat", new String[]{RDFConstants.RDFSerialization.TURTLE.contentType()});
+            HttpServletRequest wrappedRequest = new ModifiableParametersWrappedRequest(httpRequest, extraParams);
+
+            // wrap the response to allow later modification
+            AccessibleHttpServletResponseWrapper wrappedResponse = new AccessibleHttpServletResponseWrapper(httpResponse);
+
+            chain.doFilter(wrappedRequest, wrappedResponse);
+
+
+            String responseContent = new String(wrappedResponse.getDataStream());
+            String responseContentType;
+
+            //// manipulate responseContent here
+            try {
+                String baseUrl = String.format("%s://%s:%d", httpRequest.getScheme(), httpRequest.getServerName(), httpRequest.getServerPort());
+
+                HttpResponse<String> response = Unirest
+                        .post(baseUrl + "/filter")
+                        .header("Accept", RDFConstants.RDFSerialization.TURTLE.getMimeType())
+                        .header("Content-Type", outType.getMimeType())
+                        .queryString("filter-name", req.getParameter("filter"))
+                        .body(responseContent)
+                        .asString();
+
+                if (response.getStatus() != HttpStatus.OK.value()) {
+                    throw new FREMEHttpException(
+                            "Postprocessing filter failed with status code: "
+                                    + response.getStatus() + " (" + response.getStatusText() + ")",
+                            HttpStatus.valueOf(response.getStatus()));
+                }
+
+                responseContent = response.getBody();
+                responseContentType = response.getHeaders().getFirst("Content-Type");
+
+            } catch (UnirestException e) {
+                throw new FREMEHttpException(e.getMessage());
+            }
+            ////
+
+            byte[] responseToSend = responseContent.getBytes();
+
+            httpResponse.setContentType(responseContentType);
+            httpResponse.setContentLength(responseToSend.length);
+
+            ServletOutputStream outputStream = res.getOutputStream();
+            outputStream.write(responseToSend);
             outputStream.flush();
             outputStream.close();
+
 
         }
     }
