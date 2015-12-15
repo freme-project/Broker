@@ -56,19 +56,15 @@ public class PostprocessingFilter implements Filter {
             HttpServletRequest httpRequest = (HttpServletRequest) req;
             HttpServletResponse httpResponse = (HttpServletResponse) res;
 
-            String outformat = httpRequest.getParameter("outformat");
-            if(Strings.isNullOrEmpty(outformat))
-                outformat = httpRequest.getParameter("o");
-            if(Strings.isNullOrEmpty(outformat)) {
-                outformat = httpRequest.getHeader("Accept");
-                if(Strings.isNullOrEmpty(outformat))
-                    outformat  = httpRequest.getHeader("accept");
-                if (!Strings.isNullOrEmpty(outformat))
-                    outformat = outformat.split(";")[0].toLowerCase();
-            }
-            RDFConstants.RDFSerialization outType = rdfSerializationFormats.get(outformat);
-            if(outType != null && outType != RDFConstants.RDFSerialization.JSON && outType != RDFConstants.RDFSerialization.PLAINTEXT){
-                throw new FREMEHttpException("Can not use filter: "+req.getParameter("filter")+" with outformat: " + outType.contentType());
+            // get requested format of response
+            RDFConstants.RDFSerialization outType = rdfSerializationFormats.get(httpRequest.getParameter("outformat"));
+            if(outType == null)
+                outType = rdfSerializationFormats.get(httpRequest.getParameter("o"));
+            if(outType == null)
+                outType = RDFConstants.RDFSerialization.fromValue(httpRequest.getHeader("Accept"));
+
+            if(outType == null){
+                throw new FREMEHttpException("Can not use filter: "+req.getParameter("filter")+" with outformat/Accept-header: " + outType.contentType()+"/"+httpRequest.getHeader("Accept"));
             }
 
             // set outformat for original request to turtle
@@ -90,10 +86,9 @@ public class PostprocessingFilter implements Filter {
                 String baseUrl = String.format("%s://%s:%d", httpRequest.getScheme(), httpRequest.getServerName(), httpRequest.getServerPort());
 
                 HttpResponse<String> response = Unirest
-                        .post(baseUrl + "/filter")
-                        .header("Accept", RDFConstants.RDFSerialization.TURTLE.getMimeType())
-                        .header("Content-Type", outType.getMimeType())
-                        .queryString("filter-name", req.getParameter("filter"))
+                        .post(baseUrl + "/toolbox/filter/documents/"+req.getParameter("filter"))
+                        .header("Accept", RDFConstants.RDFSerialization.TURTLE.contentType())
+                        .header("Content-Type", outType.contentType())
                         .body(responseContent)
                         .asString();
 

@@ -38,10 +38,10 @@ public class FilterController extends BaseRestController {
     @Autowired
     UserDAO userDAO;
 
-    @RequestMapping(value = "/filter", method = RequestMethod.POST)
+    @RequestMapping(value = "/toolbox/filter/documents/{filterName}", method = RequestMethod.POST)
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<String> filter(
-            @RequestParam(value = "filter-name") String filterName,
+            @PathVariable("filterName") String filterName,
             @RequestHeader(value = "Accept", required = false) String acceptHeader,
             @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
             @RequestBody String postBody,
@@ -62,7 +62,7 @@ public class FilterController extends BaseRestController {
             String serialization = rdfConversionService.serializeRDF(model,
                     nifParameters.getOutformat());
             responseHeaders.add("Content-Type", nifParameters.getOutformat()
-                    .getMimeType());
+                    .contentType());
             return new ResponseEntity<>(serialization, responseHeaders,
                     HttpStatus.OK);
 
@@ -76,7 +76,7 @@ public class FilterController extends BaseRestController {
     }
 
 
-    @RequestMapping(value = "/filter/{filterName}", method = RequestMethod.POST)
+    @RequestMapping(value = "/toolbox/filter/manage/{filterName}", method = RequestMethod.POST)
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<String> addFilterByName(
             @PathVariable("filterName") String filterName,
@@ -95,7 +95,7 @@ public class FilterController extends BaseRestController {
             HttpHeaders responseHeaders = new HttpHeaders();
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String serialization = ow.writeValueAsString(filter);
-            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.getMimeType());
+            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
@@ -106,7 +106,7 @@ public class FilterController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/filter/{filterName}", method = RequestMethod.GET)
+    @RequestMapping(value = "/toolbox/filter/manage/{filterName}", method = RequestMethod.GET)
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<String> getFilterByName(
             @PathVariable("filterName") String filterName
@@ -116,7 +116,7 @@ public class FilterController extends BaseRestController {
             HttpHeaders responseHeaders = new HttpHeaders();
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String serialization = ow.writeValueAsString(filter);
-            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.getMimeType());
+            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
@@ -127,7 +127,7 @@ public class FilterController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/filter/{filterName}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/toolbox/filter/manage/{filterName}", method = RequestMethod.PUT)
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<String> putFilterByName(
             @PathVariable("filterName") String filterName,
@@ -159,7 +159,7 @@ public class FilterController extends BaseRestController {
             HttpHeaders responseHeaders = new HttpHeaders();
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String serialization = ow.writeValueAsString(filter);
-            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.getMimeType());
+            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
@@ -170,7 +170,7 @@ public class FilterController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/filter/{filterName}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/toolbox/filter/manage/{filterName}", method = RequestMethod.DELETE)
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<String> deleteFilterByName(
             @PathVariable("filterName") String filterName
@@ -188,7 +188,7 @@ public class FilterController extends BaseRestController {
         }
     }
 
-    @RequestMapping(value = "/filter", method = RequestMethod.GET)
+    @RequestMapping(value = "/toolbox/filter/manage/", method = RequestMethod.GET)
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
     public ResponseEntity<String> getAllFilter(
     ){
@@ -197,7 +197,7 @@ public class FilterController extends BaseRestController {
             HttpHeaders responseHeaders = new HttpHeaders();
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String serialization = ow.writeValueAsString(filters);
-            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.getMimeType());
+            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
