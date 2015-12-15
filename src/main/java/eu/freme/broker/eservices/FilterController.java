@@ -3,8 +3,14 @@ package eu.freme.broker.eservices;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Strings;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
 import eu.freme.broker.exception.BadRequestException;
+import eu.freme.common.conversion.rdf.JenaRDFConversionService;
+import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 import eu.freme.common.exception.FREMEHttpException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.common.conversion.rdf.RDFConstants;
@@ -14,6 +20,7 @@ import eu.freme.common.persistence.model.Filter;
 import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.common.persistence.model.User;
 import eu.freme.common.persistence.repository.FilterRepository;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +45,9 @@ public class FilterController extends BaseRestController {
 
     @Autowired
     UserDAO userDAO;
+
+    @Autowired
+    JenaRDFConversionService jenaRDFConversionService;
 
     @RequestMapping(value = "/toolbox/filter/documents/{filterName}", method = RequestMethod.POST)
     @Secured({"ROLE_USER", "ROLE_ADMIN"})
@@ -56,11 +67,39 @@ public class FilterController extends BaseRestController {
             Model model = rdfConversionService.unserializeRDF(
                     nifParameters.getInput(), nifParameters.getInformat());
 
-            model = filter.getFilteredModel(model);
+            String serialization = null;
+            switch (filter.getQueryType()){
+                case Query.QueryTypeConstruct:
+                    Model resultModel = filter.getFilteredModel(model);
+                    serialization = rdfConversionService.serializeRDF(resultModel,
+                            nifParameters.getOutformat());
+                    break;
+                case Query.QueryTypeSelect:
+                    ResultSet resultSet = filter.getFilteredResultSet(model);
+                    // write to a ByteArrayOutputStream
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    switch (nifParameters.getOutformat()){
+                        case TURTLE:
+                        case JSON_LD:
+                        case RDF_XML:
+                        case N3:
+                        case N_TRIPLES:
+                            ResultSetFormatter.outputAsRDF(outputStream, jenaRDFConversionService.getJenaType(nifParameters.getOutformat()), resultSet);
+                            serialization = new String(outputStream.toByteArray());
+                            break;
+                        case JSON:
+                            ResultSetFormatter.outputAsJSON(outputStream, resultSet);
+                            serialization = new String(outputStream.toByteArray());
+                            break;
+                        default:
+                            throw new FREMEHttpException("Unsupported output format for resultset(SELECT) query: "+nifParameters.getOutformat()+". Only JSON is supported.");
+                    }
+                    break;
+                default:
+                    throw new FREMEHttpException("Unsupported filter query. Only sparql SELECT and CONSTRUCT are permitted types.");
+            }
 
             HttpHeaders responseHeaders = new HttpHeaders();
-            String serialization = rdfConversionService.serializeRDF(model,
-                    nifParameters.getOutformat());
             responseHeaders.add("Content-Type", nifParameters.getOutformat()
                     .contentType());
             return new ResponseEntity<>(serialization, responseHeaders,
@@ -95,7 +134,7 @@ public class FilterController extends BaseRestController {
             HttpHeaders responseHeaders = new HttpHeaders();
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String serialization = ow.writeValueAsString(filter);
-            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.contentType());
+            responseHeaders.add("Content-Type", RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
@@ -116,7 +155,7 @@ public class FilterController extends BaseRestController {
             HttpHeaders responseHeaders = new HttpHeaders();
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String serialization = ow.writeValueAsString(filter);
-            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.contentType());
+            responseHeaders.add("Content-Type", RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
@@ -159,7 +198,7 @@ public class FilterController extends BaseRestController {
             HttpHeaders responseHeaders = new HttpHeaders();
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String serialization = ow.writeValueAsString(filter);
-            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.contentType());
+            responseHeaders.add("Content-Type", RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
@@ -197,7 +236,7 @@ public class FilterController extends BaseRestController {
             HttpHeaders responseHeaders = new HttpHeaders();
             ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
             String serialization = ow.writeValueAsString(filters);
-            responseHeaders.add("Content-Type", RDFConstants.RDFSerialization.JSON.contentType());
+            responseHeaders.add("Content-Type", RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());

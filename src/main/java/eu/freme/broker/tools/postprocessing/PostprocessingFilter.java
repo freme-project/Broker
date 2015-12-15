@@ -87,8 +87,8 @@ public class PostprocessingFilter implements Filter {
 
                 HttpResponse<String> response = Unirest
                         .post(baseUrl + "/toolbox/filter/documents/"+req.getParameter("filter"))
-                        .header("Accept", RDFConstants.RDFSerialization.TURTLE.contentType())
-                        .header("Content-Type", outType.contentType())
+                        .header("Content-Type", RDFConstants.RDFSerialization.TURTLE.contentType())
+                        .header("Accept", outType.contentType())
                         .body(responseContent)
                         .asString();
 
