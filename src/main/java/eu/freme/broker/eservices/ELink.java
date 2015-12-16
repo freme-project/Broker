@@ -20,7 +20,8 @@ package eu.freme.broker.eservices;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Strings;
-import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.exception.InvalidNIFException;
@@ -34,7 +35,6 @@ import eu.freme.common.exception.TemplateNotFoundException;
 import eu.freme.common.exception.UnsupportedEndpointType;
 import eu.freme.common.persistence.dao.TemplateDAO;
 import eu.freme.common.persistence.dao.UserDAO;
-import eu.freme.common.persistence.model.OwnedResource;
 import eu.freme.common.persistence.model.Template;
 import eu.freme.common.persistence.model.User;
 import eu.freme.common.persistence.tools.AccessLevelHelper;
@@ -48,7 +48,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.vote.AbstractAccessDecisionManager;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -130,7 +129,7 @@ public class ELink extends BaseRestController {
 			String serialization = rdfConversionService.serializeRDF(inModel,
 					nifParameters.getOutformat());
 			responseHeaders.add("Content-Type", nifParameters.getOutformat()
-					.getMimeType());
+					.contentType());
 			return new ResponseEntity<>(serialization, responseHeaders,
 					HttpStatus.OK);
 		} catch (AccessDeniedException ex) {
@@ -181,7 +180,7 @@ public class ELink extends BaseRestController {
 			String serialization = rdfConversionService.serializeRDF(inModel,
 					nifParameters.getOutformat());
 			responseHeaders.add("Content-Type", nifParameters.getOutformat()
-					.getMimeType());
+					.contentType());
 			return new ResponseEntity<>(serialization, responseHeaders,
 					HttpStatus.OK);
 		} catch (InvalidTemplateEndpointException ex) {
@@ -278,7 +277,7 @@ public class ELink extends BaseRestController {
 			URI location = new URI("/e-link/templates/" + template.getId());
 			responseHeaders.setLocation(location);
 			responseHeaders.set("Content-Type", nifParameters.getOutformat()
-					.getMimeType());
+					.contentType());
 			// String serialization =
 			// rdfConversionService.serializeRDF(template.getRDF(),
 			// nifParameters.getOutformat());
@@ -373,7 +372,7 @@ public class ELink extends BaseRestController {
 			URI location = new URI("/e-link/templates/" + template.getId());
 			responseHeaders.setLocation(location);
 			responseHeaders.set("Content-Type", nifParameters.getOutformat()
-					.getMimeType());
+					.contentType());
 			return new ResponseEntity<>(serialization, responseHeaders,
 					HttpStatus.OK);
 		} catch (URISyntaxException ex) {
@@ -434,7 +433,7 @@ public class ELink extends BaseRestController {
 						template.getRDF(), nifParameters.getOutformat());
 			}
 			responseHeaders.set("Content-Type", nifParameters.getOutformat()
-					.getMimeType());
+					.contentType());
 			return new ResponseEntity<>(serialization, responseHeaders,
 					HttpStatus.OK);
 
@@ -473,7 +472,7 @@ public class ELink extends BaseRestController {
 
 			HttpHeaders responseHeaders = new HttpHeaders();
 			responseHeaders.set("Content-Type", nifParameters.getOutformat()
-					.getMimeType());
+					.contentType());
 
 			List<Template> templates = templateDAO.findAllReadAccessible();
 			if (nifParameters.getOutformat().equals(
