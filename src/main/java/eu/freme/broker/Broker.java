@@ -32,7 +32,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
-import com.github.isrsal.logging.LoggingFilter;
 
 import eu.freme.broker.tools.RDFELinkSerializationFormats;
 import eu.freme.broker.tools.StarterHelper;

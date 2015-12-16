@@ -41,7 +41,8 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Gerald Haesendonck
  */
-public abstract class PipelinesCommon extends EServiceTest {
+public abstract class
+		PipelinesCommon extends EServiceTest {
 	protected PipelinesCommon() {
 		super("/pipelining/");
 		enableAuthenticate();

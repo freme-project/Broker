@@ -168,9 +168,9 @@ public class Pipelines extends BaseRestController {
 	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
 	 */
 	@RequestMapping(value = "pipelining/templates",
-					method = RequestMethod.POST,
-					consumes = "application/json",
-					produces = "application/json"
+			method = RequestMethod.POST,
+			consumes = "application/json",
+			produces = "application/json"
 	)
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> create(
