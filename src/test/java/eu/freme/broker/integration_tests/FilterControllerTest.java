@@ -109,12 +109,13 @@ public class FilterControllerTest extends EServiceTest {
 
         logger.info("initialize elink-test");
         eLinkSecurityTest.setup();
+        eLinkSecurityTest.replaceBaseUrl();
 
         logger.info("create template");
-        long templateId = eLinkSecurityTest.createTemplate(ELinkSecurityTest.constructTemplate(
+        long templateId = eLinkSecurityTest.createTemplate(eLinkSecurityTest.constructTemplate(
                 "Find nearest museums",
                 "PREFIX dbpedia: <http://dbpedia.org/resource/> PREFIX dbo: <http://dbpedia.org/ontology/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> CONSTRUCT {  ?museum <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> . } WHERE {  <@@@entity_uri@@@> geo:geometry ?citygeo .  OPTIONAL { ?museum rdf:type dbo:Museum . }  ?museum geo:geometry ?museumgeo .  FILTER (<bif:st_intersects>(?museumgeo, ?citygeo, 50)) } LIMIT 10",
-                "http://live.dbpedia.org/sparql/",
+                null,
                 "This template enriches with a list of museums (max 10) within a 50km radius around each location entity.",
                 "SPARQL",
                 "public"),
@@ -145,9 +146,7 @@ public class FilterControllerTest extends EServiceTest {
         logger.info("delete filter2");
         response = addAuthentication(delete("manage/filter2"), getTokenWithPermission()).asString();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-
     }
-
 
     private int doELink(String nifContent, long templateId, String token, String filterName, String outformat) throws UnirestException, IOException {
         HttpResponse<String> response = addAuthentication(eLinkSecurityTest.post("documents"), token)
