@@ -19,7 +19,6 @@
 package eu.freme.broker.tools.loggingfilter;
 
 
-import eu.freme.broker.tools.RDFSerializationFormats;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +38,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
+
+import eu.freme.common.conversion.rdf.RDFSerializationFormats;
 
 @Component
 public class LoggingFilter extends OncePerRequestFilter {
@@ -154,7 +154,7 @@ public class LoggingFilter extends OncePerRequestFilter {
             if (checkAgainstWhitelist(response)){
                 String body=new String(response.toByteArray(), response.getCharacterEncoding());
 
-                if (body.length()>=maxSize){
+                if (response.toByteArray().length>=maxSize){
                     try {
                         body = body.substring(0, maxSize).concat("... (truncated by LoggingFilter)");
                     } catch (StringIndexOutOfBoundsException e) {
