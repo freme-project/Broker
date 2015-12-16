@@ -30,6 +30,7 @@ import eu.freme.common.persistence.model.User;
 import eu.freme.eservices.pipelines.core.PipelineResponse;
 import eu.freme.eservices.pipelines.core.PipelineService;
 import eu.freme.eservices.pipelines.core.ServiceException;
+import eu.freme.eservices.pipelines.core.WrappedPipelineResponse;
 import eu.freme.eservices.pipelines.requests.RequestBuilder;
 import eu.freme.eservices.pipelines.requests.RequestFactory;
 import eu.freme.eservices.pipelines.requests.SerializedRequest;
@@ -70,6 +71,7 @@ public class Pipelines extends BaseRestController {
 	 * <p><To create custom requests, use the {@link RequestBuilder}.</p>
 	 * <p>Examples can be found in the unit tests in {@link eu/freme/broker/integration_tests/pipelines}.</p>
 	 * @param requests	The requests to send to the service.
+	 * @param stats		If "true": wrap the response of the last request and add timing statistics.
 	 * @return          The response of the last request.
 	 * @throws BadRequestException				The contents of the request is not valid.
 	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
@@ -80,13 +82,22 @@ public class Pipelines extends BaseRestController {
 			produces = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3"}
 	)
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
-	public ResponseEntity<String> pipeline(@RequestBody String requests) {
+	public ResponseEntity<String> pipeline(@RequestBody String requests, @RequestParam (value = "stats", defaultValue = "false", required = false) String stats) {
 		try {
+			boolean wrapResult = Boolean.parseBoolean(stats);
 			List<SerializedRequest> serializedRequests = Serializer.fromJson(requests);
-			PipelineResponse pipelineResult = pipelineAPI.chain(serializedRequests);
+			WrappedPipelineResponse pipelineResult = pipelineAPI.chain(serializedRequests);
 			MultiValueMap<String, String> headers = new HttpHeaders();
-			headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getContentType());
-			return new ResponseEntity<>(pipelineResult.getBody(), headers, HttpStatus.OK);
+
+			if (wrapResult) {
+				headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.getMimeType());
+				return new ResponseEntity<>(Serializer.toJson(pipelineResult), headers, HttpStatus.OK);
+			} else {
+				headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getContent().getContentType());
+				PipelineResponse lastResponse = pipelineResult.getContent();
+				return new ResponseEntity<>(lastResponse.getBody(), headers, HttpStatus.OK);
+			}
+
 		} catch (ServiceException serviceError) {
 			// TODO: see if this can be replaced by excsption(s) defined in the broker.
 			logger.error(serviceError.getMessage(), serviceError);
@@ -111,6 +122,7 @@ public class Pipelines extends BaseRestController {
 	 * Calls the pipelining service using an existing template.
 	 * @param body	The contents to send to the pipeline. This can be a NIF or plain text document.
 	 * @param id	The id of the pipeline template to use.
+	 * @param stats		If "true": wrap the response of the last request and add timing statistics.
 	 * @return		The response of the latest request defined in the template.
 	 * @throws AccessDeniedException			The pipeline template is not visible by the current user.
 	 * @throws BadRequestException				The contents of the request is not valid.
@@ -122,12 +134,12 @@ public class Pipelines extends BaseRestController {
 			consumes = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3", "text/plain"},
 			produces = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3"}
 	)
-	public ResponseEntity<String> pipeline(@RequestBody String body, @PathVariable long id) {
+	public ResponseEntity<String> pipeline(@RequestBody String body, @PathVariable long id, @RequestParam (value = "stats", defaultValue = "false", required = false) String stats) {
 		try {
 			Pipeline pipeline = pipelineDAO.findOneById(id);
 			List<SerializedRequest> serializedRequests = Serializer.fromJson(pipeline.getSerializedRequests());
 			serializedRequests.get(0).setBody(body);
-			return pipeline(Serializer.toJson(serializedRequests));
+			return pipeline(Serializer.toJson(serializedRequests), stats);
 		} catch (org.springframework.security.access.AccessDeniedException | InsufficientAuthenticationException ex) {
 			logger.error(ex.getMessage(), ex);
 			throw new AccessDeniedException(ex.getMessage());
@@ -156,9 +168,9 @@ public class Pipelines extends BaseRestController {
 	 * @throws InternalServerErrorException		Something goes wrong that shouldn't go wrong.
 	 */
 	@RequestMapping(value = "pipelining/templates",
-					method = RequestMethod.POST,
-					consumes = "application/json",
-					produces = "application/json"
+			method = RequestMethod.POST,
+			consumes = "application/json",
+			produces = "application/json"
 	)
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> create(

@@ -42,7 +42,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
 @Component
 public class LoggingFilter extends OncePerRequestFilter {
 
@@ -126,7 +125,7 @@ public class LoggingFilter extends OncePerRequestFilter {
                     if (request.getContentLength() >= maxSize) {
                         try {
                             body = body.substring(0, maxSize).concat("... (truncated by LoggingFilter)");
-                        } catch (ArrayIndexOutOfBoundsException e){
+                        } catch (StringIndexOutOfBoundsException e){
                             logger.warn("A Request was made whose Content-Length Header is longer than its actual content");
                         }
                     }
@@ -156,7 +155,11 @@ public class LoggingFilter extends OncePerRequestFilter {
                 String body=new String(response.toByteArray(), response.getCharacterEncoding());
 
                 if (body.length()>=maxSize){
-                    body=body.substring(0,maxSize).concat("... (truncated by LoggingFilter)");
+                    try {
+                        body = body.substring(0, maxSize).concat("... (truncated by LoggingFilter)");
+                    } catch (StringIndexOutOfBoundsException e) {
+                        logger.warn("A Request was made whose Content-Length Header is longer than its actual content");
+                    }
                 }
                 msg.append("; payload=").append(body);
             }
@@ -168,11 +171,10 @@ public class LoggingFilter extends OncePerRequestFilter {
         }
         logger.debug(msg.toString());
     }
-*/
     /**
      * Created by Jonathan Sauder (jonathan.sauder@student.hpi.de) on 11.12.15.
      */
-/*
+
     public boolean checkAgainstWhitelist(HttpServletRequest request){
         String compare=request.getParameter("informat");
         if (compare==null){
@@ -197,4 +199,3 @@ public class LoggingFilter extends OncePerRequestFilter {
     }
 
 }
-*/
