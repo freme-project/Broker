@@ -92,7 +92,7 @@ public class FilterControllerTest extends EServiceTest {
     }
 
     @Test
-    public void testFiltering() throws Exception {
+    public void testFilteringWithELink() throws Exception {
 
 
         logger.info("create filter1");
@@ -111,15 +111,13 @@ public class FilterControllerTest extends EServiceTest {
         eLinkSecurityTest.setup();
 
         logger.info("create template");
-        long templateId = eLinkSecurityTest.createTemplate(
-                "{\n" +
-                "    \"visibility\": \"PUBLIC\",\n" +
-                "    \"endpoint\": \"http://live.dbpedia.org/sparql/\",\n" +
-                "    \"query\": \"PREFIX dbpedia: <http://dbpedia.org/resource/> PREFIX dbo: <http://dbpedia.org/ontology/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> CONSTRUCT {  ?museum <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> . } WHERE {  <@@@entity_uri@@@> geo:geometry ?citygeo .  OPTIONAL { ?museum rdf:type dbo:Museum . }  ?museum geo:geometry ?museumgeo .  FILTER (<bif:st_intersects>(?museumgeo, ?citygeo, 50)) } LIMIT 10\",\n" +
-                "    \"label\": \"Find nearest museums\",\n" +
-                "    \"description\": \"This template enriches with a list of museums (max 10) within a 50km radius around each location entity.\",\n" +
-                "    \"endpointType\": \"SPARQL\"\n" +
-                "  }",
+        long templateId = eLinkSecurityTest.createTemplate(ELinkSecurityTest.constructTemplate(
+                "Find nearest museums",
+                "PREFIX dbpedia: <http://dbpedia.org/resource/> PREFIX dbo: <http://dbpedia.org/ontology/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> CONSTRUCT {  ?museum <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> . } WHERE {  <@@@entity_uri@@@> geo:geometry ?citygeo .  OPTIONAL { ?museum rdf:type dbo:Museum . }  ?museum geo:geometry ?museumgeo .  FILTER (<bif:st_intersects>(?museumgeo, ?citygeo, 50)) } LIMIT 10",
+                "http://live.dbpedia.org/sparql/",
+                "This template enriches with a list of museums (max 10) within a 50km radius around each location entity.",
+                "SPARQL",
+                "public"),
                 getTokenWithPermission());
 
 

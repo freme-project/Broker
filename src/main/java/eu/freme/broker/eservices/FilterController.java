@@ -116,9 +116,6 @@ public class FilterController extends BaseRestController {
         }catch (BadRequestException ex){
             logger.error(ex.getMessage());
             throw ex;
-        }catch (FREMEHttpException ex){
-            logger.error(ex.getMessage());
-            throw ex;
         }catch(Exception ex){
             logger.error(ex.getMessage());
             throw new FREMEHttpException(ex.getMessage());

@@ -409,7 +409,7 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
     //Used for constructiong Templates with sparql queries in E-link and E-Link Security Test
-    String constructTemplate(String label, String query, String endpoint, String description, String endpointType, String visibility) throws JsonProcessingException {
+    public static String constructTemplate(String label, String query, String endpoint, String description, String endpointType, String visibility) throws JsonProcessingException {
         Template template = new Template(null, OwnedResource.Visibility.getByString(visibility), Template.Type.getByString(endpointType), endpoint, query, label, description);
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String serialization = ow.writeValueAsString(template);
