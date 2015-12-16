@@ -81,11 +81,12 @@ public class FilterController extends BaseRestController {
                     switch (nifParameters.getOutformat()){
                         case CSV:
                             ResultSetFormatter.outputAsCSV(outputStream, resultSet);
-                            serialization = new String(outputStream.toByteArray());
                             break;
                         case XML:
                             ResultSetFormatter.outputAsXML(outputStream, resultSet);
-                            serialization = new String(outputStream.toByteArray());
+                            break;
+                        case JSON:
+                            ResultSetFormatter.outputAsJSON(outputStream, resultSet);
                             break;
                         case TURTLE:
                         case JSON_LD:
@@ -93,15 +94,11 @@ public class FilterController extends BaseRestController {
                         case N3:
                         case N_TRIPLES:
                             ResultSetFormatter.outputAsRDF(outputStream, jenaRDFConversionService.getJenaType(nifParameters.getOutformat()), resultSet);
-                            serialization = new String(outputStream.toByteArray());
-                            break;
-                        case JSON:
-                            ResultSetFormatter.outputAsJSON(outputStream, resultSet);
-                            serialization = new String(outputStream.toByteArray());
                             break;
                         default:
-                            throw new BadRequestException("Unsupported output format for resultset(SELECT) query: "+nifParameters.getOutformat()+". Only JSON is supported.");
+                            throw new BadRequestException("Unsupported output format for resultset(SELECT) query: "+nifParameters.getOutformat()+". Only JSON, CSV, XML and RDF types are supported.");
                     }
+                    serialization = new String(outputStream.toByteArray());
                     break;
                 default:
                     throw new BadRequestException("Unsupported filter query. Only sparql SELECT and CONSTRUCT are allowed types.");
