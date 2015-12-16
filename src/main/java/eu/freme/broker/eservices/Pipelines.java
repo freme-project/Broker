@@ -90,7 +90,7 @@ public class Pipelines extends BaseRestController {
 			MultiValueMap<String, String> headers = new HttpHeaders();
 
 			if (wrapResult) {
-				headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.getMimeType());
+				headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.contentType());
 				return new ResponseEntity<>(Serializer.toJson(pipelineResult), headers, HttpStatus.OK);
 			} else {
 				headers.add(HttpHeaders.CONTENT_TYPE, pipelineResult.getContent().getContentType());
@@ -384,7 +384,7 @@ public class Pipelines extends BaseRestController {
 
 	private ResponseEntity<String> createOKJSONResponse(final String contents) {
 		MultiValueMap<String, String> headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.getMimeType());
+		headers.add(HttpHeaders.CONTENT_TYPE, RDFConstants.RDFSerialization.JSON.contentType());
 		return new ResponseEntity<>(contents, headers, HttpStatus.OK);
 	}
 }

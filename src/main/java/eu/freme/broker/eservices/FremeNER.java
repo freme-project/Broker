@@ -17,37 +17,8 @@
  */
 package eu.freme.broker.eservices;
 
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDF;
-
 import eu.freme.broker.exception.ExternalServiceFailedException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.common.conversion.rdf.RDFConstants;
@@ -56,8 +27,21 @@ import eu.freme.common.persistence.model.Template;
 import eu.freme.eservices.eentity.api.EEntityService;
 import eu.freme.eservices.eentity.exceptions.BadRequestException;
 import eu.freme.eservices.elink.api.DataEnricher;
-import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.util.*;
 
 @RestController
 @Profile("broker")
@@ -228,7 +212,7 @@ public class FremeNER extends BaseRestController {
             }
             
 
-                String fremeNERRes = entityAPI.callFremeNER(docForProcessing, language, nifParameters.getPrefix(), dataset, numLinks, rMode, nifParameters.getInformat().getMimeType());
+                String fremeNERRes = entityAPI.callFremeNER(docForProcessing, language, nifParameters.getPrefix(), dataset, numLinks, rMode, nifParameters.getInformat().contentType());
                 outModel.read(new ByteArrayInputStream(fremeNERRes.getBytes()), null, "TTL");
                 outModel.add(inModel);
                 HashMap<String, String> templateParams = new HashMap<>();
