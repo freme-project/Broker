@@ -1,6 +1,5 @@
 package eu.freme.broker.tools.postprocessing;
 
-import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -66,10 +65,13 @@ public class PostprocessingFilter implements Filter {
                 throw new BadRequestException("Can not use filter: "+req.getParameter("filter")+" with outformat/Accept-header: " + outType.contentType()+"/"+httpRequest.getHeader("Accept"));
             }
 
-            // set outformat for original request to turtle
-            Map<String, String[]> extraParams = new TreeMap<String, String[]>();
-            extraParams.put("outformat", new String[]{RDFConstants.RDFSerialization.TURTLE.contentType()});
-            HttpServletRequest wrappedRequest = new ModifiableParametersWrappedRequest(httpRequest, extraParams);
+            // set Accept header for original request to turtle
+            Map<String, String[]> extraParams = new TreeMap<>();
+            // delete outformat parameter
+            extraParams.put("outformat", null);//new String[]{"turtle"});
+            Map<String, String[]> extraHeaders = new TreeMap<>();
+            extraHeaders.put("Accept", new String[]{RDFConstants.RDFSerialization.TURTLE.contentType()});
+            HttpServletRequest wrappedRequest = new ModifiableParametersWrappedRequest(httpRequest, extraParams,extraHeaders);
 
             // wrap the response to allow later modification
             AccessibleHttpServletResponseWrapper wrappedResponse = new AccessibleHttpServletResponseWrapper(httpResponse);

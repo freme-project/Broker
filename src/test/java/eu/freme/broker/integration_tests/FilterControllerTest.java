@@ -1,16 +1,13 @@
 package eu.freme.broker.integration_tests;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.broker.FremeCommonConfig;
-import eu.freme.common.conversion.rdf.RDFConstants;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -94,7 +91,6 @@ public class FilterControllerTest extends EServiceTest {
 
     @Test
     public void testFilteringWithELink() throws Exception {
-
 
         logger.info("create filter1");
         HttpResponse<String> response = addAuthentication(post("manage/filter1"), getTokenWithPermission())
