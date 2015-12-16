@@ -259,8 +259,8 @@ public class ELinkSecurityTest extends EServiceTest {
         rdf_resource = "http://dbpedia.org/resource/Berlin";
 
         response= post("/explore")
-                .header("informat","turtle")
-                .header("outformat","turtle")
+                .queryString("informat","turtle")
+                .queryString("outformat","turtle")
                 .queryString("endpoint-type","sparql")
                 .queryString("resource", rdf_resource)
                 .queryString("endpoint", endpoint)
@@ -276,8 +276,8 @@ public class ELinkSecurityTest extends EServiceTest {
         String endpoint = baseUrl+"/mockups/file/EXPLORE-ldf-resource-Berlin.ttl";
 
         HttpResponse<String> response = post("/explore")
-                .header("informat","turtle")
-                .header("outformat","turtle")
+                .queryString("informat","turtle")
+                .queryString("outformat","turtle")
                 .queryString("endpoint-type","ldf")
                 .queryString("resource", rdf_resource)
                 .queryString("endpoint", endpoint)
