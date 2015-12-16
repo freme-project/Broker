@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -408,7 +409,7 @@ public class ELinkSecurityTest extends EServiceTest {
     }
 
     //Used for constructiong Templates with sparql queries in E-link and E-Link Security Test
-    String constructTemplate(String label, String query, String endpoint, String description, String endpointType, String visibility) throws JsonProcessingException {
+    public static String constructTemplate(String label, String query, String endpoint, String description, String endpointType, String visibility) throws JsonProcessingException {
         Template template = new Template(null, OwnedResource.Visibility.getByString(visibility), Template.Type.getByString(endpointType), endpoint, query, label, description);
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String serialization = ow.writeValueAsString(template);
