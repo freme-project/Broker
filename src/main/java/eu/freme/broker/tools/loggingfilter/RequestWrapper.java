@@ -26,7 +26,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
+/* this code is based on
+ * https://github.com/isrsal/spring-mvc-logger/
+ * Copyright (c) 2013. Israel Zalmanov
+ */
 public class RequestWrapper extends HttpServletRequestWrapper {
 
     private final ByteArrayOutputStream bos = new ByteArrayOutputStream();

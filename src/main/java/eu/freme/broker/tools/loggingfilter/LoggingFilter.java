@@ -42,6 +42,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import eu.freme.common.conversion.rdf.RDFSerializationFormats;
 
+/* this code is based on
+ * https://github.com/isrsal/spring-mvc-logger/
+ * Copyright (c) 2013. Israel Zalmanov
+ */
 @Component
 public class LoggingFilter extends OncePerRequestFilter {
 
@@ -97,6 +101,9 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     }
 
+    /*
+     * Truncates requests that exceed the length of loggingfilter.maxsize in application.properties after checking against whitelist.
+     */
     private void logRequest(final HttpServletRequest request) {
         StringBuilder msg = new StringBuilder();
         msg.append(REQUEST_PREFIX);
@@ -145,7 +152,9 @@ public class LoggingFilter extends OncePerRequestFilter {
     private boolean isMultipart(final HttpServletRequest request) {
         return request.getContentType()!=null && request.getContentType().startsWith("multipart/form-data");
     }
-
+    /*
+     * Truncates responses that exceed the length of loggingfilter.maxsize in application.properties after checking against whitelist.
+     */
     private void logResponse(final ResponseWrapper response) {
         StringBuilder msg = new StringBuilder();
         msg.append(RESPONSE_PREFIX);
@@ -175,6 +184,11 @@ public class LoggingFilter extends OncePerRequestFilter {
      * Created by Jonathan Sauder (jonathan.sauder@student.hpi.de) on 11.12.15.
      */
 
+    /*
+     * Checks if the Content-Type of the given request/response is in the whitelisted
+     * Mime-Types for logging. These are specified in the loggingfilter.whitelist parameter
+     * in application.properties
+     */
     public boolean checkAgainstWhitelist(HttpServletRequest request){
         String compare=request.getParameter("informat");
         if (compare==null){

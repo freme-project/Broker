@@ -19,7 +19,10 @@
 package eu.freme.broker.tools.loggingfilter;
 
 import java.io.PrintWriter;
-
+/* this code is based on
+ * https://github.com/isrsal/spring-mvc-logger/
+ * Copyright (c) 2013. Israel Zalmanov
+ */
 public class TeePrintWriter extends PrintWriter{
 
     PrintWriter branch;
