@@ -79,7 +79,7 @@ public class Pipelines extends BaseRestController {
 	@RequestMapping(value = "pipelining/chain",
 			method = RequestMethod.POST,
 			consumes = "application/json",
-			produces = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3"}
+			produces = {"text/turtle", "application/json", "application/ld+json", "application/n-triples", "application/rdf+xml", "text/n3", "text/html"}
 	)
 	@Secured({"ROLE_USER", "ROLE_ADMIN"})
 	public ResponseEntity<String> pipeline(@RequestBody String requests, @RequestParam (value = "stats", defaultValue = "false", required = false) String stats) {
