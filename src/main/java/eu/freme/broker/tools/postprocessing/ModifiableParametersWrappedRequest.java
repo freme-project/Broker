@@ -86,8 +86,10 @@ public class ModifiableParametersWrappedRequest extends HttpServletRequestWrappe
 
     @Override
     public long getDateHeader(String name) {
-        String[] headers = modifiableHeaders.get(name.toLowerCase());
-        if(headers != null ) {
+        if(modifiableHeaders.containsKey(name)) {
+            String[] headers = modifiableHeaders.get(name.toLowerCase());
+            if(headers == null)
+                return -1;
             Date date = DateUtils.parseDate(headers[0]);
             return date.getTime();
         }
@@ -96,25 +98,34 @@ public class ModifiableParametersWrappedRequest extends HttpServletRequestWrappe
 
     @Override
     public int getIntHeader(String name){
-        String[] headers = modifiableHeaders.get(name.toLowerCase());
-        if(headers != null )
+        if(modifiableHeaders.containsKey(name) ) {
+            String[] headers = modifiableHeaders.get(name.toLowerCase());
+            if(headers==null)
+                return -1;
             return Integer.parseInt(headers[0]);
+        }
         return super.getIntHeader(name);
     }
 
     @Override
     public String getHeader(String name) {
-        String[] headers = modifiableHeaders.get(name.toLowerCase());
-        if(headers != null )
+        if(modifiableHeaders.containsKey(name)) {
+            String[] headers = modifiableHeaders.get(name.toLowerCase());
+            if(headers == null)
+                return null;
             return headers[0];
+        }
         return super.getHeader(name);
     }
 
     @Override
     public Enumeration<String> getHeaders(String name) {
-        String[] headers = modifiableHeaders.get(name.toLowerCase());
-        if(headers != null )
+        if(modifiableHeaders.containsKey(name)) {
+            String[] headers = modifiableHeaders.get(name.toLowerCase());
+            if(headers == null)
+                return Collections.emptyEnumeration();
             return Collections.enumeration(new HashSet<>(Arrays.asList(headers)));
+        }
         return super.getHeaders(name);
     }
 
@@ -124,7 +135,13 @@ public class ModifiableParametersWrappedRequest extends HttpServletRequestWrappe
         {
             allHeaderNames = new TreeSet<>();
             allHeaderNames.addAll(Collections.list(super.getHeaderNames()));
-            allHeaderNames.addAll(modifiableHeaders.keySet());
+            for(String key: modifiableHeaders.keySet()){
+                if(modifiableHeaders.get(key)!=null)
+                    allHeaderNames.add(key);
+                else
+                    allHeaderNames.remove(key);
+            }
+            //allHeaderNames.addAll(modifiableHeaders.keySet());
         }
         return Collections.enumeration(allHeaderNames);
     }
