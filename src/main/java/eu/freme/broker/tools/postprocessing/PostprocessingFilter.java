@@ -62,7 +62,7 @@ public class PostprocessingFilter implements Filter {
                 outType = RDFConstants.RDFSerialization.fromValue(httpRequest.getHeader("Accept"));
 
             if(outType == null){
-                throw new BadRequestException("Can not use filter: "+req.getParameter("filter")+" with outformat/Accept-header: " + outType.contentType()+"/"+httpRequest.getHeader("Accept"));
+                throw new BadRequestException("Can not use filter: "+req.getParameter("filter")+" with outformat/Accept-header: " + httpRequest.getParameter("outformat")+"/"+httpRequest.getHeader("Accept"));
             }
 
             // set Accept header for original request to turtle
