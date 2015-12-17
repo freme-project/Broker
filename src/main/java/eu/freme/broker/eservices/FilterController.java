@@ -182,7 +182,7 @@ public class FilterController extends BaseRestController {
         try {
             Filter filter = filterDAO.findOneByName(filterName);
 
-            if(!Strings.isNullOrEmpty(postBody)){
+            if(!Strings.isNullOrEmpty(postBody) && !postBody.trim().isEmpty() && !postBody.trim().toLowerCase().equals("null") && !postBody.trim().toLowerCase().equals("empty")){
                 filter.setQuery(postBody);
             }
 
