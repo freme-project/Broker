@@ -1,8 +1,14 @@
 package eu.freme.broker.integration_tests;
 
+import com.hp.hpl.jena.query.*;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.freme.broker.FremeCommonConfig;
+import eu.freme.common.conversion.rdf.JenaRDFConversionService;
+import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.conversion.rdf.RDFConversionService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Ignore;
@@ -13,9 +19,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -33,13 +43,12 @@ public class FilterControllerTest extends EServiceTest {
         enableAuthenticate();
     }
 
-    final String filterSelect =
-                    "PREFIX itsrdf: <http://www.w3.org/2005/11/its/rdf#>\n" +
-                    "SELECT ?s ?o\n" +
-                    "WHERE {?s itsrdf:taIdentRef ?o}";
-    final String filterConstruct =
-                    "PREFIX itsrdf: <http://www.w3.org/2005/11/its/rdf#>\n" +
-                    "CONSTRUCT {?s itsrdf:taIdentRef ?o} WHERE {?s itsrdf:taIdentRef ?o}";
+    final String entityHeader = "entity";
+    final String propertyIdentifier = "http://www.w3.org/2005/11/its/rdf#taIdentRef";
+    final String resourceIdentifier = "http://dbpedia.org/resource/Berlin";
+
+    final String filterSelect = "SELECT ?"+ entityHeader +" WHERE {[] <"+propertyIdentifier+"> ?"+ entityHeader +"}";
+    final String filterConstruct = "CONSTRUCT {?s <"+propertyIdentifier+"> ?"+ entityHeader +"} WHERE {?s <"+propertyIdentifier+"> ?"+ entityHeader +"}";
 
     @Test
     public void testFilterManagement() throws UnirestException {
@@ -87,6 +96,82 @@ public class FilterControllerTest extends EServiceTest {
         response = addAuthentication(delete("manage/filter2"), getTokenWithPermission()).asString();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
 
+    }
+
+    @Test
+    public void testFiltering() throws Exception {
+        logger.info("create filter1");
+        HttpResponse<String> response = addAuthentication(post("manage/filter1"), getTokenWithPermission())
+                .body(filterSelect)
+                .asString();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+        logger.info("create filter2");
+        response = addAuthentication(post("manage/filter2"), getTokenWithPermission())
+                .body(filterConstruct)
+                .asString();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+        String nifContent =
+                " @prefix nif:   <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .\n" +
+                " @prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> .\n" +
+                "\n" +
+                "<http://127.0.0.1:9995/spotlight#char=0,15>\n" +
+                " a                     nif:Context , nif:Sentence , nif:RFC5147String ;\n" +
+                " nif:beginIndex        \"0\" ;\n" +
+                " nif:endIndex          \"15\" ;\n" +
+                " nif:isString          \"This is Berlin.\" ;\n" +
+                " nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,15> .\n" +
+                "\n" +
+                "<http://127.0.0.1:9995/spotlight#char=8,14>\n" +
+                " a                     nif:Word , nif:RFC5147String ;\n" +
+                " nif:anchorOf          \"Berlin\" ;\n" +
+                " nif:beginIndex        \"8\" ;\n" +
+                " nif:endIndex          \"14\" ;\n" +
+                " nif:referenceContext  <http://127.0.0.1:9995/spotlight#char=0,15> ;\n" +
+                " <"+propertyIdentifier+">     <"+resourceIdentifier+"> .";
+
+
+        logger.info("filter nif with filter1(select)");
+        response = post("documents/filter1")
+                .queryString("informat", RDFConstants.RDFSerialization.TURTLE.contentType())
+                .queryString("outformat", RDFConstants.RDFSerialization.JSON.contentType())
+                .body(nifContent)
+                .asString();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        InputStream stream = new ByteArrayInputStream(response.getBody().getBytes(StandardCharsets.UTF_8));
+        ResultSet resultSet = ResultSetFactory.fromJSON(stream);
+        // check resultSet content
+        assertTrue(resultSet.nextSolution().get(entityHeader).asResource().equals(ResourceFactory.createResource(resourceIdentifier)));
+        assertFalse(resultSet.hasNext());
+
+        logger.info("filter nif with filter2(construct)");
+        response = post("documents/filter2")
+                .queryString("informat", RDFConstants.RDFSerialization.TURTLE.contentType())
+                .queryString("outformat", RDFConstants.RDFSerialization.TURTLE.contentType())
+                .body(nifContent)
+                .asString();
+        //check status code
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        RDFConversionService rdfConversionService = new JenaRDFConversionService();
+        Model resultModel = rdfConversionService.unserializeRDF(response.getBody(),RDFConstants.RDFSerialization.TURTLE);
+        // check, if the result model contains the required triple
+        Query askQuery = QueryFactory.create("ASK {[] <"+propertyIdentifier+"> <"+resourceIdentifier+">}");
+        QueryExecution qexec = QueryExecutionFactory.create(askQuery, resultModel) ;
+        assertTrue(qexec.execAsk());
+
+        // check, if the result model contains no more triples
+        Query countQuery = QueryFactory.create("SELECT (COUNT(*) as ?count) WHERE { ?s ?p ?o. }");
+        qexec = QueryExecutionFactory.create(countQuery, resultModel) ;
+        resultSet = qexec.execSelect();
+        assertEquals(1,resultSet.nextSolution().getLiteral("count").getInt());
+
+        logger.info("delete filter1");
+        response = addAuthentication(delete("manage/filter1"), getTokenWithPermission()).asString();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        logger.info("delete filter2");
+        response = addAuthentication(delete("manage/filter2"), getTokenWithPermission()).asString();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 
     @Test
