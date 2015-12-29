@@ -125,6 +125,7 @@ public class FilterController extends BaseRestController {
     public ResponseEntity<String> addFilterByName(
             @PathVariable("filterName") String filterName,
             @RequestParam(value = "visibility", required = false) String visibility,
+            @RequestParam(value = "description", required = false) String description,
             @RequestBody String postBody
     ){
         try {
@@ -133,7 +134,7 @@ public class FilterController extends BaseRestController {
             if(filter!=null)
                 throw new FREMEHttpException("Can not add filter: Filter with name: "+filterName+" already exists.");
 
-            filter = new Filter(OwnedResource.Visibility.getByString(visibility), filterName, postBody);
+            filter = new Filter(OwnedResource.Visibility.getByString(visibility), filterName, postBody, description);
             filter = filterDAO.save(filter);
 
             HttpHeaders responseHeaders = new HttpHeaders();
@@ -176,6 +177,7 @@ public class FilterController extends BaseRestController {
     public ResponseEntity<String> putFilterByName(
             @PathVariable("filterName") String filterName,
             @RequestParam(value = "visibility", required = false) String visibility,
+            @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "newOwner", required = false) String ownerName,
             @RequestBody String postBody
     ){
@@ -188,6 +190,10 @@ public class FilterController extends BaseRestController {
 
             if(!Strings.isNullOrEmpty(visibility)){
                 filter.setVisibility(OwnedResource.Visibility.getByString(visibility));
+            }
+
+            if(!Strings.isNullOrEmpty(description)){
+                filter.setDescription(description);
             }
 
             filterDAO.save(filter);
