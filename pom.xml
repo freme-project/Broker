@@ -246,6 +246,7 @@
 						<exclude>LICENSE</exclude>
 						<exclude>LICENSE-3RD-PARTY</exclude>
 						<exclude>nbactions.xml</exclude>
+						<exclude>src/main/java/eu/freme/broker/tools/loggingfilter/**</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
