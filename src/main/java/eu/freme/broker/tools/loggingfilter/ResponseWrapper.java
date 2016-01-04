@@ -1,13 +1,16 @@
-/*
- * spring-mvc-logger logs requests/responses
+/**
+ * Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+ * Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+ * Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
  *
- * Copyright (c) 2013. Israel Zalmanov
+ * This source code is derived from the Spring MVC Logging Filter
+ * (https://github.com/isrsal/spring-mvc-logger) by Israel Zalmanov.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +21,6 @@
 
 package eu.freme.broker.tools.loggingfilter;
 
-import eu.freme.broker.tools.loggingfilter.TeePrintWriter;
 import org.apache.commons.io.output.TeeOutputStream;
 
 import javax.servlet.ServletOutputStream;
@@ -29,10 +31,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-/* this code is based on
- * https://github.com/isrsal/spring-mvc-logger/
- * Copyright (c) 2013. Israel Zalmanov
- */
+
 public class ResponseWrapper extends HttpServletResponseWrapper {
 
     private final ByteArrayOutputStream bos = new ByteArrayOutputStream();

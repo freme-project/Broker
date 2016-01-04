@@ -1,13 +1,16 @@
-/*
- * spring-mvc-logger logs requests/responses
+/**
+ * Copyright (C) 2015 Agro-Know, Deutsches Forschungszentrum für Künstliche Intelligenz, iMinds,
+ * Institut für Angewandte Informatik e. V. an der Universität Leipzig,
+ * Istituto Superiore Mario Boella, Tilde, Vistatec, WRIPL (http://freme-project.eu)
  *
- * Copyright (c) 2013. Israel Zalmanov
+ * This source code is derived from the Spring MVC Logging Filter
+ * (https://github.com/isrsal/spring-mvc-logger) by Israel Zalmanov.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *         http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,20 +22,17 @@
 package eu.freme.broker.tools.loggingfilter;
 
 
-import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.conversion.rdf.RDFSerializationFormats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -40,12 +40,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.atomic.AtomicLong;
 
-import eu.freme.common.conversion.rdf.RDFSerializationFormats;
-
-/* this code is based on
- * https://github.com/isrsal/spring-mvc-logger/
- * Copyright (c) 2013. Israel Zalmanov
- */
 @Component
 public class LoggingFilter extends OncePerRequestFilter {
 
