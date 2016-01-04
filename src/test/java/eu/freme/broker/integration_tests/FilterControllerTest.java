@@ -230,7 +230,7 @@ public class FilterControllerTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testFilteringWithELinkXML() throws Exception {
         logger.info("create filter1");

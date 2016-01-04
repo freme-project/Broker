@@ -24,7 +24,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -39,6 +42,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -59,6 +63,18 @@ import eu.freme.i18n.okapi.nif.converter.ConversionException;
 @Component
 @Profile("broker")
 public class EInternationalizationFilter implements Filter {
+
+	/**
+	 * Disable e-Internationalization filter for a set of endpoints with the
+	 * configuration option freme.einternationalization.endpoint-blacklist. You
+	 * can configure a comma separated list of regular expressions. For example
+	 * the regular expression like /toolbox/.* will match the endpoint
+	 * http://localhost:8080/toolbox/test
+	 */
+	@Value("#{'${freme.einternationalization.endpoint-blacklist:/toolbox/.*}'.split(',')}")
+	Set<String> endpointBlacklist;
+
+	Set<Pattern> endpointBlacklistRegex;
 
 	@Autowired
 	ExceptionHandlerService exceptionHandlerService;
@@ -91,6 +107,14 @@ public class EInternationalizationFilter implements Filter {
 				.add(EInternationalizationAPI.MIME_TYPE_HTML.toLowerCase());
 		outputFormats.add(EInternationalizationAPI.MIME_TYPE_XLIFF_1_2
 				.toLowerCase());
+	}
+
+	@PostConstruct
+	public void doInit() {
+		endpointBlacklistRegex = new HashSet<Pattern>();
+		for (String str : endpointBlacklist) {
+			endpointBlacklistRegex.add(Pattern.compile(str));
+		}
 	}
 
 	/**
@@ -164,6 +188,14 @@ public class EInternationalizationFilter implements Filter {
 			return;
 		}
 
+		String uri = httpRequest.getRequestURI();
+		for (Pattern pattern : endpointBlacklistRegex) {
+			if (pattern.matcher(uri).matches()) {
+				chain.doFilter(req, res);
+				return;
+			}
+		}
+
 		String informat = getInformat(httpRequest);
 		String outformat = getOutformat(httpRequest);
 
@@ -204,9 +236,18 @@ public class EInternationalizationFilter implements Filter {
 		String inputQueryString = req.getParameter("input");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		try (InputStream requestInputStream =
-					inputQueryString == null ? /* read data from request body */ req.getInputStream()
-					: /* read data from query string input parameter*/ new ReaderInputStream(new StringReader(inputQueryString), "UTF-8")) {
+		try (InputStream requestInputStream = inputQueryString == null ? /*
+																		 * read
+																		 * data
+																		 * from
+																		 * request
+																		 * body
+																		 */req
+				.getInputStream() : /*
+									 * read data from query string input
+									 * parameter
+									 */new ReaderInputStream(new StringReader(
+				inputQueryString), "UTF-8")) {
 			// copy request content to buffer
 			IOUtils.copy(requestInputStream, baos);
 		}
@@ -233,22 +274,22 @@ public class EInternationalizationFilter implements Filter {
 			throw new InternalServerErrorException("Conversion from \""
 					+ informat + "\" to NIF failed");
 		}
-		
+
 		BodySwappingServletRequest bssr = new BodySwappingServletRequest(
 				(HttpServletRequest) req, nif, roundtripping);
 
-		if( !roundtripping ){
+		if (!roundtripping) {
 			chain.doFilter(bssr, res);
 			return;
 		}
-		
+
 		ConversionHttpServletResponseWrapper dummyResponse;
-		
+
 		try {
 			dummyResponse = new ConversionHttpServletResponseWrapper(
 					httpResponse, eInternationalizationApi,
 					new ByteArrayInputStream(baosData), informat, outformat);
-			
+
 			chain.doFilter(bssr, dummyResponse);
 
 			ServletOutputStream sos = httpResponse.getOutputStream();
@@ -261,7 +302,8 @@ public class EInternationalizationFilter implements Filter {
 
 		} catch (ConversionException e) {
 			e.printStackTrace();
-//			exceptionHandlerService.writeExceptionToResponse((HttpServletResponse)res,new InternalServerErrorException());
+			// exceptionHandlerService.writeExceptionToResponse((HttpServletResponse)res,new
+			// InternalServerErrorException());
 		}
 	}
 
