@@ -257,7 +257,6 @@ public class FilterControllerTest extends EServiceTest {
         logger.info("read nif to enrich");
         String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
 
-        //TODO: fix this!
         logger.info("filter with filter1(SELECT) and outformat: xml");
         assertEquals(HttpStatus.OK.value(), doELink(nifContent,templateId,getTokenWithPermission(),"filter1", "xml"));
 
