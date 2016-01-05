@@ -213,9 +213,8 @@ public class FilterControllerTest extends EServiceTest {
         logger.info("filter with filter1(SELECT) and outformat: json");
         assertEquals(HttpStatus.OK.value(), doELink(nifContent,templateId,getTokenWithPermission(),"filter1", "json"));
 
-        //TODO: fix this!
-        //logger.info("filter with filter1(SELECT) and outformat: xml");
-        //assertEquals(HttpStatus.OK.value(), doELink(nifContent,templateId,getTokenWithPermission(),"filter1", "xml"));
+        logger.info("filter with filter1(SELECT) and outformat: xml");
+        assertEquals(HttpStatus.OK.value(), doELink(nifContent,templateId,getTokenWithPermission(),"filter1", "xml"));
 
         logger.info("filter with filter2(CONSTRUCT) and outformat: turtle");
         assertEquals(HttpStatus.OK.value(), doELink(nifContent,templateId,getTokenWithPermission(),"filter2", "turtle"));
@@ -227,43 +226,6 @@ public class FilterControllerTest extends EServiceTest {
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         logger.info("delete filter2");
         response = addAuthentication(delete("manage/filter2"), getTokenWithPermission()).asString();
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
-    }
-
-    //@Ignore
-    @Test
-    public void testFilteringWithELinkXML() throws Exception {
-        logger.info("create filter1");
-        HttpResponse<String> response = addAuthentication(post("manage/filter1"), getTokenWithPermission())
-                .body(filterSelect)
-                .asString();
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
-
-        logger.info("initialize elink-test");
-        eLinkSecurityTest.setup();
-        eLinkSecurityTest.replaceBaseUrl();
-
-        logger.info("create template");
-        long templateId = eLinkSecurityTest.createTemplate(eLinkSecurityTest.constructTemplate(
-                "Find nearest museums",
-                "PREFIX dbpedia: <http://dbpedia.org/resource/> PREFIX dbo: <http://dbpedia.org/ontology/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> CONSTRUCT {  ?museum <http://xmlns.com/foaf/0.1/based_near> <@@@entity_uri@@@> . } WHERE {  <@@@entity_uri@@@> geo:geometry ?citygeo .  OPTIONAL { ?museum rdf:type dbo:Museum . }  ?museum geo:geometry ?museumgeo .  FILTER (<bif:st_intersects>(?museumgeo, ?citygeo, 50)) } LIMIT 10",
-                null, //use default: mockupEndpointUrl
-                "This template enriches with a list of museums (max 10) within a 50km radius around each location entity.",
-                "SPARQL",
-                "public"),
-                getTokenWithPermission());
-
-
-        logger.info("read nif to enrich");
-        String nifContent = readFile("src/test/resources/rdftest/e-link/data.ttl");
-
-        logger.info("filter with filter1(SELECT) and outformat: xml");
-        assertEquals(HttpStatus.OK.value(), doELink(nifContent,templateId,getTokenWithPermission(),"filter1", "xml"));
-
-        eLinkSecurityTest.deleteTemplate(templateId, getTokenWithPermission());
-
-        logger.info("delete filter1");
-        response = addAuthentication(delete("manage/filter1"), getTokenWithPermission()).asString();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
     }
 
