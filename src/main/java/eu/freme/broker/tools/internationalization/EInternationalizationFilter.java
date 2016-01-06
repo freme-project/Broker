@@ -17,12 +17,7 @@
  */
 package eu.freme.broker.tools.internationalization;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -44,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import eu.freme.broker.exception.BadRequestException;
@@ -293,8 +289,32 @@ public class EInternationalizationFilter implements Filter {
 			chain.doFilter(bssr, dummyResponse);
 
 			ServletOutputStream sos = httpResponse.getOutputStream();
+			byte[] data;
+			if (dummyResponse.getStatus()==HttpStatus.OK.value()) {
+				data = dummyResponse.writeBackToClient();
+			} else {
+				OutputStream stream = dummyResponse.getResponse().getOutputStream();
+				dummyResponse.getBufferSize();
 
-			byte[] data = dummyResponse.writeBackToClient();
+				/*
+
+				BufferedInputStream is = new BufferedInputStream(new ReaderInputStream(
+						reader));
+				byte[] buffer = new byte[1024];
+				int read = 0;
+				long length = 0;
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				while ((read = is.read(buffer)) != -1) {
+					length += read;
+					baos.write(buffer, 0, read);
+				}
+				is.close();
+				setContentLengthLong(length);
+
+				return baos.toByteArray();
+				*/
+			}
+			data=null;
 			httpResponse.setContentLength(data.length);
 			sos.write(data);
 			sos.flush();

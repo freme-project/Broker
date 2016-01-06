@@ -20,7 +20,6 @@ rate-limits:
     /e-publishing:
       - 10
       - 100000000
-
   ROLE_ADMIN:
     default:
       - 0

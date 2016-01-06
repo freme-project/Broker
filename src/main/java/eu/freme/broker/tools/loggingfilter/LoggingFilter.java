@@ -48,7 +48,7 @@ public class LoggingFilter extends OncePerRequestFilter {
     private static final String RESPONSE_PREFIX = "Response: ";
     private AtomicLong id = new AtomicLong(1);
 
-    @Value("${loggingfilter.maxsize:1000}")
+    @Value("${loggingfilter.maxsize:2000}")
     int maxSize;
 
     @Value("${loggingfilter.whitelist:null}")
@@ -77,7 +77,7 @@ public class LoggingFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
 
 
-        if(logger.isDebugEnabled()){
+        if(logger.isInfoEnabled()){
             long requestId = id.incrementAndGet();
             request = new RequestWrapper(requestId, request);
             response = new ResponseWrapper(requestId, response);
@@ -87,7 +87,7 @@ public class LoggingFilter extends OncePerRequestFilter {
 //            response.flushBuffer();
         }
         finally {
-            if(logger.isDebugEnabled()){
+            if(logger.isInfoEnabled()){
                 logRequest(request);
                 logResponse((ResponseWrapper)response);
             }
@@ -140,7 +140,7 @@ public class LoggingFilter extends OncePerRequestFilter {
             }
 
         }
-        logger.debug(msg.toString());
+        logger.info(msg.toString());
     }
 
     private boolean isMultipart(final HttpServletRequest request) {
@@ -172,7 +172,7 @@ public class LoggingFilter extends OncePerRequestFilter {
         } catch (UnsupportedEncodingException e) {
             logger.warn("Failed to parse response payload", e);
         }
-        logger.debug(msg.toString());
+        logger.info(msg.toString());
     }
     /**
      * Created by Jonathan Sauder (jonathan.sauder@student.hpi.de) on 11.12.15.
