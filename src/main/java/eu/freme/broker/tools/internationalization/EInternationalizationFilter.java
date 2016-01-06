@@ -17,7 +17,12 @@
  */
 package eu.freme.broker.tools.internationalization;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -39,7 +44,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import eu.freme.broker.exception.BadRequestException;
@@ -52,7 +56,7 @@ import eu.freme.i18n.okapi.nif.converter.ConversionException;
  * Filter that converts HTML and XLIFF input to NIF and changes the informat
  * parameter. It also performs roundtripping, e.g. to convert HTML to NIF and
  * then back to HTML.
- * 
+ *
  * @author Jan Nehring - jan.nehring@dfki.de
  */
 
@@ -116,7 +120,7 @@ public class EInternationalizationFilter implements Filter {
 	/**
 	 * Determines format of request. Returns null if the format is not suitable
 	 * for eInternationalization Filter.
-	 * 
+	 *
 	 * @param req
 	 * @return
 	 */
@@ -143,7 +147,7 @@ public class EInternationalizationFilter implements Filter {
 	/**
 	 * Determines format of request. Returns null if the format is not suitable
 	 * for eInternationalization Filter.
-	 * 
+	 *
 	 * @param req
 	 * @return
 	 */
@@ -168,7 +172,7 @@ public class EInternationalizationFilter implements Filter {
 	}
 
 	public void doFilter(ServletRequest req, ServletResponse res,
-			FilterChain chain) throws IOException, ServletException {
+						 FilterChain chain) throws IOException, ServletException {
 
 		if (!(req instanceof HttpServletRequest)
 				|| !(res instanceof HttpServletResponse)) {
@@ -289,32 +293,8 @@ public class EInternationalizationFilter implements Filter {
 			chain.doFilter(bssr, dummyResponse);
 
 			ServletOutputStream sos = httpResponse.getOutputStream();
-			byte[] data;
-			if (dummyResponse.getStatus()==HttpStatus.OK.value()) {
-				data = dummyResponse.writeBackToClient();
-			} else {
-				OutputStream stream = dummyResponse.getResponse().getOutputStream();
-				dummyResponse.getBufferSize();
 
-				/*
-
-				BufferedInputStream is = new BufferedInputStream(new ReaderInputStream(
-						reader));
-				byte[] buffer = new byte[1024];
-				int read = 0;
-				long length = 0;
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				while ((read = is.read(buffer)) != -1) {
-					length += read;
-					baos.write(buffer, 0, read);
-				}
-				is.close();
-				setContentLengthLong(length);
-
-				return baos.toByteArray();
-				*/
-			}
-			data=null;
+			byte[] data = dummyResponse.writeBackToClient();
 			httpResponse.setContentLength(data.length);
 			sos.write(data);
 			sos.flush();

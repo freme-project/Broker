@@ -106,7 +106,7 @@ public class EInternationalizationTest extends EServiceTest {
 
 		assertEquals(response.getStatus(), 200);
 		assertTrue(response.getBody().length() > 0);
-		
+
 		String longHtml = FileUtils.readFileToString(new File(
 				"src/test/resources/e-internationalization/long-html.html"));
 		response = Unirest
@@ -133,13 +133,13 @@ public class EInternationalizationTest extends EServiceTest {
 		assertEquals(response.getStatus(), 200);
 		assertTrue(response.getBody().length() > 0);
 	}
-	
+
 	@Test
 	public void testOdt() throws IOException, UnirestException{
-		
+
 		File file = new File("src/test/resources/e-internationalization/odt-test.odt");
 		byte[] data = FileUtils.readFileToByteArray(file);
-		
+
 		HttpResponse<String> response = Unirest
 				.post(super.getBaseUrl() + "/e-entity/freme-ner/documents")
 				.queryString("language", "en")
