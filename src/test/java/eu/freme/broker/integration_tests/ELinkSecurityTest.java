@@ -305,7 +305,7 @@ public class ELinkSecurityTest extends EServiceTest {
     public int getAllTemplates(List<Long> expectedIDs, String token) throws UnirestException, IOException {
         HttpResponse<String> response;
 
-        response = addAuthentication(get("templates"), token)
+        response = addAuthentication(get("manage"), token)
                 .queryString("outformat", "json").asString();
 
 
@@ -328,7 +328,7 @@ public class ELinkSecurityTest extends EServiceTest {
     public long createTemplate(String template, String token) throws Exception {
         //String query = readFile(filename);
 
-        HttpResponse<String> response = addAuthentication(post("templates"), token)
+        HttpResponse<String> response = addAuthentication(post("manage"), token)
                 .queryString("informat", "json")
                 .queryString("outformat", "json")
                 .body(template)//constructTemplate("Some label", template, mockupEnrichUrl, "Some description", "sparql", visibility))
@@ -350,7 +350,7 @@ public class ELinkSecurityTest extends EServiceTest {
     //Tests GET e-link/templates/
     public int getTemplate(long id, String token) throws UnirestException, IOException {
 
-        HttpResponse<String> response = addAuthentication(get("templates/" + id), token)
+        HttpResponse<String> response = addAuthentication(get("manage/" + id), token)
                 .queryString("outformat", "json").asString();
         if (response.getStatus() == HttpStatus.OK.value()) {
             validateNIFResponse(response, RDFConstants.RDFSerialization.JSON);
@@ -363,12 +363,12 @@ public class ELinkSecurityTest extends EServiceTest {
     public int updateTemplate(long id, String token, String template, String owner) throws IOException, UnirestException {
         //String query = readFile(filename);
 
-        HttpRequestWithBody request = addAuthentication(put("templates/" + id), token)
+        HttpRequestWithBody request = addAuthentication(put("manage/" + id), token)
                 .queryString("informat", "json")
                 .queryString("outformat", "json")
                         //.queryString("visibility", visibility)
                         //.queryString("type", type)
-                .queryString("owner", owner);
+                .queryString("newOwner", owner);
 
         HttpResponse<String> response;
         if(template!=null)
@@ -403,7 +403,7 @@ public class ELinkSecurityTest extends EServiceTest {
 
     //Tests DELETE e-link/templates/
     public int deleteTemplate(long id, String token) throws UnirestException {
-        HttpResponse<String> response = addAuthentication(delete("templates/" + id), token)
+        HttpResponse<String> response = addAuthentication(delete("manage/" + id), token)
                 .asString();
         return response.getStatus();
     }

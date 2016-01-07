@@ -53,7 +53,8 @@ public class FilterControllerTest extends EServiceTest {
     @Test
     public void testFilterManagement() throws UnirestException {
         logger.info("create filter1");
-        HttpResponse<String> response = addAuthentication(post("manage/filter1"), getTokenWithPermission())
+        HttpResponse<String> response = addAuthentication(post("manage"), getTokenWithPermission())
+                .queryString("entityId", "filter1")
                 .body(filterSelect)
                 .asString();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
@@ -77,7 +78,8 @@ public class FilterControllerTest extends EServiceTest {
         assertEquals(filterConstruct, json.getString("query"));
 
         logger.info("create filter2");
-        response = addAuthentication(post("manage/filter2"), getTokenWithPermission())
+        response = addAuthentication(post("manage"), getTokenWithPermission())
+                .queryString("entityId", "filter2")
                 .body(filterSelect)
                 .asString();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
@@ -101,13 +103,15 @@ public class FilterControllerTest extends EServiceTest {
     @Test
     public void testFiltering() throws Exception {
         logger.info("create filter1");
-        HttpResponse<String> response = addAuthentication(post("manage/filter1"), getTokenWithPermission())
+        HttpResponse<String> response = addAuthentication(post("manage"), getTokenWithPermission())
+                .queryString("entityId", "filter1")
                 .body(filterSelect)
                 .asString();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
 
         logger.info("create filter2");
-        response = addAuthentication(post("manage/filter2"), getTokenWithPermission())
+        response = addAuthentication(post("manage"), getTokenWithPermission())
+                .queryString("entityId", "filter2")
                 .body(filterConstruct)
                 .asString();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
@@ -177,14 +181,15 @@ public class FilterControllerTest extends EServiceTest {
     @Test
     public void testFilteringWithELink() throws Exception {
 
-        logger.info("create filter1");
-        HttpResponse<String> response = addAuthentication(post("manage/filter1"), getTokenWithPermission())
+        HttpResponse<String> response = addAuthentication(post("manage"), getTokenWithPermission())
+                .queryString("entityId", "filter1")
                 .body(filterSelect)
                 .asString();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
 
         logger.info("create filter2");
-        response = addAuthentication(post("manage/filter2"), getTokenWithPermission())
+        response = addAuthentication(post("manage"), getTokenWithPermission())
+                .queryString("entityId", "filter2")
                 .body(filterConstruct)
                 .asString();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
