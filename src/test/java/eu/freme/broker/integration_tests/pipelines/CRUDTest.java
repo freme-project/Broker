@@ -111,41 +111,41 @@ public class CRUDTest extends PipelinesCommon {
 		deleteTemplate(getTokenWithOutPermission(), pipeline4.getId(), HttpStatus.SC_OK);
 	}
 
-	@Test
-	public void testAllMethods() throws UnirestException {
-
-		// create 2 templates
-		Pipeline pipeline1 = createDefaultTemplate(getTokenWithPermission(), OwnedResource.Visibility.PUBLIC);
-		SerializedRequest nerRequest = RequestFactory.createEntityFremeNER("en", "dbpedia");
-		SerializedRequest translateRequest = RequestFactory.createTranslation("en", "fr");
-		Pipeline pipeline2 = createTemplate(getTokenWithPermission(), OwnedResource.Visibility.PRIVATE, "NER-Translate", "Apply FRENE NER and then e-Translate", nerRequest, translateRequest);
-
-		// list the pipelines
-		List<Pipeline> pipelines = readTemplates(getTokenWithPermission());
-		assertEquals(pipeline1, pipelines.get(0));
-		assertEquals(pipeline2, pipelines.get(1));
-
-		// read individual pipelines
-		Pipeline storedPipeline1 = readTemplate(getTokenWithPermission(), pipeline1.getId());
-		Pipeline storedPipeline2 = readTemplate(getTokenWithPermission(), pipeline2.getId());
-		assertEquals(pipeline1, storedPipeline1);
-		assertEquals(pipeline2, storedPipeline2);
-
-		// use pipelines
-		String contents = "The Atomium in Brussels is the symbol of Belgium.";
-		sendRequest(getTokenWithPermission(), HttpStatus.SC_OK, pipeline1.getId(), contents, RDFConstants.RDFSerialization.PLAINTEXT);
-		sendRequest(getTokenWithPermission(), HttpStatus.SC_OK, pipeline2.getId(), contents, RDFConstants.RDFSerialization.PLAINTEXT);
-
-		// update pipeline 1
-		pipeline1.setVisibility(OwnedResource.Visibility.PRIVATE.name());
-		updateTemplate(getTokenWithPermission(), pipeline1, HttpStatus.SC_OK);
-		storedPipeline1 = readTemplate(getTokenWithPermission(), pipeline1.getId());
-		assertEquals(pipeline1, storedPipeline1);
-
-		// delete pipelines
-		deleteTemplate(getTokenWithPermission(), pipeline1.getId(), HttpStatus.SC_OK);
-		deleteTemplate(getTokenWithPermission(), pipeline2.getId(), HttpStatus.SC_OK);
-	}
+//	@Test
+//	public void testAllMethods() throws UnirestException {
+//
+//		// create 2 templates
+//		Pipeline pipeline1 = createDefaultTemplate(getTokenWithPermission(), OwnedResource.Visibility.PUBLIC);
+//		SerializedRequest nerRequest = RequestFactory.createEntityFremeNER("en", "dbpedia");
+//		SerializedRequest translateRequest = RequestFactory.createTranslation("en", "fr");
+//		Pipeline pipeline2 = createTemplate(getTokenWithPermission(), OwnedResource.Visibility.PRIVATE, "NER-Translate", "Apply FRENE NER and then e-Translate", nerRequest, translateRequest);
+//
+//		// list the pipelines
+//		List<Pipeline> pipelines = readTemplates(getTokenWithPermission());
+//		assertEquals(pipeline1, pipelines.get(0));
+//		assertEquals(pipeline2, pipelines.get(1));
+//
+//		// read individual pipelines
+//		Pipeline storedPipeline1 = readTemplate(getTokenWithPermission(), pipeline1.getId());
+//		Pipeline storedPipeline2 = readTemplate(getTokenWithPermission(), pipeline2.getId());
+//		assertEquals(pipeline1, storedPipeline1);
+//		assertEquals(pipeline2, storedPipeline2);
+//
+//		// use pipelines
+//		String contents = "The Atomium in Brussels is the symbol of Belgium.";
+//		sendRequest(getTokenWithPermission(), HttpStatus.SC_OK, pipeline1.getId(), contents, RDFConstants.RDFSerialization.PLAINTEXT);
+//		sendRequest(getTokenWithPermission(), HttpStatus.SC_OK, pipeline2.getId(), contents, RDFConstants.RDFSerialization.PLAINTEXT);
+//
+//		// update pipeline 1
+//		pipeline1.setVisibility(OwnedResource.Visibility.PRIVATE.name());
+//		updateTemplate(getTokenWithPermission(), pipeline1, HttpStatus.SC_OK);
+//		storedPipeline1 = readTemplate(getTokenWithPermission(), pipeline1.getId());
+//		assertEquals(pipeline1, storedPipeline1);
+//
+//		// delete pipelines
+//		deleteTemplate(getTokenWithPermission(), pipeline1.getId(), HttpStatus.SC_OK);
+//		deleteTemplate(getTokenWithPermission(), pipeline2.getId(), HttpStatus.SC_OK);
+//	}
 
 	@Test
 	public void testDeleteNonExisting() throws UnirestException {

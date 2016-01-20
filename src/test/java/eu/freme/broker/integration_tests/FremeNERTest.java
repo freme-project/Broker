@@ -56,46 +56,46 @@ public class FremeNERTest extends EServiceTest {
         return super.get(function);
     }
 
-    @Test
-    public void testDatasetManagement() throws UnirestException , IOException {
-        String testDataset=readFile("src/test/resources/e-entity/small-dataset-rdfs.nt");
-        String testUpdatedDataset=readFile("src/test/resources/e-entity/small-dataset.nt");
-
-        String testDatasetName = "integration-test-dataset";
-
-        logger.info("check if the test-dataset is already available (via get request)...");
-        loggerIgnore("eu.freme.broker.exception.ExternalServiceFailedException || EXCEPTION ~=org.springframework.web.client.HttpClientErrorException");
-        HttpResponse<String> response= get("datasets/"+testDatasetName).asString();
-        loggerUnignore("eu.freme.broker.exception.ExternalServiceFailedException || EXCEPTION ~=org.springframework.web.client.HttpClientErrorException");
-        if (response.getStatus()!=200) {
-            logger.info("assume the test-dataset is not available yet, create it...");
-            response= post("datasets")
-                    .queryString("informat", "n-triples")
-                    .queryString("description","Test-Description")
-                    .queryString("language","en")
-                    .queryString("name",testDatasetName)
-                    .body(testDataset)
-                    .asString();
-            assertTrue(response.getStatus()<=201);
-        }
-        logger.info("query the test-dataset...");
-        response= get("datasets/"+testDatasetName)
-                .queryString("outformat","turtle").asString();
-        assertTrue(response.getStatus()==200);
-        /*
-        TODO:Fix PUT e-entity/datasets/{dataset-name}
-        response=put("datasets/"+testDatasetName)
-                .queryString("informat","n-triples")
-                .queryString("language","en")
-                .body(testUpdatedDataset).asString();
-
-        */
-        logger.info("delete the test-dataset...");
-        response= delete("datasets/" + testDatasetName).asString();
-        assertTrue(response.getStatus()==200);
-
-
-    }
+//    @Test
+//    public void testDatasetManagement() throws UnirestException , IOException {
+//        String testDataset=readFile("src/test/resources/e-entity/small-dataset-rdfs.nt");
+//        String testUpdatedDataset=readFile("src/test/resources/e-entity/small-dataset.nt");
+//
+//        String testDatasetName = "integration-test-dataset";
+//
+//        logger.info("check if the test-dataset is already available (via get request)...");
+//        loggerIgnore("eu.freme.broker.exception.ExternalServiceFailedException || EXCEPTION ~=org.springframework.web.client.HttpClientErrorException");
+//        HttpResponse<String> response= get("datasets/"+testDatasetName).asString();
+//        loggerUnignore("eu.freme.broker.exception.ExternalServiceFailedException || EXCEPTION ~=org.springframework.web.client.HttpClientErrorException");
+//        if (response.getStatus()!=200) {
+//            logger.info("assume the test-dataset is not available yet, create it...");
+//            response= post("datasets")
+//                    .queryString("informat", "n-triples")
+//                    .queryString("description","Test-Description")
+//                    .queryString("language","en")
+//                    .queryString("name",testDatasetName)
+//                    .body(testDataset)
+//                    .asString();
+//            assertTrue(response.getStatus()<=201);
+//        }
+//        logger.info("query the test-dataset...");
+//        response= get("datasets/"+testDatasetName)
+//                .queryString("outformat","turtle").asString();
+//        assertTrue(response.getStatus()==200);
+//        /*
+//        TODO:Fix PUT e-entity/datasets/{dataset-name}
+//        response=put("datasets/"+testDatasetName)
+//                .queryString("informat","n-triples")
+//                .queryString("language","en")
+//                .body(testUpdatedDataset).asString();
+//
+//        */
+//        logger.info("delete the test-dataset...");
+//        response= delete("datasets/" + testDatasetName).asString();
+//        assertTrue(response.getStatus()==200);
+//
+//
+//    }
 
     @Test
     public void TestFremeNER() throws UnirestException, IOException, UnsupportedEncodingException {

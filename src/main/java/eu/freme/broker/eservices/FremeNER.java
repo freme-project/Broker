@@ -177,9 +177,9 @@ public class FremeNER extends BaseRestController {
                 // input is sent as value of the input parameter
                 docForProcessing = nifParameters.getInput();
                 
-                if(rMode.size() == 1 && rMode.contains("link")) {
-                    throw new eu.freme.broker.exception.BadRequestException("Unsupported mode combination: you must provide NIF in order to perform only linking.");
-                }
+//                if(rMode.size() == 1 && rMode.contains("link")) {
+//                    throw new eu.freme.broker.exception.BadRequestException("Unsupported mode combination: you must provide NIF in order to perform only linking.");
+//                }
                 
             } else {
                 // input is sent as body of the request

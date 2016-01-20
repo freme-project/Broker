@@ -34,15 +34,15 @@ public class EntityLinkTranslationTest extends PipelinesCommon {
      * All should go well.
      * @throws UnirestException
      */
-    @Test
-    public void testSomethingThatWorks() throws UnirestException {
-        String data = "The Belfry in Ghent is one of the oldest buildings in Belgium.";
-        SerializedRequest entityRequest = RequestFactory.createEntitySpotlight(data, "en");
-        SerializedRequest linkRequest = RequestFactory.createLink("3");	// Geo pos
-        SerializedRequest translateRequest = RequestFactory.createTranslation("en", "fr");
-
-        sendRequest(HttpStatus.SC_OK, entityRequest, linkRequest, translateRequest);
-    }
+//    @Test
+//    public void testSomethingThatWorks() throws UnirestException {
+//        String data = "The Belfry in Ghent is one of the oldest buildings in Belgium.";
+//        SerializedRequest entityRequest = RequestFactory.createEntitySpotlight(data, "en");
+//        SerializedRequest linkRequest = RequestFactory.createLink("3");	// Geo pos
+//        SerializedRequest translateRequest = RequestFactory.createTranslation("en", "fr");
+//
+//        sendRequest(HttpStatus.SC_OK, entityRequest, linkRequest, translateRequest);
+//    }
 
     /**
      * e-Entity using FREME NER, e-Link using template 3 (Geo pos), and e-Translate en -> nl on two paragraphs.
