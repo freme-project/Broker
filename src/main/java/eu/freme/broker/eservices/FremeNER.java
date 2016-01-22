@@ -87,10 +87,15 @@ public class FremeNER extends BaseRestController {
 			@RequestParam(value = "numLinks", required = false) String numLinksParam,
 			@RequestParam(value = "enrichement", required = false) String enrichementType,
 			@RequestParam(value = "mode", required = false) String mode,
+			@RequestParam(value = "domain", required = false) String domain,
+			@RequestParam(value = "types", required = false) String types,
 			@RequestParam(value = "datasetKey", required = false) String datasetKey,
             @RequestParam Map<String,String> allParams,
             @RequestBody(required = false) String postBody) {
         try {
+            
+//            System.out.println(domain);
+//            System.out.println(types);
             
             // Check the language parameter.
            if(!SUPPORTED_LANGUAGES.contains(language)){
@@ -212,7 +217,7 @@ public class FremeNER extends BaseRestController {
             }
             
 
-                String fremeNERRes = entityAPI.callFremeNER(docForProcessing, language, nifParameters.getPrefix(), dataset, numLinks, rMode, nifParameters.getInformat().contentType());
+                String fremeNERRes = entityAPI.callFremeNER(docForProcessing, language, nifParameters.getPrefix(), dataset, numLinks, rMode, nifParameters.getInformat().contentType(), domain, types);
                 outModel.read(new ByteArrayInputStream(fremeNERRes.getBytes()), null, "TTL");
                 outModel.add(inModel);
                 HashMap<String, String> templateParams = new HashMap<>();
