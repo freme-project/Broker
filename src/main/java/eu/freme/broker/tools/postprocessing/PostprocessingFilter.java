@@ -1,5 +1,6 @@
 package eu.freme.broker.tools.postprocessing;
 
+import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -55,14 +56,18 @@ public class PostprocessingFilter implements Filter {
             HttpServletResponse httpResponse = (HttpServletResponse) res;
 
             // get requested format of response
-            RDFConstants.RDFSerialization outType = rdfSerializationFormats.get(httpRequest.getParameter("outformat"));
-            if(outType == null)
-                outType = rdfSerializationFormats.get(httpRequest.getParameter("o"));
-            if(outType == null)
-                outType = RDFConstants.RDFSerialization.fromValue(httpRequest.getHeader("Accept"));
+            String outTypeString = httpRequest.getParameter("outformat");
+            if(Strings.isNullOrEmpty(outTypeString))
+                outTypeString = httpRequest.getParameter("o");
+            if(Strings.isNullOrEmpty(outTypeString))
+                outTypeString = httpRequest.getHeader("Accept").split(";")[0];
 
-            if(outType == null){
-                throw new BadRequestException("Can not use filter: "+req.getParameter("filter")+" with outformat/Accept-header: " + httpRequest.getParameter("outformat")+"/"+httpRequest.getHeader("Accept"));
+            RDFConstants.RDFSerialization outType = RDFConstants.RDFSerialization.CSV;
+            if (!Strings.isNullOrEmpty(outTypeString)) {
+                outType = rdfSerializationFormats.get(outTypeString);
+                if(outType == null)
+                    throw new BadRequestException("Can not use filter: " + req.getParameter("filter") + " with outformat/Accept-header: " + httpRequest.getParameter("outformat") + "/" + httpRequest.getHeader("Accept"));
+
             }
 
             // set Accept header for original request to turtle
