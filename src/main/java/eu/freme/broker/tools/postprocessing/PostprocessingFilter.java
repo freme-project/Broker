@@ -59,11 +59,11 @@ public class PostprocessingFilter implements Filter {
             String outTypeString = httpRequest.getParameter("outformat");
             if(Strings.isNullOrEmpty(outTypeString))
                 outTypeString = httpRequest.getParameter("o");
-            if(Strings.isNullOrEmpty(outTypeString))
+            if(Strings.isNullOrEmpty(outTypeString) && !httpRequest.getHeader("Accept").equals("*/*"))
                 outTypeString = httpRequest.getHeader("Accept").split(";")[0];
 
             RDFConstants.RDFSerialization outType = RDFConstants.RDFSerialization.CSV;
-            if (!Strings.isNullOrEmpty(outTypeString) || outTypeString.toLowerCase().startsWith("null") || outTypeString.contains("*/*")) {
+            if (!Strings.isNullOrEmpty(outTypeString)) {
                 outType = rdfSerializationFormats.get(outTypeString);
                 if(outType == null)
                     throw new BadRequestException("Can not use filter: " + req.getParameter("filter") + " with outformat/Accept-header: " + httpRequest.getParameter("outformat") + "/" + httpRequest.getHeader("Accept"));
