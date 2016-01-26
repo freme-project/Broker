@@ -63,7 +63,7 @@ public class PostprocessingFilter implements Filter {
                 outTypeString = httpRequest.getHeader("Accept").split(";")[0];
 
             RDFConstants.RDFSerialization outType = RDFConstants.RDFSerialization.CSV;
-            if (!Strings.isNullOrEmpty(outTypeString)) {
+            if (!Strings.isNullOrEmpty(outTypeString) || outTypeString.toLowerCase().startsWith("null") || outTypeString.contains("*/*")) {
                 outType = rdfSerializationFormats.get(outTypeString);
                 if(outType == null)
                     throw new BadRequestException("Can not use filter: " + req.getParameter("filter") + " with outformat/Accept-header: " + httpRequest.getParameter("outformat") + "/" + httpRequest.getHeader("Accept"));
