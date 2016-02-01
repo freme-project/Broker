@@ -4,21 +4,25 @@ import com.google.common.base.Strings;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.FREMEHttpException;
 import eu.freme.broker.tools.ExceptionHandlerService;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConversionService;
 import eu.freme.common.conversion.rdf.RDFSerializationFormats;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,6 +32,7 @@ import java.util.TreeMap;
  */
 @Component
 @Profile("broker")
+@Order(9)
 public class PostprocessingFilter implements Filter {
 
     private Logger logger = Logger.getLogger(PostprocessingFilter.class);
@@ -48,7 +53,6 @@ public class PostprocessingFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-
         if (!(req instanceof HttpServletRequest) || !(res instanceof HttpServletResponse) || req.getParameter("filter")==null) {
             chain.doFilter(req, res);
         }else{
@@ -73,7 +77,7 @@ public class PostprocessingFilter implements Filter {
             // set Accept header for original request to turtle
             Map<String, String[]> extraParams = new TreeMap<>();
             // delete outformat parameter
-            extraParams.put("outformat", null);//new String[]{"turtle"});
+            extraParams.put("outformat", new String[]{"turtle"});//new String[]{"turtle"});
             Map<String, String[]> extraHeaders = new TreeMap<>();
             extraHeaders.put("Accept", new String[]{RDFConstants.RDFSerialization.TURTLE.contentType()});
             HttpServletRequest wrappedRequest = new ModifiableParametersWrappedRequest(httpRequest, extraParams,extraHeaders);
