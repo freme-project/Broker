@@ -7,6 +7,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.broker.exception.FREMEHttpException;
+import eu.freme.broker.exception.InternalServerErrorException;
 import eu.freme.broker.tools.ExceptionHandlerService;
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConversionService;
@@ -90,46 +91,68 @@ public class PostprocessingFilter implements Filter {
 
 
             String responseContent = new String(wrappedResponse.getDataStream());
-            String responseContentType;
+            String responseContentType = RDFConstants.RDFSerialization.JSON.contentType();
+
+            int responseStatus;
 
             //// manipulate responseContent here
-            try {
-                String baseUrl = String.format("%s://%s:%d", httpRequest.getScheme(), httpRequest.getServerName(), httpRequest.getServerPort());
+            String baseUrl = String.format("%s://%s:%d", httpRequest.getScheme(), httpRequest.getServerName(), httpRequest.getServerPort());
 
-                HttpResponse<String> response = Unirest
-                        .post(baseUrl + "/toolbox/filter/documents/" + req.getParameter("filter"))
+            HttpResponse<String> response = null;
+            JSONObject errorResponse = new JSONObject();
+            String url = "/toolbox/filter/documents/" + req.getParameter("filter");
+            try {
+
+                response = Unirest
+                        .post(baseUrl + url)
                         .header("Content-Type", RDFConstants.RDFSerialization.TURTLE.contentType())
                         .header("Accept", outType.contentType())
                         .body(responseContent)
                         .asString();
 
+                responseStatus = response.getStatus();
+
                 if (response.getStatus() != HttpStatus.OK.value()) {
-                    JSONObject jsonObj = new JSONObject(response.getBody());
-                    String errorMessage = jsonObj.getString("message");
-                    throw new FREMEHttpException(
-                            "Postprocessing filter failed with status code: "
-                                    + response.getStatus() + " (" + response.getStatusText() + "): "+errorMessage,
-                            HttpStatus.valueOf(response.getStatus()));
+
+                    errorResponse = new JSONObject(response.getBody());
+                    String errorMessage = errorResponse.getString("message");
+
+                    errorResponse.put("message", "Postprocessing filter failed with status code: "
+                            + response.getStatus() + " (" + response.getStatusText() + "). " + errorMessage);
+
+                    responseContent = errorResponse.toString();
+
+                } else {
+                    responseContent = response.getBody();
+                    responseContentType = response.getHeaders().getFirst("Content-Type");
                 }
-
-                responseContent = response.getBody();
-                responseContentType = response.getHeaders().getFirst("Content-Type");
-
-            } catch (JSONException e){
-                throw new FREMEHttpException(
-                        "Postprocessing with filter: "+req.getParameter("filter")+" failed. Could not parse body of json error response.");
+            } catch (JSONException e) {
+                errorResponse.put("exception", e.getClass());
+                errorResponse.put("path", url);
+                errorResponse.put("message", "Postprocessing with filter: " + req.getParameter("filter") + " failed. Could not parse body of json error response.");
+                errorResponse.put("error", "Internal Server Error");
+                errorResponse.put("status", 500);
+                errorResponse.put("timestamp", System.currentTimeMillis());
+                responseContent = errorResponse.toString();
             } catch (UnirestException e) {
-                throw new FREMEHttpException(e.getMessage());
+                errorResponse.put("exception", e.getClass());
+                errorResponse.put("path", url);
+                errorResponse.put("message", "Could not call filter endpoint");
+                errorResponse.put("error", "Internal Server Error");
+                errorResponse.put("status", 500);
+                errorResponse.put("timestamp", System.currentTimeMillis());
+                responseContent = errorResponse.toString();
             }
+
             ////
 
-            byte[] responseToSend = responseContent.getBytes();
+            byte[] responseToSendBytes = responseContent.getBytes();
 
             httpResponse.setContentType(responseContentType);
-            httpResponse.setContentLength(responseToSend.length);
+            httpResponse.setContentLength(responseToSendBytes.length);
 
             ServletOutputStream outputStream = res.getOutputStream();
-            outputStream.write(responseToSend);
+            outputStream.write(responseToSendBytes);
             outputStream.flush();
             outputStream.close();
 
