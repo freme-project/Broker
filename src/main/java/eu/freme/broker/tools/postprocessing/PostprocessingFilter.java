@@ -13,6 +13,8 @@ import eu.freme.common.conversion.rdf.RDFConversionService;
 import eu.freme.common.conversion.rdf.RDFSerializationFormats;
 
 import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
@@ -95,22 +97,27 @@ public class PostprocessingFilter implements Filter {
                 String baseUrl = String.format("%s://%s:%d", httpRequest.getScheme(), httpRequest.getServerName(), httpRequest.getServerPort());
 
                 HttpResponse<String> response = Unirest
-                        .post(baseUrl + "/toolbox/filter/documents/"+req.getParameter("filter"))
+                        .post(baseUrl + "/toolbox/filter/documents/" + req.getParameter("filter"))
                         .header("Content-Type", RDFConstants.RDFSerialization.TURTLE.contentType())
                         .header("Accept", outType.contentType())
                         .body(responseContent)
                         .asString();
 
                 if (response.getStatus() != HttpStatus.OK.value()) {
+                    JSONObject jsonObj = new JSONObject(response.getBody());
+                    String errorMessage = jsonObj.getString("message");
                     throw new FREMEHttpException(
                             "Postprocessing filter failed with status code: "
-                                    + response.getStatus() + " (" + response.getStatusText() + ")",
+                                    + response.getStatus() + " (" + response.getStatusText() + "): "+errorMessage,
                             HttpStatus.valueOf(response.getStatus()));
                 }
 
                 responseContent = response.getBody();
                 responseContentType = response.getHeaders().getFirst("Content-Type");
 
+            } catch (JSONException e){
+                throw new FREMEHttpException(
+                        "Postprocessing with filter: "+req.getParameter("filter")+" failed. Could not parse body of json error response.");
             } catch (UnirestException e) {
                 throw new FREMEHttpException(e.getMessage());
             }

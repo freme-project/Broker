@@ -14,6 +14,7 @@ import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 import eu.freme.common.exception.FREMEHttpException;
 import eu.freme.broker.tools.NIFParameterSet;
 import eu.freme.common.conversion.rdf.RDFConstants;
+import eu.freme.common.exception.OwnedResourceNotFoundException;
 import eu.freme.common.persistence.dao.FilterDAO;
 import eu.freme.common.persistence.dao.UserDAO;
 import eu.freme.common.persistence.model.Filter;
@@ -109,7 +110,9 @@ public class FilterController extends BaseRestController {
                     .contentType());
             return new ResponseEntity<>(serialization, responseHeaders,
                     HttpStatus.OK);
-
+        }catch (OwnedResourceNotFoundException ex){
+            logger.error(ex.getMessage());
+            throw ex;
         }catch (BadRequestException ex){
             logger.error(ex.getMessage());
             throw ex;
