@@ -58,77 +58,81 @@ public class PostprocessingFilter implements Filter {
         if (!(req instanceof HttpServletRequest) || !(res instanceof HttpServletResponse) || req.getParameter("filter")==null) {
             chain.doFilter(req, res);
         }else{
+            JSONObject errorResponse = new JSONObject();
+            String responseContent = null;
+            String responseContentType = RDFConstants.RDFSerialization.JSON.contentType();
+            String filterUrl = "/toolbox/filter/documents/" + req.getParameter("filter");
             HttpServletRequest httpRequest = (HttpServletRequest) req;
             HttpServletResponse httpResponse = (HttpServletResponse) res;
 
-            // get requested format of response
-            String outTypeString = httpRequest.getParameter("outformat");
-            if(Strings.isNullOrEmpty(outTypeString))
-                outTypeString = httpRequest.getParameter("o");
-            if(Strings.isNullOrEmpty(outTypeString) && !httpRequest.getHeader("Accept").equals("*/*"))
-                outTypeString = httpRequest.getHeader("Accept").split(";")[0];
-
-            RDFConstants.RDFSerialization outType = RDFConstants.RDFSerialization.CSV;
-            if (!Strings.isNullOrEmpty(outTypeString)) {
-                outType = rdfSerializationFormats.get(outTypeString);
-                if(outType == null)
-                    throw new BadRequestException("Can not use filter: " + req.getParameter("filter") + " with outformat/Accept-header: " + httpRequest.getParameter("outformat") + "/" + httpRequest.getHeader("Accept"));
-
-            }
-
-            // set Accept header for original request to turtle
-            Map<String, String[]> extraParams = new TreeMap<>();
-            // delete outformat parameter
-            extraParams.put("outformat", new String[]{"turtle"});//new String[]{"turtle"});
-            Map<String, String[]> extraHeaders = new TreeMap<>();
-            extraHeaders.put("Accept", new String[]{RDFConstants.RDFSerialization.TURTLE.contentType()});
-            HttpServletRequest wrappedRequest = new ModifiableParametersWrappedRequest(httpRequest, extraParams,extraHeaders);
-
-            // wrap the response to allow later modification
-            AccessibleHttpServletResponseWrapper wrappedResponse = new AccessibleHttpServletResponseWrapper(httpResponse);
-
-            chain.doFilter(wrappedRequest, wrappedResponse);
-
-
-            String responseContent = new String(wrappedResponse.getDataStream());
-            String responseContentType = RDFConstants.RDFSerialization.JSON.contentType();
-
-            int responseStatus;
-
-            //// manipulate responseContent here
-            String baseUrl = String.format("%s://%s:%d", httpRequest.getScheme(), httpRequest.getServerName(), httpRequest.getServerPort());
-
-            HttpResponse<String> response = null;
-            JSONObject errorResponse = new JSONObject();
-            String url = "/toolbox/filter/documents/" + req.getParameter("filter");
             try {
 
-                response = Unirest
-                        .post(baseUrl + url)
-                        .header("Content-Type", RDFConstants.RDFSerialization.TURTLE.contentType())
-                        .header("Accept", outType.contentType())
-                        .body(responseContent)
-                        .asString();
+                // get requested format of response
+                String outTypeString = httpRequest.getParameter("outformat");
+                if(Strings.isNullOrEmpty(outTypeString))
+                    outTypeString = httpRequest.getParameter("o");
+                if(Strings.isNullOrEmpty(outTypeString) && !Strings.isNullOrEmpty(httpRequest.getHeader("Accept")) && !httpRequest.getHeader("Accept").equals("*/*"))
+                    outTypeString = httpRequest.getHeader("Accept").split(";")[0];
 
-                responseStatus = response.getStatus();
+                RDFConstants.RDFSerialization outType = RDFConstants.RDFSerialization.CSV;
+                if (!Strings.isNullOrEmpty(outTypeString)) {
+                    outType = rdfSerializationFormats.get(outTypeString);
+                    if(outType == null)
+                        throw new BadRequestException("Can not use filter: " + req.getParameter("filter") + " with outformat: "+httpRequest.getParameter("outformat")+" or Accept-header: " + httpRequest.getHeader("Accept"));
 
-                if (response.getStatus() != HttpStatus.OK.value()) {
+                }
 
-                    errorResponse = new JSONObject(response.getBody());
-                    String errorMessage = errorResponse.getString("message");
+                // set Accept header for original request to turtle
+                Map<String, String[]> extraParams = new TreeMap<>();
+                // delete outformat parameter
+                extraParams.put("outformat", new String[]{"turtle"});//new String[]{"turtle"});
+                Map<String, String[]> extraHeaders = new TreeMap<>();
+                extraHeaders.put("Accept", new String[]{RDFConstants.RDFSerialization.TURTLE.contentType()});
+                HttpServletRequest wrappedRequest = new ModifiableParametersWrappedRequest(httpRequest, extraParams,extraHeaders);
 
-                    errorResponse.put("message", "Postprocessing filter failed with status code: "
-                            + response.getStatus() + " (" + response.getStatusText() + "). " + errorMessage);
+                // wrap the response to allow later modification
+                AccessibleHttpServletResponseWrapper wrappedResponse = new AccessibleHttpServletResponseWrapper(httpResponse);
 
-                    responseContent = errorResponse.toString();
 
-                } else {
-                    responseContent = response.getBody();
-                    responseContentType = response.getHeaders().getFirst("Content-Type");
+                chain.doFilter(wrappedRequest, wrappedResponse);
+                String originalResponseContent = new String(wrappedResponse.getDataStream());
+
+                // postprocess only, if original request was successful
+                if(wrappedResponse.getStatus()!=HttpStatus.OK.value()) {
+                    responseContent = originalResponseContent;
+                }else{
+
+                    //// manipulate responseContent here
+                    String baseUrl = String.format("%s://%s:%d", httpRequest.getScheme(), httpRequest.getServerName(), httpRequest.getServerPort());
+
+                    HttpResponse<String> response = null;
+
+
+                    response = Unirest
+                            .post(baseUrl + filterUrl)
+                            .header("Content-Type", RDFConstants.RDFSerialization.TURTLE.contentType())
+                            .header("Accept", outType.contentType())
+                            .body(originalResponseContent)
+                            .asString();
+
+                    if (response.getStatus() != HttpStatus.OK.value()) {
+
+                        errorResponse = new JSONObject(response.getBody());
+                        String errorMessage = errorResponse.getString("message");
+
+                        errorResponse.put("message", "Postprocessing filter failed with status code: "
+                                + response.getStatus() + " (" + response.getStatusText() + "). " + errorMessage);
+
+                        responseContent = errorResponse.toString();
+
+                    } else {
+                        responseContent = response.getBody();
+                        responseContentType = response.getHeaders().getFirst("Content-Type");
+                    }
                 }
             } catch (JSONException e) {
                 errorResponse.put("exception", e.getClass());
-                errorResponse.put("path", url);
+                errorResponse.put("path", filterUrl);
                 errorResponse.put("message", "Postprocessing with filter: " + req.getParameter("filter") + " failed. Could not parse body of json error response.");
                 errorResponse.put("error", "Internal Server Error");
                 errorResponse.put("status", 500);
@@ -136,8 +140,16 @@ public class PostprocessingFilter implements Filter {
                 responseContent = errorResponse.toString();
             } catch (UnirestException e) {
                 errorResponse.put("exception", e.getClass());
-                errorResponse.put("path", url);
+                errorResponse.put("path", filterUrl);
                 errorResponse.put("message", "Could not call filter endpoint");
+                errorResponse.put("error", "Internal Server Error");
+                errorResponse.put("status", 500);
+                errorResponse.put("timestamp", System.currentTimeMillis());
+                responseContent = errorResponse.toString();
+            } catch (Exception e){
+                errorResponse.put("exception", e.getClass());
+                errorResponse.put("path", filterUrl);
+                errorResponse.put("message", e.getMessage());
                 errorResponse.put("error", "Internal Server Error");
                 errorResponse.put("status", 500);
                 errorResponse.put("timestamp", System.currentTimeMillis());
