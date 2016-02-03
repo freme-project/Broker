@@ -134,7 +134,7 @@ public class PostprocessingFilter implements Filter {
             } catch (JSONException e) {
                 errorResponse.put("exception", e.getClass());
                 errorResponse.put("path", filterUrl);
-                errorResponse.put("message", "Postprocessing with filter: " + req.getParameter("filter") + " failed. Could not parse body of json error response.");
+                errorResponse.put("message", "Postprocessing with filter: " + req.getParameter("filter") + " failed. Can not parse body of json error response.");
                 errorResponse.put("error", "Internal Server Error");
                 errorResponse.put("status", 500);
                 errorResponse.put("timestamp", System.currentTimeMillis());
@@ -142,7 +142,7 @@ public class PostprocessingFilter implements Filter {
             } catch (UnirestException e) {
                 errorResponse.put("exception", e.getClass());
                 errorResponse.put("path", filterUrl);
-                errorResponse.put("message", "Could not call filter endpoint");
+                errorResponse.put("message", "Can not call filter endpoint");
                 errorResponse.put("error", "Internal Server Error");
                 errorResponse.put("status", 500);
                 errorResponse.put("timestamp", System.currentTimeMillis());
