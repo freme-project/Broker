@@ -75,7 +75,7 @@ public class TildeETranslation extends BaseRestController {
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "domain", defaultValue = "") String domain,
 			@RequestParam(value = "system", defaultValue = "full") String system,
-			@RequestHeader(value = "key", required= false) String key
+			@RequestParam(value = "key", required= false) String key
 	) {
 
 		// merge long and short parameters - long parameters override short
