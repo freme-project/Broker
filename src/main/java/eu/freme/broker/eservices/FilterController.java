@@ -57,7 +57,7 @@ public class FilterController extends BaseRestController {
             @PathVariable("filterName") String filterName,
             @RequestHeader(value = "Accept", required = false) String acceptHeader,
             @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
-            @RequestBody String postBody,
+            @RequestBody(required = false) String postBody,
             @RequestParam Map<String, String> allParams
     ){
         try {
@@ -192,12 +192,12 @@ public class FilterController extends BaseRestController {
             @RequestParam(value = "visibility", required = false) String visibility,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "newOwner", required = false) String ownerName,
-            @RequestBody String postBody
+            @RequestBody(required = false) String postBody
     ){
         try {
             Filter filter = filterDAO.findOneByName(filterName);
 
-            if(!Strings.isNullOrEmpty(postBody) && !postBody.trim().isEmpty() && !postBody.trim().toLowerCase().equals("null") && !postBody.trim().toLowerCase().equals("empty")){
+            if(!Strings.isNullOrEmpty(postBody)){
                 filter.setQuery(postBody);
             }
 
