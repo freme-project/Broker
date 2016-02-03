@@ -3,10 +3,7 @@ package eu.freme.broker.eservices;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.base.Strings;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
+import com.hp.hpl.jena.query.*;
 import com.hp.hpl.jena.rdf.model.Model;
 import eu.freme.broker.exception.BadRequestException;
 import eu.freme.common.conversion.rdf.JenaRDFConversionService;
@@ -137,9 +134,9 @@ public class FilterController extends BaseRestController {
     ){
         try {
 
-            Filter filter = ((FilterRepository)filterDAO.getRepository()).findOneByName(filterName);
-            if(filter!=null)
-                throw new FREMEHttpException("Can not add filter: Filter with name: "+filterName+" already exists.");
+            Filter filter = ((FilterRepository) filterDAO.getRepository()).findOneByName(filterName);
+            if (filter != null)
+                throw new FREMEHttpException("Can not add filter: Filter with name: " + filterName + " already exists.");
 
             filter = new Filter(OwnedResource.Visibility.getByString(visibility), filterName, postBody, description);
             filter = filterDAO.save(filter);
@@ -149,6 +146,9 @@ public class FilterController extends BaseRestController {
             String serialization = ow.writeValueAsString(filter);
             responseHeaders.add("Content-Type", RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (QueryParseException ex){
+            logger.error(ex.getMessage());
+            throw new BadRequestException("Could not parse SPARQL query. "+ex.getMessage());
         }catch (AccessDeniedException ex){
             logger.error(ex.getMessage());
             throw new eu.freme.broker.exception.AccessDeniedException(ex.getMessage());
@@ -224,6 +224,9 @@ public class FilterController extends BaseRestController {
             String serialization = ow.writeValueAsString(filter);
             responseHeaders.add("Content-Type", RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (QueryParseException ex){
+            logger.error(ex.getMessage());
+            throw new BadRequestException("Could not parse SPARQL query. "+ex.getMessage());
         }catch (AccessDeniedException ex){
             logger.error(ex.getMessage());
             throw new eu.freme.broker.exception.AccessDeniedException(ex.getMessage());
