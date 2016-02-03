@@ -35,6 +35,7 @@ import java.util.TreeMap;
  */
 @Component
 @Profile("broker")
+@Order(10)
 public class PostprocessingFilter implements Filter {
 
     private Logger logger = Logger.getLogger(PostprocessingFilter.class);

@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import eu.freme.broker.exception.BadRequestException;
@@ -62,6 +63,7 @@ import eu.freme.i18n.okapi.nif.converter.ConversionException;
 
 @Component
 @Profile("broker")
+@Order(11)
 public class EInternationalizationFilter implements Filter {
 
 	/**
