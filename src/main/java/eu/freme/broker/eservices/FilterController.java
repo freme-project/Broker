@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,7 +70,7 @@ public class FilterController extends BaseRestController {
                     nifParameters.getInput(), nifParameters.getInformat());
 
             String serialization = null;
-            switch (filter.getQueryType()){
+            switch (filter.getQueryType()) {
                 case Query.QueryTypeConstruct:
                     Model resultModel = filter.getFilteredModel(model);
                     serialization = rdfConversionService.serializeRDF(resultModel,
@@ -79,7 +80,7 @@ public class FilterController extends BaseRestController {
                     ResultSet resultSet = filter.getFilteredResultSet(model);
                     // write to a ByteArrayOutputStream
                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    switch (nifParameters.getOutformat()){
+                    switch (nifParameters.getOutformat()) {
                         case CSV:
                             ResultSetFormatter.outputAsCSV(outputStream, resultSet);
                             break;
@@ -97,7 +98,7 @@ public class FilterController extends BaseRestController {
                             ResultSetFormatter.outputAsRDF(outputStream, jenaRDFConversionService.getJenaType(nifParameters.getOutformat()), resultSet);
                             break;
                         default:
-                            throw new BadRequestException("Unsupported output format for resultset(SELECT) query: "+nifParameters.getOutformat()+". Only JSON, CSV, XML and RDF types are supported.");
+                            throw new BadRequestException("Unsupported output format for resultset(SELECT) query: " + nifParameters.getOutformat() + ". Only JSON, CSV, XML and RDF types are supported.");
                     }
                     serialization = new String(outputStream.toByteArray());
                     break;
@@ -110,6 +111,9 @@ public class FilterController extends BaseRestController {
                     .contentType());
             return new ResponseEntity<>(serialization, responseHeaders,
                     HttpStatus.OK);
+        }catch (AccessDeniedException ex){
+            logger.error(ex.getMessage());
+            throw new eu.freme.broker.exception.AccessDeniedException(ex.getMessage());
         }catch (OwnedResourceNotFoundException ex){
             logger.error(ex.getMessage());
             throw ex;
@@ -145,6 +149,9 @@ public class FilterController extends BaseRestController {
             String serialization = ow.writeValueAsString(filter);
             responseHeaders.add("Content-Type", RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (AccessDeniedException ex){
+            logger.error(ex.getMessage());
+            throw new eu.freme.broker.exception.AccessDeniedException(ex.getMessage());
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
             throw ex;
@@ -166,6 +173,9 @@ public class FilterController extends BaseRestController {
             String serialization = ow.writeValueAsString(filter);
             responseHeaders.add("Content-Type", RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (AccessDeniedException ex){
+            logger.error(ex.getMessage());
+            throw new eu.freme.broker.exception.AccessDeniedException(ex.getMessage());
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
             throw ex;
@@ -214,6 +224,9 @@ public class FilterController extends BaseRestController {
             String serialization = ow.writeValueAsString(filter);
             responseHeaders.add("Content-Type", RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (AccessDeniedException ex){
+            logger.error(ex.getMessage());
+            throw new eu.freme.broker.exception.AccessDeniedException(ex.getMessage());
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
             throw ex;
@@ -232,6 +245,9 @@ public class FilterController extends BaseRestController {
             Filter filter = filterDAO.findOneByName(filterName);
             filterDAO.delete(filter);
             return new ResponseEntity<>("The template was sucessfully removed.", HttpStatus.OK);
+        }catch (AccessDeniedException ex){
+            logger.error(ex.getMessage());
+            throw new eu.freme.broker.exception.AccessDeniedException(ex.getMessage());
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
             throw ex;
@@ -252,6 +268,9 @@ public class FilterController extends BaseRestController {
             String serialization = ow.writeValueAsString(filters);
             responseHeaders.add("Content-Type", RDFSerialization.JSON.contentType());
             return new ResponseEntity<>(serialization, responseHeaders, HttpStatus.OK);
+        }catch (AccessDeniedException ex){
+            logger.error(ex.getMessage());
+            throw new eu.freme.broker.exception.AccessDeniedException(ex.getMessage());
         }catch (FREMEHttpException ex){
             logger.error(ex.getMessage());
             throw ex;
