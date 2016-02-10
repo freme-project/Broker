@@ -1,6 +1,42 @@
 FREME Changelog
 
 ---------------------------
+FREME 0.5 - 10.02.2016
+---------------------------
+
+General features
+
+* Speed Testing of FREME NER
+* Rate limiting of FREME APIs
+* Work on architecture update
+* Implementation of HTTP Monitoring of all FREME API endpoints and external services
+* Create post processing filter to simplify output of FREME through SPARQL filters
+* Specify batch processing tool
+
+FREME NER
+
+* Linking for a single entity
+* Exchange FREME NER database with MySQL
+* Make FREME NER a Java API
+* Remove dependency on Gerbil
+* Improve linking algorithm
+* Add grid dataset
+
+e-Internationalization
+* Improve stability and bugfixes
+
+Datasets
+* Convert dataset
+* Work on data management plan
+
+e-Publishing
+* Implement the semantic eBook
+
+Documentation
+* Add more articles / improve articles
+* Add demos / show cases, e.g. screencasts, screenshots, Javascript demos
+
+---------------------------
 FREME 0.4 - 12.11.2015
 ---------------------------
 
