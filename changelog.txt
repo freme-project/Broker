@@ -21,6 +21,7 @@ FREME NER
 * Remove dependency on Gerbil
 * Improve linking algorithm
 * Add grid dataset
+* Add domain parameter for domain specific NER
 
 e-Internationalization
 * Improve stability and bugfixes
