@@ -15,7 +15,7 @@
 	<groupId>eu.freme</groupId>
 	<artifactId>Broker</artifactId>
 	<inceptionYear>2015</inceptionYear>
-	<version>0.6-SNAPSHOT</version>
+	<version>0.51</version>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
