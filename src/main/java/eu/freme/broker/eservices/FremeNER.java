@@ -60,7 +60,7 @@ public class FremeNER extends BaseRestController {
     @Autowired
     DataEnricher dataEnricher;
     
-    @Value("${freme.ner.api-endpoint:http://rv2622.1blu.de:8080/api}")
+    @Value("${freme.ner.api-endpoint:http://rv2622.1blu.de:8081/api}")
     String fremeNerEndpoint;
 
     public final Set<String> SUPPORTED_LANGUAGES = new HashSet<>(Arrays.asList(new String[]{
