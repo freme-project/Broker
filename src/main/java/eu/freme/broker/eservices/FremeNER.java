@@ -250,7 +250,7 @@ public class FremeNER extends BaseRestController {
             @RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 			@RequestParam(value = "name", required = true) String name,
 			@RequestParam(value = "description", required = true) String description,
-			@RequestParam(value = "language", required = true) String language,
+			@RequestParam(value = "language", required = false) String language,
 			//@RequestParam(value = "informat", required = false) String informat,
 			//@RequestParam(value = "f", required = false) String f,
 			@RequestParam(value = "endpoint", required = false) String endpoint,
@@ -259,9 +259,11 @@ public class FremeNER extends BaseRestController {
             @RequestBody(required = false) String postBody) {
 
         try {
-            if (!SUPPORTED_LANGUAGES.contains(language)) {
-                // The language specified with the langauge parameter is not supported.
-                throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
+            if(language != null) {
+                if (!SUPPORTED_LANGUAGES.contains(language)) {
+                    // The language specified with the langauge parameter is not supported.
+                    throw new eu.freme.broker.exception.BadRequestException("Unsupported language.");
+                }
             }
 
             // first check if user wants to submit data via SPARQL
@@ -301,10 +303,16 @@ public class FremeNER extends BaseRestController {
                         + "&sparql=" + URLEncoder.encode(sparql, "UTF-8"), HttpMethod.POST, null);
             } else {
                 // datasets is sent
-                return callBackend(fremeNerEndpoint+"/datasets?format=" + format
-                        + "&name=" + name
-                        + "&description=" + URLEncoder.encode(description, "UTF-8")
-                        + "&language=" + language, HttpMethod.POST, nifParameters.getInput());
+                if(language != null) {
+                    return callBackend(fremeNerEndpoint+"/datasets?format=" + format
+                            + "&name=" + name
+                            + "&description=" + URLEncoder.encode(description, "UTF-8")
+                            + "&language=" + language, HttpMethod.POST, nifParameters.getInput());
+                } else {
+                    return callBackend(fremeNerEndpoint+"/datasets?format=" + format
+                            + "&name=" + name
+                            + "&description=" + URLEncoder.encode(description, "UTF-8") , HttpMethod.POST, nifParameters.getInput());
+                }
             }
         } catch(Exception e){
             logger.error(e.getMessage(), e);
@@ -389,6 +397,7 @@ public class FremeNER extends BaseRestController {
 
 
     private ResponseEntity<String> callBackend(String uri, HttpMethod method, String body) {
+        
         RestTemplate restTemplate = new RestTemplate();
         try {
             if(body == null) {
