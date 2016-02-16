@@ -55,7 +55,7 @@ public class TildeETranslation extends BaseRestController {
 	@Autowired
 	TranslationConversionService translationConversionService;
 
-	@Value("${freme.broker.tildeETranslationUrl:https://servicsdafes.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}}")
+	@Value("${freme.broker.tildeETranslationUrl:https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}}")
 	private String endpoint;// = "https://services.tilde.com/translation/?sourceLang={source-lang}&targetLang={target-lang}";
 
 	@RequestMapping(value = "/e-translation/tilde", method = RequestMethod.POST)
@@ -75,7 +75,7 @@ public class TildeETranslation extends BaseRestController {
 			@RequestParam(value = "target-lang") String targetLang,
 			@RequestParam(value = "domain", defaultValue = "") String domain,
 			@RequestParam(value = "system", defaultValue = "full") String system,
-			@RequestHeader(value = "key", required= false) String key
+			@RequestParam(value = "key", required= false) String key
 	) {
 
 		// merge long and short parameters - long parameters override short
