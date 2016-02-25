@@ -404,7 +404,14 @@ public class FremeNER extends BaseRestController {
             if(body == null) {
                 return restTemplate.exchange(new URI(uri), method, null, String.class);
             } else {
-                return restTemplate.exchange(new URI(uri), method, new HttpEntity<String>(body), String.class);
+                ResponseEntity<String> response = restTemplate.exchange(new URI(uri), method, new HttpEntity<String>(body), String.class);
+                
+                if(response.getStatusCode() == HttpStatus.CONFLICT) {
+                    throw new eu.freme.broker.exception.BadRequestException("Dataset with this name already existis and it cannot be created.");
+                } else {
+                    return response;
+                }
+//                return restTemplate.exchange(new URI(uri), method, new HttpEntity<String>(body), String.class);
             }
         } catch (RestClientException rce) {
             logger.error("failed", rce);
