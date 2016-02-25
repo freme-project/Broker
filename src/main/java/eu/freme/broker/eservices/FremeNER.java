@@ -42,6 +42,7 @@ import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
 @Profile("broker")
@@ -412,6 +413,12 @@ public class FremeNER extends BaseRestController {
                     return response;
                 }
 //                return restTemplate.exchange(new URI(uri), method, new HttpEntity<String>(body), String.class);
+            }
+        } catch (HttpClientErrorException rce) {
+            if(rce.getStatusCode() == HttpStatus.CONFLICT) {
+                throw new eu.freme.broker.exception.BadRequestException("Dataset with this name already existis and it cannot be created.");
+            } else {
+                throw new eu.freme.broker.exception.ExternalServiceFailedException(rce.getMessage());
             }
         } catch (RestClientException rce) {
             logger.error("failed", rce);
