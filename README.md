@@ -1,5 +1,7 @@
 # FREME Broker
 
+**This repository is deprecated. It has moved to [freme-packages repository](https://github.com/freme-project/freme-packages).**
+
 This repository hosts the Broker of the FREME project. 
 
 ## Useful links
