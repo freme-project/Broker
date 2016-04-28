@@ -6,8 +6,7 @@ FREME 0.6 - 28.04.2016
 
 * Implemented first version of batch processing tool
 * Architecture update
-* Implemented dataset security
-* Implemented dataset security
+* Allow creation of private datasets
 * Wrote 10 new articles for the documentation
 * Restructured knowledge base section of documentation homepage
 
